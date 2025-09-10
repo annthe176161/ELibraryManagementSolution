@@ -1,8 +1,168 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Trang Chủ";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+<!-- Hero Section -->
+<section id="home" class="hero">
+    <div class="hero-container">
+        <div class="hero-content">
+            <h1>Chào Mừng Đến Với Thư Viện Điện Tử</h1>
+            <p>Khám phá thế giới tri thức với hàng nghìn đầu sách chất lượng.
+                Đọc sách mọi lúc mọi nơi với hệ thống quản lý hiện đại.</p>
+            <div class="hero-buttons">
+                <a href="#features" class="btn btn-primary">Khám Phá</a>
+                <a href="@Url.Action("Index", "Account", new { area = "" })" class="btn btn-secondary">Đăng Ký</a>
+            </div>
+        </div>
+        <div class="hero-image">
+            <i class="fas fa-book-open"></i>
+        </div>
+    </div>
+</section>
+
+<!-- About Section -->
+<section id="about" class="about">
+    <div class="content-wrapper">
+        <div class="section-header">
+            <h2>Giới Thiệu Về Chúng Tôi</h2>
+            <p>Hệ thống thư viện điện tử hiện đại phục vụ cộng đồng</p>
+        </div>
+        <div class="about-content">
+            <div class="about-text">
+                <h3>Thư Viện Điện Tử ELibrary</h3>
+                <p>Chúng tôi cung cấp một nền tảng quản lý thư viện hiện đại, giúp bạn dễ dàng tìm kiếm, mượn và trả
+                    sách. Với công nghệ tiên tiến và giao diện thân thiện, trải nghiệm đọc sách của bạn sẽ trở nên thú
+                    vị hơn bao giờ hết.</p>
+                <ul class="about-list">
+                    <li><i class="fas fa-check-circle"></i> Hàng nghìn đầu sách đa dạng thể loại</li>
+                    <li><i class="fas fa-check-circle"></i> Quản lý mượn trả sách dễ dàng</li>
+                    <li><i class="fas fa-check-circle"></i> Giao diện thân thiện, dễ sử dụng</li>
+                    <li><i class="fas fa-check-circle"></i> Hỗ trợ tìm kiếm thông minh</li>
+                </ul>
+            </div>
+            <div class="about-stats">
+                <div class="stat-item">
+                    <div class="stat-number">10,000+</div>
+                    <div class="stat-label">Đầu Sách</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">5,000+</div>
+                    <div class="stat-label">Thành Viên</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">50,000+</div>
+                    <div class="stat-label">Lượt Mượn</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section id="features" class="features">
+    <div class="content-wrapper">
+        <div class="section-header">
+            <h2>Tính Năng Nổi Bật</h2>
+            <p>Khám phá các tính năng tuyệt vời của hệ thống</p>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-search"></i>
+                </div>
+                <h3>Tìm Kiếm Thông Minh</h3>
+                <p>Tìm kiếm sách nhanh chóng với công cụ tìm kiếm thông minh, hỗ trợ tìm theo tên sách, tác giả, thể
+                    loại.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+                <h3>Quản Lý Mượn Trả</h3>
+                <p>Quản lý lịch sử mượn trả sách dễ dàng, theo dõi thời hạn trả sách và phí phạt khi quá hạn.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-user-friends"></i>
+                </div>
+                <h3>Quản Lý Thành Viên</h3>
+                <p>Hệ thống quản lý thông tin thành viên toàn diện, phân quyền người dùng và quản lý tài khoản.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-chart-bar"></i>
+                </div>
+                <h3>Báo Cáo Thống Kê</h3>
+                <p>Cung cấp các báo cáo thống kê chi tiết về tình hình mượn trả sách và hoạt động của thư viện.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-mobile-alt"></i>
+                </div>
+                <h3>Responsive Design</h3>
+                <p>Giao diện responsive, tương thích với mọi thiết bị từ máy tính đến điện thoại di động.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <h3>Bảo Mật Cao</h3>
+                <p>Hệ thống bảo mật cao, đảm bảo an toàn thông tin và quyền riêng tư của người dùng.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Contact Section -->
+<section id="contact" class="contact">
+    <div class="content-wrapper">
+        <div class="section-header">
+            <h2>Liên Hệ Với Chúng Tôi</h2>
+            <p>Chúng tôi luôn sẵn sàng hỗ trợ bạn</p>
+        </div>
+        <div class="contact-content">
+            <div class="contact-info">
+                <div class="contact-item">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <div>
+                        <h4>Địa Chỉ</h4>
+                        <p>123 Đường ABC, Quận XYZ, TP.HCM</p>
+                    </div>
+                </div>
+                <div class="contact-item">
+                    <i class="fas fa-phone"></i>
+                    <div>
+                        <h4>Điện Thoại</h4>
+                        <p>(028) 1234-5678</p>
+                    </div>
+                </div>
+                <div class="contact-item">
+                    <i class="fas fa-envelope"></i>
+                    <div>
+                        <h4>Email</h4>
+                        <p>info@elibrary.com</p>
+                    </div>
+                </div>
+                <div class="contact-item">
+                    <i class="fas fa-clock"></i>
+                    <div>
+                        <h4>Giờ Làm Việc</h4>
+                        <p>Thứ 2 - Thứ 6: 8:00 - 17:00<br>Thứ 7: 8:00 - 12:00</p>
+                    </div>
+                </div>
+            </div>
+            <form class="contact-form">
+                <div class="form-group">
+                    <input type="text" id="name" placeholder="Họ và tên" required>
+                </div>
+                <div class="form-group">
+                    <input type="email" id="email" placeholder="Email" required>
+                </div>
+                <div class="form-group">
+                    <textarea id="message" rows="5" placeholder="Nội dung tin nhắn" required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Gửi Tin Nhắn</button>
+            </form>
+        </div>
+    </div>
+</section>
