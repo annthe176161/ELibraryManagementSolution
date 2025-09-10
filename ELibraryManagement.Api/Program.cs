@@ -1,5 +1,7 @@
 
 using ELibraryManagement.Api.Data;
+using ELibraryManagement.Api.Services.Implementations;
+using ELibraryManagement.Api.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace ELibraryManagement.Api
@@ -13,6 +15,9 @@ namespace ELibraryManagement.Api
             // Add services to the container.
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+            // Register services
+            builder.Services.AddScoped<IBookService, BookService>();
 
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
