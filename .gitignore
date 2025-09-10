@@ -1,0 +1,64 @@
+# .NET Core
+bin/
+obj/
+
+# User-specific files
+*.user
+*.suo
+
+# Visual Studio
+.vs/
+.vscode/
+
+# NuGet packages
+packages/
+
+# Entity Framework Core
+*.db
+*.db-shm
+*.db-wal
+
+# Logs
+*.log
+logs/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Temporary files
+*.tmp
+*.temp
+
+# Build outputs
+*.exe
+*.dll
+*.pdb
+
+# ASP.NET Core
+appsettings.Development.json
+# Uncomment if you want to ignore appsettings.json (contains secrets)
+# appsettings.json
+
+# EF Migrations (uncomment if you don't want to push migrations)
+# Migrations/
+
+# Rider
+.idea/
+
+# Windows
+[Tt]humbs.db
+*.stackdump
+
+# macOS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db

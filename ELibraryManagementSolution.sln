@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36414.22 d17.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ELibraryManagement.Api", "ELibraryManagement.Api\ELibraryManagement.Api.csproj", "{633A9D88-36B1-43E5-BE39-398B6F30DC70}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ELibraryManagement.Web", "ELibraryManagement.Web\ELibraryManagement.Web.csproj", "{2C9D2468-E15C-4E8B-8A82-1A3FCCC87A66}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{633A9D88-36B1-43E5-BE39-398B6F30DC70}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{633A9D88-36B1-43E5-BE39-398B6F30DC70}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{633A9D88-36B1-43E5-BE39-398B6F30DC70}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{633A9D88-36B1-43E5-BE39-398B6F30DC70}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2C9D2468-E15C-4E8B-8A82-1A3FCCC87A66}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2C9D2468-E15C-4E8B-8A82-1A3FCCC87A66}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2C9D2468-E15C-4E8B-8A82-1A3FCCC87A66}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2C9D2468-E15C-4E8B-8A82-1A3FCCC87A66}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C9A63250-6D58-47AA-BABA-638B9C8BC9FA}
+	EndGlobalSection
+EndGlobal
