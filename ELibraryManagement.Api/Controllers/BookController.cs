@@ -8,6 +8,7 @@ namespace ELibraryManagement.Api.Controllers
     [ApiController]
     [Route("api/[controller]")]
     [Route("odata/[controller]")]
+    [Produces("application/json", "application/xml", "text/csv")]
     public class BookController : ControllerBase
     {
         private readonly IBookService _bookService;
