@@ -1,11 +1,13 @@
 using ELibraryManagement.Api.DTOs;
 using ELibraryManagement.Api.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OData.Query;
 
 namespace ELibraryManagement.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Route("odata/[controller]")]
     public class BookController : ControllerBase
     {
         private readonly IBookService _bookService;
@@ -19,9 +21,10 @@ namespace ELibraryManagement.Api.Controllers
         /// Lấy danh sách sách khả dụng trong thư viện
         /// </summary>
         [HttpGet("available")]
-        public async Task<IActionResult> GetAvailableBooks()
+        [EnableQuery]
+        public IActionResult GetAvailableBooks()
         {
-            var books = await _bookService.GetAvailableBooksAsync();
+            var books = _bookService.GetAvailableBooksQueryable();
             return Ok(books);
         }
 
@@ -29,6 +32,7 @@ namespace ELibraryManagement.Api.Controllers
         /// Lấy thông tin sách theo ID
         /// </summary>
         [HttpGet("{id}")]
+        [EnableQuery]
         public async Task<IActionResult> GetBookById(int id)
         {
             var book = await _bookService.GetBookByIdAsync(id);

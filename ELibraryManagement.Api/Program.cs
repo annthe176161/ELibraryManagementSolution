@@ -1,8 +1,11 @@
 
 using ELibraryManagement.Api.Data;
+using ELibraryManagement.Api.DTOs;
 using ELibraryManagement.Api.Services.Implementations;
 using ELibraryManagement.Api.Services.Interfaces;
+using Microsoft.AspNetCore.OData;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OData.ModelBuilder;
 
 namespace ELibraryManagement.Api
 {
@@ -19,7 +22,20 @@ namespace ELibraryManagement.Api
             // Register services
             builder.Services.AddScoped<IBookService, BookService>();
 
-            builder.Services.AddControllers();
+            // Add OData
+            var modelBuilder = new ODataConventionModelBuilder();
+            var books = modelBuilder.EntitySet<BookDto>("Books");
+            books.EntityType.HasMany(b => b.Categories);
+            builder.Services.AddControllers().AddOData(
+                options => options
+                    .Select()
+                    .Filter()
+                    .OrderBy()
+                    .Expand()
+                    .Count()
+                    .SetMaxTop(100)
+                    .AddRouteComponents("odata", modelBuilder.GetEdmModel())
+            );
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();

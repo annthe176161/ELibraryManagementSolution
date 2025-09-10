@@ -15,15 +15,37 @@ namespace ELibraryManagement.Api.Services.Implementations
             _context = context;
         }
 
-        public async Task<IEnumerable<BookDto>> GetAvailableBooksAsync()
+        public IQueryable<BookDto> GetAvailableBooksQueryable()
         {
-            var books = await _context.Books
+            return _context.Books
                 .Where(b => b.AvailableQuantity > 0 && !b.IsDeleted)
                 .Include(b => b.BookCategories)
                 .ThenInclude(bc => bc.Category)
-                .ToListAsync();
-
-            return books.Select(MapToDto);
+                .Select(b => new BookDto
+                {
+                    Id = b.Id,
+                    Title = b.Title,
+                    Author = b.Author,
+                    ISBN = b.ISBN,
+                    Publisher = b.Publisher,
+                    PublicationYear = b.PublicationYear,
+                    Description = b.Description,
+                    CoverImageUrl = b.CoverImageUrl,
+                    Quantity = b.Quantity,
+                    AvailableQuantity = b.AvailableQuantity,
+                    Price = b.Price,
+                    Language = b.Language,
+                    PageCount = b.PageCount,
+                    AverageRating = (float)b.AverageRating,
+                    RatingCount = b.RatingCount,
+                    Categories = b.BookCategories.Select(bc => new CategoryDto
+                    {
+                        Id = bc.Category.Id,
+                        Name = bc.Category.Name,
+                        Description = bc.Category.Description,
+                        Color = bc.Category.Color
+                    }).ToList()
+                });
         }
 
         public async Task<BookDto?> GetBookByIdAsync(int id)
@@ -34,11 +56,8 @@ namespace ELibraryManagement.Api.Services.Implementations
                 .ThenInclude(bc => bc.Category)
                 .FirstOrDefaultAsync();
 
-            return book != null ? MapToDto(book) : null;
-        }
+            if (book == null) return null;
 
-        private static BookDto MapToDto(Book book)
-        {
             return new BookDto
             {
                 Id = book.Id,

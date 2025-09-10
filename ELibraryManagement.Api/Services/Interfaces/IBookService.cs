@@ -4,7 +4,7 @@ namespace ELibraryManagement.Api.Services.Interfaces
 {
     public interface IBookService
     {
-        Task<IEnumerable<BookDto>> GetAvailableBooksAsync();
+        IQueryable<BookDto> GetAvailableBooksQueryable();
         Task<BookDto?> GetBookByIdAsync(int id);
     }
 }
