@@ -25,6 +25,17 @@ namespace ELibraryManagement.Api
             // Register services
             builder.Services.AddScoped<IBookService, BookService>();
 
+            // Add CORS
+            builder.Services.AddCors(options =>
+            {
+                options.AddPolicy("AllowWebApp", policy =>
+                {
+                    policy.WithOrigins("https://localhost:7208", "http://localhost:5224", "https://localhost:7125", "http://localhost:5293")
+                          .AllowAnyMethod()
+                          .AllowAnyHeader();
+                });
+            });
+
             // Add OData
             var modelBuilder = new ODataConventionModelBuilder();
             var books = modelBuilder.EntitySet<BookDto>("Books");
@@ -78,6 +89,9 @@ namespace ELibraryManagement.Api
             }
 
             app.UseHttpsRedirection();
+
+            // Enable CORS
+            app.UseCors("AllowWebApp");
 
             app.UseAuthorization();
 

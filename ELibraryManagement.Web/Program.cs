@@ -1,3 +1,5 @@
+using ELibraryManagement.Web.Services;
+
 namespace ELibraryManagement.Web
 {
     public class Program
@@ -8,6 +10,10 @@ namespace ELibraryManagement.Web
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+
+            // Add HttpClient for API calls
+            builder.Services.AddHttpClient<IBookApiService, BookApiService>();
+            builder.Services.AddScoped<IBookApiService, BookApiService>();
 
             var app = builder.Build();
 

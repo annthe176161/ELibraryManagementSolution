@@ -1,0 +1,118 @@
+@model List<ELibraryManagement.Web.Models.BookViewModel>
+@{
+    ViewData["Title"] = "Danh Sách Sách Khả Dụng";
+}
+
+<!-- Load CSS -->
+<link rel="stylesheet" href="~/css/books.css" asp-append-version="true">
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="mb-4">Danh Sách Sách Khả Dụng</h2>
+            
+            @if (Model.Any())
+            {
+                <div class="row">
+                    @foreach (var book in Model)
+                    {
+                        <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+                            <div class="card h-100 book-card">
+                                <div class="card-img-container">
+                                    @if (!string.IsNullOrEmpty(book.ImageUrl))
+                                    {
+                                        <img src="@book.ImageUrl" class="card-img-top" alt="@book.Title" 
+                                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                    }
+                                    <div class="placeholder-image" 
+                                         style="display: @(string.IsNullOrEmpty(book.ImageUrl) ? "flex" : "none");">
+                                        <i class="fas fa-book fa-3x"></i>
+                                        <span>Không có ảnh</span>
+                                    </div>
+                                </div>
+                                <div class="card-body d-flex flex-column">
+                                    <h5 class="card-title">@book.Title</h5>
+                                    <p class="card-text text-muted mb-1">
+                                        <i class="fas fa-user"></i> @book.Author
+                                    </p>
+                                    <p class="card-text text-muted mb-1">
+                                        <i class="fas fa-tag"></i> @book.CategoryName
+                                    </p>
+                                    <p class="card-text flex-grow-1">
+                                        @if (!string.IsNullOrEmpty(book.Description))
+                                        {
+                                            @(book.Description.Length > 100 ? book.Description.Substring(0, 100) + "..." : book.Description)
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">Không có mô tả</span>
+                                        }
+                                    </p>
+                                    <div class="book-info mt-auto">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <small class="text-success">
+                                                <i class="fas fa-copy"></i> Còn @book.AvailableCopies/@book.TotalCopies cuốn
+                                            </small>
+                                            @if (book.RentalPrice.HasValue && book.RentalPrice.Value > 0)
+                                            {
+                                                <small class="text-warning">
+                                                    <i class="fas fa-dollar-sign"></i> @book.RentalPrice.Value.ToString("N0") VND/ngày
+                                                </small>
+                                            }
+                                            else
+                                            {
+                                                <small class="text-info">
+                                                    <i class="fas fa-gift"></i> Miễn phí
+                                                </small>
+                                            }
+                                        </div>
+                                        @if (book.AvailableCopies > 0)
+                                        {
+                                            <button class="btn btn-primary btn-sm w-100" onclick="borrowBook(@book.Id)">
+                                                <i class="fas fa-book-reader"></i> Mượn sách
+                                            </button>
+                                        }
+                                        else
+                                        {
+                                            <button class="btn btn-secondary btn-sm w-100" disabled>
+                                                <i class="fas fa-ban"></i> Hết sách
+                                            </button>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-5">
+                    <i class="fas fa-book-open fa-3x text-muted mb-3"></i>
+                    <h4 class="text-muted">Không có sách khả dụng</h4>
+                    <p class="text-muted">Hiện tại chưa có sách nào trong thư viện hoặc đã hết sách.</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- Load FontAwesome if not already loaded -->
+@{
+    if (!ViewData.ContainsKey("FontAwesome"))
+    {
+        ViewData["FontAwesome"] = true;
+    }
+}
+
+@if (!ViewData.ContainsKey("FontAwesome"))
+{
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+}
+
+<script>
+function borrowBook(bookId) {
+    // TODO: Implement borrow functionality
+    alert('Tính năng mượn sách sẽ được triển khai sau. Book ID: ' + bookId);
+}
+</script>
