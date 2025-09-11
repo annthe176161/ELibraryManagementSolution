@@ -39,27 +39,6 @@ namespace ELibraryManagement.Web.Controllers
             }
         }
 
-        // DEBUG: Test authentication endpoint
-        public IActionResult TestAuth()
-        {
-            var isAuth = _authApiService.IsAuthenticated();
-            var token = _authApiService.GetCurrentToken();
-            var userName = _authApiService.GetCurrentUserName();
-
-            // Also check session directly
-            var sessionToken = HttpContext.Session.GetString("AuthToken");
-            var sessionUserName = HttpContext.Session.GetString("UserName");
-
-            ViewBag.IsAuthenticated = isAuth;
-            ViewBag.Token = token;
-            ViewBag.UserName = userName;
-            ViewBag.SessionToken = sessionToken;
-            ViewBag.SessionUserName = sessionUserName;
-            ViewBag.SessionId = HttpContext.Session.Id;
-
-            return View();
-        }
-
         // GET: Book/Borrow/5
         public async Task<IActionResult> Borrow(int id)
         {

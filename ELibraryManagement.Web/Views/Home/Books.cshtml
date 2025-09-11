@@ -210,63 +210,65 @@
                         }
 
                         <div class="book-info">
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <small class="availability @(book.AvailableCopies > 0 ? "text-success" : "text-danger")">
-                                    <i class="fas fa-copy"></i>
-                                    @if (book.AvailableCopies > 0)
+                            <div class="book-meta-grid">
+                                <div class="availability-section">
+                                    <small class="availability @(book.AvailableCopies > 0 ? "text-success" : "text-danger")">
+                                        <i class="fas fa-copy"></i>
+                                        @if (book.AvailableCopies > 0)
+                                        {
+                                            <span>Còn @book.AvailableCopies/@book.TotalCopies cuốn</span>
+                                        }
+                                        else
+                                        {
+                                            <span>Hết sách (@book.TotalCopies cuốn)</span>
+                                        }
+                                    </small>
+                                </div>
+
+                                <div class="price-section">
+                                    @if (book.RentalPrice.HasValue && book.RentalPrice.Value > 0)
                                     {
-                                        <span>Còn @book.AvailableCopies/@book.TotalCopies cuốn</span>
+                                        <small class="text-warning">
+                                            <i class="fas fa-money-bill-wave"></i>
+                                            @book.RentalPrice.Value.ToString("N0") VND/ngày
+                                        </small>
                                     }
                                     else
                                     {
-                                        <span>Hết sách (@book.TotalCopies cuốn)</span>
+                                        <small class="text-info">
+                                            <i class="fas fa-gift"></i>
+                                            Miễn phí
+                                        </small>
                                     }
-                                </small>
-
-                                @if (book.RentalPrice.HasValue && book.RentalPrice.Value > 0)
-                                {
-                                    <small class="text-warning">
-                                        <i class="fas fa-money-bill-wave"></i>
-                                        @book.RentalPrice.Value.ToString("N0") VND/ngày
-                                    </small>
-                                }
-                                else
-                                {
-                                    <small class="text-info">
-                                        <i class="fas fa-gift"></i>
-                                        Miễn phí
-                                    </small>
-                                }
+                                </div>
                             </div>
 
-                            @if (book.AvailableCopies > 0)
-                            {
-                                <div class="book-actions">
+                            <div class="book-actions-grid">
+                                @if (book.AvailableCopies > 0)
+                                {
                                     <a href="@Url.Action("BookDetail", "Home", new { id = book.Id })"
-                                        class="btn btn-info btn-sm me-2">
+                                        class="btn btn-info action-btn">
                                         <i class="fas fa-eye"></i>
                                         Chi Tiết
                                     </a>
-                                    <button class="btn btn-primary btn-sm" onclick="borrowBook(@book.Id, '@book.Title')">
+                                    <button class="btn btn-primary action-btn" onclick="borrowBook(@book.Id, '@book.Title')">
                                         <i class="fas fa-book-reader"></i>
                                         Mượn Ngay
                                     </button>
-                                </div>
-                            }
-                            else
-                            {
-                                <div class="book-actions">
+                                }
+                                else
+                                {
                                     <a href="@Url.Action("BookDetail", "Home", new { id = book.Id })"
-                                        class="btn btn-info btn-sm me-2">
+                                        class="btn btn-info action-btn">
                                         <i class="fas fa-eye"></i>
                                         Chi Tiết
                                     </a>
-                                    <button class="btn btn-secondary btn-sm" disabled>
+                                    <button class="btn btn-secondary action-btn" disabled>
                                         <i class="fas fa-ban"></i>
                                         Hết Sách
                                     </button>
-                                </div>
-                            }
+                                }
+                            </div>
                         </div>
                     </div>
                 </div>

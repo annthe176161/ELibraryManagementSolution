@@ -269,12 +269,113 @@
     padding-top: 15px;
 }
 
+/* Book Meta Grid - Sử dụng CSS Grid đơn giản */
+.book-meta-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 15px;
+    align-items: center;
+}
+
+.availability-section {
+    text-align: left;
+    min-width: 0; /* Cho phép text wrap */
+}
+
+.price-section {
+    text-align: right;
+    min-width: 0; /* Cho phép text wrap */
+}
+
 .availability {
-    display: flex;
+    display: inline-flex;
     align-items: center;
     gap: 5px;
     font-size: 0.9rem;
     font-weight: 500;
+    word-break: break-word;
+    hyphens: auto;
+}
+
+.price-section small {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    word-break: break-word;
+    hyphens: auto;
+    justify-content: flex-end;
+}
+
+/* Book Actions Grid - Hai nút trên cùng hàng */
+.book-actions-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+.action-btn {
+    padding: 8px 12px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    min-height: 36px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+    word-break: break-word;
+    white-space: normal;
+}
+
+.action-btn:hover {
+    transform: translateY(-1px);
+    text-decoration: none;
+}
+
+.action-btn:focus {
+    box-shadow: 0 0 0 2px rgba(218, 37, 30, 0.2);
+    outline: none;
+}
+
+.action-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.action-btn:disabled:hover {
+    transform: none;
+}
+
+/* Responsive cho mobile */
+@media (max-width: 576px) {
+    .book-meta-grid {
+        grid-template-columns: 1fr;
+        gap: 8px;
+    }
+    
+    .availability-section,
+    .price-section {
+        text-align: center;
+    }
+    
+    .book-actions-grid {
+        grid-template-columns: 1fr;
+        gap: 6px;
+    }
+    
+    .action-btn {
+        padding: 10px 15px;
+        font-size: 0.9rem;
+        min-height: 40px;
+    }
 }
 
 .text-success {
@@ -508,55 +609,4 @@
     text-decoration: underline;
     outline: 2px solid var(--golden-yellow);
     outline-offset: 2px;
-}
-
-/* ==== BOOK ACTIONS STYLES ==== */
-.book-actions {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    gap: 8px;
-}
-
-.book-actions .btn {
-    border-radius: 20px;
-    font-weight: 500;
-    transition: all 0.3s ease;
-    font-size: 0.85rem;
-    padding: 6px 15px;
-}
-
-.book-actions .btn-info {
-    background-color: #17a2b8;
-    border-color: #17a2b8;
-    color: white;
-}
-
-.book-actions .btn-info:hover {
-    background-color: #138496;
-    border-color: #117a8b;
-    transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba(23, 162, 184, 0.3);
-}
-
-.book-actions .btn-primary {
-    background: var(--gradient-bg);
-    border: none;
-}
-
-.book-actions .btn-primary:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba(218, 37, 30, 0.3);
-}
-
-@media (max-width: 576px) {
-    .book-actions {
-        justify-content: center;
-    }
-    
-    .book-actions .btn {
-        flex: 1;
-        min-width: 80px;
-    }
 }
