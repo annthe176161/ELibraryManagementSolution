@@ -43,5 +43,52 @@ namespace ELibraryManagement.Api.Controllers
             }
             return Ok(book);
         }
+
+        /// <summary>
+        /// Đặt sách (mượn sách)
+        /// </summary>
+        [HttpPost("borrow")]
+        public async Task<IActionResult> BorrowBook([FromBody] BorrowBookRequestDto request)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var result = await _bookService.BorrowBookAsync(request);
+
+            if (string.IsNullOrEmpty(result.Message) || !result.Message.Contains("successfully"))
+            {
+                return BadRequest(result);
+            }
+
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Lấy danh sách sách đã mượn của user
+        /// </summary>
+        [HttpGet("borrowed/{userId}")]
+        public async Task<IActionResult> GetBorrowedBooks(string userId)
+        {
+            var borrowedBooks = await _bookService.GetBorrowedBooksByUserAsync(userId);
+            return Ok(borrowedBooks);
+        }
+
+        /// <summary>
+        /// Trả sách
+        /// </summary>
+        [HttpPost("return/{borrowRecordId}")]
+        public async Task<IActionResult> ReturnBook(int borrowRecordId)
+        {
+            var result = await _bookService.ReturnBookAsync(borrowRecordId);
+
+            if (!result.Success)
+            {
+                return BadRequest(result);
+            }
+
+            return Ok(result);
+        }
     }
 }

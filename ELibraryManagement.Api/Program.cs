@@ -2,8 +2,10 @@
 using ELibraryManagement.Api.Data;
 using ELibraryManagement.Api.DTOs;
 using ELibraryManagement.Api.Formatters;
+using ELibraryManagement.Api.Models;
 using ELibraryManagement.Api.Services.Implementations;
 using ELibraryManagement.Api.Services.Interfaces;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData;
 using Microsoft.EntityFrameworkCore;
@@ -21,6 +23,11 @@ namespace ELibraryManagement.Api
             // Add services to the container.
             builder.Services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+            // Add Identity
+            builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
+                .AddEntityFrameworkStores<ApplicationDbContext>()
+                .AddDefaultTokenProviders();
 
             // Register services
             builder.Services.AddScoped<IBookService, BookService>();
@@ -93,6 +100,7 @@ namespace ELibraryManagement.Api
             // Enable CORS
             app.UseCors("AllowWebApp");
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
 

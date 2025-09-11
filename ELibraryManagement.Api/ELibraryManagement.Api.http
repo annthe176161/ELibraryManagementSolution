@@ -4,3 +4,52 @@ GET {{ELibraryManagement.Api_HostAddress}}/weatherforecast/
 Accept: application/json
 
 ###
+
+# Create test user for testing borrow functionality
+POST {{ELibraryManagement.Api_HostAddress}}/api/user/create-test-user
+Content-Type: application/json
+
+###
+
+# Get all users
+GET {{ELibraryManagement.Api_HostAddress}}/api/user
+Accept: application/json
+
+###
+
+# Get available books
+GET {{ELibraryManagement.Api_HostAddress}}/api/books/available
+Accept: application/json
+
+###
+
+# Get book by ID
+GET {{ELibraryManagement.Api_HostAddress}}/api/books/1
+Accept: application/json
+
+###
+
+# Borrow a book (replace user-id-here with actual user ID from create-test-user response)
+POST {{ELibraryManagement.Api_HostAddress}}/api/books/borrow
+Content-Type: application/json
+
+{
+  "bookId": 1,
+  "userId": "user-id-here",
+  "dueDate": "2025-09-25T00:00:00Z",
+  "notes": "Borrowing for study purposes"
+}
+
+###
+
+# Get borrowed books by user (replace user-id-here with actual user ID)
+GET {{ELibraryManagement.Api_HostAddress}}/api/books/borrowed/user-id-here
+Accept: application/json
+
+###
+
+# Return a book (replace borrow-record-id with actual ID from borrowed books response)
+POST {{ELibraryManagement.Api_HostAddress}}/api/books/return/1
+Content-Type: application/json
+
+###
