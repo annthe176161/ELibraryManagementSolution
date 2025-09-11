@@ -9,11 +9,13 @@ namespace ELibraryManagement.Web.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly IBookApiService _bookApiService;
+        private readonly IAuthApiService _authApiService;
 
-        public HomeController(ILogger<HomeController> logger, IBookApiService bookApiService)
+        public HomeController(ILogger<HomeController> logger, IBookApiService bookApiService, IAuthApiService authApiService)
         {
             _logger = logger;
             _bookApiService = bookApiService;
+            _authApiService = authApiService;
         }
 
         public IActionResult Index()
@@ -71,6 +73,10 @@ namespace ELibraryManagement.Web.Controllers
                 // Lấy sách liên quan (cùng thể loại)
                 var relatedBooks = await _bookApiService.GetRelatedBooksAsync(id, book.CategoryName);
                 ViewBag.RelatedBooks = relatedBooks ?? new List<BookViewModel>();
+
+                // Truyền thông tin authentication vào View
+                ViewBag.IsAuthenticated = _authApiService.IsAuthenticated();
+                ViewBag.AuthToken = _authApiService.GetCurrentToken();
 
                 return View(book);
             }

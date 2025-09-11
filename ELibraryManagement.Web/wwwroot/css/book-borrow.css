@@ -1,0 +1,207 @@
+/* Book Borrow Styles */
+.borrow-container {
+    min-height: calc(100vh - 80px);
+    background: linear-gradient(135deg, #f8fafc 0%, #e9ecef 100%);
+    padding-top: 20px;
+}
+
+.borrow-card {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+    padding: 40px;
+    margin-bottom: 30px;
+}
+
+.borrow-header {
+    text-align: center;
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 2px solid #f1f3f4;
+}
+
+.borrow-header h2 {
+    color: #2d3748;
+    font-weight: 700;
+    font-size: 2.2rem;
+    margin-bottom: 10px;
+}
+
+.book-info-section {
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
+    border-radius: 15px;
+    padding: 25px;
+    margin-bottom: 30px;
+    border: 1px solid rgba(102, 126, 234, 0.1);
+}
+
+.book-cover img {
+    border-radius: 10px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    width: 100%;
+    max-width: 150px;
+}
+
+.book-placeholder {
+    background: linear-gradient(135deg, #e9ecef, #f8f9fa);
+    border-radius: 10px;
+    padding: 40px 20px;
+    text-align: center;
+    color: #6c757d;
+    border: 2px dashed #dee2e6;
+}
+
+.book-details {
+    padding-left: 20px;
+}
+
+.book-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 10px;
+}
+
+.book-author {
+    color: #718096;
+    font-size: 1rem;
+    margin-bottom: 15px;
+}
+
+.rental-price {
+    font-size: 1.1rem;
+}
+
+.borrow-form {
+    background: #f8fafc;
+    border-radius: 15px;
+    padding: 30px;
+}
+
+.form-label {
+    font-weight: 600;
+    color: #2d3748;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+}
+
+.form-label i {
+    margin-right: 8px;
+    color: #667eea;
+}
+
+.form-control {
+    border: 2px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 12px 15px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.form-text {
+    color: #718096;
+    font-size: 0.9rem;
+    margin-top: 5px;
+}
+
+.terms-section {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid #e2e8f0;
+}
+
+.terms-section .alert-info {
+    background: linear-gradient(135deg, rgba(13, 202, 240, 0.1), rgba(13, 110, 253, 0.1));
+    border: 1px solid rgba(13, 202, 240, 0.2);
+    border-radius: 10px;
+}
+
+.terms-section ul {
+    padding-left: 20px;
+}
+
+.terms-section li {
+    margin-bottom: 5px;
+    color: #4a5568;
+}
+
+.form-check {
+    margin-top: 15px;
+}
+
+.form-check-input:checked {
+    background-color: #667eea;
+    border-color: #667eea;
+}
+
+.action-buttons {
+    text-align: center;
+    margin-top: 30px;
+}
+
+.action-buttons .btn {
+    font-weight: 600;
+    border-radius: 12px;
+    padding: 15px 30px;
+    font-size: 1.1rem;
+    transition: all 0.3s ease;
+}
+
+.action-buttons .btn-primary {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    border: none;
+    box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+}
+
+.action-buttons .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 15px 35px rgba(102, 126, 234, 0.4);
+}
+
+.action-buttons .btn-outline-secondary {
+    border: 2px solid #e2e8f0;
+    color: #4a5568;
+}
+
+.action-buttons .btn-outline-secondary:hover {
+    background: #f8fafc;
+    border-color: #cbd5e0;
+    transform: translateY(-1px);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .borrow-card {
+        padding: 25px 20px;
+        margin: 15px;
+    }
+    
+    .borrow-header h2 {
+        font-size: 1.8rem;
+    }
+    
+    .book-info-section {
+        padding: 20px;
+    }
+    
+    .book-details {
+        padding-left: 0;
+        margin-top: 20px;
+    }
+    
+    .borrow-form {
+        padding: 20px;
+    }
+    
+    .action-buttons .btn {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+}

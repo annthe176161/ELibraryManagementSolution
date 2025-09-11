@@ -1,0 +1,155 @@
+@model ELibraryManagement.Web.Models.BorrowBookViewModel
+@{
+    ViewData["Title"] = "Mượn sách - " + Model.BookTitle;
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/book-borrow.css" />
+}
+
+<div class="borrow-container">
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="borrow-card">
+                    <div class="borrow-header">
+                        <h2>
+                            <i class="fas fa-book-open me-2"></i>
+                            Mượn sách
+                        </h2>
+                        <p class="text-muted">Vui lòng xác nhận thông tin mượn sách</p>
+                    </div>
+
+                    <!-- Book Information -->
+                    <div class="book-info-section">
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="book-cover">
+                                    @if (!string.IsNullOrEmpty(Model.BookCoverUrl))
+                                    {
+                                        <img src="@Model.BookCoverUrl" alt="@Model.BookTitle" class="img-fluid rounded">
+                                    }
+                                    else
+                                    {
+                                        <div class="book-placeholder">
+                                            <i class="fas fa-book fa-3x"></i>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                            <div class="col-md-9">
+                                <div class="book-details">
+                                    <h4 class="book-title">@Model.BookTitle</h4>
+                                    <p class="book-author">
+                                        <i class="fas fa-user me-1"></i>
+                                        @Model.BookAuthor
+                                    </p>
+
+                                    @if (Model.RentalPrice.HasValue && Model.RentalPrice > 0)
+                                    {
+                                        <div class="rental-price">
+                                            <i class="fas fa-money-bill-wave text-success me-1"></i>
+                                            <strong class="text-success">Phí thuê: @Model.RentalPrice.Value.ToString("N0")
+                                                VNĐ</strong>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="rental-price">
+                                            <i class="fas fa-gift text-success me-1"></i>
+                                            <strong class="text-success">Miễn phí</strong>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Borrow Form -->
+                    <form asp-action="Borrow" method="post" class="borrow-form">
+                        <input type="hidden" asp-for="BookId" />
+                        <input type="hidden" asp-for="BookTitle" />
+                        <input type="hidden" asp-for="BookAuthor" />
+                        <input type="hidden" asp-for="BookCoverUrl" />
+                        <input type="hidden" asp-for="RentalPrice" />
+
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                        <div class="form-group mb-4">
+                            <label asp-for="DueDate" class="form-label">
+                                <i class="fas fa-calendar-alt me-1"></i>
+                                Ngày trả dự kiến
+                            </label>
+                            <input asp-for="DueDate" class="form-control" type="date"
+                                min="@DateTime.Today.AddDays(1).ToString("yyyy-MM-dd")"
+                                max="@DateTime.Today.AddDays(30).ToString("yyyy-MM-dd")" />
+                            <div class="form-text">
+                                <i class="fas fa-info-circle me-1"></i>
+                                Thời gian mượn tối đa 30 ngày
+                            </div>
+                            <span asp-validation-for="DueDate" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-4">
+                            <label asp-for="Notes" class="form-label">
+                                <i class="fas fa-sticky-note me-1"></i>
+                                Ghi chú (Tùy chọn)
+                            </label>
+                            <textarea asp-for="Notes" class="form-control" rows="3"
+                                placeholder="Nhập ghi chú nếu có..."></textarea>
+                            <span asp-validation-for="Notes" class="text-danger"></span>
+                        </div>
+
+                        <!-- Terms and Conditions -->
+                        <div class="terms-section mb-4">
+                            <div class="alert alert-info">
+                                <h6><i class="fas fa-exclamation-circle me-1"></i> Quy định mượn sách:</h6>
+                                <ul class="mb-0">
+                                    <li>Thời gian mượn tối đa 30 ngày</li>
+                                    <li>Trả sách đúng hạn để tránh phí phạt</li>
+                                    <li>Giữ gìn sách trong tình trạng tốt</li>
+                                    <li>Không được cho mượn lại hoặc sao chép</li>
+                                </ul>
+                            </div>
+
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="agreeTerms" required>
+                                <label class="form-check-label" for="agreeTerms">
+                                    Tôi đồng ý với các quy định mượn sách của thư viện
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="action-buttons">
+                            <button type="submit" class="btn btn-primary btn-lg me-3">
+                                <i class="fas fa-check me-2"></i>
+                                Xác nhận mượn sách
+                            </button>
+                            <a asp-controller="Book" asp-action="Details" asp-route-id="@Model.BookId"
+                                class="btn btn-outline-secondary btn-lg">
+                                <i class="fas fa-arrow-left me-2"></i>
+                                Quay lại
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        // Auto-set due date to 14 days from today if not set
+        document.addEventListener('DOMContentLoaded', function () {
+            const dueDateInput = document.getElementById('DueDate');
+            if (!dueDateInput.value) {
+                const defaultDate = new Date();
+                defaultDate.setDate(defaultDate.getDate() + 14);
+                dueDateInput.value = defaultDate.toISOString().split('T')[0];
+            }
+        });
+    </script>
+}

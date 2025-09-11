@@ -11,6 +11,9 @@ namespace ELibraryManagement.Web.Services
         Task<List<BookViewModel>> GetRelatedBooksAsync(int excludeId, string? categoryName, int count = 4);
         Task<List<string>> GetCategoriesAsync();
         Task<List<string>> GetAuthorsAsync();
+        Task<BorrowBookResponseViewModel> BorrowBookAsync(BorrowBookRequestViewModel request, string token);
+        Task<List<UserBorrowedBookViewModel>> GetBorrowedBooksAsync(string userId, string token);
+        Task<BorrowBookResponseViewModel> ReturnBookAsync(int borrowRecordId, string token);
     }
 
     public class BookApiService : IBookApiService
@@ -30,11 +33,21 @@ namespace ELibraryManagement.Web.Services
             };
         }
 
+        private string GetApiBaseUrl()
+        {
+            // Ưu tiên HTTPS URL cho Visual Studio 2022, fallback về HTTP cho VS Code
+            var httpsUrl = _configuration["ApiSettings:BaseUrl"];
+            var httpUrl = _configuration["ApiSettings:BaseUrlHttp"];
+
+            // Sử dụng BaseUrl đầu tiên (ưu tiên HTTPS), nếu không có thì dùng HTTP
+            return httpsUrl ?? httpUrl ?? "https://localhost:7125";
+        }
+
         public async Task<List<BookViewModel>> GetAvailableBooksAsync()
         {
             try
             {
-                var apiBaseUrl = _configuration["ApiSettings:BaseUrl"] ?? "https://localhost:7125";
+                var apiBaseUrl = GetApiBaseUrl();
                 var response = await _httpClient.GetAsync($"{apiBaseUrl}/api/Book/available");
 
                 if (response.IsSuccessStatusCode)
@@ -99,7 +112,7 @@ namespace ELibraryManagement.Web.Services
         {
             try
             {
-                var apiBaseUrl = _configuration["ApiSettings:BaseUrl"] ?? "https://localhost:7125";
+                var apiBaseUrl = GetApiBaseUrl();
                 var queryParams = new List<string>();
 
                 // Build OData query
@@ -195,7 +208,7 @@ namespace ELibraryManagement.Web.Services
         {
             try
             {
-                var apiBaseUrl = _configuration["ApiSettings:BaseUrl"] ?? "https://localhost:7125";
+                var apiBaseUrl = GetApiBaseUrl();
                 var response = await _httpClient.GetAsync($"{apiBaseUrl}/api/Book/available?$select=categories&$expand=categories");
 
                 if (response.IsSuccessStatusCode)
@@ -232,7 +245,7 @@ namespace ELibraryManagement.Web.Services
         {
             try
             {
-                var apiBaseUrl = _configuration["ApiSettings:BaseUrl"] ?? "https://localhost:7125";
+                var apiBaseUrl = GetApiBaseUrl();
                 var response = await _httpClient.GetAsync($"{apiBaseUrl}/api/Book/available?$select=author");
 
                 if (response.IsSuccessStatusCode)
@@ -295,7 +308,7 @@ namespace ELibraryManagement.Web.Services
         {
             try
             {
-                var apiBaseUrl = _configuration["ApiSettings:BaseUrl"] ?? "http://localhost:5293";
+                var apiBaseUrl = GetApiBaseUrl();
                 var response = await _httpClient.GetAsync($"{apiBaseUrl}/api/Book/{id}");
 
                 if (response.IsSuccessStatusCode)
@@ -362,7 +375,7 @@ namespace ELibraryManagement.Web.Services
         {
             try
             {
-                var apiBaseUrl = _configuration["ApiSettings:BaseUrl"] ?? "https://localhost:7125";
+                var apiBaseUrl = GetApiBaseUrl();
                 var filter = "";
 
                 if (!string.IsNullOrEmpty(categoryName))
@@ -451,6 +464,161 @@ namespace ELibraryManagement.Web.Services
             catch
             {
                 return "Chưa phân loại";
+            }
+        }
+
+        // Borrow Book Methods
+        public async Task<BorrowBookResponseViewModel> BorrowBookAsync(BorrowBookRequestViewModel request, string token)
+        {
+            try
+            {
+                var apiBaseUrl = GetApiBaseUrl();
+
+                System.Diagnostics.Debug.WriteLine($"=== BorrowBookAsync START ===");
+                System.Diagnostics.Debug.WriteLine($"API URL: {apiBaseUrl}");
+                System.Diagnostics.Debug.WriteLine($"BookId: {request.BookId}");
+                System.Diagnostics.Debug.WriteLine($"UserId: {request.UserId}");
+                System.Diagnostics.Debug.WriteLine($"Token: {(!string.IsNullOrEmpty(token) ? "Present" : "Missing")}");
+
+                var requestDto = new
+                {
+                    BookId = request.BookId,
+                    UserId = request.UserId,
+                    DueDate = request.DueDate,
+                    Notes = request.Notes
+                };
+
+                var json = JsonSerializer.Serialize(requestDto, _jsonOptions);
+                System.Diagnostics.Debug.WriteLine($"Request JSON: {json}");
+
+                var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+
+                _httpClient.DefaultRequestHeaders.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+                var fullUrl = $"{apiBaseUrl}/api/Book/borrow";
+                System.Diagnostics.Debug.WriteLine($"Full URL: {fullUrl}");
+
+                var response = await _httpClient.PostAsync(fullUrl, content);
+                var responseContent = await response.Content.ReadAsStringAsync();
+
+                System.Diagnostics.Debug.WriteLine($"Response Status: {response.StatusCode}");
+                System.Diagnostics.Debug.WriteLine($"Response Content: {responseContent}");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var result = JsonSerializer.Deserialize<dynamic>(responseContent, _jsonOptions);
+                    return new BorrowBookResponseViewModel
+                    {
+                        Success = true,
+                        BorrowRecordId = GetPropertyValue<int>(result, "borrowRecordId"),
+                        BookId = GetPropertyValue<int>(result, "bookId"),
+                        BookTitle = GetPropertyValue<string>(result, "bookTitle") ?? "",
+                        UserId = GetPropertyValue<string>(result, "userId") ?? "",
+                        BorrowDate = GetPropertyValue<DateTime>(result, "borrowDate"),
+                        DueDate = GetPropertyValue<DateTime>(result, "dueDate"),
+                        RentalPrice = GetPropertyValue<decimal?>(result, "rentalPrice"),
+                        Status = GetPropertyValue<string>(result, "status") ?? "",
+                        Message = GetPropertyValue<string>(result, "message") ?? "Mượn sách thành công!"
+                    };
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine($"API Error: {response.StatusCode} - {responseContent}");
+                    return new BorrowBookResponseViewModel
+                    {
+                        Success = false,
+                        Message = $"Lỗi API: {response.StatusCode}"
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Exception in BorrowBookAsync: {ex.Message}");
+                return new BorrowBookResponseViewModel
+                {
+                    Success = false,
+                    Message = $"Có lỗi xảy ra: {ex.Message}"
+                };
+            }
+        }
+
+        public async Task<List<UserBorrowedBookViewModel>> GetBorrowedBooksAsync(string userId, string token)
+        {
+            try
+            {
+                var apiBaseUrl = GetApiBaseUrl();
+
+                _httpClient.DefaultRequestHeaders.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+                var response = await _httpClient.GetAsync($"{apiBaseUrl}/api/Book/borrowed/{userId}");
+                var responseContent = await response.Content.ReadAsStringAsync();
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var borrowedBooks = JsonSerializer.Deserialize<List<dynamic>>(responseContent, _jsonOptions);
+
+                    return borrowedBooks?.Select(book => new UserBorrowedBookViewModel
+                    {
+                        BorrowRecordId = GetPropertyValue<int>(book, "borrowRecordId"),
+                        BookId = GetPropertyValue<int>(book, "bookId"),
+                        BookTitle = GetPropertyValue<string>(book, "bookTitle") ?? "",
+                        BookAuthor = GetPropertyValue<string>(book, "bookAuthor") ?? "",
+                        BookCoverUrl = GetPropertyValue<string>(book, "bookCoverUrl") ?? "",
+                        BorrowDate = GetPropertyValue<DateTime>(book, "borrowDate"),
+                        DueDate = GetPropertyValue<DateTime>(book, "dueDate"),
+                        ReturnDate = GetPropertyValue<DateTime?>(book, "returnDate"),
+                        RentalPrice = GetPropertyValue<decimal?>(book, "rentalPrice"),
+                        Status = GetPropertyValue<string>(book, "status") ?? "",
+                        Notes = GetPropertyValue<string>(book, "notes")
+                    }).ToList() ?? new List<UserBorrowedBookViewModel>();
+                }
+
+                return new List<UserBorrowedBookViewModel>();
+            }
+            catch (Exception)
+            {
+                return new List<UserBorrowedBookViewModel>();
+            }
+        }
+
+        public async Task<BorrowBookResponseViewModel> ReturnBookAsync(int borrowRecordId, string token)
+        {
+            try
+            {
+                var apiBaseUrl = GetApiBaseUrl();
+
+                _httpClient.DefaultRequestHeaders.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+                var response = await _httpClient.PostAsync($"{apiBaseUrl}/api/Book/return/{borrowRecordId}", null);
+                var responseContent = await response.Content.ReadAsStringAsync();
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return new BorrowBookResponseViewModel
+                    {
+                        Success = true,
+                        Message = "Trả sách thành công!"
+                    };
+                }
+                else
+                {
+                    return new BorrowBookResponseViewModel
+                    {
+                        Success = false,
+                        Message = "Không thể trả sách. Vui lòng thử lại sau."
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                return new BorrowBookResponseViewModel
+                {
+                    Success = false,
+                    Message = $"Có lỗi xảy ra: {ex.Message}"
+                };
             }
         }
     }

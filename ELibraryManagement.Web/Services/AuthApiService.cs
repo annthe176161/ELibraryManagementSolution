@@ -13,6 +13,7 @@ namespace ELibraryManagement.Web.Services
         bool IsAuthenticated();
         string? GetCurrentUserToken();
         string GetCurrentUserName();
+        string? GetCurrentToken();
     }
 
     public class AuthApiService : IAuthApiService
@@ -33,11 +34,21 @@ namespace ELibraryManagement.Web.Services
             };
         }
 
+        private string GetApiBaseUrl()
+        {
+            // Ưu tiên HTTPS URL cho Visual Studio 2022, fallback về HTTP cho VS Code
+            var httpsUrl = _configuration["ApiSettings:BaseUrl"];
+            var httpUrl = _configuration["ApiSettings:BaseUrlHttp"];
+
+            // Sử dụng BaseUrl đầu tiên (ưu tiên HTTPS), nếu không có thì dùng HTTP
+            return httpsUrl ?? httpUrl ?? "https://localhost:7125";
+        }
+
         public async Task<AuthResponseViewModel> RegisterAsync(RegisterViewModel model)
         {
             try
             {
-                var apiBaseUrl = _configuration["ApiSettings:BaseUrl"] ?? "http://localhost:5293";
+                var apiBaseUrl = GetApiBaseUrl();
                 var requestData = new
                 {
                     email = model.Email,
@@ -92,7 +103,7 @@ namespace ELibraryManagement.Web.Services
         {
             try
             {
-                var apiBaseUrl = _configuration["ApiSettings:BaseUrl"] ?? "http://localhost:5293";
+                var apiBaseUrl = GetApiBaseUrl();
                 var requestData = new
                 {
                     userNameOrEmail = model.UserNameOrEmail,
@@ -162,9 +173,14 @@ namespace ELibraryManagement.Web.Services
                 if (string.IsNullOrEmpty(token))
                     return null;
 
-                var apiBaseUrl = _configuration["ApiSettings:BaseUrl"] ?? "http://localhost:5293";
+                var apiBaseUrl = GetApiBaseUrl();
+
+                // Clear existing headers
                 _httpClient.DefaultRequestHeaders.Clear();
-                _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+
+                // Set Authorization header properly
+                _httpClient.DefaultRequestHeaders.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
                 var response = await _httpClient.GetAsync($"{apiBaseUrl}/api/Auth/me");
 
@@ -279,6 +295,11 @@ namespace ELibraryManagement.Web.Services
             {
                 return "User";
             }
+        }
+
+        public string? GetCurrentToken()
+        {
+            return GetCurrentUserToken();
         }
     }
 }
