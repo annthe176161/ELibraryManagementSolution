@@ -39,10 +39,11 @@ button.accept-policy {
   line-height: inherit;
 }
 
+/* Footer styles - removed old absolute positioning */
 .footer {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  white-space: nowrap;
-  line-height: 60px;
+  position: static;
+  bottom: auto;
+  width: auto;
+  white-space: normal;
+  line-height: normal;
 }

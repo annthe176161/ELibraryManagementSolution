@@ -22,7 +22,7 @@
     @await RenderSectionAsync("Styles", required: false)
 </head>
 
-<body>
+<body class="d-flex flex-column min-vh-100">
     <header>
         <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
             <div class="container">
@@ -114,15 +114,15 @@
         </nav>
     </header>
 
-    <!-- Add padding to account for fixed navbar -->
-    <div style="padding-top: 80px;">
+    <!-- Main content area with flex-grow-1 to push footer down -->
+    <div class="flex-grow-1" style="padding-top: 80px;">
         <main role="main">
             @RenderBody()
         </main>
     </div>
 
-    <!-- Footer with Vietnamese cultural elements -->
-    <footer class="bg-dark text-light py-5 mt-5">
+    <!-- Footer with sticky positioning -->
+    <footer class="bg-dark text-light py-5 mt-auto">
         <div class="container">
             <div class="row">
                 <div class="col-lg-4 mb-4">

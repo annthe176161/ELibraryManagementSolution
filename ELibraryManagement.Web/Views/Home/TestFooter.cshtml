@@ -1,0 +1,66 @@
+@{
+    ViewData["Title"] = "Test Footer Sticky";
+}
+
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="text-center mb-4">Test Footer Sticky</h1>
+
+            <div class="alert alert-info">
+                <h5>🎯 Kiểm tra Footer Sticky:</h5>
+                <ul>
+                    <li>Kéo xuống cuối trang để xem footer</li>
+                    <li>Footer sẽ luôn nằm ở cuối trang</li>
+                    <li>Không còn khoảng trắng thừa dưới footer</li>
+                </ul>
+            </div>
+
+            <!-- Nội dung demo để test scroll -->
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5>📚 Sách Gợi Ý</h5>
+                        </div>
+                        <div class="card-body">
+                            <p>Đây là nội dung demo để test chức năng footer sticky. Khi bạn kéo xuống cuối trang, footer sẽ luôn nằm ở cuối mà không có khoảng trắng thừa.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5>🔥 Sách Hot</h5>
+                        </div>
+                        <div class="card-body">
+                            <p>Chức năng footer sticky sử dụng Flexbox CSS để đảm bảo footer luôn nằm ở cuối trang, bất kể nội dung trang có ít hay nhiều.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Thêm nhiều nội dung để test scroll -->
+            @for (int i = 1; i <= 10; i++)
+            {
+                <div class="card mb-3">
+                    <div class="card-body">
+                        <h6>Nội dung demo @i</h6>
+                        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+                        <small class="text-muted">Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.</small>
+                    </div>
+                </div>
+            }
+
+            <div class="text-center mt-5 mb-5">
+                <h4>🎉 Đã đến cuối trang!</h4>
+                <p class="text-muted">Kéo xuống để xem footer sticky hoạt động</p>
+                <div class="mt-4">
+                    <a href="/" class="btn btn-primary me-2">Về Trang Chủ</a>
+                    <a href="/Home/Books" class="btn btn-success">Xem Sách</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
