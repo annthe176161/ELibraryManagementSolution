@@ -1,5 +1,6 @@
 using ELibraryManagement.Api.DTOs;
 using ELibraryManagement.Api.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using ELibraryManagement.Api.Models;
@@ -19,9 +20,10 @@ namespace ELibraryManagement.Api.Controllers
         }
 
         /// <summary>
-        /// Tạo user mẫu để test
+        /// Tạo user mẫu để test (chỉ dành cho Admin)
         /// </summary>
         [HttpPost("create-test-user")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> CreateTestUser()
         {
             var testUser = new ApplicationUser

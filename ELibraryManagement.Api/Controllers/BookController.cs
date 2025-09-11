@@ -1,5 +1,6 @@
 using ELibraryManagement.Api.DTOs;
 using ELibraryManagement.Api.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData.Query;
 
@@ -45,9 +46,10 @@ namespace ELibraryManagement.Api.Controllers
         }
 
         /// <summary>
-        /// Đặt sách (mượn sách)
+        /// Đặt sách (mượn sách) - Yêu cầu đăng nhập
         /// </summary>
         [HttpPost("borrow")]
+        [Authorize]
         public async Task<IActionResult> BorrowBook([FromBody] BorrowBookRequestDto request)
         {
             if (!ModelState.IsValid)
@@ -66,9 +68,10 @@ namespace ELibraryManagement.Api.Controllers
         }
 
         /// <summary>
-        /// Lấy danh sách sách đã mượn của user
+        /// Lấy danh sách sách đã mượn của user - Yêu cầu đăng nhập
         /// </summary>
         [HttpGet("borrowed/{userId}")]
+        [Authorize]
         public async Task<IActionResult> GetBorrowedBooks(string userId)
         {
             var borrowedBooks = await _bookService.GetBorrowedBooksByUserAsync(userId);
@@ -76,9 +79,10 @@ namespace ELibraryManagement.Api.Controllers
         }
 
         /// <summary>
-        /// Trả sách
+        /// Trả sách - Yêu cầu đăng nhập
         /// </summary>
         [HttpPost("return/{borrowRecordId}")]
+        [Authorize]
         public async Task<IActionResult> ReturnBook(int borrowRecordId)
         {
             var result = await _bookService.ReturnBookAsync(borrowRecordId);

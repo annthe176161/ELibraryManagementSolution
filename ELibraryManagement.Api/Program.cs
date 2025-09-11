@@ -3,20 +3,24 @@ using ELibraryManagement.Api.Data;
 using ELibraryManagement.Api.DTOs;
 using ELibraryManagement.Api.Formatters;
 using ELibraryManagement.Api.Models;
+using ELibraryManagement.Api.Seeders;
 using ELibraryManagement.Api.Services.Implementations;
 using ELibraryManagement.Api.Services.Interfaces;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OData;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OData.ModelBuilder;
+using Microsoft.OpenApi.Models;
 using System.Text;
 
 namespace ELibraryManagement.Api
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -29,8 +33,30 @@ namespace ELibraryManagement.Api
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
 
+            // Add JWT Authentication
+            builder.Services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(options =>
+            {
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ValidateLifetime = true,
+                    ValidateIssuerSigningKey = true,
+                    ValidIssuer = builder.Configuration["Jwt:Issuer"] ?? "ELibraryManagement.Api",
+                    ValidAudience = builder.Configuration["Jwt:Audience"] ?? "ELibraryManagement.Client",
+                    IssuerSigningKey = new SymmetricSecurityKey(
+                        Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"] ?? "default-secret-key-for-development-only"))
+                };
+            });
+
             // Register services
             builder.Services.AddScoped<IBookService, BookService>();
+            builder.Services.AddScoped<IAuthService, AuthService>();
 
             // Add CORS
             builder.Services.AddCors(options =>
@@ -79,14 +105,46 @@ namespace ELibraryManagement.Api
                 {
                     Title = "ELibrary Management API",
                     Version = "v1",
-                    Description = "API for managing electronic library with Content Negotiation support"
+                    Description = "API for managing electronic library with JWT Authentication and Content Negotiation support"
                 });
 
                 // Configure Swagger to show all supported media types
                 options.OperationFilter<AcceptHeaderOperationFilter>();
+
+                // Add JWT Bearer authentication to Swagger
+                options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Name = "Authorization",
+                    Type = SecuritySchemeType.Http,
+                    Scheme = "Bearer",
+                    BearerFormat = "JWT",
+                    In = ParameterLocation.Header,
+                    Description = "Enter your JWT token in the text input below.\n\nExample: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                });
+
+                options.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            }
+                        },
+                        new string[] {}
+                    }
+                });
             });
 
             var app = builder.Build();
+
+            // Seed admin user
+            using (var scope = app.Services.CreateScope())
+            {
+                await AdminUserSeeder.SeedAdminUser(scope.ServiceProvider);
+            }
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())

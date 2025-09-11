@@ -1,12 +1,78 @@
 @ELibraryManagement.Api_HostAddress = http://localhost:5293
 
+# 🔑 JWT Token - Replace this with your actual token after login
+@authToken = YOUR_JWT_TOKEN_HERE
+
 GET {{ELibraryManagement.Api_HostAddress}}/weatherforecast/
 Accept: application/json
 
 ###
 
-# Create test user for testing borrow functionality
+# Register a new user
+POST {{ELibraryManagement.Api_HostAddress}}/api/auth/register
+Content-Type: application/json
+
+{
+  "email": "user@example.com",
+  "password": "Password123!",
+  "confirmPassword": "Password123!",
+  "userName": "testuser",
+  "firstName": "Test",
+  "lastName": "User",
+  "phoneNumber": "0123456789",
+  "address": "123 Test Street",
+  "dateOfBirth": "1990-01-01T00:00:00Z"
+}
+
+###
+
+# 🔄 HOW TO USE:
+# 1. Run the "Login with Admin credentials" request below
+# 2. Copy the "token" value from the response
+# 3. Replace "YOUR_JWT_TOKEN_HERE" with your actual token in the @authToken variable above
+# 4. All subsequent requests will automatically use your token!
+
+# Login with Admin credentials
+POST {{ELibraryManagement.Api_HostAddress}}/api/auth/login
+Content-Type: application/json
+
+{
+  "userNameOrEmail": "admin@elibrary.com",
+  "password": "Admin@123"
+}
+
+###
+
+# Get current user info (uses the token from @authToken variable)
+GET {{ELibraryManagement.Api_HostAddress}}/api/auth/me
+Authorization: Bearer {{authToken}}
+Accept: application/json
+
+###
+
+# Change password (uses the token from @authToken variable)
+POST {{ELibraryManagement.Api_HostAddress}}/api/auth/change-password
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "currentPassword": "Admin@123",
+  "newPassword": "NewPassword123!",
+  "confirmNewPassword": "NewPassword123!"
+}
+
+###
+
+# Get user roles (uses the token from @authToken variable)
+GET {{ELibraryManagement.Api_HostAddress}}/api/auth/roles
+Authorization: Bearer {{authToken}}
+Accept: application/json
+
+###
+
+# Create test user for testing borrow functionality (uses the token from @authToken variable)
 POST {{ELibraryManagement.Api_HostAddress}}/api/user/create-test-user
+Authorization: Bearer {{authToken}}
 Content-Type: application/json
 
 ###
@@ -29,27 +95,30 @@ Accept: application/json
 
 ###
 
-# Borrow a book (replace user-id-here with actual user ID from create-test-user response)
+# Borrow a book (uses the token from @authToken variable)
 POST {{ELibraryManagement.Api_HostAddress}}/api/books/borrow
+Authorization: Bearer {{authToken}}
 Content-Type: application/json
 
 {
   "bookId": 1,
-  "userId": "user-id-here",
+  "userId": "YOUR_USER_ID_HERE",
   "dueDate": "2025-09-25T00:00:00Z",
   "notes": "Borrowing for study purposes"
 }
 
 ###
 
-# Get borrowed books by user (replace user-id-here with actual user ID)
-GET {{ELibraryManagement.Api_HostAddress}}/api/books/borrowed/user-id-here
+# Get borrowed books by user (uses the token from @authToken variable)
+GET {{ELibraryManagement.Api_HostAddress}}/api/books/borrowed/YOUR_USER_ID_HERE
+Authorization: Bearer {{authToken}}
 Accept: application/json
 
 ###
 
-# Return a book (replace borrow-record-id with actual ID from borrowed books response)
+# Return a book (uses the token from @authToken variable)
 POST {{ELibraryManagement.Api_HostAddress}}/api/books/return/1
+Authorization: Bearer {{authToken}}
 Content-Type: application/json
 
 ###

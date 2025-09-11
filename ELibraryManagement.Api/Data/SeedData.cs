@@ -1,4 +1,5 @@
 using ELibraryManagement.Api.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace ELibraryManagement.Api.Data
@@ -7,6 +8,13 @@ namespace ELibraryManagement.Api.Data
     {
         public static void Initialize(ModelBuilder modelBuilder)
         {
+            // Seed Roles
+            modelBuilder.Entity<IdentityRole>().HasData(
+                new IdentityRole { Id = "1", Name = "Admin", NormalizedName = "ADMIN" },
+                new IdentityRole { Id = "2", Name = "Librarian", NormalizedName = "LIBRARIAN" },
+                new IdentityRole { Id = "3", Name = "User", NormalizedName = "USER" }
+            );
+
             // Seed Categories - Danh mục sách tiếng Việt
             modelBuilder.Entity<Category>().HasData(
                 new Category { Id = 1, Name = "Tiểu Thuyết", Description = "Các tác phẩm tiểu thuyết, truyện dài", Color = "#FF6B6B", CreatedAt = DateTime.UtcNow },
