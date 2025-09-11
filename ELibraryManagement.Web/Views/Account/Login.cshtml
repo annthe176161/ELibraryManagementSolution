@@ -75,8 +75,18 @@
             </div>
 
             <div class="auth-footer">
-                <p><a href="#" class="auth-link">Quên mật khẩu?</a></p>
-                <p><a asp-controller="Home" asp-action="Index" class="auth-link">← Quay về trang chủ</a></p>
+                <div class="auth-links">
+                    <a href="#" class="auth-link">Quên mật khẩu?</a>
+                    <span class="separator">•</span>
+                    <a asp-controller="Home" asp-action="Index" class="auth-link">← Quay về trang chủ</a>
+                </div>
+                <div class="auth-switch">
+                    <p>Chưa có tài khoản?
+                        <a asp-controller="Account" asp-action="Register" class="auth-link-primary">
+                            <i class="fas fa-user-plus"></i> Đăng ký ngay
+                        </a>
+                    </p>
+                </div>
             </div>
         </div>
     </div>

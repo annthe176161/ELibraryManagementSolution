@@ -138,7 +138,16 @@
             </form>
 
             <div class="auth-footer">
-                <p><a asp-controller="Home" asp-action="Index" class="auth-link">← Quay về trang chủ</a></p>
+                <div class="auth-links">
+                    <a asp-controller="Home" asp-action="Index" class="auth-link">← Quay về trang chủ</a>
+                </div>
+                <div class="auth-switch">
+                    <p>Đã có tài khoản?
+                        <a asp-controller="Account" asp-action="Login" class="auth-link-primary">
+                            <i class="fas fa-sign-in-alt"></i> Đăng nhập ngay
+                        </a>
+                    </p>
+                </div>
             </div>
         </div>
     </div>
