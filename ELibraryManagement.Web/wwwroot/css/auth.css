@@ -139,6 +139,10 @@
     position: relative;
 }
 
+.password-input::after {
+    display: none !important; /* Ensure no pseudo-elements create duplicate icons */
+}
+
 .password-toggle {
     position: absolute;
     right: 15px;
@@ -147,6 +151,11 @@
     cursor: pointer;
     color: #718096;
     transition: color 0.3s ease;
+    z-index: 10;
+}
+
+.password-toggle:hover {
+    color: #667eea;
 }
 
 .password-toggle:hover {
@@ -811,4 +820,69 @@
         width: 100px;
         height: 100px;
     }
+}
+
+/* Google Login Button */
+.google-btn {
+    width: auto; /* Thay đổi từ 100% thành auto */
+    min-width: 280px; /* Chiều rộng tối thiểu */
+    max-width: 320px; /* Chiều rộng tối đa */
+    background: linear-gradient(135deg, #db4437 0%, #c23321 100%); /* Màu đỏ đặc trưng của Google */
+    border: none;
+    border-radius: 8px;
+    padding: 14px 24px;
+    font-size: 1rem;
+    font-weight: 500;
+    color: white;
+    transition: all 0.3s ease;
+    margin-bottom: 20px;
+    display: inline-flex; /* Thay đổi từ flex thành inline-flex */
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(219, 68, 55, 0.3);
+}
+
+.google-btn:hover {
+    background: linear-gradient(135deg, #c23321 0%, #a52714 100%); /* Màu đỏ đậm hơn khi hover */
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(219, 68, 55, 0.4);
+    color: white; /* Đảm bảo chữ vẫn màu trắng */
+}
+
+.google-btn:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 4px rgba(219, 68, 55, 0.3);
+}
+
+.google-btn i {
+    color: white;
+    font-size: 1.2rem;
+}
+
+/* Toggle Password Button */
+.toggle-password-btn {
+    border-left: none !important;
+    background: #f8f9fa;
+    border-color: #ced4da;
+    color: #6c757d;
+    transition: all 0.3s ease;
+}
+
+.toggle-password-btn:hover {
+    background: #e9ecef;
+    color: #495057;
+    border-color: #adb5bd;
+}
+
+.toggle-password-btn:focus {
+    box-shadow: none;
+    border-color: #80bdff;
+    background: #e7f1ff;
+}
+
+.input-group .form-control:focus + .toggle-password-btn {
+    border-color: #80bdff;
 }

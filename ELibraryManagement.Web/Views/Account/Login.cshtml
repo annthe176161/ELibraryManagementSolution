@@ -74,10 +74,18 @@
                 <span>hoặc</span>
             </div>
 
+            <!-- Google Login Button -->
+            <div class="d-flex justify-content-center">
+                <button type="button" class="btn btn-outline-secondary google-btn" onclick="showGoogleMessage()">
+                    <i class="fab fa-google"></i>
+                    Đăng nhập bằng Google
+                </button>
+            </div>
+            </button>
+
             <div class="auth-footer">
                 <div class="auth-links">
                     <a href="#" class="auth-link">Quên mật khẩu?</a>
-                    <span class="separator">•</span>
                     <a asp-controller="Home" asp-action="Index" class="auth-link">← Quay về trang chủ</a>
                 </div>
                 <div class="auth-switch">
@@ -117,5 +125,13 @@
                 usernameField.focus();
             }
         });
+
+        function showGoogleMessage() {
+            // Show a simple alert message
+            alert('Chức năng này sẽ được cập nhật sau!');
+
+            // Alternative: Show a toast notification if you have a toast library
+            // You can also create a custom modal or notification
+        }
     </script>
 }
