@@ -1,168 +1,373 @@
 ﻿@{
-    ViewData["Title"] = "Trang Chủ";
+    ViewData["Title"] = "Thư Viện Điện Tử ELibrary - Nơi Khởi Nguồn Tri Thức";
 }
 
-<!-- Hero Section -->
+@section Styles {
+    <link rel="stylesheet" href="~/css/home.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+}
+
+<!-- Hero Section - Khắc họa tinh thần học tập Việt Nam -->
 <section id="home" class="hero">
     <div class="hero-container">
         <div class="hero-content">
-            <h1>Chào Mừng Đến Với Thư Viện Điện Tử</h1>
-            <p>Khám phá thế giới tri thức với hàng nghìn đầu sách chất lượng.
-                Đọc sách mọi lúc mọi nơi với hệ thống quản lý hiện đại.</p>
+            <h1>🏮 Thư Viện Điện Tử ELibrary</h1>
+            <p>
+                <strong>"Học, học nữa, học mãi"</strong> - Theo tinh thần của Bác Hồ,
+                chúng tôi mang đến cho bạn kho tàng tri thức phong phú với hàng nghìn đầu sách chất lượng.
+                Khám phá văn hóa đọc Việt Nam trong thời đại số!
+            </p>
             <div class="hero-buttons">
-                <a href="#features" class="btn btn-primary">Khám Phá</a>
-                <a href="@Url.Action("Index", "Account", new { area = "" })" class="btn btn-secondary">Đăng Ký</a>
+                <a href="#features" class="btn btn-primary">
+                    <i class="fas fa-compass"></i>
+                    Khám Phá Ngay
+                </a>
+                <a href="#books" class="btn btn-secondary">
+                    <i class="fas fa-book"></i>
+                    Sách Nổi Bật
+                </a>
             </div>
         </div>
         <div class="hero-image">
-            <i class="fas fa-book-open"></i>
+            <i class="fas fa-graduation-cap"></i>
         </div>
     </div>
 </section>
 
-<!-- About Section -->
+<!-- About Section - Giới thiệu về văn hóa đọc Việt Nam -->
 <section id="about" class="about">
     <div class="content-wrapper">
         <div class="section-header">
-            <h2>Giới Thiệu Về Chúng Tôi</h2>
-            <p>Hệ thống thư viện điện tử hiện đại phục vụ cộng đồng</p>
+            <h2>🇻🇳 Thư Viện Số Phục Vụ Cộng Đồng</h2>
+            <p>Kết nối tri thức Việt với thế giới, bảo tồn và phát huy giá trị văn hóa dân tộc</p>
         </div>
         <div class="about-content">
             <div class="about-text">
-                <h3>Thư Viện Điện Tử ELibrary</h3>
-                <p>Chúng tôi cung cấp một nền tảng quản lý thư viện hiện đại, giúp bạn dễ dàng tìm kiếm, mượn và trả
-                    sách. Với công nghệ tiên tiến và giao diện thân thiện, trải nghiệm đọc sách của bạn sẽ trở nên thú
-                    vị hơn bao giờ hết.</p>
+                <h3 class="cultural-accent">Sứ Mệnh Của Chúng Tôi</h3>
+                <p>
+                    ELibrary được xây dựng với tâm huyết mang tri thức đến gần hơn với mọi người Việt Nam.
+                    Chúng tôi tin rằng việc đọc sách không chỉ là học tập mà còn là cách thức để con người
+                    Việt Nam phát triển toàn diện, giữ gìn bản sắc văn hóa và hòa nhập với thế giới.
+                </p>
+                <p>
+                    Với công nghệ hiện đại và giao diện thân thiện, chúng tôi mong muốn tạo ra một
+                    <strong>"ngôi nhà chung"</strong> cho những người yêu sách trên khắp đất nước.
+                </p>
                 <ul class="about-list">
-                    <li><i class="fas fa-check-circle"></i> Hàng nghìn đầu sách đa dạng thể loại</li>
-                    <li><i class="fas fa-check-circle"></i> Quản lý mượn trả sách dễ dàng</li>
-                    <li><i class="fas fa-check-circle"></i> Giao diện thân thiện, dễ sử dụng</li>
-                    <li><i class="fas fa-check-circle"></i> Hỗ trợ tìm kiếm thông minh</li>
+                    <li><i class="fas fa-dragon"></i> Kho tàng sách Việt Nam và quốc tế phong phú</li>
+                    <li><i class="fas fa-yin-yang"></i> Hệ thống quản lý thông minh, dễ sử dụng</li>
+                    <li><i class="fas fa-heart"></i> Giao diện thiết kế theo văn hóa Việt</li>
+                    <li><i class="fas fa-users"></i> Cộng đồng độc giả năng động</li>
+                    <li><i class="fas fa-mobile-alt"></i> Truy cập mọi lúc mọi nơi</li>
                 </ul>
             </div>
             <div class="about-stats">
                 <div class="stat-item">
-                    <div class="stat-number">10,000+</div>
-                    <div class="stat-label">Đầu Sách</div>
+                    <div class="stat-number">15,000+</div>
+                    <div class="stat-label">📚 Đầu Sách</div>
                 </div>
                 <div class="stat-item">
-                    <div class="stat-number">5,000+</div>
-                    <div class="stat-label">Thành Viên</div>
+                    <div class="stat-number">8,500+</div>
+                    <div class="stat-label">👥 Thành Viên</div>
                 </div>
                 <div class="stat-item">
-                    <div class="stat-number">50,000+</div>
-                    <div class="stat-label">Lượt Mượn</div>
+                    <div class="stat-number">75,000+</div>
+                    <div class="stat-label">📖 Lượt Mượn</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">98%</div>
+                    <div class="stat-label">😊 Hài Lòng</div>
                 </div>
             </div>
         </div>
     </div>
 </section>
 
-<!-- Features Section -->
+<!-- Featured Books Section - Sách nổi bật -->
+<section id="books" class="featured-books" style="padding: 100px 0; background: white;">
+    <div class="content-wrapper">
+        <div class="section-header">
+            <h2>📚 Sách Nổi Bật Tháng Này</h2>
+            <p>Khám phá những cuốn sách được yêu thích nhất trong cộng đồng độc giả Việt Nam</p>
+        </div>
+
+        <div class="row">
+            <!-- Featured Book 1 -->
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="book-card"
+                    style="background: white; border-radius: 15px; padding: 25px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); transition: transform 0.3s ease; height: 100%;">
+                    <div class="book-image" style="text-align: center; margin-bottom: 20px;">
+                        <div
+                            style="width: 120px; height: 160px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); margin: 0 auto; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-size: 2rem;">
+                            <i class="fas fa-book"></i>
+                        </div>
+                    </div>
+                    <h5 style="color: #da251e; font-weight: 600; margin-bottom: 10px;">Đắc Nhân Tâm</h5>
+                    <p style="color: #666; margin-bottom: 15px;"><strong>Tác giả:</strong> Dale Carnegie</p>
+                    <p style="color: #555; line-height: 1.6; margin-bottom: 20px;">
+                        Cuốn sách kinh điển về nghệ thuật giao tiếp và ứng xử, giúp bạn xây dựng các mối quan hệ tốt đẹp
+                        trong cuộc sống.
+                    </p>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span class="badge"
+                            style="background: #da251e; color: white; padding: 5px 12px; border-radius: 20px;">⭐
+                            4.8/5</span>
+                        <a href="#" class="btn btn-outline-danger btn-sm">Xem Chi Tiết</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Featured Book 2 -->
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="book-card"
+                    style="background: white; border-radius: 15px; padding: 25px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); transition: transform 0.3s ease; height: 100%;">
+                    <div class="book-image" style="text-align: center; margin-bottom: 20px;">
+                        <div
+                            style="width: 120px; height: 160px; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); margin: 0 auto; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-size: 2rem;">
+                            <i class="fas fa-globe-asia"></i>
+                        </div>
+                    </div>
+                    <h5 style="color: #da251e; font-weight: 600; margin-bottom: 10px;">Sapiens: Lược Sử Loài Người</h5>
+                    <p style="color: #666; margin-bottom: 15px;"><strong>Tác giả:</strong> Yuval Noah Harari</p>
+                    <p style="color: #555; line-height: 1.6; margin-bottom: 20px;">
+                        Khám phá hành trình tiến hóa đáng kinh ngạc của loài người từ thời tiền sử đến thời hiện đại.
+                    </p>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span class="badge"
+                            style="background: #da251e; color: white; padding: 5px 12px; border-radius: 20px;">⭐
+                            4.9/5</span>
+                        <a href="#" class="btn btn-outline-danger btn-sm">Xem Chi Tiết</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Featured Book 3 -->
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="book-card"
+                    style="background: white; border-radius: 15px; padding: 25px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); transition: transform 0.3s ease; height: 100%;">
+                    <div class="book-image" style="text-align: center; margin-bottom: 20px;">
+                        <div
+                            style="width: 120px; height: 160px; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); margin: 0 auto; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: white; font-size: 2rem;">
+                            <i class="fas fa-brain"></i>
+                        </div>
+                    </div>
+                    <h5 style="color: #da251e; font-weight: 600; margin-bottom: 10px;">Tư Duy Nhanh Và Chậm</h5>
+                    <p style="color: #666; margin-bottom: 15px;"><strong>Tác giả:</strong> Daniel Kahneman</p>
+                    <p style="color: #555; line-height: 1.6; margin-bottom: 20px;">
+                        Khám phá cách thức hoạt động của bộ não và nghệ thuật đưa ra quyết định thông minh.
+                    </p>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span class="badge"
+                            style="background: #da251e; color: white; padding: 5px 12px; border-radius: 20px;">⭐
+                            4.7/5</span>
+                        <a href="#" class="btn btn-outline-danger btn-sm">Xem Chi Tiết</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center mt-4">
+            <a href="/Home/Books" class="btn btn-danger btn-lg">
+                <i class="fas fa-book-open me-2"></i>
+                Xem Tất Cả Sách
+                <i class="fas fa-arrow-right ms-2"></i>
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section - Tính năng nổi bật với phong cách Việt Nam -->
 <section id="features" class="features">
     <div class="content-wrapper">
         <div class="section-header">
-            <h2>Tính Năng Nổi Bật</h2>
-            <p>Khám phá các tính năng tuyệt vời của hệ thống</p>
+            <h2>🌟 Tính Năng Vượt Trội</h2>
+            <p>Khám phá những tính năng tuyệt vời được thiết kế đặc biệt cho người dùng Việt Nam</p>
         </div>
         <div class="features-grid">
             <div class="feature-card">
                 <div class="feature-icon">
-                    <i class="fas fa-search"></i>
+                    <i class="fas fa-search-plus"></i>
                 </div>
-                <h3>Tìm Kiếm Thông Minh</h3>
-                <p>Tìm kiếm sách nhanh chóng với công cụ tìm kiếm thông minh, hỗ trợ tìm theo tên sách, tác giả, thể
-                    loại.</p>
+                <h3>🔍 Tìm Kiếm Thông Minh</h3>
+                <p>
+                    Công cụ tìm kiếm hỗ trợ tiếng Việt có dấu, không dấu và cả từ khóa tiếng Anh.
+                    Tìm kiếm theo tên sách, tác giả, thể loại hay thậm chí là trích dẫn nổi tiếng.
+                </p>
             </div>
             <div class="feature-card">
                 <div class="feature-icon">
-                    <i class="fas fa-calendar-check"></i>
+                    <i class="fas fa-calendar-alt"></i>
                 </div>
-                <h3>Quản Lý Mượn Trả</h3>
-                <p>Quản lý lịch sử mượn trả sách dễ dàng, theo dõi thời hạn trả sách và phí phạt khi quá hạn.</p>
+                <h3>📅 Quản Lý Mượn Trả</h3>
+                <p>
+                    Hệ thống nhắc nhở thông minh qua email và SMS. Gia hạn sách online dễ dàng,
+                    theo dõi lịch sử mượn sách và tính phí phạt minh bạch.
+                </p>
             </div>
             <div class="feature-card">
                 <div class="feature-icon">
-                    <i class="fas fa-user-friends"></i>
+                    <i class="fas fa-users-cog"></i>
                 </div>
-                <h3>Quản Lý Thành Viên</h3>
-                <p>Hệ thống quản lý thông tin thành viên toàn diện, phân quyền người dùng và quản lý tài khoản.</p>
+                <h3>👨‍👩‍👧‍👦 Quản Lý Cộng Đồng</h3>
+                <p>
+                    Hệ thống phân quyền linh hoạt cho thành viên, thủ thư và quản trị viên.
+                    Tạo nhóm đọc sách, chia sẻ đánh giá và gợi ý sách hay.
+                </p>
             </div>
             <div class="feature-card">
                 <div class="feature-icon">
-                    <i class="fas fa-chart-bar"></i>
+                    <i class="fas fa-chart-line"></i>
                 </div>
-                <h3>Báo Cáo Thống Kê</h3>
-                <p>Cung cấp các báo cáo thống kê chi tiết về tình hình mượn trả sách và hoạt động của thư viện.</p>
+                <h3>📊 Thống Kê Thông Minh</h3>
+                <p>
+                    Báo cáo chi tiết về xu hướng đọc, sách được yêu thích nhất,
+                    thống kê theo thể loại và gợi ý sách phù hợp với sở thích cá nhân.
+                </p>
             </div>
             <div class="feature-card">
                 <div class="feature-icon">
                     <i class="fas fa-mobile-alt"></i>
                 </div>
-                <h3>Responsive Design</h3>
-                <p>Giao diện responsive, tương thích với mọi thiết bị từ máy tính đến điện thoại di động.</p>
+                <h3>📱 Responsive Hoàn Hảo</h3>
+                <p>
+                    Giao diện tối ưu cho mọi thiết bị từ điện thoại, tablet đến máy tính.
+                    Đọc sách mọi lúc mọi nơi với trải nghiệm mượt mà.
+                </p>
             </div>
             <div class="feature-card">
                 <div class="feature-icon">
                     <i class="fas fa-shield-alt"></i>
                 </div>
-                <h3>Bảo Mật Cao</h3>
-                <p>Hệ thống bảo mật cao, đảm bảo an toàn thông tin và quyền riêng tư của người dùng.</p>
+                <h3>🛡️ Bảo Mật Tuyệt Đối</h3>
+                <p>
+                    Hệ thống bảo mật đa lớp với xác thực JWT, mã hóa dữ liệu và
+                    tuân thủ các tiêu chuẩn bảo mật quốc tế để đảm bảo an toàn thông tin.
+                </p>
             </div>
         </div>
     </div>
 </section>
 
-<!-- Contact Section -->
+<!-- Contact Section - Liên hệ với phong cách Việt Nam -->
 <section id="contact" class="contact">
     <div class="content-wrapper">
         <div class="section-header">
-            <h2>Liên Hệ Với Chúng Tôi</h2>
-            <p>Chúng tôi luôn sẵn sàng hỗ trợ bạn</p>
+            <h2>📞 Kết Nối Với Chúng Tôi</h2>
+            <p>Đội ngũ ELibrary luôn sẵn sàng hỗ trợ bạn 24/7 với tinh thần phục vụ tận tâm</p>
         </div>
         <div class="contact-content">
             <div class="contact-info">
                 <div class="contact-item">
                     <i class="fas fa-map-marker-alt"></i>
                     <div>
-                        <h4>Địa Chỉ</h4>
-                        <p>123 Đường ABC, Quận XYZ, TP.HCM</p>
+                        <h4>🏢 Trụ Sở Chính</h4>
+                        <p>Tầng 15, Tòa nhà Landmark 81<br>
+                            208 Nguyễn Hữu Cảnh, Bình Thạnh<br>
+                            Thành phố Hồ Chí Minh</p>
                     </div>
                 </div>
                 <div class="contact-item">
-                    <i class="fas fa-phone"></i>
+                    <i class="fas fa-phone-volume"></i>
                     <div>
-                        <h4>Điện Thoại</h4>
-                        <p>(028) 1234-5678</p>
+                        <h4>☎️ Hotline Hỗ Trợ</h4>
+                        <p>📞 1900-ELIBRARY (354272)<br>
+                            📱 (+84) 28-3841-5678<br>
+                            <small>Miễn phí cuộc gọi từ 8:00 - 22:00</small>
+                        </p>
                     </div>
                 </div>
                 <div class="contact-item">
-                    <i class="fas fa-envelope"></i>
+                    <i class="fas fa-envelope-open"></i>
                     <div>
-                        <h4>Email</h4>
-                        <p>info@elibrary.com</p>
+                        <h4>✉️ Email Liên Hệ</h4>
+                        <p>📧 hotro@elibrary.vn<br>
+                            📧 admin@elibrary.vn<br>
+                            <small>Phản hồi trong vòng 2 giờ</small>
+                        </p>
                     </div>
                 </div>
                 <div class="contact-item">
                     <i class="fas fa-clock"></i>
                     <div>
-                        <h4>Giờ Làm Việc</h4>
-                        <p>Thứ 2 - Thứ 6: 8:00 - 17:00<br>Thứ 7: 8:00 - 12:00</p>
+                        <h4>⏰ Giờ Phục Vụ</h4>
+                        <p>🌅 Thứ 2 - Thứ 6: 7:00 - 21:00<br>
+                            🌤️ Thứ 7 - Chủ nhật: 8:00 - 18:00<br>
+                            🌙 Hỗ trợ online 24/7</p>
                     </div>
                 </div>
             </div>
-            <form class="contact-form">
+            <form class="contact-form" id="contactForm">
+                <h3 style="margin-bottom: 25px; color: #da251e; text-align: center;">
+                    💌 Gửi Tin Nhắn Cho Chúng Tôi
+                </h3>
                 <div class="form-group">
-                    <input type="text" id="name" placeholder="Họ và tên" required>
+                    <input type="text" id="name" placeholder="🙋‍♂️ Họ và tên của bạn" required>
                 </div>
                 <div class="form-group">
-                    <input type="email" id="email" placeholder="Email" required>
+                    <input type="email" id="email" placeholder="📧 Địa chỉ email" required>
                 </div>
                 <div class="form-group">
-                    <textarea id="message" rows="5" placeholder="Nội dung tin nhắn" required></textarea>
+                    <input type="tel" id="phone" placeholder="📱 Số điện thoại (tùy chọn)">
                 </div>
-                <button type="submit" class="btn btn-primary">Gửi Tin Nhắn</button>
+                <div class="form-group">
+                    <select id="topic" required
+                        style="width: 100%; padding: 15px 20px; border: 2px solid transparent; border-radius: 10px; font-size: 1rem; background: white;">
+                        <option value="">🎯 Chọn chủ đề cần hỗ trợ</option>
+                        <option value="account">Tài khoản & Đăng ký</option>
+                        <option value="borrow">Mượn & Trả sách</option>
+                        <option value="technical">Hỗ trợ kỹ thuật</option>
+                        <option value="suggestion">Góp ý & Đề xuất</option>
+                        <option value="other">Khác</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <textarea id="message" rows="5" placeholder="💬 Nội dung tin nhắn của bạn..." required></textarea>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">
+                    <i class="fas fa-paper-plane"></i>
+                    Gửi Tin Nhắn
+                </button>
+                <p style="text-align: center; margin-top: 15px; color: #666; font-size: 0.9rem;">
+                    🔒 Thông tin của bạn được bảo mật tuyệt đối
+                </p>
             </form>
         </div>
     </div>
 </section>
+
+@section Scripts {
+    <script>
+        // Form submission handling
+        document.getElementById('contactForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            // Simple form validation and success message
+            const name = document.getElementById('name').value;
+            const email = document.getElementById('email').value;
+            const message = document.getElementById('message').value;
+
+            if (name && email && message) {
+                alert('🎉 Cảm ơn bạn đã liên hệ! Chúng tôi sẽ phản hồi trong thời gian sớm nhất.');
+                this.reset();
+            }
+        });
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+    </script>
+}
