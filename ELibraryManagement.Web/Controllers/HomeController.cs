@@ -102,5 +102,10 @@ namespace ELibraryManagement.Web.Controllers
         {
             return View();
         }
+
+        public IActionResult TestEmptyState()
+        {
+            return View();
+        }
     }
 }

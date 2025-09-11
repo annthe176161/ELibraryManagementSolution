@@ -249,6 +249,7 @@
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
+    line-clamp: 2;
     overflow: hidden;
 }
 
@@ -321,6 +322,15 @@
     text-align: center;
     padding: 80px 20px;
     color: #666;
+    background: white;
+    border-radius: 15px;
+    margin: 40px 0;
+    box-shadow: var(--shadow-light);
+    border: 1px solid var(--border-color);
+}
+
+.empty-state-icon {
+    margin-bottom: 30px;
 }
 
 .empty-state i {
@@ -333,13 +343,69 @@
 .empty-state h4 {
     color: var(--dark-text);
     margin-bottom: 15px;
+    font-size: 1.5rem;
+    font-weight: 600;
 }
 
 .empty-state p {
     font-size: 1.1rem;
     line-height: 1.6;
     max-width: 500px;
-    margin: 0 auto;
+    margin: 0 auto 30px;
+    color: #777;
+}
+
+.empty-state-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.btn-view-all {
+    background: var(--gradient-bg);
+    color: white;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 25px;
+    font-weight: 500;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none !important;
+    cursor: pointer;
+}
+
+.btn-view-all:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-medium);
+    color: white;
+    text-decoration: none !important;
+}
+
+.btn-home {
+    background: transparent;
+    color: var(--primary-red);
+    border: 2px solid var(--primary-red);
+    padding: 10px 24px;
+    border-radius: 25px;
+    font-weight: 500;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none !important;
+    cursor: pointer;
+}
+
+.btn-home:hover {
+    background: var(--primary-red);
+    color: white;
+    transform: translateY(-2px);
+    text-decoration: none !important;
 }
 
 /* ==== RESPONSIVE DESIGN ==== */
@@ -407,6 +473,18 @@
     
     .filter-form .col-md-6 {
         margin-bottom: 15px;
+    }
+    
+    .empty-state-actions {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .btn-view-all,
+    .btn-home {
+        width: 100%;
+        max-width: 250px;
+        justify-content: center;
     }
 }
 

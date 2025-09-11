@@ -1,0 +1,59 @@
+@{
+    ViewData["Title"] = "Test Empty State - Books Page";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/books.css" asp-append-version="true">
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="text-center mb-4">Test Giao Diện Empty State</h1>
+
+            <div class="alert alert-info">
+                <h5>🎯 Kiểm tra các cải tiến:</h5>
+                <ul>
+                    <li>Nút "Xem Tất Cả Sách" không còn gạch dưới</li>
+                    <li>Kích thước nút đã được điều chỉnh</li>
+                    <li>Thêm nút "Về Trang Chủ" để dễ điều hướng</li>
+                    <li>Không còn hiển thị "Tìm thấy 0 cuốn sách" khi không có sách</li>
+                    <li>Giao diện empty state đẹp hơn với icon và layout tốt hơn</li>
+                </ul>
+            </div>
+
+            <!-- Simulate empty state -->
+            <div class="empty-state">
+                <div class="empty-state-icon">
+                    <i class="fas fa-search"></i>
+                </div>
+                <h4>Không tìm thấy sách phù hợp</h4>
+                <p>
+                    Rất tiếc, chúng tôi không tìm thấy cuốn sách nào phù hợp với tiêu chí tìm kiếm của bạn.
+                    <br>Vui lòng thử lại với từ khóa khác hoặc điều chỉnh bộ lọc.
+                </p>
+                <div class="empty-state-actions">
+                    <a href="@Url.Action("Books", "Home")" class="btn-view-all">
+                        <i class="fas fa-refresh"></i>
+                        Xem Tất Cả Sách
+                    </a>
+                    <a href="@Url.Action("Index", "Home")" class="btn-home">
+                        <i class="fas fa-home"></i>
+                        Về Trang Chủ
+                    </a>
+                </div>
+            </div>
+
+            <div class="text-center mt-5">
+                <h4>🎉 Cải tiến hoàn thành!</h4>
+                <p class="text-muted">Bây giờ hãy test với trang Books thật:</p>
+                <div class="mt-4">
+                    <a href="/Home/Books" class="btn btn-primary me-2">Test Trang Books</a>
+                    <a href="/" class="btn btn-success">Về Trang Chủ</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
