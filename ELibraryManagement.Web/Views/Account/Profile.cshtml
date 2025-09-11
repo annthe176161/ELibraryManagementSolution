@@ -1,0 +1,135 @@
+@model ELibraryManagement.Web.Models.UserViewModel
+@{
+    ViewData["Title"] = "Thông tin cá nhân";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/auth.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+}
+
+<div class="profile-container">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="profile-card">
+                    <div class="profile-header">
+                        <div class="profile-avatar">
+                            @if (!string.IsNullOrEmpty(Model.AvatarUrl))
+                            {
+                                <img src="@Model.AvatarUrl" alt="Avatar" class="avatar-img" />
+                            }
+                            else
+                            {
+                                <div class="avatar-placeholder">
+                                    <i class="fas fa-user"></i>
+                                </div>
+                            }
+                        </div>
+                        <div class="profile-info">
+                            <h2 class="profile-name">
+                                @if (!string.IsNullOrEmpty(Model.FirstName) || !string.IsNullOrEmpty(Model.LastName))
+                                {
+                                    @($"{Model.FirstName} {Model.LastName}".Trim())
+                                }
+                                else
+                                {
+                                    @Model.UserName
+                                }
+                            </h2>
+                            <p class="profile-username">@Model.UserName</p>
+                            <p class="profile-email">@Model.Email</p>
+                        </div>
+                    </div>
+
+                    <div class="profile-body">
+                        <h3 class="section-title">
+                            <i class="fas fa-info-circle"></i>
+                            Thông tin chi tiết
+                        </h3>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="info-item">
+                                    <label class="info-label">
+                                        <i class="fas fa-id-card"></i>
+                                        Họ
+                                    </label>
+                                    <p class="info-value">@(Model.FirstName ?? "Chưa cập nhật")</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="info-item">
+                                    <label class="info-label">
+                                        <i class="fas fa-id-card"></i>
+                                        Tên
+                                    </label>
+                                    <p class="info-value">@(Model.LastName ?? "Chưa cập nhật")</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="info-item">
+                                    <label class="info-label">
+                                        <i class="fas fa-phone"></i>
+                                        Số điện thoại
+                                    </label>
+                                    <p class="info-value">@(Model.PhoneNumber ?? "Chưa cập nhật")</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="info-item">
+                                    <label class="info-label">
+                                        <i class="fas fa-calendar"></i>
+                                        Ngày sinh
+                                    </label>
+                                    <p class="info-value">
+                                        @(Model.DateOfBirth?.ToString("dd/MM/yyyy") ?? "Chưa cập nhật")
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="info-item">
+                            <label class="info-label">
+                                <i class="fas fa-map-marker-alt"></i>
+                                Địa chỉ
+                            </label>
+                            <p class="info-value">@(Model.Address ?? "Chưa cập nhật")</p>
+                        </div>
+
+                        <div class="info-item">
+                            <label class="info-label">
+                                <i class="fas fa-clock"></i>
+                                Ngày tạo tài khoản
+                            </label>
+                            <p class="info-value">@Model.CreatedAt.ToString("dd/MM/yyyy HH:mm")</p>
+                        </div>
+                    </div>
+
+                    <div class="profile-actions">
+                        <a href="#" class="btn btn-primary">
+                            <i class="fas fa-edit"></i>
+                            Chỉnh sửa thông tin
+                        </a>
+                        <a href="#" class="btn btn-outline-secondary">
+                            <i class="fas fa-key"></i>
+                            Đổi mật khẩu
+                        </a>
+                        <form asp-controller="Auth" asp-action="Logout" method="post" class="d-inline">
+                            <button type="submit" class="btn btn-outline-danger">
+                                <i class="fas fa-sign-out-alt"></i>
+                                Đăng xuất
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

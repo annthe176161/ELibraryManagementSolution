@@ -1,0 +1,188 @@
+@model ELibraryManagement.Web.Models.RegisterViewModel
+@{
+    ViewData["Title"] = "Đăng ký tài khoản";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/auth.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+}
+
+<div class="auth-container">
+    <div class="auth-wrapper">
+        <div class="auth-card">
+            <div class="auth-header">
+                <i class="fas fa-user-plus auth-icon"></i>
+                <h2 class="auth-title">Đăng ký tài khoản</h2>
+                <p class="auth-subtitle">Tạo tài khoản mới để sử dụng thư viện</p>
+            </div>
+
+            <form asp-action="Register" method="post" class="auth-form">
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label asp-for="UserName" class="form-label">
+                                <i class="fas fa-user"></i>
+                                Tên đăng nhập
+                            </label>
+                            <input asp-for="UserName" class="form-control" placeholder="Nhập tên đăng nhập" />
+                            <span asp-validation-for="UserName" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label asp-for="Email" class="form-label">
+                                <i class="fas fa-envelope"></i>
+                                Email
+                            </label>
+                            <input asp-for="Email" class="form-control" placeholder="Nhập địa chỉ email" />
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label asp-for="FirstName" class="form-label">
+                                <i class="fas fa-id-card"></i>
+                                Họ
+                            </label>
+                            <input asp-for="FirstName" class="form-control" placeholder="Nhập họ" />
+                            <span asp-validation-for="FirstName" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label asp-for="LastName" class="form-label">
+                                <i class="fas fa-id-card"></i>
+                                Tên
+                            </label>
+                            <input asp-for="LastName" class="form-control" placeholder="Nhập tên" />
+                            <span asp-validation-for="LastName" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label asp-for="Password" class="form-label">
+                                <i class="fas fa-lock"></i>
+                                Mật khẩu
+                            </label>
+                            <div class="password-input">
+                                <input asp-for="Password" class="form-control" placeholder="Nhập mật khẩu" />
+                                <i class="fas fa-eye password-toggle" onclick="togglePassword('Password')"></i>
+                            </div>
+                            <span asp-validation-for="Password" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label asp-for="ConfirmPassword" class="form-label">
+                                <i class="fas fa-lock"></i>
+                                Xác nhận mật khẩu
+                            </label>
+                            <div class="password-input">
+                                <input asp-for="ConfirmPassword" class="form-control" placeholder="Nhập lại mật khẩu" />
+                                <i class="fas fa-eye password-toggle" onclick="togglePassword('ConfirmPassword')"></i>
+                            </div>
+                            <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label asp-for="PhoneNumber" class="form-label">
+                                <i class="fas fa-phone"></i>
+                                Số điện thoại
+                            </label>
+                            <input asp-for="PhoneNumber" class="form-control" placeholder="Nhập số điện thoại" />
+                            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label asp-for="DateOfBirth" class="form-label">
+                                <i class="fas fa-calendar"></i>
+                                Ngày sinh
+                            </label>
+                            <input asp-for="DateOfBirth" class="form-control" />
+                            <span asp-validation-for="DateOfBirth" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Address" class="form-label">
+                        <i class="fas fa-map-marker-alt"></i>
+                        Địa chỉ
+                    </label>
+                    <textarea asp-for="Address" class="form-control" rows="3" placeholder="Nhập địa chỉ"></textarea>
+                    <span asp-validation-for="Address" class="text-danger"></span>
+                </div>
+
+                <button type="submit" class="btn btn-primary auth-btn">
+                    <i class="fas fa-user-plus"></i>
+                    Đăng ký
+                </button>
+            </form>
+
+            <div class="auth-footer">
+                <p><a asp-controller="Home" asp-action="Index" class="auth-link">← Quay về trang chủ</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        function togglePassword(fieldId) {
+            const field = document.getElementById(fieldId);
+            const toggle = field.nextElementSibling;
+
+            if (field.type === 'password') {
+                field.type = 'text';
+                toggle.classList.remove('fa-eye');
+                toggle.classList.add('fa-eye-slash');
+            } else {
+                field.type = 'password';
+                toggle.classList.remove('fa-eye-slash');
+                toggle.classList.add('fa-eye');
+            }
+        }
+
+        // Real-time password validation
+        document.getElementById('Password').addEventListener('input', function () {
+            const password = this.value;
+            const confirmPassword = document.getElementById('ConfirmPassword').value;
+
+            if (confirmPassword && password !== confirmPassword) {
+                document.getElementById('ConfirmPassword').classList.add('is-invalid');
+            } else {
+                document.getElementById('ConfirmPassword').classList.remove('is-invalid');
+            }
+        });
+
+        document.getElementById('ConfirmPassword').addEventListener('input', function () {
+            const password = document.getElementById('Password').value;
+            const confirmPassword = this.value;
+
+            if (password !== confirmPassword) {
+                this.classList.add('is-invalid');
+            } else {
+                this.classList.remove('is-invalid');
+            }
+        });
+    </script>
+}

@@ -11,9 +11,24 @@ namespace ELibraryManagement.Web
             // Add services to the container.
             builder.Services.AddControllersWithViews();
 
+            // Add Session support
+            builder.Services.AddSession(options =>
+            {
+                options.IdleTimeout = TimeSpan.FromHours(2);
+                options.Cookie.HttpOnly = true;
+                options.Cookie.IsEssential = true;
+            });
+
+            // Add HttpContextAccessor
+            builder.Services.AddHttpContextAccessor();
+
             // Add HttpClient for API calls
             builder.Services.AddHttpClient<IBookApiService, BookApiService>();
             builder.Services.AddScoped<IBookApiService, BookApiService>();
+
+            // Add Auth services
+            builder.Services.AddHttpClient<IAuthApiService, AuthApiService>();
+            builder.Services.AddScoped<IAuthApiService, AuthApiService>();
 
             var app = builder.Build();
 
@@ -27,6 +42,9 @@ namespace ELibraryManagement.Web
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
+
+            // Add Session middleware
+            app.UseSession();
 
             app.UseRouting();
 
