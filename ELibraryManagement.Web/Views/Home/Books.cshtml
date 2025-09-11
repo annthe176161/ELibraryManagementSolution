@@ -1,118 +1,353 @@
 @model List<ELibraryManagement.Web.Models.BookViewModel>
 @{
-    ViewData["Title"] = "Danh Sách Sách Khả Dụng";
+    ViewData["Title"] = "Thư Viện Sách Việt Nam - Kho Tàng Tri Thức";
 }
 
-<!-- Load CSS -->
-<link rel="stylesheet" href="~/css/books.css" asp-append-version="true">
+@section Styles {
+    <link rel="stylesheet" href="~/css/books.css" asp-append-version="true">
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+}
 
-<div class="container mt-4">
-    <div class="row">
-        <div class="col-12">
-            <h2 class="mb-4">Danh Sách Sách Khả Dụng</h2>
-            
-            @if (Model.Any())
-            {
-                <div class="row">
-                    @foreach (var book in Model)
-                    {
-                        <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
-                            <div class="card h-100 book-card">
-                                <div class="card-img-container">
-                                    @if (!string.IsNullOrEmpty(book.ImageUrl))
-                                    {
-                                        <img src="@book.ImageUrl" class="card-img-top" alt="@book.Title" 
-                                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                                    }
-                                    <div class="placeholder-image" 
-                                         style="display: @(string.IsNullOrEmpty(book.ImageUrl) ? "flex" : "none");">
-                                        <i class="fas fa-book fa-3x"></i>
-                                        <span>Không có ảnh</span>
-                                    </div>
-                                </div>
-                                <div class="card-body d-flex flex-column">
-                                    <h5 class="card-title">@book.Title</h5>
-                                    <p class="card-text text-muted mb-1">
-                                        <i class="fas fa-user"></i> @book.Author
-                                    </p>
-                                    <p class="card-text text-muted mb-1">
-                                        <i class="fas fa-tag"></i> @book.CategoryName
-                                    </p>
-                                    <p class="card-text flex-grow-1">
-                                        @if (!string.IsNullOrEmpty(book.Description))
-                                        {
-                                            @(book.Description.Length > 100 ? book.Description.Substring(0, 100) + "..." : book.Description)
-                                        }
-                                        else
-                                        {
-                                            <span class="text-muted">Không có mô tả</span>
-                                        }
-                                    </p>
-                                    <div class="book-info mt-auto">
-                                        <div class="d-flex justify-content-between align-items-center mb-2">
-                                            <small class="text-success">
-                                                <i class="fas fa-copy"></i> Còn @book.AvailableCopies/@book.TotalCopies cuốn
-                                            </small>
-                                            @if (book.RentalPrice.HasValue && book.RentalPrice.Value > 0)
-                                            {
-                                                <small class="text-warning">
-                                                    <i class="fas fa-dollar-sign"></i> @book.RentalPrice.Value.ToString("N0") VND/ngày
-                                                </small>
-                                            }
-                                            else
-                                            {
-                                                <small class="text-info">
-                                                    <i class="fas fa-gift"></i> Miễn phí
-                                                </small>
-                                            }
-                                        </div>
-                                        @if (book.AvailableCopies > 0)
-                                        {
-                                            <button class="btn btn-primary btn-sm w-100" onclick="borrowBook(@book.Id)">
-                                                <i class="fas fa-book-reader"></i> Mượn sách
-                                            </button>
-                                        }
-                                        else
-                                        {
-                                            <button class="btn btn-secondary btn-sm w-100" disabled>
-                                                <i class="fas fa-ban"></i> Hết sách
-                                            </button>
-                                        }
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    }
+<!-- Page Header -->
+<section class="books-header">
+    <div class="container">
+        <div class="row justify-content-center text-center">
+            <div class="col-lg-8">
+                <h1>📚 Thư Viện Sách Việt Nam</h1>
+                <p>Khám phá kho tàng tri thức với hàng nghìn đầu sách chất lượng từ khắp thế giới</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Filter Section -->
+<div class="container">
+    <div class="filter-section">
+        <h3 class="filter-title">
+            <i class="fas fa-filter"></i>
+            Tìm Kiếm & Lọc Sách
+        </h3>
+
+        <form method="get" action="@Url.Action("Books", "Home")" class="filter-form">
+            <div class="row">
+                <!-- Search -->
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">
+                        <i class="fas fa-search"></i>
+                        Tìm kiếm sách
+                    </label>
+                    <input type="text" name="search" class="form-control"
+                        placeholder="Nhập tên sách, tác giả hoặc từ khóa..." value="@ViewBag.Search">
                 </div>
-            }
-            else
+
+                <!-- Category Filter -->
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">
+                        <i class="fas fa-tags"></i>
+                        Thể loại
+                    </label>
+                    <select name="category" class="form-select">
+                        <option value="">-- Tất cả thể loại --</option>
+                        @if (ViewBag.Categories != null)
+                        {
+                            foreach (string category in ViewBag.Categories)
+                            {
+                                var isSelected = ViewBag.Category == category;
+                                <option value="@category" selected="@isSelected">
+                                    @category
+                                </option>
+                            }
+                        }
+                    </select>
+                </div>
+
+                <!-- Author Filter -->
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">
+                        <i class="fas fa-user-edit"></i>
+                        Tác giả
+                    </label>
+                    <select name="author" class="form-select">
+                        <option value="">-- Tất cả tác giả --</option>
+                        @if (ViewBag.Authors != null)
+                        {
+                            foreach (string author in ViewBag.Authors)
+                            {
+                                var isSelected = ViewBag.Author == author;
+                                <option value="@author" selected="@isSelected">
+                                    @author
+                                </option>
+                            }
+                        }
+                    </select>
+                </div>
+
+                <!-- Sort By -->
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">
+                        <i class="fas fa-sort"></i>
+                        Sắp xếp theo
+                    </label>
+                    <select name="sortBy" class="form-select">
+                        <option value="title" selected="@(ViewBag.SortBy == "title")">Tên sách (A-Z)</option>
+                        <option value="title_desc" selected="@(ViewBag.SortBy == "title_desc")">Tên sách (Z-A)</option>
+                        <option value="author" selected="@(ViewBag.SortBy == "author")">Tác giả (A-Z)</option>
+                        <option value="author_desc" selected="@(ViewBag.SortBy == "author_desc")">Tác giả (Z-A)</option>
+                        <option value="year" selected="@(ViewBag.SortBy == "year")">Năm xuất bản (Mới nhất)</option>
+                        <option value="year_asc" selected="@(ViewBag.SortBy == "year_asc")">Năm xuất bản (Cũ nhất)
+                        </option>
+                        <option value="price" selected="@(ViewBag.SortBy == "price")">Giá (Thấp đến cao)</option>
+                        <option value="price_desc" selected="@(ViewBag.SortBy == "price_desc")">Giá (Cao đến thấp)
+                        </option>
+                    </select>
+                </div>
+
+                <!-- Price Range -->
+                <div class="col-md-3 mb-3">
+                    <label class="form-label">
+                        <i class="fas fa-dollar-sign"></i>
+                        Giá từ (VND)
+                    </label>
+                    <input type="number" name="minPrice" class="form-control" placeholder="0" min="0" step="1000"
+                        value="@ViewBag.MinPrice">
+                </div>
+
+                <div class="col-md-3 mb-3">
+                    <label class="form-label">
+                        <i class="fas fa-dollar-sign"></i>
+                        Giá đến (VND)
+                    </label>
+                    <input type="number" name="maxPrice" class="form-control" placeholder="1000000" min="0" step="1000"
+                        value="@ViewBag.MaxPrice">
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="filter-buttons">
+                <button type="submit" class="btn-filter">
+                    <i class="fas fa-search"></i>
+                    Tìm Kiếm
+                </button>
+                <a href="@Url.Action("Books", "Home")" class="btn-clear">
+                    <i class="fas fa-eraser"></i>
+                    Xóa Bộ Lọc
+                </a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Results Section -->
+    <div class="results-header">
+        <div class="results-count">
+            <i class="fas fa-book"></i>
+            Tìm thấy <strong>@Model.Count</strong> cuốn sách
+        </div>
+    </div>
+
+    <!-- Books Grid -->
+    @if (Model.Any())
+    {
+        <div class="books-grid">
+            @foreach (var book in Model)
             {
-                <div class="text-center py-5">
-                    <i class="fas fa-book-open fa-3x text-muted mb-3"></i>
-                    <h4 class="text-muted">Không có sách khả dụng</h4>
-                    <p class="text-muted">Hiện tại chưa có sách nào trong thư viện hoặc đã hết sách.</p>
+                <div class="book-card">
+                    <div class="card-img-container">
+                        @if (!string.IsNullOrEmpty(book.ImageUrl))
+                        {
+                            <img src="@book.ImageUrl" class="card-img-top" alt="@book.Title"
+                                onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                        }
+                        <div class="placeholder-image"
+                            style="display: @(string.IsNullOrEmpty(book.ImageUrl) ? "flex" : "none");">
+                            <i class="fas fa-book fa-3x"></i>
+                            <span>Không có ảnh bìa</span>
+                        </div>
+
+                        @if (book.AvailableCopies > 0)
+                        {
+                            <div class="book-badge">Còn @book.AvailableCopies cuốn</div>
+                        }
+                        else
+                        {
+                            <div class="book-badge" style="background: #dc3545;">Hết sách</div>
+                        }
+                    </div>
+
+                    <div class="card-body">
+                        <h5 class="card-title">@book.Title</h5>
+
+                        <p class="card-text text-muted">
+                            <i class="fas fa-user"></i>
+                            <strong>Tác giả:</strong> @book.Author
+                        </p>
+
+                        <p class="card-text text-muted">
+                            <i class="fas fa-tag"></i>
+                            <strong>Thể loại:</strong> @book.CategoryName
+                        </p>
+
+                        @if (book.PublicationYear > 0)
+                        {
+                            <p class="card-text text-muted">
+                                <i class="fas fa-calendar"></i>
+                                <strong>Năm XB:</strong> @book.PublicationYear
+                            </p>
+                        }
+
+                        @if (!string.IsNullOrEmpty(book.Description))
+                        {
+                            <p class="card-text">
+                                @(book.Description.Length > 120 ? book.Description.Substring(0, 120) + "..." : book.Description)
+                            </p>
+                        }
+
+                        <div class="book-info">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <small class="availability @(book.AvailableCopies > 0 ? "text-success" : "text-danger")">
+                                    <i class="fas fa-copy"></i>
+                                    @if (book.AvailableCopies > 0)
+                                    {
+                                        <span>Còn @book.AvailableCopies/@book.TotalCopies cuốn</span>
+                                    }
+                                    else
+                                    {
+                                        <span>Hết sách (@book.TotalCopies cuốn)</span>
+                                    }
+                                </small>
+
+                                @if (book.RentalPrice.HasValue && book.RentalPrice.Value > 0)
+                                {
+                                    <small class="text-warning">
+                                        <i class="fas fa-money-bill-wave"></i>
+                                        @book.RentalPrice.Value.ToString("N0") VND/ngày
+                                    </small>
+                                }
+                                else
+                                {
+                                    <small class="text-info">
+                                        <i class="fas fa-gift"></i>
+                                        Miễn phí
+                                    </small>
+                                }
+                            </div>
+
+                            @if (book.AvailableCopies > 0)
+                            {
+                                <button class="btn btn-primary" onclick="borrowBook(@book.Id, '@book.Title')">
+                                    <i class="fas fa-book-reader"></i>
+                                    Mượn Sách Ngay
+                                </button>
+                            }
+                            else
+                            {
+                                <button class="btn btn-secondary" disabled>
+                                    <i class="fas fa-ban"></i>
+                                    Tạm Hết Sách
+                                </button>
+                            }
+                        </div>
+                    </div>
                 </div>
             }
         </div>
-    </div>
+    }
+    else
+    {
+        <div class="empty-state">
+            <i class="fas fa-search"></i>
+            <h4>Không tìm thấy sách phù hợp</h4>
+            <p>
+                Rất tiếc, chúng tôi không tìm thấy cuốn sách nào phù hợp với tiêu chí tìm kiếm của bạn.
+                <br>Vui lòng thử lại với từ khóa khác hoặc điều chỉnh bộ lọc.
+            </p>
+            <a href="@Url.Action("Books", "Home")" class="btn-filter" style="margin-top: 20px;">
+                <i class="fas fa-refresh"></i>
+                Xem Tất Cả Sách
+            </a>
+        </div>
+    }
 </div>
 
-<!-- Load FontAwesome if not already loaded -->
-@{
-    if (!ViewData.ContainsKey("FontAwesome"))
-    {
-        ViewData["FontAwesome"] = true;
-    }
-}
+@section Scripts {
+    <script>
+        // Function to handle book borrowing
+        function borrowBook(bookId, bookTitle) {
+            // Check if user is logged in (you can implement this check)
+            if (confirm(`Bạn có muốn mượn sách "${bookTitle}" không?`)) {
+                // Show loading state
+                const button = event.target;
+                const originalText = button.innerHTML;
+                button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang xử lý...';
+                button.disabled = true;
 
-@if (!ViewData.ContainsKey("FontAwesome"))
-{
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-}
+                // TODO: Implement actual borrow functionality via API
+                // For now, just show a message
+                setTimeout(() => {
+                    alert(`Tính năng mượn sách đang được phát triển!\n\nSách: ${bookTitle}\nMã sách: ${bookId}\n\nVui lòng liên hệ thủ thư để mượn sách.`);
 
-<script>
-function borrowBook(bookId) {
-    // TODO: Implement borrow functionality
-    alert('Tính năng mượn sách sẽ được triển khai sau. Book ID: ' + bookId);
+                    // Restore button state
+                    button.innerHTML = originalText;
+                    button.disabled = false;
+                }, 1000);
+            }
+        }
+
+        // Auto-submit form when sort option changes
+        document.querySelector('select[name="sortBy"]').addEventListener('change', function () {
+            this.form.submit();
+        });
+
+        // Smooth scroll to results when filter is applied
+        if (window.location.search) {
+            setTimeout(() => {
+                const resultsSection = document.querySelector('.results-header');
+                if (resultsSection) {
+                    resultsSection.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            }, 100);
+        }
+
+        // Add loading animation to filter form
+        document.querySelector('.filter-form').addEventListener('submit', function () {
+            const submitButton = this.querySelector('.btn-filter');
+            const originalText = submitButton.innerHTML;
+            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang tìm kiếm...';
+            submitButton.disabled = true;
+        });
+
+        // Image lazy loading fallback
+        document.querySelectorAll('.card-img-top').forEach(img => {
+            img.addEventListener('error', function () {
+                this.style.display = 'none';
+                this.nextElementSibling.style.display = 'flex';
+            });
+        });
+
+        // Add animation to book cards on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -100px 0px'
+        };
+
+        const observer = new IntersectionObserver(function (entries) {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // Initialize animations
+        document.querySelectorAll('.book-card').forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(30px)';
+            card.style.transition = `opacity 0.6s ease ${index * 0.1}s, transform 0.6s ease ${index * 0.1}s`;
+            observer.observe(card);
+        });
+    </script>
 }
-</script>
