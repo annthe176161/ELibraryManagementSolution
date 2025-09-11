@@ -14,5 +14,9 @@ namespace ELibraryManagement.Web.Models
         public int AvailableCopies { get; set; }
         public decimal? RentalPrice { get; set; }
         public string CategoryName { get; set; } = string.Empty;
+        public string Language { get; set; } = string.Empty;
+        public int PageCount { get; set; }
+        public decimal AverageRating { get; set; }
+        public int RatingCount { get; set; }
     }
 }

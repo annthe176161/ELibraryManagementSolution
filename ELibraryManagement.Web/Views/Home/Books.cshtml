@@ -175,7 +175,11 @@
                     </div>
 
                     <div class="card-body">
-                        <h5 class="card-title">@book.Title</h5>
+                        <h5 class="card-title">
+                            <a href="@Url.Action("BookDetail", "Home", new { id = book.Id })" class="book-title-link">
+                                @book.Title
+                            </a>
+                        </h5>
 
                         <p class="card-text text-muted">
                             <i class="fas fa-user"></i>
@@ -234,17 +238,29 @@
 
                             @if (book.AvailableCopies > 0)
                             {
-                                <button class="btn btn-primary" onclick="borrowBook(@book.Id, '@book.Title')">
-                                    <i class="fas fa-book-reader"></i>
-                                    Mượn Sách Ngay
-                                </button>
+                                <div class="book-actions">
+                                    <a href="@Url.Action("BookDetail", "Home", new { id = book.Id })" class="btn btn-info btn-sm me-2">
+                                        <i class="fas fa-eye"></i>
+                                        Chi Tiết
+                                    </a>
+                                    <button class="btn btn-primary btn-sm" onclick="borrowBook(@book.Id, '@book.Title')">
+                                        <i class="fas fa-book-reader"></i>
+                                        Mượn Ngay
+                                    </button>
+                                </div>
                             }
                             else
                             {
-                                <button class="btn btn-secondary" disabled>
-                                    <i class="fas fa-ban"></i>
-                                    Tạm Hết Sách
-                                </button>
+                                <div class="book-actions">
+                                    <a href="@Url.Action("BookDetail", "Home", new { id = book.Id })" class="btn btn-info btn-sm me-2">
+                                        <i class="fas fa-eye"></i>
+                                        Chi Tiết
+                                    </a>
+                                    <button class="btn btn-secondary btn-sm" disabled>
+                                        <i class="fas fa-ban"></i>
+                                        Hết Sách
+                                    </button>
+                                </div>
                             }
                         </div>
                     </div>

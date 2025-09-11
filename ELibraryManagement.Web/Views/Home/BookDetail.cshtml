@@ -1,0 +1,431 @@
+@using ELibraryManagement.Web.Models
+@model BookViewModel
+@{
+    ViewData["Title"] = $"{Model.Title} - Chi Tiết Sách";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/book-detail.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+}
+
+<!-- Breadcrumb Navigation -->
+<nav aria-label="breadcrumb" class="breadcrumb-nav">
+    <div class="container">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item">
+                <a href="@Url.Action("Index", "Home")">
+                    <i class="fas fa-home me-1"></i>Trang Chủ
+                </a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="@Url.Action("Books", "Home")">
+                    <i class="fas fa-book me-1"></i>Danh Sách Sách
+                </a>
+            </li>
+            <li class="breadcrumb-item active" aria-current="page">@Model.Title</li>
+        </ol>
+    </div>
+</nav>
+
+<!-- Main Book Detail Section -->
+<div class="container book-detail-container">
+    <div class="row">
+        <!-- Book Image and Quick Actions -->
+        <div class="col-lg-5 mb-4">
+            <div class="book-image-section">
+                <div class="book-cover-wrapper">
+                    <img src="@Model.ImageUrl" 
+                         alt="@Model.Title" 
+                         class="book-cover"
+                         onerror="this.src='/images/default-book-cover.jpg'">
+                    <div class="book-badge">
+                        @if (Model.AvailableCopies > 0)
+                        {
+                            <span class="badge-available">📚 Có Sẵn</span>
+                        }
+                        else
+                        {
+                            <span class="badge-unavailable">❌ Hết Sách</span>
+                        }
+                    </div>
+                </div>
+                
+                <!-- Quick Actions -->
+                <div class="quick-actions mt-4">
+                    @if (Model.AvailableCopies > 0)
+                    {
+                        <button class="btn btn-borrow btn-lg w-100 mb-3" onclick="borrowBook(@Model.Id)">
+                            <i class="fas fa-book-reader me-2"></i>
+                            Mượn Sách Ngay
+                        </button>
+                    }
+                    else
+                    {
+                        <button class="btn btn-unavailable btn-lg w-100 mb-3" disabled>
+                            <i class="fas fa-clock me-2"></i>
+                            Đặt Hàng Chờ
+                        </button>
+                    }
+                    
+                    <div class="row">
+                        <div class="col-6">
+                            <button class="btn btn-outline-primary w-100" onclick="addToWishlist(@Model.Id)">
+                                <i class="fas fa-heart me-1"></i>Yêu Thích
+                            </button>
+                        </div>
+                        <div class="col-6">
+                            <button class="btn btn-outline-secondary w-100" onclick="shareBook(@Model.Id)">
+                                <i class="fas fa-share-alt me-1"></i>Chia Sẻ
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Book Stats -->
+                <div class="book-stats mt-4">
+                    <div class="stat-item">
+                        <div class="stat-label">Đánh Giá</div>
+                        <div class="stat-value">
+                            <div class="rating-display">
+                                @for (int i = 1; i <= 5; i++)
+                                {
+                                    if (i <= Model.AverageRating)
+                                    {
+                                        <i class="fas fa-star text-warning"></i>
+                                    }
+                                    else if (i - 0.5 <= (double)Model.AverageRating)
+                                    {
+                                        <i class="fas fa-star-half-alt text-warning"></i>
+                                    }
+                                    else
+                                    {
+                                        <i class="far fa-star text-muted"></i>
+                                    }
+                                }
+                                <span class="rating-text ms-2">@Model.AverageRating.ToString("F1")/5.0</span>
+                            </div>
+                            <small class="text-muted">(@Model.RatingCount lượt đánh giá)</small>
+                        </div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Tình Trạng</div>
+                        <div class="stat-value">
+                            <span class="available-info">
+                                @Model.AvailableCopies/@Model.TotalCopies cuốn có sẵn
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Book Information -->
+        <div class="col-lg-7">
+            <div class="book-info-section">
+                <div class="book-header">
+                    <h1 class="book-title">@Model.Title</h1>
+                    <p class="book-author">
+                        <i class="fas fa-user-edit me-2 text-primary"></i>
+                        Tác giả: <strong>@Model.Author</strong>
+                    </p>
+                    
+                    @if (Model.RentalPrice.HasValue)
+                    {
+                        <div class="book-price">
+                            <span class="price-label">Phí mượn:</span>
+                            <span class="price-value">@Model.RentalPrice.Value.ToString("C0", System.Globalization.CultureInfo.GetCultureInfo("vi-VN"))</span>
+                            <small class="price-note">/ 7 ngày</small>
+                        </div>
+                    }
+                </div>
+
+                <!-- Book Description -->
+                <div class="book-description">
+                    <h5 class="section-title">📖 Mô Tả Sách</h5>
+                    <p class="description-text">@Model.Description</p>
+                </div>
+
+                <!-- Book Details -->
+                <div class="book-details">
+                    <h5 class="section-title">📋 Thông Tin Chi Tiết</h5>
+                    <div class="details-grid">
+                        <div class="detail-item">
+                            <span class="detail-label">📚 Thể Loại:</span>
+                            <span class="detail-value">@Model.CategoryName</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">🏢 Nhà Xuất Bản:</span>
+                            <span class="detail-value">@Model.Publisher</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">📅 Năm Xuất Bản:</span>
+                            <span class="detail-value">@Model.PublicationYear</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">🔢 Mã ISBN:</span>
+                            <span class="detail-value">@Model.ISBN</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">🌐 Ngôn Ngữ:</span>
+                            <span class="detail-value">@Model.Language</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">📄 Số Trang:</span>
+                            <span class="detail-value">@Model.PageCount trang</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Borrowing Information -->
+                <div class="borrowing-info">
+                    <h5 class="section-title">ℹ️ Thông Tin Mượn Sách</h5>
+                    <div class="info-list">
+                        <div class="info-item">
+                            <i class="fas fa-calendar-alt text-primary me-2"></i>
+                            <span>Thời gian mượn tối đa: <strong>14 ngày</strong></span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-redo text-success me-2"></i>
+                            <span>Có thể gia hạn: <strong>1 lần (7 ngày)</strong></span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-exclamation-triangle text-warning me-2"></i>
+                            <span>Phí phạt quá hạn: <strong>5,000đ/ngày</strong></span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-shield-alt text-info me-2"></i>
+                            <span>Bảo hiểm sách: <strong>Được bồi thường 100% nếu mất</strong></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Related Books Section -->
+@if (ViewBag.RelatedBooks != null && ((List<BookViewModel>)ViewBag.RelatedBooks).Any())
+{
+    <div class="related-books-section">
+        <div class="container">
+            <h3 class="section-title text-center mb-5">
+                <i class="fas fa-books me-2"></i>
+                Sách Cùng Thể Loại
+            </h3>
+            <div class="row">
+                @foreach (var book in (List<BookViewModel>)ViewBag.RelatedBooks)
+                {
+                    <div class="col-lg-3 col-md-6 mb-4">
+                        <div class="related-book-card">
+                            <div class="book-image">
+                                <img src="@book.ImageUrl" 
+                                     alt="@book.Title" 
+                                     onerror="this.src='/images/default-book-cover.jpg'">
+                                <div class="book-overlay">
+                                    <a href="@Url.Action("BookDetail", new { id = book.Id })" class="btn btn-outline-white btn-sm">
+                                        <i class="fas fa-eye me-1"></i>Xem Chi Tiết
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="book-content">
+                                <h6 class="book-title">@book.Title</h6>
+                                <p class="book-author">@book.Author</p>
+                                <div class="book-rating">
+                                    @for (int i = 1; i <= 5; i++)
+                                    {
+                                        if (i <= book.AverageRating)
+                                        {
+                                            <i class="fas fa-star text-warning"></i>
+                                        }
+                                        else
+                                        {
+                                            <i class="far fa-star text-muted"></i>
+                                        }
+                                    }
+                                </div>
+                                @if (book.RentalPrice.HasValue)
+                                {
+                                    <div class="book-price">
+                                        @book.RentalPrice.Value.ToString("C0", System.Globalization.CultureInfo.GetCultureInfo("vi-VN"))
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+}
+
+@section Scripts {
+    <script>
+        // Borrow book function
+        function borrowBook(bookId) {
+            // Kiểm tra đăng nhập
+            if (!isUserLoggedIn()) {
+                Swal.fire({
+                    title: '🔐 Cần Đăng Nhập',
+                    text: 'Bạn cần đăng nhập để mượn sách. Chuyển đến trang đăng nhập?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#da251e',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Đăng Nhập',
+                    cancelButtonText: 'Hủy',
+                    customClass: {
+                        popup: 'swal-vietnamese'
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        window.location.href = '/Account/Login';
+                    }
+                });
+                return;
+            }
+
+            // Confirm borrow
+            Swal.fire({
+                title: '📚 Xác Nhận Mượn Sách',
+                text: `Bạn có chắc chắn muốn mượn sách "${@Html.Raw(Json.Serialize(Model.Title))}"?`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#da251e',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Mượn Ngay',
+                cancelButtonText: 'Hủy',
+                customClass: {
+                    popup: 'swal-vietnamese'
+                }
+            }).then(async (result) => {
+                if (result.isConfirmed) {
+                    try {
+                        // Show loading
+                        Swal.fire({
+                            title: 'Đang xử lý...',
+                            text: 'Vui lòng chờ trong giây lát',
+                            allowOutsideClick: false,
+                            didOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
+
+                        // Call API to borrow book
+                        const response = await fetch('/api/borrow', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${localStorage.getItem('jwt_token')}`
+                            },
+                            body: JSON.stringify({
+                                bookId: bookId,
+                                borrowDays: 14
+                            })
+                        });
+
+                        if (response.ok) {
+                            Swal.fire({
+                                title: '🎉 Mượn Sách Thành Công!',
+                                text: 'Sách đã được thêm vào danh sách mượn của bạn. Hạn trả: 14 ngày kể từ hôm nay.',
+                                icon: 'success',
+                                confirmButtonColor: '#da251e',
+                                customClass: {
+                                    popup: 'swal-vietnamese'
+                                }
+                            }).then(() => {
+                                // Refresh page to update available copies
+                                window.location.reload();
+                            });
+                        } else {
+                            const error = await response.json();
+                            Swal.fire({
+                                title: '❌ Lỗi',
+                                text: error.message || 'Không thể mượn sách. Vui lòng thử lại sau.',
+                                icon: 'error',
+                                confirmButtonColor: '#da251e'
+                            });
+                        }
+                    } catch (error) {
+                        Swal.fire({
+                            title: '❌ Lỗi Kết Nối',
+                            text: 'Không thể kết nối đến server. Vui lòng kiểm tra kết nối mạng.',
+                            icon: 'error',
+                            confirmButtonColor: '#da251e'
+                        });
+                    }
+                }
+            });
+        }
+
+        // Add to wishlist function
+        function addToWishlist(bookId) {
+            Swal.fire({
+                title: '💝 Thêm Vào Yêu Thích',
+                text: 'Tính năng này sẽ được phát triển trong phiên bản tiếp theo!',
+                icon: 'info',
+                confirmButtonColor: '#da251e'
+            });
+        }
+
+        // Share book function
+        function shareBook(bookId) {
+            const bookUrl = window.location.href;
+            const bookTitle = @Html.Raw(Json.Serialize(Model.Title));
+            
+            if (navigator.share) {
+                navigator.share({
+                    title: bookTitle,
+                    text: `Tôi vừa tìm thấy cuốn sách hay: ${bookTitle}`,
+                    url: bookUrl
+                }).catch(console.error);
+            } else {
+                // Fallback: copy to clipboard
+                navigator.clipboard.writeText(bookUrl).then(() => {
+                    Swal.fire({
+                        title: '📋 Đã Sao Chép',
+                        text: 'Link sách đã được sao chép vào clipboard!',
+                        icon: 'success',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                });
+            }
+        }
+
+        // Check if user is logged in
+        function isUserLoggedIn() {
+            // This would typically check for a JWT token or session
+            return localStorage.getItem('jwt_token') !== null;
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add smooth scrolling to related books
+            const relatedBooksCards = document.querySelectorAll('.related-book-card');
+            relatedBooksCards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-5px)';
+                });
+                card.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0)';
+                });
+            });
+
+            // Book cover animation
+            const bookCover = document.querySelector('.book-cover');
+            bookCover.addEventListener('mouseenter', function() {
+                this.style.transform = 'scale(1.05) rotateY(5deg)';
+            });
+            bookCover.addEventListener('mouseleave', function() {
+                this.style.transform = 'scale(1) rotateY(0deg)';
+            });
+        });
+    </script>
+    
+    <!-- SweetAlert2 for beautiful alerts -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+}

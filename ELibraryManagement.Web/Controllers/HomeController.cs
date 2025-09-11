@@ -51,6 +51,36 @@ namespace ELibraryManagement.Web.Controllers
             }
         }
 
+        public async Task<IActionResult> BookDetail(int id)
+        {
+            _logger.LogInformation("BookDetail action called with ID: {BookId}", id);
+
+            try
+            {
+                _logger.LogInformation("Calling API to get book with ID: {BookId}", id);
+                var book = await _bookApiService.GetBookByIdAsync(id);
+
+                if (book == null)
+                {
+                    _logger.LogWarning("Book with ID {BookId} not found in API response", id);
+                    return NotFound($"Book with ID {id} not found");
+                }
+
+                _logger.LogInformation("Successfully retrieved book: {BookTitle}", book.Title);
+
+                // Lấy sách liên quan (cùng thể loại)
+                var relatedBooks = await _bookApiService.GetRelatedBooksAsync(id, book.CategoryName);
+                ViewBag.RelatedBooks = relatedBooks ?? new List<BookViewModel>();
+
+                return View(book);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error loading book detail for ID: {BookId}", id);
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
         public IActionResult Privacy()
         {
             return View();
