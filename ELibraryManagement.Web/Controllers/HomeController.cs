@@ -23,11 +23,11 @@ namespace ELibraryManagement.Web.Controllers
             return View();
         }
 
-        public async Task<IActionResult> Books(string? search, string? category, string? author, decimal? minPrice, decimal? maxPrice, string? sortBy, int page = 1, int pageSize = 12)
+        public async Task<IActionResult> Books(string? search, string? category, string? author, string? sortBy, int page = 1, int pageSize = 12)
         {
             try
             {
-                var books = await _bookApiService.GetAvailableBooksAsync(search, category, author, minPrice, maxPrice, sortBy, page, pageSize);
+                var books = await _bookApiService.GetAvailableBooksAsync(search, category, author, sortBy, page, pageSize);
 
                 // Lấy danh sách categories và authors để hiển thị trong filter
                 var categories = await _bookApiService.GetCategoriesAsync();
@@ -38,8 +38,6 @@ namespace ELibraryManagement.Web.Controllers
                 ViewBag.Search = search;
                 ViewBag.Category = category;
                 ViewBag.Author = author;
-                ViewBag.MinPrice = minPrice;
-                ViewBag.MaxPrice = maxPrice;
                 ViewBag.SortBy = sortBy;
                 ViewBag.Page = page;
                 ViewBag.PageSize = pageSize;

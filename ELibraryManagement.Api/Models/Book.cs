@@ -35,8 +35,6 @@ namespace ELibraryManagement.Api.Models
 
         public bool IsAvailable => AvailableQuantity > 0;
 
-        public decimal? Price { get; set; }
-
         [MaxLength(50)]
         public string? Language { get; set; } = "Vietnamese";
 

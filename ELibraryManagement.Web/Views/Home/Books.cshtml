@@ -226,20 +226,10 @@
                                 </div>
 
                                 <div class="price-section">
-                                    @if (book.RentalPrice.HasValue && book.RentalPrice.Value > 0)
-                                    {
-                                        <small class="text-warning">
-                                            <i class="fas fa-money-bill-wave"></i>
-                                            @book.RentalPrice.Value.ToString("N0") VND/ngày
-                                        </small>
-                                    }
-                                    else
-                                    {
-                                        <small class="text-info">
-                                            <i class="fas fa-gift"></i>
-                                            Miễn phí
-                                        </small>
-                                    }
+                                    <small class="text-info">
+                                        <i class="fas fa-gift"></i>
+                                        Miễn phí
+                                    </small>
                                 </div>
                             </div>
 

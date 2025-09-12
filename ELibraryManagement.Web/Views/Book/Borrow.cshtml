@@ -45,21 +45,10 @@
                                         @Model.BookAuthor
                                     </p>
 
-                                    @if (Model.RentalPrice.HasValue && Model.RentalPrice > 0)
-                                    {
-                                        <div class="rental-price">
-                                            <i class="fas fa-money-bill-wave text-success me-1"></i>
-                                            <strong class="text-success">Phí thuê: @Model.RentalPrice.Value.ToString("N0")
-                                                VND/ngày</strong>
-                                        </div>
-                                    }
-                                    else
-                                    {
-                                        <div class="rental-price">
-                                            <i class="fas fa-gift text-success me-1"></i>
-                                            <strong class="text-success">Miễn phí</strong>
-                                        </div>
-                                    }
+                                    <div class="rental-price">
+                                        <i class="fas fa-gift text-success me-1"></i>
+                                        <strong class="text-success">Miễn phí mượn</strong>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -71,7 +60,6 @@
                         <input type="hidden" asp-for="BookTitle" />
                         <input type="hidden" asp-for="BookAuthor" />
                         <input type="hidden" asp-for="BookCoverUrl" />
-                        <input type="hidden" asp-for="RentalPrice" />
 
                         <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
 

@@ -18,14 +18,14 @@ namespace ELibraryManagement.Api.Models
 
         public DateTime? ReturnDate { get; set; }
 
-        public BorrowStatus Status { get; set; } = BorrowStatus.Borrowed;
+        public BorrowStatus Status { get; set; } = BorrowStatus.Requested;
 
         [MaxLength(500)]
         public string? Notes { get; set; }
 
-        public decimal? RentalPrice { get; set; } // Giá thuê tại thời điểm mượn
+        public DateTime? ConfirmedDate { get; set; } // Ngày admin xác nhận mượn
 
-        public bool IsOverdue => ReturnDate == null && DateTime.UtcNow > DueDate;
+        public bool IsOverdue => Status == BorrowStatus.Borrowed && ReturnDate == null && DateTime.UtcNow > DueDate;
 
         public int OverdueDays => IsOverdue ? (DateTime.UtcNow - DueDate).Days : 0;
 
@@ -41,9 +41,11 @@ namespace ELibraryManagement.Api.Models
 
     public enum BorrowStatus
     {
-        Borrowed,
-        Returned,
-        Lost,
-        Damaged
+        Requested,  // Sinh viên yêu cầu mượn (chờ xác nhận)
+        Borrowed,   // Đang mượn (đã xác nhận)
+        Returned,   // Đã trả
+        Lost,       // Mất sách
+        Damaged,    // Hư hỏng
+        Cancelled   // Hủy yêu cầu
     }
 }

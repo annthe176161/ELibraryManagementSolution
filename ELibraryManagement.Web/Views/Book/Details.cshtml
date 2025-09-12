@@ -99,21 +99,10 @@
                                 </div>
                             </div>
                             <div class="col-sm-6">
-                                @if (Model.RentalPrice.HasValue && Model.RentalPrice > 0)
-                                {
-                                    <div class="meta-item">
-                                        <i class="fas fa-money-bill-wave text-success"></i>
-                                        <strong>Giá thuê:</strong> <span
-                                            class="text-success">@Model.RentalPrice.Value.ToString("N0") VND/ngày</span>
-                                    </div>
-                                }
-                                else
-                                {
-                                    <div class="meta-item">
-                                        <i class="fas fa-gift text-success"></i>
-                                        <strong class="text-success">Miễn phí</strong>
-                                    </div>
-                                }
+                                <div class="meta-item">
+                                    <i class="fas fa-gift text-success"></i>
+                                    <strong>Trạng thái:</strong> <span class="text-success">Miễn phí mượn</span>
+                                </div>
                             </div>
                         </div>
 

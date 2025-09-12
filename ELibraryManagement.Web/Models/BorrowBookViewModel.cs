@@ -10,7 +10,6 @@ namespace ELibraryManagement.Web.Models
         public string BookTitle { get; set; } = string.Empty;
         public string BookAuthor { get; set; } = string.Empty;
         public string BookCoverUrl { get; set; } = string.Empty;
-        public decimal? RentalPrice { get; set; }
 
         [Display(Name = "Ngày trả dự kiến")]
         [DataType(DataType.Date)]
@@ -43,7 +42,6 @@ namespace ELibraryManagement.Web.Models
         public string UserId { get; set; } = string.Empty;
         public DateTime BorrowDate { get; set; }
         public DateTime DueDate { get; set; }
-        public decimal? RentalPrice { get; set; }
         public string Status { get; set; } = string.Empty;
         public string Message { get; set; } = string.Empty;
         public bool Success { get; set; }
@@ -59,7 +57,6 @@ namespace ELibraryManagement.Web.Models
         public DateTime BorrowDate { get; set; }
         public DateTime DueDate { get; set; }
         public DateTime? ReturnDate { get; set; }
-        public decimal? RentalPrice { get; set; }
         public string Status { get; set; } = string.Empty;
         public string? Notes { get; set; }
         public bool IsOverdue => DueDate < DateTime.Now && ReturnDate == null;

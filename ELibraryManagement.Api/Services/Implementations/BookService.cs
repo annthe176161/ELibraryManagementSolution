@@ -1,4 +1,4 @@
-using ELibraryManagement.Api.Data;
+﻿using ELibraryManagement.Api.Data;
 using ELibraryManagement.Api.DTOs;
 using ELibraryManagement.Api.Models;
 using ELibraryManagement.Api.Services.Interfaces;
@@ -33,7 +33,6 @@ namespace ELibraryManagement.Api.Services.Implementations
                     CoverImageUrl = b.CoverImageUrl,
                     Quantity = b.Quantity,
                     AvailableQuantity = b.AvailableQuantity,
-                    Price = b.Price,
                     Language = b.Language,
                     PageCount = b.PageCount,
                     AverageRating = (float)b.AverageRating,
@@ -70,12 +69,11 @@ namespace ELibraryManagement.Api.Services.Implementations
                 CoverImageUrl = book.CoverImageUrl,
                 Quantity = book.Quantity,
                 AvailableQuantity = book.AvailableQuantity,
-                Price = book.Price,
                 Language = book.Language,
                 PageCount = book.PageCount,
                 AverageRating = (float)book.AverageRating,
                 RatingCount = book.RatingCount,
-                Categories = book.BookCategories?.Select(bc => new CategoryDto
+                Categories = book.BookCategories.Select(bc => new CategoryDto
                 {
                     Id = bc.Category.Id,
                     Name = bc.Category.Name,
@@ -87,53 +85,28 @@ namespace ELibraryManagement.Api.Services.Implementations
 
         public async Task<BorrowBookResponseDto> BorrowBookAsync(BorrowBookRequestDto request)
         {
-            // Validate book exists and is available
-            var book = await _context.Books
-                .FirstOrDefaultAsync(b => b.Id == request.BookId && !b.IsDeleted);
-
+            // Check if book exists and is available
+            var book = await _context.Books.FindAsync(request.BookId);
             if (book == null)
             {
-                return new BorrowBookResponseDto
-                {
-                    Message = "Book not found."
-                };
+                throw new ArgumentException("Book not found.");
             }
 
             if (book.AvailableQuantity <= 0)
             {
-                return new BorrowBookResponseDto
-                {
-                    Message = "Book is not available for borrowing."
-                };
+                throw new InvalidOperationException("Book is not available for borrowing.");
             }
 
-            // Validate user exists
-            var user = await _context.Users
-                .FirstOrDefaultAsync(u => u.Id == request.UserId);
-
-            if (user == null)
-            {
-                return new BorrowBookResponseDto
-                {
-                    Message = "User not found."
-                };
-            }
-
-            // Check if user already has this book borrowed and not returned
+            // Check if user already has this book borrowed
             var existingBorrow = await _context.BorrowRecords
-                .FirstOrDefaultAsync(br => br.UserId == request.UserId &&
-                                         br.BookId == request.BookId &&
-                                         br.Status == BorrowStatus.Borrowed);
+                .AnyAsync(br => br.UserId == request.UserId && br.BookId == request.BookId && br.Status == BorrowStatus.Borrowed);
 
-            if (existingBorrow != null)
+            if (existingBorrow)
             {
-                return new BorrowBookResponseDto
-                {
-                    Message = "You have already borrowed this book and haven't returned it yet."
-                };
+                throw new InvalidOperationException("You have already borrowed this book.");
             }
 
-            // Set default due date if not provided (14 days from now)
+            // Calculate due date (default 14 days if not provided)
             var dueDate = request.DueDate ?? DateTime.UtcNow.AddDays(14);
 
             // Create borrow record
@@ -145,7 +118,6 @@ namespace ELibraryManagement.Api.Services.Implementations
                 DueDate = dueDate,
                 Status = BorrowStatus.Borrowed,
                 Notes = request.Notes,
-                RentalPrice = book.Price, // Use book's price as rental price
                 CreatedAt = DateTime.UtcNow
             };
 
@@ -164,7 +136,6 @@ namespace ELibraryManagement.Api.Services.Implementations
                 UserId = request.UserId,
                 BorrowDate = borrowRecord.BorrowDate,
                 DueDate = borrowRecord.DueDate,
-                RentalPrice = borrowRecord.RentalPrice,
                 Status = borrowRecord.Status.ToString(),
                 Message = "Book borrowed successfully."
             };
@@ -187,7 +158,6 @@ namespace ELibraryManagement.Api.Services.Implementations
                     DueDate = br.DueDate,
                     ReturnDate = br.ReturnDate,
                     Status = br.Status.ToString(),
-                    RentalPrice = br.RentalPrice,
                     Notes = br.Notes
                 })
                 .ToListAsync();
@@ -203,51 +173,45 @@ namespace ELibraryManagement.Api.Services.Implementations
 
             if (borrowRecord == null)
             {
-                return new ReturnBookResponseDto
-                {
-                    Success = false,
-                    Message = "Borrow record not found."
-                };
+                throw new ArgumentException("Borrow record not found.");
             }
 
-            if (borrowRecord.Status == BorrowStatus.Returned)
+            if (borrowRecord.Status != BorrowStatus.Borrowed)
             {
-                return new ReturnBookResponseDto
-                {
-                    Success = false,
-                    Message = "Book has already been returned."
-                };
+                throw new InvalidOperationException("This book is not currently borrowed.");
             }
 
-            // Calculate fine if overdue
+            var returnDate = DateTime.UtcNow;
+            var isOverdue = returnDate > borrowRecord.DueDate;
             decimal? fineAmount = null;
-            if (DateTime.UtcNow > borrowRecord.DueDate)
+
+            // Calculate fine if overdue (e.g., $1 per day)
+            if (isOverdue)
             {
-                var overdueDays = (DateTime.UtcNow - borrowRecord.DueDate).Days;
-                fineAmount = overdueDays * 1000; // 1000 VND per day overdue
+                var overdueDays = (returnDate - borrowRecord.DueDate).Days;
+                fineAmount = overdueDays * 1.0m; // $1 per day fine
+
+                // Create a fine record
+                var fine = new Fine
+                {
+                    UserId = borrowRecord.UserId,
+                    BorrowRecordId = borrowRecord.Id,
+                    Amount = fineAmount.Value,
+                    Reason = $"Overdue return - {overdueDays} days late",
+                    Status = FineStatus.Pending,
+                    CreatedAt = DateTime.UtcNow
+                };
+
+                _context.Fines.Add(fine);
             }
 
             // Update borrow record
-            borrowRecord.ReturnDate = DateTime.UtcNow;
+            borrowRecord.ReturnDate = returnDate;
             borrowRecord.Status = BorrowStatus.Returned;
             borrowRecord.UpdatedAt = DateTime.UtcNow;
 
             // Increase available quantity
             borrowRecord.Book.AvailableQuantity++;
-
-            // Create fine record if overdue
-            if (fineAmount > 0)
-            {
-                var fine = new Fine
-                {
-                    BorrowRecordId = borrowRecord.Id,
-                    Amount = fineAmount.Value,
-                    Reason = $"Overdue return: {borrowRecord.Book.Title}",
-                    Status = FineStatus.Pending,
-                    CreatedAt = DateTime.UtcNow
-                };
-                _context.Fines.Add(fine);
-            }
 
             await _context.SaveChangesAsync();
 
@@ -258,9 +222,9 @@ namespace ELibraryManagement.Api.Services.Implementations
                 BookId = borrowRecord.BookId,
                 BookTitle = borrowRecord.Book.Title,
                 UserId = borrowRecord.UserId,
-                ReturnDate = borrowRecord.ReturnDate.Value,
+                ReturnDate = returnDate,
                 FineAmount = fineAmount,
-                Message = fineAmount > 0 ? $"Book returned successfully. Fine amount: {fineAmount} VND" : "Book returned successfully."
+                Message = isOverdue ? $"Book returned successfully. Fine: ${fineAmount:F2}" : "Book returned successfully."
             };
         }
     }

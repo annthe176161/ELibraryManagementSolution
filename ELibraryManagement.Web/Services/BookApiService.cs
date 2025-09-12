@@ -6,7 +6,7 @@ namespace ELibraryManagement.Web.Services
     public interface IBookApiService
     {
         Task<List<BookViewModel>> GetAvailableBooksAsync();
-        Task<List<BookViewModel>> GetAvailableBooksAsync(string? search, string? category, string? author, decimal? minPrice, decimal? maxPrice, string? sortBy, int page = 1, int pageSize = 12);
+        Task<List<BookViewModel>> GetAvailableBooksAsync(string? search, string? category, string? author, string? sortBy, int page = 1, int pageSize = 12);
         Task<BookViewModel?> GetBookByIdAsync(int id);
         Task<List<BookViewModel>> GetRelatedBooksAsync(int excludeId, string? categoryName, int count = 4);
         Task<List<string>> GetCategoriesAsync();
@@ -67,7 +67,6 @@ namespace ELibraryManagement.Web.Services
                         ImageUrl = GetPropertyValue<string>(book, "coverImageUrl") ?? string.Empty,
                         TotalCopies = GetPropertyValue<int>(book, "quantity"),
                         AvailableCopies = GetPropertyValue<int>(book, "availableQuantity"),
-                        RentalPrice = GetPropertyValue<decimal?>(book, "price"),
                         CategoryName = GetCategoryName(book)
                     }).ToList() ?? new List<BookViewModel>();
                 }
@@ -108,7 +107,7 @@ namespace ELibraryManagement.Web.Services
             }
         }
 
-        public async Task<List<BookViewModel>> GetAvailableBooksAsync(string? search, string? category, string? author, decimal? minPrice, decimal? maxPrice, string? sortBy, int page = 1, int pageSize = 12)
+        public async Task<List<BookViewModel>> GetAvailableBooksAsync(string? search, string? category, string? author, string? sortBy, int page = 1, int pageSize = 12)
         {
             try
             {
@@ -133,16 +132,6 @@ namespace ELibraryManagement.Web.Services
                     filters.Add($"contains(tolower(author), '{author.ToLower()}')");
                 }
 
-                if (minPrice.HasValue)
-                {
-                    filters.Add($"price ge {minPrice.Value}");
-                }
-
-                if (maxPrice.HasValue)
-                {
-                    filters.Add($"price le {maxPrice.Value}");
-                }
-
                 if (filters.Any())
                 {
                     queryParams.Add($"$filter={string.Join(" and ", filters)}");
@@ -157,8 +146,6 @@ namespace ELibraryManagement.Web.Services
                         "title_desc" => "title desc",
                         "author" => "author",
                         "author_desc" => "author desc",
-                        "price" => "price",
-                        "price_desc" => "price desc",
                         "year" => "publicationYear desc",
                         "year_asc" => "publicationYear",
                         _ => "title"
@@ -191,7 +178,6 @@ namespace ELibraryManagement.Web.Services
                         ImageUrl = GetPropertyValue<string>(book, "coverImageUrl") ?? string.Empty,
                         TotalCopies = GetPropertyValue<int>(book, "quantity"),
                         AvailableCopies = GetPropertyValue<int>(book, "availableQuantity"),
-                        RentalPrice = GetPropertyValue<decimal?>(book, "price"),
                         CategoryName = GetCategoryName(book)
                     }).ToList() ?? new List<BookViewModel>();
                 }
@@ -586,7 +572,6 @@ namespace ELibraryManagement.Web.Services
                         ImageUrl = root.TryGetProperty("coverImageUrl", out var imgProp) ? imgProp.GetString() ?? "/images/no-image.jpg" : "/images/no-image.jpg",
                         TotalCopies = root.TryGetProperty("quantity", out var qtyProp) ? qtyProp.GetInt32() : 1,
                         AvailableCopies = root.TryGetProperty("availableQuantity", out var availProp) ? availProp.GetInt32() : 1,
-                        RentalPrice = root.TryGetProperty("price", out var priceProp) ? (decimal?)priceProp.GetDecimal() : 50000m,
 
                         // Try multiple possible property names for category
                         CategoryName = GetCategoryName(root),
@@ -620,7 +605,6 @@ namespace ELibraryManagement.Web.Services
                     ImageUrl = "https://via.placeholder.com/300x400?text=Book+Cover",
                     TotalCopies = 5,
                     AvailableCopies = 3,
-                    RentalPrice = 30000m + (id * 5000),
                     CategoryName = categories[id % categories.Length],
                     Language = languages[id % languages.Length],
                     PageCount = 200 + (id * 20),
@@ -659,7 +643,6 @@ namespace ELibraryManagement.Web.Services
                         Title = GetPropertyValue<string>(book, "title") ?? string.Empty,
                         Author = GetPropertyValue<string>(book, "author") ?? string.Empty,
                         ImageUrl = GetPropertyValue<string>(book, "coverImageUrl") ?? string.Empty,
-                        RentalPrice = GetPropertyValue<decimal?>(book, "price"),
                         CategoryName = GetCategoryName(book),
                         AverageRating = GetPropertyValue<decimal>(book, "averageRating")
                     }).ToList() ?? new List<BookViewModel>();
@@ -776,7 +759,6 @@ namespace ELibraryManagement.Web.Services
                         UserId = GetPropertyValue<string>(result, "userId") ?? "",
                         BorrowDate = GetPropertyValue<DateTime>(result, "borrowDate"),
                         DueDate = GetPropertyValue<DateTime>(result, "dueDate"),
-                        RentalPrice = GetPropertyValue<decimal?>(result, "rentalPrice"),
                         Status = GetPropertyValue<string>(result, "status") ?? "",
                         Message = GetPropertyValue<string>(result, "message") ?? "Mượn sách thành công!"
                     };
@@ -828,7 +810,6 @@ namespace ELibraryManagement.Web.Services
                         BorrowDate = GetPropertyValue<DateTime>(book, "borrowDate"),
                         DueDate = GetPropertyValue<DateTime>(book, "dueDate"),
                         ReturnDate = GetPropertyValue<DateTime?>(book, "returnDate"),
-                        RentalPrice = GetPropertyValue<decimal?>(book, "rentalPrice"),
                         Status = GetPropertyValue<string>(book, "status") ?? "",
                         Notes = GetPropertyValue<string>(book, "notes")
                     }).ToList() ?? new List<UserBorrowedBookViewModel>();

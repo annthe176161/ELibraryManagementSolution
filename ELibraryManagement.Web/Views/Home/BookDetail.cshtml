@@ -132,14 +132,10 @@
                         Tác giả: <strong>@Model.Author</strong>
                     </p>
 
-                    @if (Model.RentalPrice.HasValue)
-                    {
-                        <div class="book-price">
-                            <span class="price-label">Phí mượn:</span>
-                            <span class="price-value">@Model.RentalPrice.Value.ToString("N0") VND</span>
-                            <small class="price-note">/ngày</small>
-                        </div>
-                    }
+                    <div class="book-price">
+                        <span class="price-label">Trạng thái:</span>
+                        <span class="price-value text-success">Miễn phí mượn</span>
+                    </div>
                 </div>
 
                 <!-- Book Description -->
@@ -245,12 +241,9 @@
                                         }
                                     }
                                 </div>
-                                @if (book.RentalPrice.HasValue)
-                                {
-                                    <div class="book-price">
-                                        @book.RentalPrice.Value.ToString("N0") VND/ngày
-                                    </div>
-                                }
+                                <div class="book-price">
+                                    <span class="text-success">Miễn phí</span>
+                                </div>
                             </div>
                         </div>
                     </div>

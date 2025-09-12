@@ -24,7 +24,6 @@ namespace ELibraryManagement.Api.DTOs
         public string UserId { get; set; } = string.Empty;
         public DateTime BorrowDate { get; set; }
         public DateTime DueDate { get; set; }
-        public decimal? RentalPrice { get; set; }
         public string Status { get; set; } = string.Empty;
         public string Message { get; set; } = string.Empty;
     }
@@ -40,7 +39,6 @@ namespace ELibraryManagement.Api.DTOs
         public DateTime DueDate { get; set; }
         public DateTime? ReturnDate { get; set; }
         public string Status { get; set; } = string.Empty;
-        public decimal? RentalPrice { get; set; }
         public string? Notes { get; set; }
         public bool IsOverdue => ReturnDate == null && DateTime.UtcNow > DueDate;
         public int OverdueDays => IsOverdue ? (DateTime.UtcNow - DueDate).Days : 0;

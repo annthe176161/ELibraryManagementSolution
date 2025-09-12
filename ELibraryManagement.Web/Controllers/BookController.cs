@@ -72,7 +72,6 @@ namespace ELibraryManagement.Web.Controllers
                     BookTitle = book.Title,
                     BookAuthor = book.Author,
                     BookCoverUrl = book.ImageUrl,
-                    RentalPrice = book.RentalPrice,
                     DueDate = DateTime.Today.AddDays(14) // Mặc định 14 ngày
                 };
 

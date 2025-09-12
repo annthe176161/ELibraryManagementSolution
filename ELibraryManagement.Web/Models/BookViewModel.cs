@@ -12,7 +12,6 @@ namespace ELibraryManagement.Web.Models
         public string ImageUrl { get; set; } = string.Empty;
         public int TotalCopies { get; set; }
         public int AvailableCopies { get; set; }
-        public decimal? RentalPrice { get; set; }
         public string CategoryName { get; set; } = string.Empty;
         public string Language { get; set; } = string.Empty;
         public int PageCount { get; set; }

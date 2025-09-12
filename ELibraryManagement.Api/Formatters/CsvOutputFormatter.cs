@@ -26,7 +26,7 @@ namespace ELibraryManagement.Api.Formatters
             if (context.Object is IEnumerable<BookDto> books)
             {
                 // Write CSV header
-                buffer.AppendLine("Id,Title,Author,ISBN,Publisher,PublicationYear,Description,CoverImageUrl,Quantity,AvailableQuantity,Price,Language,PageCount,AverageRating,RatingCount,Categories");
+                buffer.AppendLine("Id,Title,Author,ISBN,Publisher,PublicationYear,Description,CoverImageUrl,Quantity,AvailableQuantity,Language,PageCount,AverageRating,RatingCount,Categories");
 
                 foreach (var book in books)
                 {
@@ -35,7 +35,7 @@ namespace ELibraryManagement.Api.Formatters
             }
             else if (context.Object is BookDto book)
             {
-                buffer.AppendLine("Id,Title,Author,ISBN,Publisher,PublicationYear,Description,CoverImageUrl,Quantity,AvailableQuantity,Price,Language,PageCount,AverageRating,RatingCount,Categories");
+                buffer.AppendLine("Id,Title,Author,ISBN,Publisher,PublicationYear,Description,CoverImageUrl,Quantity,AvailableQuantity,Language,PageCount,AverageRating,RatingCount,Categories");
                 buffer.AppendLine(FormatBookAsCsv(book));
             }
 
@@ -58,7 +58,6 @@ namespace ELibraryManagement.Api.Formatters
                    $"{EscapeCsv(book.CoverImageUrl)}," +
                    $"{EscapeCsv(book.Quantity)}," +
                    $"{EscapeCsv(book.AvailableQuantity)}," +
-                   $"{EscapeCsv(book.Price)}," +
                    $"{EscapeCsv(book.Language)}," +
                    $"{EscapeCsv(book.PageCount)}," +
                    $"{EscapeCsv(book.AverageRating)}," +

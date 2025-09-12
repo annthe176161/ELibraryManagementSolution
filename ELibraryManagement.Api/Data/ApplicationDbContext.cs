@@ -85,14 +85,6 @@ namespace ELibraryManagement.Api.Data
                 .Property(f => f.Amount)
                 .HasColumnType("decimal(18,2)");
 
-            modelBuilder.Entity<Book>()
-                .Property(b => b.Price)
-                .HasColumnType("decimal(18,2)");
-
-            modelBuilder.Entity<BorrowRecord>()
-                .Property(br => br.RentalPrice)
-                .HasColumnType("decimal(18,2)");
-
             // Configure indexes for performance
             modelBuilder.Entity<Book>()
                 .HasIndex(b => b.ISBN)

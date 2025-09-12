@@ -51,10 +51,6 @@ namespace ELibraryManagement.Api.DTOs
         public int AvailableQuantity { get; set; }
 
         [DataMember]
-        [XmlElement("Price")]
-        public decimal? Price { get; set; }
-
-        [DataMember]
         [XmlElement("Language")]
         public string? Language { get; set; }
 
