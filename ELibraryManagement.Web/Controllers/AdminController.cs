@@ -223,7 +223,7 @@ namespace ELibraryManagement.Web.Controllers
                 _httpClient.DefaultRequestHeaders.Authorization =
                     new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
-                var response = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Book/borrow-records");
+                var response = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/borrow/admin/all");
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -344,6 +344,153 @@ namespace ELibraryManagement.Web.Controllers
                 else
                 {
                     return Json(new { success = false, message = "Không thể xóa sách" });
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Có lỗi xảy ra: {ex.Message}" });
+            }
+        }
+
+        // Borrow Management Actions
+        [HttpPost]
+        public async Task<IActionResult> UpdateBorrowStatus(int id, string status, string? notes)
+        {
+            var accessCheck = await CheckAdminAccessAsync();
+            if (accessCheck != null) return Json(new { success = false, message = "Unauthorized" });
+
+            try
+            {
+                var token = _authApiService.GetCurrentToken();
+                if (string.IsNullOrEmpty(token))
+                {
+                    return Json(new { success = false, message = "Không có token xác thực" });
+                }
+
+                _httpClient.DefaultRequestHeaders.Clear();
+                _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+
+                var updateDto = new { Status = status, Notes = notes };
+                var json = JsonSerializer.Serialize(updateDto, _jsonOptions);
+                var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+
+                var response = await _httpClient.PutAsync($"{GetApiBaseUrl()}/api/borrow/admin/{id}/status", content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return Json(new { success = true, message = "Cập nhật trạng thái thành công" });
+                }
+                else
+                {
+                    return Json(new { success = false, message = "Không thể cập nhật trạng thái" });
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Có lỗi xảy ra: {ex.Message}" });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ExtendDueDate(int id, DateTime newDueDate, string? reason)
+        {
+            var accessCheck = await CheckAdminAccessAsync();
+            if (accessCheck != null) return Json(new { success = false, message = "Unauthorized" });
+
+            try
+            {
+                var token = _authApiService.GetCurrentToken();
+                if (string.IsNullOrEmpty(token))
+                {
+                    return Json(new { success = false, message = "Không có token xác thực" });
+                }
+
+                _httpClient.DefaultRequestHeaders.Clear();
+                _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+
+                var extendDto = new { NewDueDate = newDueDate, Reason = reason };
+                var json = JsonSerializer.Serialize(extendDto, _jsonOptions);
+                var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+
+                var response = await _httpClient.PutAsync($"{GetApiBaseUrl()}/api/borrow/admin/{id}/extend", content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return Json(new { success = true, message = "Gia hạn thành công" });
+                }
+                else
+                {
+                    return Json(new { success = false, message = "Không thể gia hạn" });
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Có lỗi xảy ra: {ex.Message}" });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SendReminder(int id)
+        {
+            var accessCheck = await CheckAdminAccessAsync();
+            if (accessCheck != null) return Json(new { success = false, message = "Unauthorized" });
+
+            try
+            {
+                var token = _authApiService.GetCurrentToken();
+                if (string.IsNullOrEmpty(token))
+                {
+                    return Json(new { success = false, message = "Không có token xác thực" });
+                }
+
+                _httpClient.DefaultRequestHeaders.Clear();
+                _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+
+                var response = await _httpClient.PostAsync($"{GetApiBaseUrl()}/api/borrow/admin/{id}/remind", null);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return Json(new { success = true, message = "Đã gửi thông báo nhắc nhở" });
+                }
+                else
+                {
+                    return Json(new { success = false, message = "Không thể gửi thông báo" });
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Có lỗi xảy ra: {ex.Message}" });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ConfirmReturn(int id)
+        {
+            var accessCheck = await CheckAdminAccessAsync();
+            if (accessCheck != null) return Json(new { success = false, message = "Unauthorized" });
+
+            try
+            {
+                var token = _authApiService.GetCurrentToken();
+                if (string.IsNullOrEmpty(token))
+                {
+                    return Json(new { success = false, message = "Không có token xác thực" });
+                }
+
+                _httpClient.DefaultRequestHeaders.Clear();
+                _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+
+                var response = await _httpClient.PostAsync($"{GetApiBaseUrl()}/api/borrow/admin/{id}/return", null);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var result = await response.Content.ReadAsStringAsync();
+                    var returnResult = JsonSerializer.Deserialize<dynamic>(result, _jsonOptions);
+                    return Json(new { success = true, message = "Xác nhận trả sách thành công", data = returnResult });
+                }
+                else
+                {
+                    return Json(new { success = false, message = "Không thể xác nhận trả sách" });
                 }
             }
             catch (Exception ex)

@@ -28,13 +28,29 @@ namespace ELibraryManagement.Web.Models
         public int BookId { get; set; }
         public string BookTitle { get; set; } = "";
         public string BookAuthor { get; set; } = "";
+        public string BookCoverUrl { get; set; } = "";
         public DateTime BorrowDate { get; set; }
         public DateTime DueDate { get; set; }
         public DateTime? ReturnDate { get; set; }
-        public bool IsReturned { get; set; }
-        public bool IsOverdue => !IsReturned && DateTime.Now > DueDate;
-        public decimal? RentalPrice { get; set; }
-        public string Status => IsReturned ? "Đã trả" : (IsOverdue ? "Quá hạn" : "Đang mượn");
+        public string Status { get; set; } = "";
+        public string? Notes { get; set; }
+        public decimal? FineAmount { get; set; }
+        public bool IsOverdue => ReturnDate == null && DateTime.Now > DueDate;
+        public int OverdueDays => IsOverdue ? (DateTime.Now - DueDate).Days : 0;
+        public string StatusDisplay => Status switch
+        {
+            "Borrowed" => "Đang mượn",
+            "Returned" => "Đã trả",
+            "Overdue" => "Quá hạn",
+            _ => Status
+        };
+        public string StatusClass => Status switch
+        {
+            "Borrowed" => "success",
+            "Returned" => "secondary",
+            "Overdue" => "danger",
+            _ => "primary"
+        };
     }
 
     public class AdminUserViewModel

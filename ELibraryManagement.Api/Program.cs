@@ -58,6 +58,7 @@ namespace ELibraryManagement.Api
             builder.Services.AddScoped<IBookService, BookService>();
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<IReviewService, ReviewService>();
+            builder.Services.AddScoped<IBorrowService, BorrowService>();
 
             // Add CORS
             builder.Services.AddCors(options =>

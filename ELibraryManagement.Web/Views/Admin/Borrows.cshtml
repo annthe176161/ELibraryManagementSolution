@@ -50,7 +50,7 @@
                     <div class="d-flex justify-content-between">
                         <div>
                             <div class="small">Đang mượn</div>
-                            <div class="h4 mb-0">@Model.Count(b => !b.IsReturned)</div>
+                            <div class="h4 mb-0">@Model.Count(b => b.Status == "Borrowed")</div>
                         </div>
                         <div class="align-self-center">
                             <i class="fas fa-hand-holding fa-2x opacity-75"></i>
@@ -80,7 +80,7 @@
                     <div class="d-flex justify-content-between">
                         <div>
                             <div class="small">Đã trả</div>
-                            <div class="h4 mb-0">@Model.Count(b => b.IsReturned)</div>
+                            <div class="h4 mb-0">@Model.Count(b => b.Status == "Returned")</div>
                         </div>
                         <div class="align-self-center">
                             <i class="fas fa-check-circle fa-2x opacity-75"></i>
@@ -125,7 +125,7 @@
                                     <th scope="col">Hạn trả</th>
                                     <th scope="col">Ngày trả</th>
                                     <th scope="col">Trạng thái</th>
-                                    <th scope="col">Phí thuê</th>
+                                    <th scope="col">Phí phạt</th>
                                     <th scope="col">Thao tác</th>
                                 </tr>
                             </thead>
@@ -169,27 +169,20 @@
                                             }
                                         </td>
                                         <td>
-                                            @if (borrow.IsReturned)
+                                            <span class="badge bg-@borrow.StatusClass">@borrow.StatusDisplay</span>
+                                            @if (borrow.IsOverdue)
                                             {
-                                                <span class="badge bg-success">Đã trả</span>
-                                            }
-                                            else if (borrow.IsOverdue)
-                                            {
-                                                <span class="badge bg-danger">Quá hạn</span>
-                                            }
-                                            else
-                                            {
-                                                <span class="badge bg-warning">Đang mượn</span>
+                                                <br><small class="text-danger">Quá hạn @borrow.OverdueDays ngày</small>
                                             }
                                         </td>
                                         <td>
-                                            @if (borrow.RentalPrice.HasValue)
+                                            @if (borrow.FineAmount.HasValue && borrow.FineAmount.Value > 0)
                                             {
-                                                <span class="fw-bold">@borrow.RentalPrice.Value.ToString("C0", new System.Globalization.CultureInfo("vi-VN"))</span>
+                                                <span class="fw-bold text-danger">@borrow.FineAmount.Value.ToString("C0", new System.Globalization.CultureInfo("vi-VN"))</span>
                                             }
                                             else
                                             {
-                                                <span class="text-muted">Miễn phí</span>
+                                                <span class="text-muted">Không có phạt</span>
                                             }
                                         </td>
                                         <td>
@@ -197,13 +190,13 @@
                                                 <button type="button" class="btn btn-sm btn-outline-primary" title="Xem chi tiết" onclick="viewBorrow(@borrow.Id)">
                                                     <i class="fas fa-eye"></i>
                                                 </button>
-                                                @if (!borrow.IsReturned)
+                                                @if (borrow.Status == "Borrowed")
                                                 {
                                                     <button type="button" class="btn btn-sm btn-outline-success" title="Xác nhận trả sách" onclick="returnBook(@borrow.Id, '@borrow.UserName', '@borrow.BookTitle')">
                                                         <i class="fas fa-check"></i>
                                                     </button>
                                                 }
-                                                @if (borrow.IsOverdue && !borrow.IsReturned)
+                                                @if (borrow.IsOverdue && borrow.Status == "Borrowed")
                                                 {
                                                     <button type="button" class="btn btn-sm btn-outline-warning" title="Gửi nhắc nhở" onclick="sendReminder(@borrow.Id, '@borrow.UserEmail')">
                                                         <i class="fas fa-bell"></i>
@@ -214,10 +207,16 @@
                                                         <i class="fas fa-cog"></i>
                                                     </button>
                                                     <ul class="dropdown-menu">
-                                                        <li><a class="dropdown-item" href="#" onclick="extendDue(@borrow.Id)"><i class="fas fa-calendar-plus me-2"></i>Gia hạn</a></li>
-                                                        <li><a class="dropdown-item" href="#" onclick="viewHistory(@borrow.UserId)"><i class="fas fa-history me-2"></i>Lịch sử mượn</a></li>
-                                                        <li><hr class="dropdown-divider"></li>
-                                                        <li><a class="dropdown-item text-warning" href="#" onclick="addFine(@borrow.Id)"><i class="fas fa-exclamation-triangle me-2"></i>Thêm phạt</a></li>
+                                                        @if (borrow.Status == "Borrowed")
+                                                        {
+                                                            <li><a class="dropdown-item" href="#" onclick="extendDue(@borrow.Id)"><i class="fas fa-calendar-plus me-2"></i>Gia hạn</a></li>
+                                                        }
+                                                        <li><a class="dropdown-item" href="#" onclick="viewHistory('@borrow.UserId')"><i class="fas fa-history me-2"></i>Lịch sử mượn</a></li>
+                                                        @if (!string.IsNullOrEmpty(borrow.Notes))
+                                                        {
+                                                            <li><hr class="dropdown-divider"></li>
+                                                            <li><a class="dropdown-item" href="#" onclick="viewNotes(@borrow.Id)"><i class="fas fa-sticky-note me-2"></i>Xem ghi chú</a></li>
+                                                        }
                                                     </ul>
                                                 </div>
                                             </div>
@@ -248,6 +247,58 @@
                         </nav>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Extend Due Date Modal -->
+<div class="modal fade" id="extendModal" tabindex="-1" aria-labelledby="extendModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="extendModalLabel">Gia hạn ngày trả</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="extendForm">
+                    <div class="mb-3">
+                        <label for="currentDueDate" class="form-label">Ngày hiện tại</label>
+                        <input type="text" class="form-control" id="currentDueDate" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="newDueDate" class="form-label">Ngày gia hạn mới</label>
+                        <input type="date" class="form-control" id="newDueDate" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="extendReason" class="form-label">Lý do gia hạn (tùy chọn)</label>
+                        <textarea class="form-control" id="extendReason" rows="3" placeholder="Nhập lý do gia hạn..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-warning" id="confirmExtend">Gia hạn</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- View Details Modal -->
+<div class="modal fade" id="detailsModal" tabindex="-1" aria-labelledby="detailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="detailsModalLabel">Chi tiết giao dịch mượn</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div id="borrowDetails">
+                    <!-- Details will be loaded here -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
             </div>
         </div>
     </div>
@@ -303,15 +354,48 @@
             });
         });
 
+        let currentBorrowId = null;
+
         function viewBorrow(borrowId) {
-            // Implement view borrow functionality
-            console.log('View borrow:', borrowId);
+            // Show borrow details in modal
+            $('#detailsModal').modal('show');
+            
+            // You would fetch details from API here
+            $('#borrowDetails').html('<div class="text-center"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div>');
+            
+            // Simulate loading details
+            setTimeout(function() {
+                $('#borrowDetails').html(`
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Thông tin người mượn</h6>
+                            <p><strong>Họ tên:</strong> Loading...</p>
+                            <p><strong>Email:</strong> Loading...</p>
+                            <p><strong>Số điện thoại:</strong> Loading...</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Thông tin sách</h6>
+                            <p><strong>Tên sách:</strong> Loading...</p>
+                            <p><strong>Tác giả:</strong> Loading...</p>
+                            <p><strong>ISBN:</strong> Loading...</p>
+                        </div>
+                    </div>
+                    <hr>
+                    <div class="row">
+                        <div class="col-12">
+                            <h6>Thông tin mượn trả</h6>
+                            <p><strong>Ngày mượn:</strong> Loading...</p>
+                            <p><strong>Ngày đến hạn:</strong> Loading...</p>
+                            <p><strong>Trạng thái:</strong> Loading...</p>
+                            <p><strong>Ghi chú:</strong> Loading...</p>
+                        </div>
+                    </div>
+                `);
+            }, 1000);
         }
 
-        let borrowToReturn = null;
-
         function returnBook(borrowId, userName, bookTitle) {
-            borrowToReturn = borrowId;
+            currentBorrowId = borrowId;
             $('#returnDetails').html(`
                 <strong>Người mượn:</strong> ${userName}<br>
                 <strong>Sách:</strong> ${bookTitle}
@@ -320,46 +404,142 @@
         }
 
         $('#confirmReturn').on('click', function() {
-            if (borrowToReturn) {
-                // Implement return book functionality
-                console.log('Return book:', borrowToReturn);
-                // Here you would make an AJAX call to mark the book as returned
-                // For now, just close the modal
-                $('#returnModal').modal('hide');
-                // Show success message
-                alert('Sách đã được xác nhận trả thành công!');
-                // Reload page to reflect changes
-                location.reload();
+            if (currentBorrowId) {
+                // Call API to confirm return
+                const token = localStorage.getItem('token');
+                
+                $.ajax({
+                    url: `/Admin/ConfirmReturn`,
+                    type: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + token
+                    },
+                    data: {
+                        borrowId: currentBorrowId
+                    },
+                    success: function(response) {
+                        $('#returnModal').modal('hide');
+                        showToast('success', 'Sách đã được xác nhận trả thành công!');
+                        setTimeout(() => location.reload(), 1500);
+                    },
+                    error: function(xhr) {
+                        showToast('error', 'Có lỗi xảy ra khi xác nhận trả sách: ' + xhr.responseText);
+                    }
+                });
             }
         });
 
         function sendReminder(borrowId, userEmail) {
-            // Implement send reminder functionality
-            console.log('Send reminder to:', userEmail, 'for borrow:', borrowId);
-            alert('Đã gửi email nhắc nhở đến ' + userEmail);
+            const token = localStorage.getItem('token');
+            
+            $.ajax({
+                url: `/Admin/SendReminder`,
+                type: 'POST',
+                headers: {
+                    'Authorization': 'Bearer ' + token
+                },
+                data: {
+                    borrowId: borrowId
+                },
+                success: function(response) {
+                    showToast('success', `Đã gửi email nhắc nhở đến ${userEmail}`);
+                },
+                error: function(xhr) {
+                    showToast('error', 'Có lỗi xảy ra khi gửi email nhắc nhở: ' + xhr.responseText);
+                }
+            });
         }
 
         function extendDue(borrowId) {
-            // Implement extend due date functionality
-            console.log('Extend due date for borrow:', borrowId);
-            var newDate = prompt('Nhập ngày gia hạn mới (dd/mm/yyyy):');
-            if (newDate) {
-                alert('Đã gia hạn đến ngày ' + newDate);
-            }
+            currentBorrowId = borrowId;
+            
+            // Get current due date from the table row
+            const row = $(`button[onclick*="${borrowId}"]`).closest('tr');
+            const currentDate = row.find('td:nth-child(5)').text().trim(); // Due date column
+            
+            $('#currentDueDate').val(currentDate);
+            
+            // Set minimum date to tomorrow
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            $('#newDueDate').attr('min', tomorrow.toISOString().split('T')[0]);
+            
+            $('#extendModal').modal('show');
         }
+
+        $('#confirmExtend').on('click', function() {
+            if (currentBorrowId) {
+                const newDueDate = $('#newDueDate').val();
+                const reason = $('#extendReason').val();
+                
+                if (!newDueDate) {
+                    showToast('error', 'Vui lòng chọn ngày gia hạn mới');
+                    return;
+                }
+                
+                const token = localStorage.getItem('token');
+                
+                $.ajax({
+                    url: `/Admin/ExtendDueDate`,
+                    type: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + token
+                    },
+                    data: {
+                        borrowId: currentBorrowId,
+                        newDueDate: newDueDate,
+                        reason: reason
+                    },
+                    success: function(response) {
+                        $('#extendModal').modal('hide');
+                        showToast('success', 'Đã gia hạn thành công!');
+                        setTimeout(() => location.reload(), 1500);
+                    },
+                    error: function(xhr) {
+                        showToast('error', 'Có lỗi xảy ra khi gia hạn: ' + xhr.responseText);
+                    }
+                });
+            }
+        });
 
         function viewHistory(userId) {
-            // Implement view user borrow history
-            console.log('View history for user:', userId);
+            // Redirect to user history page or show in modal
+            showToast('info', 'Chức năng xem lịch sử sẽ được triển khai sau');
         }
 
-        function addFine(borrowId) {
-            // Implement add fine functionality
-            console.log('Add fine for borrow:', borrowId);
-            var amount = prompt('Nhập số tiền phạt (VND):');
-            if (amount) {
-                alert('Đã thêm phạt ' + amount + ' VND');
+        function viewNotes(borrowId) {
+            // Show notes in modal or tooltip
+            showToast('info', 'Hiển thị ghi chú cho giao dịch #' + borrowId);
+        }
+
+        // Toast notification function
+        function showToast(type, message) {
+            const toastHtml = `
+                <div class="toast align-items-center text-white bg-${type === 'success' ? 'success' : type === 'error' ? 'danger' : 'info'} border-0" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="d-flex">
+                        <div class="toast-body">
+                            ${message}
+                        </div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                </div>
+            `;
+            
+            // Create toast container if it doesn't exist
+            if (!$('#toastContainer').length) {
+                $('body').append('<div id="toastContainer" class="toast-container position-fixed top-0 end-0 p-3"></div>');
             }
+            
+            const $toast = $(toastHtml);
+            $('#toastContainer').append($toast);
+            
+            const toast = new bootstrap.Toast($toast[0]);
+            toast.show();
+            
+            // Remove toast element after it's hidden
+            $toast.on('hidden.bs.toast', function() {
+                $(this).remove();
+            });
         }
     </script>
 }

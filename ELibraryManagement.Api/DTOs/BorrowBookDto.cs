@@ -36,6 +36,8 @@ namespace ELibraryManagement.Api.DTOs
         public string BookAuthor { get; set; } = string.Empty;
         public string BookCoverUrl { get; set; } = string.Empty;
         public string UserId { get; set; } = string.Empty;
+        public string UserName { get; set; } = string.Empty;
+        public string UserEmail { get; set; } = string.Empty;
         public DateTime BorrowDate { get; set; }
         public DateTime DueDate { get; set; }
         public DateTime? ReturnDate { get; set; }
@@ -43,6 +45,21 @@ namespace ELibraryManagement.Api.DTOs
         public string? Notes { get; set; }
         public bool IsOverdue => ReturnDate == null && DateTime.UtcNow > DueDate;
         public int OverdueDays => IsOverdue ? (DateTime.UtcNow - DueDate).Days : 0;
+        public decimal? FineAmount { get; set; }
+    }
+
+    public class UpdateBorrowStatusDto
+    {
+        [Required]
+        public string Status { get; set; } = string.Empty;
+        public string? Notes { get; set; }
+    }
+
+    public class ExtendDueDateDto
+    {
+        [Required]
+        public DateTime NewDueDate { get; set; }
+        public string? Reason { get; set; }
     }
 
     public class ReturnBookResponseDto
