@@ -11,5 +11,7 @@ namespace ELibraryManagement.Api.Services.Interfaces
         Task<bool> AssignRoleAsync(string userId, string roleName);
         Task<IList<string>> GetUserRolesAsync(string userId);
         Task<AuthResponseDto> UpdateProfileAsync(string userId, UpdateProfileRequestDto request);
+        Task<AuthResponseDto> ForgotPasswordAsync(string email);
+        Task<AuthResponseDto> ResetPasswordAsync(string email, string token, string newPassword);
     }
 }

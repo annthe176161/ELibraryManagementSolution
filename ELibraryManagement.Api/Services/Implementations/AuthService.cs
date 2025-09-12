@@ -15,17 +15,20 @@ namespace ELibraryManagement.Api.Services.Implementations
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IConfiguration _configuration;
+        private readonly ILogger<AuthService> _logger;
 
         public AuthService(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             RoleManager<IdentityRole> roleManager,
-            IConfiguration configuration)
+            IConfiguration configuration,
+            ILogger<AuthService> logger)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _roleManager = roleManager;
             _configuration = configuration;
+            _logger = logger;
         }
 
         public async Task<AuthResponseDto> RegisterAsync(RegisterRequestDto request)
@@ -296,6 +299,90 @@ namespace ELibraryManagement.Api.Services.Implementations
                 {
                     Success = false,
                     Message = $"An error occurred: {ex.Message}"
+                };
+            }
+        }
+
+        public async Task<AuthResponseDto> ForgotPasswordAsync(string email)
+        {
+            try
+            {
+                var user = await _userManager.FindByEmailAsync(email);
+                if (user == null)
+                {
+                    // Không tiết lộ thông tin user có tồn tại hay không
+                    return new AuthResponseDto
+                    {
+                        Success = true,
+                        Message = "Nếu email tồn tại trong hệ thống, chúng tôi đã gửi link reset mật khẩu đến email của bạn."
+                    };
+                }
+
+                // Tạo password reset token
+                var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+
+                // TODO: Gửi email với link reset password
+                // Trong môi trường production, bạn sẽ cần implement email service
+                // Ví dụ: await _emailService.SendPasswordResetEmailAsync(user.Email, token);
+
+                // Lưu token vào log để test (chỉ dùng trong development)
+                _logger.LogInformation($"Password reset token for {email}: {token}");
+
+                return new AuthResponseDto
+                {
+                    Success = true,
+                    Message = "Nếu email tồn tại trong hệ thống, chúng tôi đã gửi link reset mật khẩu đến email của bạn."
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in ForgotPasswordAsync");
+                return new AuthResponseDto
+                {
+                    Success = false,
+                    Message = "Có lỗi xảy ra khi xử lý yêu cầu."
+                };
+            }
+        }
+
+        public async Task<AuthResponseDto> ResetPasswordAsync(string email, string token, string newPassword)
+        {
+            try
+            {
+                var user = await _userManager.FindByEmailAsync(email);
+                if (user == null)
+                {
+                    return new AuthResponseDto
+                    {
+                        Success = false,
+                        Message = "Email không tồn tại trong hệ thống."
+                    };
+                }
+
+                var result = await _userManager.ResetPasswordAsync(user, token, newPassword);
+
+                if (!result.Succeeded)
+                {
+                    return new AuthResponseDto
+                    {
+                        Success = false,
+                        Message = "Token không hợp lệ hoặc đã hết hạn. " + string.Join(", ", result.Errors.Select(e => e.Description))
+                    };
+                }
+
+                return new AuthResponseDto
+                {
+                    Success = true,
+                    Message = "Mật khẩu đã được reset thành công. Bạn có thể đăng nhập bằng mật khẩu mới."
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in ResetPasswordAsync");
+                return new AuthResponseDto
+                {
+                    Success = false,
+                    Message = "Có lỗi xảy ra khi reset mật khẩu."
                 };
             }
         }

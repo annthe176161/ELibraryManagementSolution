@@ -18,6 +18,8 @@ namespace ELibraryManagement.Web.Services
         Task<bool> IsInRoleAsync(string roleName);
         Task<AuthResponseViewModel> UpdateProfileAsync(EditProfileViewModel model);
         Task<AuthResponseViewModel> ChangePasswordAsync(ChangePasswordViewModel model);
+        Task<AuthResponseViewModel> ForgotPasswordAsync(ForgotPasswordViewModel model);
+        Task<AuthResponseViewModel> ResetPasswordAsync(ResetPasswordViewModel model);
     }
 
     public class AuthApiService : IAuthApiService
@@ -464,6 +466,83 @@ namespace ELibraryManagement.Web.Services
                 {
                     Success = false,
                     Message = $"Đổi mật khẩu thất bại: {responseContent}"
+                };
+            }
+            catch (Exception ex)
+            {
+                return new AuthResponseViewModel
+                {
+                    Success = false,
+                    Message = $"Có lỗi xảy ra: {ex.Message}"
+                };
+            }
+        }
+
+        public async Task<AuthResponseViewModel> ForgotPasswordAsync(ForgotPasswordViewModel model)
+        {
+            try
+            {
+                var requestData = new
+                {
+                    Email = model.Email
+                };
+
+                var json = JsonSerializer.Serialize(requestData, _jsonOptions);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                var response = await _httpClient.PostAsync($"{GetApiBaseUrl()}/api/Auth/forgot-password", content);
+                var responseContent = await response.Content.ReadAsStringAsync();
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var result = JsonSerializer.Deserialize<AuthResponseViewModel>(responseContent, _jsonOptions);
+                    return result ?? new AuthResponseViewModel { Success = true, Message = "Đã gửi link reset mật khẩu!" };
+                }
+
+                return new AuthResponseViewModel
+                {
+                    Success = false,
+                    Message = $"Gửi link reset mật khẩu thất bại: {responseContent}"
+                };
+            }
+            catch (Exception ex)
+            {
+                return new AuthResponseViewModel
+                {
+                    Success = false,
+                    Message = $"Có lỗi xảy ra: {ex.Message}"
+                };
+            }
+        }
+
+        public async Task<AuthResponseViewModel> ResetPasswordAsync(ResetPasswordViewModel model)
+        {
+            try
+            {
+                var requestData = new
+                {
+                    Email = model.Email,
+                    Token = model.Token,
+                    NewPassword = model.NewPassword,
+                    ConfirmNewPassword = model.ConfirmPassword
+                };
+
+                var json = JsonSerializer.Serialize(requestData, _jsonOptions);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                var response = await _httpClient.PostAsync($"{GetApiBaseUrl()}/api/Auth/reset-password", content);
+                var responseContent = await response.Content.ReadAsStringAsync();
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var result = JsonSerializer.Deserialize<AuthResponseViewModel>(responseContent, _jsonOptions);
+                    return result ?? new AuthResponseViewModel { Success = true, Message = "Reset mật khẩu thành công!" };
+                }
+
+                return new AuthResponseViewModel
+                {
+                    Success = false,
+                    Message = $"Reset mật khẩu thất bại: {responseContent}"
                 };
             }
             catch (Exception ex)

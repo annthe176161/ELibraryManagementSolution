@@ -239,5 +239,87 @@ namespace ELibraryManagement.Web.Controllers
                 return View(model);
             }
         }
+
+        [HttpGet]
+        public IActionResult ForgotPassword()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            try
+            {
+                var result = await _authApiService.ForgotPasswordAsync(model);
+
+                if (result.Success)
+                {
+                    TempData["SuccessMessage"] = result.Message;
+                    return View(model);
+                }
+
+                TempData["ErrorMessage"] = result.Message;
+                return View(model);
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Có lỗi xảy ra: {ex.Message}";
+                return View(model);
+            }
+        }
+
+        [HttpGet]
+        public IActionResult ResetPassword(string email, string token)
+        {
+            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(token))
+            {
+                TempData["ErrorMessage"] = "Link reset mật khẩu không hợp lệ.";
+                return RedirectToAction("ForgotPassword");
+            }
+
+            var model = new ResetPasswordViewModel
+            {
+                Email = email,
+                Token = token
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ResetPassword(ResetPasswordViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            try
+            {
+                var result = await _authApiService.ResetPasswordAsync(model);
+
+                if (result.Success)
+                {
+                    TempData["SuccessMessage"] = "Mật khẩu đã được reset thành công. Bạn có thể đăng nhập bằng mật khẩu mới.";
+                    return RedirectToAction("Login");
+                }
+
+                TempData["ErrorMessage"] = result.Message;
+                return View(model);
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Có lỗi xảy ra: {ex.Message}";
+                return View(model);
+            }
+        }
     }
 }

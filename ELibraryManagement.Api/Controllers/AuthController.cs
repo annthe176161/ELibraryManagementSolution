@@ -182,6 +182,48 @@ namespace ELibraryManagement.Api.Controllers
 
             return Ok(result);
         }
+
+        /// <summary>
+        /// Quên mật khẩu - Gửi email reset password
+        /// </summary>
+        [HttpPost("forgot-password")]
+        public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequestDto request)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var result = await _authService.ForgotPasswordAsync(request.Email);
+
+            // Luôn trả về success để tránh việc kẻ tấn công biết email có tồn tại hay không
+            return Ok(new
+            {
+                Success = true,
+                Message = "Nếu email tồn tại trong hệ thống, chúng tôi đã gửi link reset mật khẩu đến email của bạn."
+            });
+        }
+
+        /// <summary>
+        /// Reset mật khẩu
+        /// </summary>
+        [HttpPost("reset-password")]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequestDto request)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var result = await _authService.ResetPasswordAsync(request.Email, request.Token, request.NewPassword);
+
+            if (!result.Success)
+            {
+                return BadRequest(result);
+            }
+
+            return Ok(result);
+        }
     }
 
     public class AssignRoleRequestDto
