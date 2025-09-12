@@ -26,6 +26,30 @@
             </div>
         }
 
+        @if (TempData["ShowReviewOption"] as bool? == true)
+        {
+            <div class="alert alert-info alert-dismissible fade show review-prompt" role="alert">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <i class="fas fa-star me-2"></i>
+                        <strong>Bạn vừa trả sách thành công!</strong>
+                        <br>
+                        <small>Hãy chia sẻ trải nghiệm của bạn về cuốn sách "@TempData["ReturnedBookTitle"]" để giúp các bạn khác.</small>
+                    </div>
+                    <div class="ms-3">
+                        <a asp-controller="Review" 
+                           asp-action="Create" 
+                           asp-route-bookId="@TempData["ReturnedBookId"]" 
+                           asp-route-borrowRecordId="@TempData["BorrowRecordId"]"
+                           class="btn btn-primary btn-sm">
+                            <i class="fas fa-star me-1"></i>Viết Đánh Giá
+                        </a>
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+
         @if (TempData["ErrorMessage"] != null)
         {
             <div class="alert alert-danger alert-dismissible fade show" role="alert">

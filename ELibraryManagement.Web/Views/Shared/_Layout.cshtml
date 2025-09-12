@@ -77,6 +77,9 @@
                                     <li><a class="dropdown-item" asp-controller="Book" asp-action="MyBooks">
                                             <i class="fas fa-book me-2"></i>Sách đã mượn
                                         </a></li>
+                                    <li><a class="dropdown-item" asp-controller="Review" asp-action="MyReviews">
+                                            <i class="fas fa-star me-2"></i>Đánh giá của tôi
+                                        </a></li>
                                     <li><a class="dropdown-item" href="#">
                                             <i class="fas fa-history me-2"></i>Lịch sử
                                         </a></li>
@@ -211,6 +214,7 @@
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
+    @await RenderSectionAsync("ValidationScripts", required: false)
 </body>
 
 </html>

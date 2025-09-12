@@ -266,6 +266,23 @@ namespace ELibraryManagement.Web.Controllers
                 if (result.Success)
                 {
                     TempData["SuccessMessage"] = result.Message;
+
+                    // Lấy thông tin borrowed book để biết BookId
+                    var currentUser = await _authApiService.GetCurrentUserAsync();
+                    if (currentUser != null)
+                    {
+                        var borrowedBooks = await _bookApiService.GetBorrowedBooksAsync(currentUser.Id, token);
+                        var returnedBook = borrowedBooks.FirstOrDefault(b => b.BorrowRecordId == id);
+
+                        if (returnedBook != null)
+                        {
+                            // Thêm thông tin để hiển thị option review
+                            TempData["ReturnedBookId"] = returnedBook.BookId;
+                            TempData["ReturnedBookTitle"] = returnedBook.BookTitle;
+                            TempData["BorrowRecordId"] = id;
+                            TempData["ShowReviewOption"] = true;
+                        }
+                    }
                 }
                 else
                 {

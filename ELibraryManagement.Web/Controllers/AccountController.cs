@@ -110,5 +110,11 @@ namespace ELibraryManagement.Web.Controllers
                 return RedirectToAction("Login");
             }
         }
+
+        // Redirect action for backward compatibility
+        public IActionResult MyBooks()
+        {
+            return RedirectToAction("MyBooks", "Book");
+        }
     }
 }

@@ -698,3 +698,148 @@ body {
     outline: 3px solid var(--golden-yellow);
     outline-offset: 2px;
 }
+
+/* ==== REVIEWS SECTION ==== */
+.reviews-section {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-top: 1px solid var(--border-color);
+}
+
+.rating-summary-card {
+    background: white;
+    border: none;
+    box-shadow: var(--shadow-light);
+    border-radius: 15px;
+    transition: all 0.3s ease;
+}
+
+.rating-summary-card:hover {
+    box-shadow: var(--shadow-medium);
+    transform: translateY(-2px);
+}
+
+.rating-number {
+    font-size: 3rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.rating-stars {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.rating-stars i {
+    margin: 0 2px;
+}
+
+.review-actions .btn {
+    border-radius: 25px;
+    padding: 8px 20px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.review-actions .btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(218, 37, 30, 0.3);
+}
+
+.recent-reviews .review-item {
+    border: none;
+    border-radius: 10px;
+    box-shadow: var(--shadow-light);
+    transition: all 0.3s ease;
+    background: white;
+}
+
+.recent-reviews .review-item:hover {
+    box-shadow: var(--shadow-medium);
+    transform: translateY(-1px);
+}
+
+.reviewer-avatar {
+    min-width: 40px;
+}
+
+.reviewer-name {
+    color: var(--dark-text);
+    font-weight: 600;
+}
+
+.review-rating {
+    min-width: 100px;
+    text-align: right;
+}
+
+.review-rating i {
+    font-size: 0.9rem;
+    margin: 0 1px;
+}
+
+.review-comment {
+    color: #6c757d;
+    line-height: 1.6;
+    font-size: 0.95rem;
+}
+
+/* Empty state styling */
+.reviews-section .text-center i {
+    opacity: 0.5;
+}
+
+.reviews-section .text-center h5 {
+    color: var(--dark-text);
+    margin-bottom: 0.5rem;
+}
+
+.reviews-section .text-center p {
+    margin-bottom: 1rem;
+}
+
+/* Review section title */
+.reviews-section .section-title {
+    color: var(--dark-text);
+    font-weight: 600;
+    margin-bottom: 0;
+}
+
+/* Review button styling */
+.reviews-section .btn-outline-primary {
+    border-color: var(--primary-red);
+    color: var(--primary-red);
+    border-radius: 20px;
+    font-weight: 500;
+    padding: 6px 16px;
+    transition: all 0.3s ease;
+}
+
+.reviews-section .btn-outline-primary:hover {
+    background-color: var(--primary-red);
+    border-color: var(--primary-red);
+    color: white;
+    transform: translateY(-1px);
+}
+
+/* Responsive adjustments for reviews */
+@media (max-width: 768px) {
+    .rating-number {
+        font-size: 2.5rem;
+    }
+    
+    .rating-stars {
+        font-size: 1.2rem;
+    }
+    
+    .review-item .card-body {
+        padding: 1rem;
+    }
+    
+    .reviewer-name {
+        font-size: 0.9rem;
+    }
+    
+    .review-comment {
+        font-size: 0.9rem;
+    }
+}

@@ -10,12 +10,18 @@ namespace ELibraryManagement.Web.Controllers
         private readonly ILogger<HomeController> _logger;
         private readonly IBookApiService _bookApiService;
         private readonly IAuthApiService _authApiService;
+        private readonly IReviewApiService _reviewApiService;
 
-        public HomeController(ILogger<HomeController> logger, IBookApiService bookApiService, IAuthApiService authApiService)
+        public HomeController(
+            ILogger<HomeController> logger,
+            IBookApiService bookApiService,
+            IAuthApiService authApiService,
+            IReviewApiService reviewApiService)
         {
             _logger = logger;
             _bookApiService = bookApiService;
             _authApiService = authApiService;
+            _reviewApiService = reviewApiService;
         }
 
         public IActionResult Index()
@@ -71,6 +77,24 @@ namespace ELibraryManagement.Web.Controllers
                 // Lấy sách liên quan (cùng thể loại)
                 var relatedBooks = await _bookApiService.GetRelatedBooksAsync(id, book.CategoryName);
                 ViewBag.RelatedBooks = relatedBooks ?? new List<BookViewModel>();
+
+                // Lấy recent reviews (3 đánh giá gần nhất)
+                try
+                {
+                    var recentReviews = await _reviewApiService.GetBookReviewsAsync(id, 1, 3);
+                    ViewBag.RecentReviews = recentReviews.Reviews.Select(r => new
+                    {
+                        UserName = r.UserName,
+                        Rating = r.Rating,
+                        Comment = r.Comment,
+                        CreatedAt = r.CreatedAt.ToString("dd/MM/yyyy")
+                    }).ToList();
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "Could not load recent reviews for book {BookId}", id);
+                    ViewBag.RecentReviews = new List<object>();
+                }
 
                 // Truyền thông tin authentication vào View
                 ViewBag.IsAuthenticated = _authApiService.IsAuthenticated();

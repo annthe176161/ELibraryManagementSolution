@@ -1,0 +1,233 @@
+@model CreateReviewViewModel
+
+@{
+    ViewData["Title"] = "Đánh giá sách";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-star me-2"></i>Đánh giá sách
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <!-- Book Information -->
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            <img src="@Model.BookCoverUrl" alt="@Model.BookTitle" 
+                                 class="img-fluid rounded shadow-sm" 
+                                 style="max-height: 200px; object-fit: cover;">
+                        </div>
+                        <div class="col-md-9 d-flex flex-column justify-content-center">
+                            <h5 class="mb-2">@Model.BookTitle</h5>
+                            <p class="text-muted mb-1">
+                                <i class="fas fa-user me-1"></i>Tác giả: @Model.BookAuthor
+                            </p>
+                            <div class="alert alert-info mt-3">
+                                <i class="fas fa-info-circle me-2"></i>
+                                Chia sẻ trải nghiệm của bạn về cuốn sách này để giúp các bạn sinh viên khác có thêm thông tin tham khảo.
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Review Form -->
+                    <form asp-action="Create" method="post">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" asp-for="BookId" />
+                        <input type="hidden" asp-for="BorrowRecordId" />
+
+                        <!-- Rating Section -->
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">
+                                <i class="fas fa-star text-warning me-1"></i>Đánh giá sao *
+                            </label>
+                            <div class="rating-container">
+                                <div class="star-rating" id="star-rating">
+                                    @for (int i = 1; i <= 5; i++)
+                                    {
+                                        <span class="star" data-rating="@i">
+                                            <i class="fas fa-star"></i>
+                                        </span>
+                                    }
+                                </div>
+                                <input type="hidden" asp-for="Rating" id="rating-input" />
+                                <div class="rating-text mt-2">
+                                    <small id="rating-description" class="text-muted">Chọn số sao để đánh giá</small>
+                                </div>
+                            </div>
+                            <span asp-validation-for="Rating" class="text-danger"></span>
+                        </div>
+
+                        <!-- Comment Section -->
+                        <div class="mb-4">
+                            <label asp-for="Comment" class="form-label fw-bold">
+                                <i class="fas fa-comment me-1"></i>Nhận xét chi tiết
+                            </label>
+                            <textarea asp-for="Comment" 
+                                      class="form-control" 
+                                      rows="5" 
+                                      placeholder="Chia sẻ cảm nhận của bạn về nội dung, phong cách viết, tính hữu ích của cuốn sách..."></textarea>
+                            <span asp-validation-for="Comment" class="text-danger"></span>
+                            <div class="form-text">
+                                Tối thiểu 10 ký tự, tối đa 1000 ký tự
+                            </div>
+                        </div>
+
+                        <!-- Action Buttons -->
+                        <div class="d-flex justify-content-end gap-2">
+                            <a asp-controller="Home" asp-action="BookDetail" asp-route-id="@Model.BookId" 
+                               class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-1"></i>Quay lại
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-paper-plane me-1"></i>Gửi đánh giá
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            const stars = $('.star');
+            const ratingInput = $('#rating-input');
+            const ratingDescription = $('#rating-description');
+            
+            const ratingTexts = {
+                1: "⭐ Rất tệ - Không khuyến khích đọc",
+                2: "⭐⭐ Tệ - Có nhiều điểm cần cải thiện",
+                3: "⭐⭐⭐ Trung bình - Có thể đọc",
+                4: "⭐⭐⭐⭐ Tốt - Đáng đọc",
+                5: "⭐⭐⭐⭐⭐ Xuất sắc - Rất khuyến khích đọc"
+            };
+
+            // Set initial rating if exists
+            const initialRating = parseInt(ratingInput.val()) || 0;
+            if (initialRating > 0) {
+                updateStars(initialRating);
+            }
+
+            // Star click handler
+            stars.on('click', function() {
+                const rating = parseInt($(this).data('rating'));
+                ratingInput.val(rating);
+                updateStars(rating);
+                ratingDescription.text(ratingTexts[rating]);
+            });
+
+            // Star hover handler
+            stars.on('mouseenter', function() {
+                const rating = parseInt($(this).data('rating'));
+                highlightStars(rating);
+                ratingDescription.text(ratingTexts[rating]);
+            });
+
+            // Reset on mouse leave
+            $('.star-rating').on('mouseleave', function() {
+                const currentRating = parseInt(ratingInput.val()) || 0;
+                updateStars(currentRating);
+                if (currentRating > 0) {
+                    ratingDescription.text(ratingTexts[currentRating]);
+                } else {
+                    ratingDescription.text('Chọn số sao để đánh giá');
+                }
+            });
+
+            function highlightStars(rating) {
+                stars.each(function(index) {
+                    const star = $(this);
+                    if (index < rating) {
+                        star.addClass('active').removeClass('inactive');
+                    } else {
+                        star.removeClass('active').addClass('inactive');
+                    }
+                });
+            }
+
+            function updateStars(rating) {
+                stars.each(function(index) {
+                    const star = $(this);
+                    if (index < rating) {
+                        star.addClass('selected').removeClass('unselected');
+                    } else {
+                        star.removeClass('selected').addClass('unselected');
+                    }
+                });
+            }
+        });
+    </script>
+
+    <style>
+        .star-rating {
+            display: flex;
+            gap: 5px;
+            cursor: pointer;
+        }
+
+        .star {
+            font-size: 2rem;
+            color: #ddd;
+            transition: color 0.2s ease;
+            cursor: pointer;
+        }
+
+        .star:hover,
+        .star.active {
+            color: #ffc107;
+        }
+
+        .star.selected {
+            color: #ffc107;
+        }
+
+        .star.unselected {
+            color: #ddd;
+        }
+
+        .star.inactive {
+            color: #ccc;
+        }
+
+        .rating-container {
+            padding: 15px;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            background-color: #f8f9fa;
+        }
+
+        .card {
+            border: none;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        }
+
+        .card-header {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .form-label.fw-bold {
+            color: #495057;
+        }
+
+        .btn {
+            border-radius: 6px;
+            padding: 8px 16px;
+        }
+
+        .alert-info {
+            border-left: 4px solid #17a2b8;
+            background-color: #d1ecf1;
+            border-color: #bee5eb;
+        }
+    </style>
+}
+
+@section ValidationScripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

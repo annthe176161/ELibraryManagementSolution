@@ -31,6 +31,10 @@ namespace ELibraryManagement.Web
             builder.Services.AddHttpClient<IAuthApiService, AuthApiService>();
             builder.Services.AddScoped<IAuthApiService, AuthApiService>();
 
+            // Add Review services
+            builder.Services.AddHttpClient<IReviewApiService, ReviewApiService>();
+            builder.Services.AddScoped<IReviewApiService, ReviewApiService>();
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
