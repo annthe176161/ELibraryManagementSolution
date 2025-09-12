@@ -58,6 +58,7 @@ namespace ELibraryManagement.Api.Services.Implementations
                 Email = request.Email,
                 FirstName = request.FirstName,
                 LastName = request.LastName,
+                StudentId = request.StudentId,
                 Address = request.Address,
                 PhoneNumber = request.PhoneNumber,
                 DateOfBirth = request.DateOfBirth,

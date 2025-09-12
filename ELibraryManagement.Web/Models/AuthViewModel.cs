@@ -34,6 +34,10 @@ namespace ELibraryManagement.Web.Models
         [Display(Name = "Tên")]
         public string? LastName { get; set; }
 
+        [MaxLength(20, ErrorMessage = "Mã sinh viên không được quá 20 ký tự")]
+        [Display(Name = "Mã sinh viên")]
+        public string? StudentId { get; set; }
+
         [MaxLength(255, ErrorMessage = "Địa chỉ không được quá 255 ký tự")]
         [Display(Name = "Địa chỉ")]
         public string? Address { get; set; }

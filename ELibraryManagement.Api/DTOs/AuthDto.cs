@@ -26,6 +26,9 @@ namespace ELibraryManagement.Api.DTOs
         [MaxLength(50)]
         public string? LastName { get; set; }
 
+        [MaxLength(20)]
+        public string? StudentId { get; set; }
+
         [MaxLength(255)]
         public string? Address { get; set; }
 

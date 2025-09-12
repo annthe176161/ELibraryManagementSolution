@@ -57,6 +57,7 @@ namespace ELibraryManagement.Web.Services
                     userName = model.UserName,
                     firstName = model.FirstName,
                     lastName = model.LastName,
+                    studentId = model.StudentId,
                     address = model.Address,
                     phoneNumber = model.PhoneNumber,
                     dateOfBirth = model.DateOfBirth
