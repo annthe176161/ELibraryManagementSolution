@@ -13,6 +13,9 @@ namespace ELibraryManagement.Api.Services.Interfaces
         // Xóa review
         Task<ReviewResponseDto> DeleteReviewAsync(string userId, int reviewId);
 
+        // Xóa review bởi admin (không cần kiểm tra userId)
+        Task<ReviewResponseDto> DeleteReviewByAdminAsync(int reviewId);
+
         // Lấy review theo ID
         Task<ReviewDto?> GetReviewByIdAsync(int reviewId);
 
@@ -30,5 +33,8 @@ namespace ELibraryManagement.Api.Services.Interfaces
 
         // Kiểm tra user đã review sách này chưa
         Task<ReviewDto?> GetUserReviewForBookAsync(string userId, int bookId);
+
+        // Lấy tất cả reviews cho admin
+        Task<List<ReviewDto>> GetAllReviewsAsync();
     }
 }

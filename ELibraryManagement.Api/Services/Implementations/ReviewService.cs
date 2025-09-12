@@ -189,6 +189,41 @@ namespace ELibraryManagement.Api.Services.Implementations
             }
         }
 
+        public async Task<ReviewResponseDto> DeleteReviewByAdminAsync(int reviewId)
+        {
+            try
+            {
+                var review = await _context.Reviews.FindAsync(reviewId);
+                if (review == null)
+                {
+                    return new ReviewResponseDto
+                    {
+                        Success = false,
+                        Message = "Không tìm thấy đánh giá.",
+                        Errors = new List<string> { "Review không tồn tại." }
+                    };
+                }
+
+                _context.Reviews.Remove(review);
+                await _context.SaveChangesAsync();
+
+                return new ReviewResponseDto
+                {
+                    Success = true,
+                    Message = "Xóa đánh giá thành công!"
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ReviewResponseDto
+                {
+                    Success = false,
+                    Message = "Có lỗi xảy ra khi xóa đánh giá.",
+                    Errors = new List<string> { ex.Message }
+                };
+            }
+        }
+
         public async Task<ReviewDto?> GetReviewByIdAsync(int reviewId)
         {
             var review = await _context.Reviews
@@ -333,6 +368,39 @@ namespace ELibraryManagement.Api.Services.Implementations
                 UpdatedAt = review.UpdatedAt,
                 CanEdit = true // Vì đây là review của chính user này
             };
+        }
+
+        public async Task<List<ReviewDto>> GetAllReviewsAsync()
+        {
+            try
+            {
+                var reviews = await _context.Reviews
+                    .Include(r => r.User)
+                    .Include(r => r.Book)
+                    .OrderByDescending(r => r.CreatedAt)
+                    .Select(r => new ReviewDto
+                    {
+                        Id = r.Id,
+                        UserId = r.UserId,
+                        UserName = $"{r.User.FirstName} {r.User.LastName}".Trim(),
+                        UserAvatarUrl = r.User.AvatarUrl ?? "",
+                        BookId = r.BookId,
+                        BookTitle = r.Book.Title,
+                        Rating = r.Rating,
+                        Comment = r.Comment,
+                        ReviewDate = r.ReviewDate,
+                        CreatedAt = r.CreatedAt,
+                        UpdatedAt = r.UpdatedAt,
+                        CanEdit = false // Admin view, not user's own review
+                    })
+                    .ToListAsync();
+
+                return reviews;
+            }
+            catch (Exception)
+            {
+                return new List<ReviewDto>();
+            }
         }
     }
 }

@@ -73,17 +73,31 @@ namespace ELibraryManagement.Api.Controllers
         }
 
         /// <summary>
-        /// Xóa review - Yêu cầu đăng nhập và là chủ review
+        /// Xóa review - Yêu cầu đăng nhập và là chủ review hoặc admin
         /// </summary>
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteReview(int id)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var userRole = User.FindFirst(ClaimTypes.Role)?.Value;
+
             if (string.IsNullOrEmpty(userId))
             {
                 return Unauthorized("Không thể xác định user.");
             }
 
+            // Admin/Librarian có thể xóa bất kỳ review nào
+            if (userRole == "Admin" || userRole == "Librarian")
+            {
+                var adminResult = await _reviewService.DeleteReviewByAdminAsync(id);
+                if (adminResult.Success)
+                {
+                    return Ok(adminResult);
+                }
+                return BadRequest(adminResult);
+            }
+
+            // User thường chỉ có thể xóa review của chính họ
             var result = await _reviewService.DeleteReviewAsync(userId, id);
 
             if (result.Success)
@@ -239,6 +253,17 @@ namespace ELibraryManagement.Api.Controllers
             }
 
             return Ok(review);
+        }
+
+        /// <summary>
+        /// Lấy tất cả reviews cho admin
+        /// </summary>
+        [HttpGet("all")]
+        [Authorize(Roles = "Admin,Librarian")]
+        public async Task<IActionResult> GetAllReviews()
+        {
+            var reviews = await _reviewService.GetAllReviewsAsync();
+            return Ok(reviews);
         }
     }
 }

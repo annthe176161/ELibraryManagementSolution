@@ -289,13 +289,13 @@
         }
 
         function viewReview(reviewId) {
-            // Implement view review functionality
-            console.log('View review:', reviewId);
+            // Show review details in modal or redirect to detail page
+            showToast('info', 'Xem chi tiết review #' + reviewId);
         }
 
         function editReview(reviewId) {
-            // Implement edit review functionality
-            console.log('Edit review:', reviewId);
+            // Redirect to edit page or show edit modal
+            showToast('info', 'Chức năng chỉnh sửa review sẽ được triển khai sau');
         }
 
         let reviewToDelete = null;
@@ -311,14 +311,56 @@
 
         $('#confirmDelete').on('click', function() {
             if (reviewToDelete) {
-                // Implement delete review functionality
-                console.log('Delete review:', reviewToDelete);
-                // Here you would make an AJAX call to delete the review
-                // For now, just close the modal
-                $('#deleteModal').modal('hide');
-                // Show success message
-                alert('Đánh giá đã được xóa thành công!');
+                $.ajax({
+                    url: '/Admin/DeleteReview',
+                    type: 'POST',
+                    data: {
+                        reviewId: reviewToDelete
+                    },
+                    success: function(response) {
+                        $('#deleteModal').modal('hide');
+                        if (response.success) {
+                            showToast('success', response.message);
+                            setTimeout(() => location.reload(), 1500);
+                        } else {
+                            showToast('error', response.message);
+                        }
+                    },
+                    error: function(xhr) {
+                        showToast('error', 'Có lỗi xảy ra khi xóa đánh giá');
+                    }
+                });
             }
         });
+
+        // Toast notification function
+        function showToast(type, message) {
+            const toastHtml = `
+                <div class="toast align-items-center text-white bg-${type === 'success' ? 'success' : type === 'error' ? 'danger' : 'info'} border-0" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="d-flex">
+                        <div class="toast-body">
+                            ${message}
+                        </div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                </div>
+            `;
+            
+            // Create toast container if it doesn't exist
+            if (!$('#toastContainer').length) {
+                $('body').append('<div id="toastContainer" class="toast-container position-fixed top-0 end-0 p-3"></div>');
+            }
+            
+            const $toast = $(toastHtml);
+            $('#toastContainer').append($toast);
+            
+            const toast = new bootstrap.Toast($toast[0]);
+            toast.show();
+            
+            // Remove toast element after it's hidden
+            $toast.on('hidden.bs.toast', function() {
+                $(this).remove();
+            });
+        }
     </script>
 }

@@ -211,6 +211,35 @@ namespace ELibraryManagement.Web.Controllers
             }
         }
 
+        // POST: Admin/DeleteReview - Delete Review
+        [HttpPost]
+        public async Task<IActionResult> DeleteReview(int reviewId)
+        {
+            var accessCheck = await CheckAdminAccessAsync();
+            if (accessCheck != null) return Json(new { success = false, message = "Unauthorized" });
+
+            try
+            {
+                var token = _authApiService.GetCurrentToken();
+                _httpClient.DefaultRequestHeaders.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+                var response = await _httpClient.DeleteAsync($"{GetApiBaseUrl()}/api/Review/{reviewId}");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return Json(new { success = true, message = "Đánh giá đã được xóa thành công!" });
+                }
+
+                var errorContent = await response.Content.ReadAsStringAsync();
+                return Json(new { success = false, message = "Không thể xóa đánh giá: " + errorContent });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Có lỗi xảy ra: {ex.Message}" });
+            }
+        }
+
         // GET: Admin/Borrows - Borrow Records Management
         public async Task<IActionResult> Borrows()
         {
