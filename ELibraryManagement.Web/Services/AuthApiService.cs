@@ -41,7 +41,7 @@ namespace ELibraryManagement.Web.Services
             var httpUrl = _configuration["ApiSettings:BaseUrlHttp"];
 
             // Sử dụng BaseUrl đầu tiên (ưu tiên HTTPS), nếu không có thì dùng HTTP
-            return httpsUrl ?? httpUrl ?? "https://localhost:7125";
+            return httpsUrl ?? httpUrl ?? "http://localhost:5293";
         }
 
         public async Task<AuthResponseViewModel> RegisterAsync(RegisterViewModel model)

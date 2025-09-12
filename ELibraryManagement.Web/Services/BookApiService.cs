@@ -40,7 +40,7 @@ namespace ELibraryManagement.Web.Services
             var httpUrl = _configuration["ApiSettings:BaseUrlHttp"];
 
             // Sử dụng BaseUrl đầu tiên (ưu tiên HTTPS), nếu không có thì dùng HTTP
-            return httpsUrl ?? httpUrl ?? "https://localhost:7125";
+            return httpsUrl ?? httpUrl ?? "http://localhost:5293";
         }
 
         public async Task<List<BookViewModel>> GetAvailableBooksAsync()
@@ -360,28 +360,180 @@ namespace ELibraryManagement.Web.Services
             }
         }
 
-        private string GetCategoryName(dynamic book)
+        private string GetCategoryName(JsonElement book)
         {
             try
             {
-                if (book is JsonElement element)
+                Console.WriteLine("=== Starting GetCategoryName parsing ===");
+
+                // Debug: Log all properties in the book element
+                Console.WriteLine("Available properties in book element:");
+                foreach (var property in book.EnumerateObject())
                 {
-                    if (element.TryGetProperty("categories", out JsonElement categories))
+                    Console.WriteLine($"  {property.Name}: {property.Value.ValueKind}");
+                    if (property.Value.ValueKind == JsonValueKind.Object)
                     {
-                        if (categories.ValueKind == JsonValueKind.Array && categories.GetArrayLength() > 0)
+                        Console.WriteLine($"    Object properties:");
+                        foreach (var subProp in property.Value.EnumerateObject())
                         {
-                            var firstCategory = categories[0];
-                            if (firstCategory.TryGetProperty("name", out JsonElement name))
+                            Console.WriteLine($"      {subProp.Name}: {subProp.Value}");
+                        }
+                    }
+                    else if (property.Value.ValueKind == JsonValueKind.Array)
+                    {
+                        Console.WriteLine($"    Array with {property.Value.GetArrayLength()} items");
+                        for (int i = 0; i < Math.Min(property.Value.GetArrayLength(), 3); i++)
+                        {
+                            Console.WriteLine($"      [{i}]: {property.Value[i]}");
+                        }
+                    }
+                }
+
+                // Try different possible structures for category
+
+                // 1. Try "categoryName" property
+                if (book.TryGetProperty("categoryName", out JsonElement categoryName))
+                {
+                    var name = categoryName.GetString();
+                    if (!string.IsNullOrEmpty(name))
+                    {
+                        Console.WriteLine($"✓ Found categoryName: {name}");
+                        return name;
+                    }
+                }
+
+                // 2. Try "category" property
+                if (book.TryGetProperty("category", out JsonElement category))
+                {
+                    var name = category.GetString();
+                    if (!string.IsNullOrEmpty(name))
+                    {
+                        Console.WriteLine($"✓ Found category: {name}");
+                        return name;
+                    }
+                }
+
+                // 3. Try "categories" array
+                if (book.TryGetProperty("categories", out JsonElement categories))
+                {
+                    if (categories.ValueKind == JsonValueKind.Array && categories.GetArrayLength() > 0)
+                    {
+                        var firstCategory = categories[0];
+
+                        // Try "name" property in category object
+                        if (firstCategory.TryGetProperty("name", out JsonElement nameElement))
+                        {
+                            var catNameFromArray = nameElement.GetString();
+                            if (!string.IsNullOrEmpty(catNameFromArray))
                             {
-                                return name.GetString() ?? "Chưa phân loại";
+                                Console.WriteLine($"✓ Found categories[0].name: {catNameFromArray}");
+                                return catNameFromArray;
+                            }
+                        }
+
+                        // Try direct string value
+                        if (firstCategory.ValueKind == JsonValueKind.String)
+                        {
+                            var catName = firstCategory.GetString();
+                            if (!string.IsNullOrEmpty(catName))
+                            {
+                                Console.WriteLine($"✓ Found categories[0] as string: {catName}");
+                                return catName;
                             }
                         }
                     }
                 }
+
+                // 4. Try "bookCategory" property (nested object)
+                if (book.TryGetProperty("bookCategory", out JsonElement bookCategory))
+                {
+                    if (bookCategory.ValueKind == JsonValueKind.Object)
+                    {
+                        // Try "name" in bookCategory
+                        if (bookCategory.TryGetProperty("name", out JsonElement name))
+                        {
+                            var catName = name.GetString();
+                            if (!string.IsNullOrEmpty(catName))
+                            {
+                                Console.WriteLine($"✓ Found bookCategory.name: {catName}");
+                                return catName;
+                            }
+                        }
+
+                        // Try "categoryName" in bookCategory
+                        if (bookCategory.TryGetProperty("categoryName", out JsonElement catNameElement))
+                        {
+                            var categoryNameFromBookCat = catNameElement.GetString();
+                            if (!string.IsNullOrEmpty(categoryNameFromBookCat))
+                            {
+                                Console.WriteLine($"✓ Found bookCategory.categoryName: {categoryNameFromBookCat}");
+                                return categoryNameFromBookCat;
+                            }
+                        }
+
+                        // Try "title" in bookCategory
+                        if (bookCategory.TryGetProperty("title", out JsonElement titleElement))
+                        {
+                            var categoryTitle = titleElement.GetString();
+                            if (!string.IsNullOrEmpty(categoryTitle))
+                            {
+                                Console.WriteLine($"✓ Found bookCategory.title: {categoryTitle}");
+                                return categoryTitle;
+                            }
+                        }
+                    }
+                }
+
+                // 5. Try "categoryId" and map to name (if we had a mapping)
+                if (book.TryGetProperty("categoryId", out JsonElement categoryId))
+                {
+                    var id = categoryId.GetInt32();
+                    Console.WriteLine($"Found categoryId: {id}");
+
+                    // Simple mapping for common categories
+                    var categoryMap = new Dictionary<int, string>
+                    {
+                        {1, "Văn học"},
+                        {2, "Khoa học"},
+                        {3, "Lịch sử"},
+                        {4, "Công nghệ"},
+                        {5, "Kinh tế"},
+                        {6, "Nghệ thuật"},
+                        {7, "Thể thao"},
+                        {8, "Du lịch"},
+                        {9, "Nấu ăn"},
+                        {10, "Sức khỏe"}
+                    };
+
+                    if (categoryMap.TryGetValue(id, out var mappedName))
+                    {
+                        Console.WriteLine($"✓ Mapped categoryId {id} to: {mappedName}");
+                        return mappedName;
+                    }
+                }
+
+                // 6. Try other possible property names
+                var possibleNames = new[] { "genre", "subject", "type", "classification", "group" };
+                foreach (var propName in possibleNames)
+                {
+                    if (book.TryGetProperty(propName, out JsonElement propValue))
+                    {
+                        var name = propValue.GetString();
+                        if (!string.IsNullOrEmpty(name))
+                        {
+                            Console.WriteLine($"✓ Found {propName}: {name}");
+                            return name;
+                        }
+                    }
+                }
+
+                Console.WriteLine("❌ No category found in any expected location, returning default");
                 return "Chưa phân loại";
             }
-            catch
+            catch (Exception ex)
             {
+                Console.WriteLine($"❌ Error parsing category: {ex.Message}");
+                Console.WriteLine($"Stack trace: {ex.StackTrace}");
                 return "Chưa phân loại";
             }
         }
@@ -402,6 +554,25 @@ namespace ELibraryManagement.Web.Services
                     var jsonDoc = JsonDocument.Parse(content);
                     var root = jsonDoc.RootElement;
 
+                    // Debug: Log all properties in the response
+                    Console.WriteLine($"Available properties in JSON response:");
+                    foreach (var property in root.EnumerateObject())
+                    {
+                        Console.WriteLine($"  {property.Name}: {property.Value.ValueKind}");
+                        if (property.Value.ValueKind == JsonValueKind.Object)
+                        {
+                            Console.WriteLine($"    Object properties:");
+                            foreach (var subProp in property.Value.EnumerateObject())
+                            {
+                                Console.WriteLine($"      {subProp.Name}: {subProp.Value}");
+                            }
+                        }
+                        else if (property.Value.ValueKind == JsonValueKind.Array)
+                        {
+                            Console.WriteLine($"    Array with {property.Value.GetArrayLength()} items");
+                        }
+                    }
+
                     // Create a simple BookViewModel with basic properties
                     return new BookViewModel
                     {
@@ -416,11 +587,13 @@ namespace ELibraryManagement.Web.Services
                         TotalCopies = root.TryGetProperty("quantity", out var qtyProp) ? qtyProp.GetInt32() : 1,
                         AvailableCopies = root.TryGetProperty("availableQuantity", out var availProp) ? availProp.GetInt32() : 1,
                         RentalPrice = root.TryGetProperty("price", out var priceProp) ? (decimal?)priceProp.GetDecimal() : 50000m,
-                        CategoryName = "Chưa phân loại",
-                        Language = "Tiếng Việt",
-                        PageCount = 300,
-                        AverageRating = 4.5m,
-                        RatingCount = 10
+
+                        // Try multiple possible property names for category
+                        CategoryName = GetCategoryName(root),
+                        Language = root.TryGetProperty("language", out var langProp) ? langProp.GetString() ?? "Tiếng Việt" : "Tiếng Việt",
+                        PageCount = root.TryGetProperty("pageCount", out var pageProp) ? pageProp.GetInt32() : 0,
+                        AverageRating = root.TryGetProperty("averageRating", out var ratingProp) ? ratingProp.GetDecimal() : 0m,
+                        RatingCount = root.TryGetProperty("ratingCount", out var countProp) ? countProp.GetInt32() : 0
                     };
                 }
 
@@ -431,24 +604,28 @@ namespace ELibraryManagement.Web.Services
                 Console.WriteLine($"Error in GetBookByIdAsync: {ex.Message}");
 
                 // Return a mock book for testing if API fails
+                var categories = new[] { "Văn học", "Khoa học", "Lịch sử", "Công nghệ", "Kinh tế" };
+                var languages = new[] { "Tiếng Việt", "Tiếng Anh", "Tiếng Pháp" };
+                var authors = new[] { "Nguyễn Du", "Tô Hoài", "Nam Cao", "Xuân Diệu", "Dale Carnegie" };
+
                 return new BookViewModel
                 {
                     Id = id,
                     Title = $"Sample Book {id}",
-                    Author = "Sample Author",
+                    Author = authors[id % authors.Length],
                     ISBN = $"978-0000000{id:D3}",
                     Publisher = "Sample Publisher",
-                    PublicationYear = 2024,
+                    PublicationYear = 2020 + (id % 5),
                     Description = "This is a sample book description for testing purposes.",
                     ImageUrl = "https://via.placeholder.com/300x400?text=Book+Cover",
                     TotalCopies = 5,
                     AvailableCopies = 3,
-                    RentalPrice = 50000m,
-                    CategoryName = "Văn học",
-                    Language = "Tiếng Việt",
-                    PageCount = 250,
-                    AverageRating = 4.2m,
-                    RatingCount = 15
+                    RentalPrice = 30000m + (id * 5000),
+                    CategoryName = categories[id % categories.Length],
+                    Language = languages[id % languages.Length],
+                    PageCount = 200 + (id * 20),
+                    AverageRating = 3.5m + (id % 3) * 0.5m,
+                    RatingCount = 5 + (id * 2)
                 };
             }
         }

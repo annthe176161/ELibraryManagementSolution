@@ -136,11 +136,10 @@
                     {
                         <div class="book-price">
                             <span class="price-label">Phí mượn:</span>
-                            <span class="price-value">@Model.RentalPrice.Value.ToString("C0",
-                                                            System.Globalization.CultureInfo.GetCultureInfo("vi-VN"))</span>
-                        <small class="price-note">/ 7 ngày</small>
-                    </div>
-                                        }
+                            <span class="price-value">@Model.RentalPrice.Value.ToString("N0") VND</span>
+                            <small class="price-note">/ngày</small>
+                        </div>
+                    }
                 </div>
 
                 <!-- Book Description -->
@@ -167,7 +166,7 @@
                         </div>
                         <div class="detail-item">
                             <span class="detail-label">🔢 Mã ISBN:</span>
-                            <span class="detail-value">@Model.ISBN</span>
+                            <span class="detail-value isbn-value" title="@Model.ISBN">@Model.ISBN</span>
                         </div>
                         <div class="detail-item">
                             <span class="detail-label">🌐 Ngôn Ngữ:</span>
@@ -249,10 +248,9 @@
                                 @if (book.RentalPrice.HasValue)
                                 {
                                     <div class="book-price">
-                                        @book.RentalPrice.Value.ToString("C0",
-                                        System.Globalization.CultureInfo.GetCultureInfo("vi-VN"))
-                        </div>
-                                                }
+                                        @book.RentalPrice.Value.ToString("N0") VND/ngày
+                                    </div>
+                                }
                             </div>
                         </div>
                     </div>

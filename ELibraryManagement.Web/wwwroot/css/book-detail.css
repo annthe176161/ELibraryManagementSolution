@@ -335,6 +335,39 @@ body {
 .detail-value {
     color: #555;
     flex: 1;
+    word-break: break-all;
+    overflow-wrap: break-word;
+    hyphens: auto;
+    max-width: 100%;
+}
+
+.isbn-value {
+    font-family: 'Courier New', monospace;
+    font-size: 0.9em;
+    background: rgba(0, 0, 0, 0.05);
+    padding: 2px 6px;
+    border-radius: 4px;
+    cursor: help;
+    transition: background-color 0.2s ease;
+}
+
+.isbn-value:hover {
+    background: rgba(0, 0, 0, 0.1);
+}
+
+/* Meta item styling for book details */
+.meta-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 0;
+}
+
+.meta-item .isbn-value {
+    word-break: break-all;
+    overflow-wrap: break-word;
+    max-width: 100%;
+    flex: 1;
 }
 
 /* ==== BORROWING INFO ==== */

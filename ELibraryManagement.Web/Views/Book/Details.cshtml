@@ -70,7 +70,8 @@
                             <div class="col-sm-6">
                                 <div class="meta-item">
                                     <i class="fas fa-barcode text-primary"></i>
-                                    <strong>ISBN:</strong> @Model.ISBN
+                                    <strong>ISBN:</strong> <span class="isbn-value"
+                                        title="@Model.ISBN">@Model.ISBN</span>
                                 </div>
                             </div>
                         </div>
@@ -103,7 +104,7 @@
                                     <div class="meta-item">
                                         <i class="fas fa-money-bill-wave text-success"></i>
                                         <strong>Giá thuê:</strong> <span
-                                            class="text-success">@Model.RentalPrice.Value.ToString("N0") VNĐ</span>
+                                            class="text-success">@Model.RentalPrice.Value.ToString("N0") VND/ngày</span>
                                     </div>
                                 }
                                 else
