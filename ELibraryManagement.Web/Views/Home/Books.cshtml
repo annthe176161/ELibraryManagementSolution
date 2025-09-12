@@ -251,10 +251,11 @@
                                         <i class="fas fa-eye"></i>
                                         Chi Tiết
                                     </a>
-                                    <button class="btn btn-primary action-btn" onclick="borrowBook(@book.Id, '@book.Title')">
+                                    <a href="@Url.Action("Borrow", "Book", new { id = book.Id })"
+                                        class="btn btn-primary action-btn">
                                         <i class="fas fa-book-reader"></i>
                                         Mượn Ngay
-                                    </button>
+                                    </a>
                                 }
                                 else
                                 {
@@ -302,83 +303,73 @@
 
 @section Scripts {
     <script>
-        // Function to handle book borrowing
-        function borrowBook(bookId, bookTitle) {
-            // Check if user is logged in (you can implement this check)
-            if (confirm(`Bạn có muốn mượn sách "${bookTitle}" không?`)) {
-                // Show loading state
-                const button = event.target;
-                const originalText = button.innerHTML;
-                button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang xử lý...';
-                button.disabled = true;
-
-                // TODO: Implement actual borrow functionality via API
-                // For now, just show a message
-                setTimeout(() => {
-                    alert(`Tính năng mượn sách đang được phát triển!\n\nSách: ${bookTitle}\nMã sách: ${bookId}\n\nVui lòng liên hệ thủ thư để mượn sách.`);
-
-                    // Restore button state
-                    button.innerHTML = originalText;
-                    button.disabled = false;
-                }, 1000);
-            }
-        }
-
         // Auto-submit form when sort option changes
         document.querySelector('select[name="sortBy"]').addEventListener('change', function () {
             this.form.submit();
         });
 
-        // Smooth scroll to results when filter is applied
-        if (window.location.search) {
-            setTimeout(() => {
-                const resultsSection = document.querySelector('.results-header');
-                if (resultsSection) {
-                    resultsSection.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
-                }
-            }, 100);
-        }
-
-        // Add loading animation to filter form
-        document.querySelector('.filter-form').addEventListener('submit', function () {
-            const submitButton = this.querySelector('.btn-filter');
-            const originalText = submitButton.innerHTML;
-            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang tìm kiếm...';
-            submitButton.disabled = true;
+        // Auto-submit form when category changes
+        document.querySelector('select[name="category"]').addEventListener('change', function () {
+            this.form.submit();
         });
 
-        // Image lazy loading fallback
-        document.querySelectorAll('.card-img-top').forEach(img => {
-            img.addEventListener('error', function () {
-                this.style.display = 'none';
-                this.nextElementSibling.style.display = 'flex';
-            });
-        });
-
-        // Add animation to book cards on scroll
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -100px 0px'
-        };
-
-        const observer = new IntersectionObserver(function (entries) {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.style.opacity = '1';
-                    entry.target.style.transform = 'translateY(0)';
-                }
-            });
-        }, observerOptions);
-
-        // Initialize animations
-        document.querySelectorAll('.book-card').forEach((card, index) => {
-            card.style.opacity = '0';
-            card.style.transform = 'translateY(30px)';
-            card.style.transition = `opacity 0.6s ease ${index * 0.1}s, transform 0.6s ease ${index * 0.1}s`;
-            observer.observe(card);
+        // Auto-submit form when author changes
+        document.querySelector('select[name="author"]').addEventListener('change', function () {
+            this.form.submit();
         });
     </script>
+}
+
+// Smooth scroll to results when filter is applied
+if (window.location.search) {
+setTimeout(() => {
+const resultsSection = document.querySelector('.results-header');
+if (resultsSection) {
+resultsSection.scrollIntoView({
+behavior: 'smooth',
+block: 'start'
+});
+}
+}, 100);
+}
+
+// Add loading animation to filter form
+document.querySelector('.filter-form').addEventListener('submit', function () {
+const submitButton = this.querySelector('.btn-filter');
+const originalText = submitButton.innerHTML;
+submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang tìm kiếm...';
+submitButton.disabled = true;
+});
+
+// Image lazy loading fallback
+document.querySelectorAll('.card-img-top').forEach(img => {
+img.addEventListener('error', function () {
+this.style.display = 'none';
+this.nextElementSibling.style.display = 'flex';
+});
+});
+
+// Add animation to book cards on scroll
+const observerOptions = {
+threshold: 0.1,
+rootMargin: '0px 0px -100px 0px'
+};
+
+const observer = new IntersectionObserver(function (entries) {
+entries.forEach(entry => {
+if (entry.isIntersecting) {
+entry.target.style.opacity = '1';
+entry.target.style.transform = 'translateY(0)';
+}
+});
+}, observerOptions);
+
+// Initialize animations
+document.querySelectorAll('.book-card').forEach((card, index) => {
+card.style.opacity = '0';
+card.style.transform = 'translateY(30px)';
+card.style.transition = `opacity 0.6s ease ${index * 0.1}s, transform 0.6s ease ${index * 0.1}s`;
+observer.observe(card);
+});
+</script>
 }
