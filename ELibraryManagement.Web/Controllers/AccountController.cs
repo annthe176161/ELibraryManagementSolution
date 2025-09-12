@@ -86,19 +86,29 @@ namespace ELibraryManagement.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> Profile()
         {
-            if (!_authApiService.IsAuthenticated())
+            try
             {
+                if (!_authApiService.IsAuthenticated())
+                {
+                    TempData["ErrorMessage"] = "Bạn cần đăng nhập để xem thông tin cá nhân.";
+                    return RedirectToAction("Login");
+                }
+
+                var user = await _authApiService.GetCurrentUserAsync();
+                if (user == null)
+                {
+                    TempData["ErrorMessage"] = "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.";
+                    _authApiService.Logout();
+                    return RedirectToAction("Login");
+                }
+
+                return View(user);
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Có lỗi xảy ra khi tải thông tin cá nhân: {ex.Message}";
                 return RedirectToAction("Login");
             }
-
-            var user = await _authApiService.GetCurrentUserAsync();
-            if (user == null)
-            {
-                _authApiService.Logout();
-                return RedirectToAction("Login");
-            }
-
-            return View(user);
         }
     }
 }

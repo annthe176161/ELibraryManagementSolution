@@ -1,4 +1,5 @@
 using ELibraryManagement.Web.Services;
+using ELibraryManagement.Web.Middleware;
 
 namespace ELibraryManagement.Web
 {
@@ -45,6 +46,9 @@ namespace ELibraryManagement.Web
 
             // Add Session middleware
             app.UseSession();
+
+            // Add authentication logging middleware for debugging
+            app.UseMiddleware<AuthenticationLoggingMiddleware>();
 
             app.UseRouting();
 

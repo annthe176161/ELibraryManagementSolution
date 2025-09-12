@@ -170,25 +170,27 @@ namespace ELibraryManagement.Web.Controllers
         // GET: Book/MyBooks
         public async Task<IActionResult> MyBooks()
         {
-            if (!_authApiService.IsAuthenticated())
-            {
-                TempData["ErrorMessage"] = "Bạn cần đăng nhập để xem sách đã mượn.";
-                return RedirectToAction("Login", "Account");
-            }
-
             try
             {
+                if (!_authApiService.IsAuthenticated())
+                {
+                    TempData["ErrorMessage"] = "Bạn cần đăng nhập để xem sách đã mượn.";
+                    return RedirectToAction("Login", "Account");
+                }
+
                 var currentUser = await _authApiService.GetCurrentUserAsync();
                 if (currentUser == null)
                 {
-                    TempData["ErrorMessage"] = "Không thể xác thực người dùng.";
+                    TempData["ErrorMessage"] = "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.";
+                    _authApiService.Logout();
                     return RedirectToAction("Login", "Account");
                 }
 
                 var token = _authApiService.GetCurrentToken();
                 if (string.IsNullOrEmpty(token))
                 {
-                    TempData["ErrorMessage"] = "Phiên đăng nhập đã hết hạn.";
+                    TempData["ErrorMessage"] = "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.";
+                    _authApiService.Logout();
                     return RedirectToAction("Login", "Account");
                 }
 
@@ -198,8 +200,9 @@ namespace ELibraryManagement.Web.Controllers
             }
             catch (Exception ex)
             {
-                TempData["ErrorMessage"] = $"Có lỗi xảy ra: {ex.Message}";
-                return View(new List<UserBorrowedBookViewModel>());
+                System.Diagnostics.Debug.WriteLine($"Error in MyBooks: {ex.Message}");
+                TempData["ErrorMessage"] = $"Có lỗi xảy ra khi tải danh sách sách đã mượn: {ex.Message}";
+                return RedirectToAction("Index", "Home");
             }
         }
 

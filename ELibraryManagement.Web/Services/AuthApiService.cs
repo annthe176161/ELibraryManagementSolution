@@ -41,7 +41,7 @@ namespace ELibraryManagement.Web.Services
             var httpUrl = _configuration["ApiSettings:BaseUrlHttp"];
 
             // Sử dụng BaseUrl đầu tiên (ưu tiên HTTPS), nếu không có thì dùng HTTP
-            return httpsUrl ?? httpUrl ?? "http://localhost:5293";
+            return httpsUrl ?? httpUrl ?? "https://localhost:7125";
         }
 
         public async Task<AuthResponseViewModel> RegisterAsync(RegisterViewModel model)
@@ -171,7 +171,11 @@ namespace ELibraryManagement.Web.Services
             {
                 var token = GetCurrentUserToken();
                 if (string.IsNullOrEmpty(token))
+                {
+                    // If no token, ensure session is cleared
+                    Logout();
                     return null;
+                }
 
                 var apiBaseUrl = GetApiBaseUrl();
 
@@ -188,13 +192,36 @@ namespace ELibraryManagement.Web.Services
                 {
                     var content = await response.Content.ReadAsStringAsync();
                     var apiResponse = JsonSerializer.Deserialize<JsonElement>(content, _jsonOptions);
-                    return ParseUser(apiResponse);
+                    var user = ParseUser(apiResponse);
+
+                    if (user != null)
+                    {
+                        // Update session with fresh user info
+                        _httpContextAccessor.HttpContext?.Session.SetString("UserName", user.UserName ?? "");
+                        _httpContextAccessor.HttpContext?.Session.SetString("Email", user.Email ?? "");
+                        _httpContextAccessor.HttpContext?.Session.SetString("FullName",
+                            !string.IsNullOrEmpty(user.FirstName) || !string.IsNullOrEmpty(user.LastName)
+                                ? $"{user.FirstName} {user.LastName}".Trim()
+                                : user.UserName ?? user.Email ?? "");
+                    }
+
+                    return user;
+                }
+                else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                {
+                    // Token is invalid or expired, clear session
+                    Logout();
+                    return null;
                 }
 
                 return null;
             }
-            catch
+            catch (Exception ex)
             {
+                // Log the error if needed
+                System.Diagnostics.Debug.WriteLine($"Error in GetCurrentUserAsync: {ex.Message}");
+                // Clear session on error to avoid inconsistent state
+                Logout();
                 return null;
             }
         }
@@ -210,7 +237,26 @@ namespace ELibraryManagement.Web.Services
 
         public bool IsAuthenticated()
         {
-            return !string.IsNullOrEmpty(GetCurrentUserToken());
+            try
+            {
+                var token = GetCurrentUserToken();
+                var context = _httpContextAccessor.HttpContext;
+                var userName = context?.Session?.GetString("UserName");
+
+                var isAuth = !string.IsNullOrEmpty(token) &&
+                       context?.Session != null &&
+                       !string.IsNullOrEmpty(userName);
+
+                // Debug logging
+                System.Diagnostics.Debug.WriteLine($"IsAuthenticated check - Token: {!string.IsNullOrEmpty(token)}, Session: {context?.Session != null}, UserName: {!string.IsNullOrEmpty(userName)}, Result: {isAuth}");
+
+                return isAuth;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"IsAuthenticated error: {ex.Message}");
+                return false;
+            }
         }
 
         public string? GetCurrentUserToken()
