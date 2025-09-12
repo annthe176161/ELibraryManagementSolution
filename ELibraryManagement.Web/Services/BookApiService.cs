@@ -14,6 +14,13 @@ namespace ELibraryManagement.Web.Services
         Task<BorrowBookResponseViewModel> BorrowBookAsync(BorrowBookRequestViewModel request, string token);
         Task<List<UserBorrowedBookViewModel>> GetBorrowedBooksAsync(string userId, string token);
         Task<BorrowBookResponseViewModel> ReturnBookAsync(int borrowRecordId, string token);
+
+        // Admin methods
+        Task<List<BookViewModel>> GetAllBooksAsync(string token);
+        Task<BookViewModel> CreateBookAsync(CreateBookViewModel book, string token);
+        Task<BookViewModel> UpdateBookAsync(UpdateBookViewModel book, string token);
+        Task<bool> DeleteBookAsync(int id, string token);
+        Task<List<CategoryViewModel>> GetAllCategoriesAsync(string token);
     }
 
     public class BookApiService : IBookApiService
@@ -875,6 +882,174 @@ namespace ELibraryManagement.Web.Services
                     Success = false,
                     Message = $"Có lỗi xảy ra: {ex.Message}"
                 };
+            }
+        }
+
+        // Admin methods
+        public async Task<List<BookViewModel>> GetAllBooksAsync(string token)
+        {
+            try
+            {
+                var apiBaseUrl = GetApiBaseUrl();
+                var url = $"{apiBaseUrl}/api/book/admin/all";
+
+                _httpClient.DefaultRequestHeaders.Clear();
+                _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+
+                var response = await _httpClient.GetAsync(url);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var jsonContent = await response.Content.ReadAsStringAsync();
+                    var books = JsonSerializer.Deserialize<List<BookViewModel>>(jsonContent, _jsonOptions);
+                    return books ?? new List<BookViewModel>();
+                }
+
+                return new List<BookViewModel>();
+            }
+            catch (Exception)
+            {
+                return new List<BookViewModel>();
+            }
+        }
+
+        public async Task<BookViewModel> CreateBookAsync(CreateBookViewModel book, string token)
+        {
+            try
+            {
+                var apiBaseUrl = GetApiBaseUrl();
+                var url = $"{apiBaseUrl}/api/book/admin/create";
+
+                _httpClient.DefaultRequestHeaders.Clear();
+                _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+
+                var createDto = new
+                {
+                    title = book.Title,
+                    author = book.Author,
+                    isbn = book.ISBN,
+                    publisher = book.Publisher,
+                    publicationYear = book.PublicationYear,
+                    description = book.Description,
+                    coverImageUrl = book.CoverImageUrl,
+                    quantity = book.Quantity,
+                    language = book.Language,
+                    pageCount = book.PageCount,
+                    categoryIds = book.CategoryIds
+                };
+
+                var json = JsonSerializer.Serialize(createDto, _jsonOptions);
+                var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+
+                var response = await _httpClient.PostAsync(url, content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var jsonContent = await response.Content.ReadAsStringAsync();
+                    var createdBook = JsonSerializer.Deserialize<BookViewModel>(jsonContent, _jsonOptions);
+                    return createdBook ?? throw new Exception("Failed to deserialize created book");
+                }
+
+                var errorContent = await response.Content.ReadAsStringAsync();
+                throw new Exception($"API call failed: {response.StatusCode} - {errorContent}");
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error creating book: {ex.Message}");
+            }
+        }
+
+        public async Task<BookViewModel> UpdateBookAsync(UpdateBookViewModel book, string token)
+        {
+            try
+            {
+                var apiBaseUrl = GetApiBaseUrl();
+                var url = $"{apiBaseUrl}/api/book/admin/update";
+
+                _httpClient.DefaultRequestHeaders.Clear();
+                _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+
+                var updateDto = new
+                {
+                    id = book.Id,
+                    title = book.Title,
+                    author = book.Author,
+                    isbn = book.ISBN,
+                    publisher = book.Publisher,
+                    publicationYear = book.PublicationYear,
+                    description = book.Description,
+                    coverImageUrl = book.CoverImageUrl,
+                    quantity = book.Quantity,
+                    language = book.Language,
+                    pageCount = book.PageCount,
+                    categoryIds = book.CategoryIds
+                };
+
+                var json = JsonSerializer.Serialize(updateDto, _jsonOptions);
+                var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+
+                var response = await _httpClient.PutAsync(url, content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var jsonContent = await response.Content.ReadAsStringAsync();
+                    var updatedBook = JsonSerializer.Deserialize<BookViewModel>(jsonContent, _jsonOptions);
+                    return updatedBook ?? throw new Exception("Failed to deserialize updated book");
+                }
+
+                var errorContent = await response.Content.ReadAsStringAsync();
+                throw new Exception($"API call failed: {response.StatusCode} - {errorContent}");
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error updating book: {ex.Message}");
+            }
+        }
+
+        public async Task<bool> DeleteBookAsync(int id, string token)
+        {
+            try
+            {
+                var apiBaseUrl = GetApiBaseUrl();
+                var url = $"{apiBaseUrl}/api/book/admin/delete/{id}";
+
+                _httpClient.DefaultRequestHeaders.Clear();
+                _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+
+                var response = await _httpClient.DeleteAsync(url);
+
+                return response.IsSuccessStatusCode;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        public async Task<List<CategoryViewModel>> GetAllCategoriesAsync(string token)
+        {
+            try
+            {
+                var apiBaseUrl = GetApiBaseUrl();
+                var url = $"{apiBaseUrl}/api/book/admin/categories";
+
+                _httpClient.DefaultRequestHeaders.Clear();
+                _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+
+                var response = await _httpClient.GetAsync(url);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var jsonContent = await response.Content.ReadAsStringAsync();
+                    var categories = JsonSerializer.Deserialize<List<CategoryViewModel>>(jsonContent, _jsonOptions);
+                    return categories ?? new List<CategoryViewModel>();
+                }
+
+                return new List<CategoryViewModel>();
+            }
+            catch (Exception)
+            {
+                return new List<CategoryViewModel>();
             }
         }
     }

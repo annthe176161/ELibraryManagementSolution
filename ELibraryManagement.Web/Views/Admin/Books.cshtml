@@ -24,7 +24,7 @@
                     </nav>
                 </div>
                 <div>
-                    <button type="button" class="btn btn-success">
+                    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#bookModal" onclick="openCreateBookModal()">
                         <i class="fas fa-plus me-1"></i>
                         Thêm sách mới
                     </button>
@@ -204,23 +204,15 @@
                                         </td>
                                         <td>
                                             <div class="btn-group" role="group">
-                                                <button type="button" class="btn btn-sm btn-outline-primary" title="Xem chi tiết">
+                                                <button type="button" class="btn btn-sm btn-outline-primary" title="Xem chi tiết" onclick="viewBook(@book.Id)">
                                                     <i class="fas fa-eye"></i>
                                                 </button>
-                                                <button type="button" class="btn btn-sm btn-outline-warning" title="Chỉnh sửa">
+                                                <button type="button" class="btn btn-sm btn-outline-warning" title="Chỉnh sửa" onclick="editBook(@book.Id)" data-bs-toggle="modal" data-bs-target="#bookModal">
                                                     <i class="fas fa-edit"></i>
                                                 </button>
-                                                <div class="btn-group" role="group">
-                                                    <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
-                                                        <i class="fas fa-cog"></i>
-                                                    </button>
-                                                    <ul class="dropdown-menu">
-                                                        <li><a class="dropdown-item" href="#"><i class="fas fa-plus me-2"></i>Thêm bản sao</a></li>
-                                                        <li><a class="dropdown-item" href="#"><i class="fas fa-minus me-2"></i>Giảm bản sao</a></li>
-                                                        <li><hr class="dropdown-divider"></li>
-                                                        <li><a class="dropdown-item text-danger" href="#"><i class="fas fa-trash me-2"></i>Xóa sách</a></li>
-                                                    </ul>
-                                                </div>
+                                                <button type="button" class="btn btn-sm btn-outline-danger" title="Xóa" onclick="deleteBook(@book.Id, '@book.Title')">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
                                             </div>
                                         </td>
                                     </tr>
@@ -253,9 +245,141 @@
         </div>
     </div>
 
+<!-- Book Modal (Create/Edit) -->
+<div class="modal fade" id="bookModal" tabindex="-1" aria-labelledby="bookModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="bookModalLabel">Thêm sách mới</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="bookForm">
+                    <input type="hidden" id="bookId" name="id" />
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="title" class="form-label">Tiêu đề <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="title" name="title" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="author" class="form-label">Tác giả <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="author" name="author" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="isbn" class="form-label">ISBN</label>
+                                <input type="text" class="form-control" id="isbn" name="isbn">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="publisher" class="form-label">Nhà xuất bản</label>
+                                <input type="text" class="form-control" id="publisher" name="publisher">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="publicationYear" class="form-label">Năm xuất bản</label>
+                                <input type="number" class="form-control" id="publicationYear" name="publicationYear" 
+                                       min="1000" max="2100" value="2025">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="quantity" class="form-label">Số lượng <span class="text-danger">*</span></label>
+                                <input type="number" class="form-control" id="quantity" name="quantity" 
+                                       min="0" required>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="pageCount" class="form-label">Số trang</label>
+                                <input type="number" class="form-control" id="pageCount" name="pageCount" min="0">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="language" class="form-label">Ngôn ngữ</label>
+                                <input type="text" class="form-control" id="language" name="language" value="Tiếng Việt">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="categories" class="form-label">Danh mục</label>
+                                <select class="form-select" id="categories" name="categoryIds" multiple>
+                                    <!-- Categories will be loaded dynamically -->
+                                </select>
+                                <small class="form-text text-muted">Giữ Ctrl để chọn nhiều danh mục</small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="coverImageUrl" class="form-label">URL hình bìa</label>
+                        <input type="url" class="form-control" id="coverImageUrl" name="coverImageUrl" 
+                               placeholder="https://example.com/image.jpg">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="description" class="form-label">Mô tả</label>
+                        <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-primary" id="saveBookBtn" onclick="saveBook()">
+                    <i class="fas fa-save me-1"></i>
+                    Lưu
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Xác nhận xóa</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có chắc chắn muốn xóa sách này không?</p>
+                <div id="deleteDetails"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Xóa</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
     <script>
+        let currentBookId = null;
+        let categories = [];
+
         $(document).ready(function() {
+            // Load categories for the form
+            loadCategories();
+
             // Search functionality
             $('#searchInput').on('keyup', function() {
                 var value = $(this).val().toLowerCase();
@@ -283,5 +407,154 @@
                 });
             });
         });
+
+        // Load categories for dropdown
+        function loadCategories() {
+            $.get('/Admin/GetCategories')
+                .done(function(response) {
+                    if (response.success) {
+                        categories = response.data;
+                        updateCategoriesDropdown();
+                    }
+                })
+                .fail(function() {
+                    console.error('Failed to load categories');
+                });
+        }
+
+        function updateCategoriesDropdown() {
+            const select = $('#categories');
+            select.empty();
+            categories.forEach(category => {
+                select.append(`<option value="${category.id}">${category.name}</option>`);
+            });
+        }
+
+        // Open modal for creating new book
+        function openCreateBookModal() {
+            currentBookId = null;
+            $('#bookModalLabel').text('Thêm sách mới');
+            $('#bookForm')[0].reset();
+            $('#bookId').val('');
+            $('#publicationYear').val(new Date().getFullYear());
+            $('#language').val('Tiếng Việt');
+            $('#categories').val([]);
+        }
+
+        // View book details
+        function viewBook(bookId) {
+            // Implement view book functionality
+            console.log('View book:', bookId);
+            // You could redirect to a detail page or show a modal with book details
+        }
+
+        // Edit book
+        function editBook(bookId) {
+            currentBookId = bookId;
+            $('#bookModalLabel').text('Chỉnh sửa sách');
+            
+            // Find book data from the table
+            const row = $(`button[onclick="editBook(${bookId})"]`).closest('tr');
+            const title = row.find('td:eq(0) h6').text().trim();
+            const author = row.find('td:eq(1)').text().trim();
+            
+            // Load book details and populate form
+            loadBookForEdit(bookId);
+        }
+
+        // Load book details for editing
+        function loadBookForEdit(bookId) {
+            // You might want to make an API call to get full book details
+            // For now, we'll populate basic fields from the table
+            const row = $(`button[onclick="editBook(${bookId})"]`).closest('tr');
+            
+            $('#bookId').val(bookId);
+            $('#title').val(row.find('td:eq(0) h6').text().trim());
+            $('#author').val(row.find('td:eq(1)').text().trim());
+            
+            // You would need to make an API call to get full book details
+            // including ISBN, description, etc.
+        }
+
+        // Save book (create or update)
+        function saveBook() {
+            const form = $('#bookForm')[0];
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            const formData = {
+                id: parseInt($('#bookId').val()) || 0,
+                title: $('#title').val(),
+                author: $('#author').val(),
+                isbn: $('#isbn').val(),
+                publisher: $('#publisher').val(),
+                publicationYear: parseInt($('#publicationYear').val()),
+                description: $('#description').val(),
+                coverImageUrl: $('#coverImageUrl').val(),
+                quantity: parseInt($('#quantity').val()),
+                language: $('#language').val(),
+                pageCount: parseInt($('#pageCount').val()) || 0,
+                categoryIds: $('#categories').val() ? $('#categories').val().map(id => parseInt(id)) : []
+            };
+
+            const isEdit = currentBookId !== null && currentBookId > 0;
+            const url = isEdit ? '/Admin/UpdateBook' : '/Admin/CreateBook';
+            
+            $('#saveBookBtn').prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i>Đang lưu...');
+
+            $.ajax({
+                url: url,
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(formData),
+                success: function(response) {
+                    if (response.success) {
+                        $('#bookModal').modal('hide');
+                        alert(response.message);
+                        location.reload(); // Reload page to show updated data
+                    } else {
+                        alert('Lỗi: ' + response.message);
+                    }
+                },
+                error: function(xhr) {
+                    console.error('Error:', xhr);
+                    alert('Có lỗi xảy ra khi lưu sách');
+                },
+                complete: function() {
+                    $('#saveBookBtn').prop('disabled', false).html('<i class="fas fa-save me-1"></i>Lưu');
+                }
+            });
+        }
+
+        // Delete book
+        function deleteBook(bookId, bookTitle) {
+            $('#deleteDetails').html(`<strong>Sách:</strong> ${bookTitle}`);
+            
+            $('#confirmDeleteBtn').off('click').on('click', function() {
+                $.ajax({
+                    url: '/Admin/DeleteBook',
+                    type: 'POST',
+                    data: { id: bookId },
+                    success: function(response) {
+                        $('#deleteModal').modal('hide');
+                        if (response.success) {
+                            alert(response.message);
+                            location.reload();
+                        } else {
+                            alert('Lỗi: ' + response.message);
+                        }
+                    },
+                    error: function(xhr) {
+                        $('#deleteModal').modal('hide');
+                        console.error('Error:', xhr);
+                        alert('Có lỗi xảy ra khi xóa sách');
+                    }
+                });
+            });
+            
+            $('#deleteModal').modal('show');
+        }
     </script>
 }

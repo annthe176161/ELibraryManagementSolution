@@ -94,5 +94,105 @@ namespace ELibraryManagement.Api.Controllers
 
             return Ok(result);
         }
+
+        // Admin endpoints
+        /// <summary>
+        /// Lấy tất cả sách (bao gồm không khả dụng) - Chỉ dành cho Admin
+        /// </summary>
+        [HttpGet("admin/all")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetAllBooks()
+        {
+            var books = await _bookService.GetAllBooksAsync();
+            return Ok(books);
+        }
+
+        /// <summary>
+        /// Tạo sách mới - Chỉ dành cho Admin
+        /// </summary>
+        [HttpPost("admin/create")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> CreateBook([FromBody] CreateBookDto createBookDto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+                var book = await _bookService.CreateBookAsync(createBookDto);
+                return CreatedAtAction(nameof(GetBookById), new { id = book.Id }, book);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Cập nhật thông tin sách - Chỉ dành cho Admin
+        /// </summary>
+        [HttpPut("admin/update")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> UpdateBook([FromBody] UpdateBookDto updateBookDto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            try
+            {
+                var book = await _bookService.UpdateBookAsync(updateBookDto);
+                return Ok(book);
+            }
+            catch (ArgumentException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Xóa sách - Chỉ dành cho Admin
+        /// </summary>
+        [HttpDelete("admin/delete/{id}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> DeleteBook(int id)
+        {
+            try
+            {
+                var result = await _bookService.DeleteBookAsync(id);
+                if (!result)
+                {
+                    return NotFound(new { message = $"Book with ID {id} not found" });
+                }
+
+                return Ok(new { message = "Book deleted successfully" });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Lấy tất cả danh mục - Chỉ dành cho Admin
+        /// </summary>
+        [HttpGet("admin/categories")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetAllCategories()
+        {
+            var categories = await _bookService.GetAllCategoriesAsync();
+            return Ok(categories);
+        }
     }
 }

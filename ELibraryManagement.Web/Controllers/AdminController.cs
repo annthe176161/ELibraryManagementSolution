@@ -164,7 +164,13 @@ namespace ELibraryManagement.Web.Controllers
 
             try
             {
-                var books = await _bookApiService.GetAvailableBooksAsync();
+                var token = _authApiService.GetCurrentToken();
+                if (string.IsNullOrEmpty(token))
+                {
+                    return RedirectToAction("Login", "Account");
+                }
+
+                var books = await _bookApiService.GetAllBooksAsync(token);
                 return View(books ?? new List<BookViewModel>());
             }
             catch (Exception ex)
@@ -233,6 +239,116 @@ namespace ELibraryManagement.Web.Controllers
             {
                 TempData["ErrorMessage"] = $"Có lỗi xảy ra: {ex.Message}";
                 return View(new List<BorrowRecordViewModel>());
+            }
+        }
+
+        // Book Management Actions
+        [HttpGet]
+        public async Task<IActionResult> GetCategories()
+        {
+            var accessCheck = await CheckAdminAccessAsync();
+            if (accessCheck != null) return Json(new { success = false, message = "Unauthorized" });
+
+            try
+            {
+                var token = _authApiService.GetCurrentToken();
+                if (string.IsNullOrEmpty(token))
+                {
+                    return Json(new { success = false, message = "No token" });
+                }
+
+                var categories = await _bookApiService.GetAllCategoriesAsync(token);
+                return Json(new { success = true, data = categories });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateBook([FromBody] CreateBookViewModel model)
+        {
+            var accessCheck = await CheckAdminAccessAsync();
+            if (accessCheck != null) return Json(new { success = false, message = "Unauthorized" });
+
+            if (!ModelState.IsValid)
+            {
+                return Json(new { success = false, message = "Dữ liệu không hợp lệ", errors = ModelState });
+            }
+
+            try
+            {
+                var token = _authApiService.GetCurrentToken();
+                if (string.IsNullOrEmpty(token))
+                {
+                    return Json(new { success = false, message = "Không có token xác thực" });
+                }
+
+                var book = await _bookApiService.CreateBookAsync(model, token);
+                return Json(new { success = true, message = "Thêm sách thành công", data = book });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Có lỗi xảy ra: {ex.Message}" });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateBook([FromBody] UpdateBookViewModel model)
+        {
+            var accessCheck = await CheckAdminAccessAsync();
+            if (accessCheck != null) return Json(new { success = false, message = "Unauthorized" });
+
+            if (!ModelState.IsValid)
+            {
+                return Json(new { success = false, message = "Dữ liệu không hợp lệ", errors = ModelState });
+            }
+
+            try
+            {
+                var token = _authApiService.GetCurrentToken();
+                if (string.IsNullOrEmpty(token))
+                {
+                    return Json(new { success = false, message = "Không có token xác thực" });
+                }
+
+                var book = await _bookApiService.UpdateBookAsync(model, token);
+                return Json(new { success = true, message = "Cập nhật sách thành công", data = book });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Có lỗi xảy ra: {ex.Message}" });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteBook(int id)
+        {
+            var accessCheck = await CheckAdminAccessAsync();
+            if (accessCheck != null) return Json(new { success = false, message = "Unauthorized" });
+
+            try
+            {
+                var token = _authApiService.GetCurrentToken();
+                if (string.IsNullOrEmpty(token))
+                {
+                    return Json(new { success = false, message = "Không có token xác thực" });
+                }
+
+                var result = await _bookApiService.DeleteBookAsync(id, token);
+                if (result)
+                {
+                    return Json(new { success = true, message = "Xóa sách thành công" });
+                }
+                else
+                {
+                    return Json(new { success = false, message = "Không thể xóa sách" });
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Có lỗi xảy ra: {ex.Message}" });
             }
         }
     }

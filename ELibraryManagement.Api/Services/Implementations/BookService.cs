@@ -228,5 +228,170 @@ namespace ELibraryManagement.Api.Services.Implementations
                 Message = isOverdue ? $"Book returned successfully. Fine: ${fineAmount:F2}" : "Book returned successfully."
             };
         }
+
+        // Admin functions
+        public async Task<BookDto> CreateBookAsync(CreateBookDto createBookDto)
+        {
+            var book = new Book
+            {
+                Title = createBookDto.Title,
+                Author = createBookDto.Author,
+                ISBN = createBookDto.ISBN,
+                Publisher = createBookDto.Publisher,
+                PublicationYear = createBookDto.PublicationYear,
+                Description = createBookDto.Description,
+                CoverImageUrl = createBookDto.CoverImageUrl,
+                Quantity = createBookDto.Quantity,
+                AvailableQuantity = createBookDto.Quantity, // Initially all books are available
+                Language = createBookDto.Language,
+                PageCount = createBookDto.PageCount,
+                AverageRating = 0,
+                RatingCount = 0,
+                IsDeleted = false,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
+            };
+
+            _context.Books.Add(book);
+            await _context.SaveChangesAsync();
+
+            // Add categories if provided
+            if (createBookDto.CategoryIds?.Any() == true)
+            {
+                var bookCategories = createBookDto.CategoryIds.Select(categoryId => new BookCategory
+                {
+                    BookId = book.Id,
+                    CategoryId = categoryId
+                }).ToList();
+
+                _context.BookCategories.AddRange(bookCategories);
+                await _context.SaveChangesAsync();
+            }
+
+            // Return the created book with categories
+            return await GetBookByIdAsync(book.Id) ?? throw new InvalidOperationException("Failed to retrieve created book");
+        }
+
+        public async Task<BookDto> UpdateBookAsync(UpdateBookDto updateBookDto)
+        {
+            var book = await _context.Books
+                .Include(b => b.BookCategories)
+                .FirstOrDefaultAsync(b => b.Id == updateBookDto.Id && !b.IsDeleted);
+
+            if (book == null)
+            {
+                throw new ArgumentException($"Book with ID {updateBookDto.Id} not found");
+            }
+
+            // Update book properties
+            book.Title = updateBookDto.Title;
+            book.Author = updateBookDto.Author;
+            book.ISBN = updateBookDto.ISBN;
+            book.Publisher = updateBookDto.Publisher;
+            book.PublicationYear = updateBookDto.PublicationYear;
+            book.Description = updateBookDto.Description;
+            book.CoverImageUrl = updateBookDto.CoverImageUrl;
+
+            // Update quantity but maintain available quantity ratio
+            var borrowedQuantity = book.Quantity - book.AvailableQuantity;
+            book.Quantity = updateBookDto.Quantity;
+            book.AvailableQuantity = Math.Max(0, updateBookDto.Quantity - borrowedQuantity);
+
+            book.Language = updateBookDto.Language;
+            book.PageCount = updateBookDto.PageCount;
+            book.UpdatedAt = DateTime.UtcNow;
+
+            // Update categories
+            if (updateBookDto.CategoryIds != null)
+            {
+                // Remove existing categories
+                _context.BookCategories.RemoveRange(book.BookCategories);
+
+                // Add new categories
+                var newBookCategories = updateBookDto.CategoryIds.Select(categoryId => new BookCategory
+                {
+                    BookId = book.Id,
+                    CategoryId = categoryId
+                }).ToList();
+
+                _context.BookCategories.AddRange(newBookCategories);
+            }
+
+            await _context.SaveChangesAsync();
+
+            // Return the updated book with categories
+            return await GetBookByIdAsync(book.Id) ?? throw new InvalidOperationException("Failed to retrieve updated book");
+        }
+
+        public async Task<bool> DeleteBookAsync(int id)
+        {
+            var book = await _context.Books
+                .Include(b => b.BorrowRecords)
+                .FirstOrDefaultAsync(b => b.Id == id && !b.IsDeleted);
+
+            if (book == null)
+            {
+                return false;
+            }
+
+            // Check if book has active borrows
+            var hasActiveBorrows = book.BorrowRecords.Any(br => br.Status == BorrowStatus.Borrowed);
+            if (hasActiveBorrows)
+            {
+                throw new InvalidOperationException("Cannot delete book with active borrows");
+            }
+
+            // Soft delete
+            book.IsDeleted = true;
+            book.UpdatedAt = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<IEnumerable<BookDto>> GetAllBooksAsync()
+        {
+            return await _context.Books
+                .Where(b => !b.IsDeleted)
+                .Include(b => b.BookCategories)
+                .ThenInclude(bc => bc.Category)
+                .Select(b => new BookDto
+                {
+                    Id = b.Id,
+                    Title = b.Title,
+                    Author = b.Author,
+                    ISBN = b.ISBN,
+                    Publisher = b.Publisher,
+                    PublicationYear = b.PublicationYear,
+                    Description = b.Description,
+                    CoverImageUrl = b.CoverImageUrl,
+                    Quantity = b.Quantity,
+                    AvailableQuantity = b.AvailableQuantity,
+                    Language = b.Language,
+                    PageCount = b.PageCount,
+                    AverageRating = (float)b.AverageRating,
+                    RatingCount = b.RatingCount,
+                    Categories = b.BookCategories.Select(bc => new CategoryDto
+                    {
+                        Id = bc.Category.Id,
+                        Name = bc.Category.Name,
+                        Description = bc.Category.Description,
+                        Color = bc.Category.Color
+                    }).ToList()
+                }).ToListAsync();
+        }
+
+        public async Task<IEnumerable<CategoryDto>> GetAllCategoriesAsync()
+        {
+            return await _context.Categories
+                .Where(c => !c.IsDeleted)
+                .Select(c => new CategoryDto
+                {
+                    Id = c.Id,
+                    Name = c.Name,
+                    Description = c.Description,
+                    Color = c.Color
+                }).ToListAsync();
+        }
     }
 }
