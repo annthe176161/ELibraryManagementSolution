@@ -14,6 +14,8 @@ namespace ELibraryManagement.Web.Services
         string? GetCurrentUserToken();
         string GetCurrentUserName();
         string? GetCurrentToken();
+        Task<List<string>> GetCurrentUserRolesAsync();
+        Task<bool> IsInRoleAsync(string roleName);
     }
 
     public class AuthApiService : IAuthApiService
@@ -347,6 +349,39 @@ namespace ELibraryManagement.Web.Services
         public string? GetCurrentToken()
         {
             return GetCurrentUserToken();
+        }
+
+        public async Task<List<string>> GetCurrentUserRolesAsync()
+        {
+            try
+            {
+                var token = GetCurrentUserToken();
+                if (string.IsNullOrEmpty(token))
+                    return new List<string>();
+
+                _httpClient.DefaultRequestHeaders.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+                var response = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Auth/roles");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+                    var result = JsonSerializer.Deserialize<Dictionary<string, List<string>>>(content, _jsonOptions);
+                    return result?["roles"] ?? new List<string>();
+                }
+                return new List<string>();
+            }
+            catch
+            {
+                return new List<string>();
+            }
+        }
+
+        public async Task<bool> IsInRoleAsync(string roleName)
+        {
+            var roles = await GetCurrentUserRolesAsync();
+            return roles.Contains(roleName, StringComparer.OrdinalIgnoreCase);
         }
     }
 }

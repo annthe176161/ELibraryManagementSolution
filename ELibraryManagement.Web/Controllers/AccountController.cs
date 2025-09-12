@@ -45,10 +45,16 @@ namespace ELibraryManagement.Web.Controllers
         }
 
         [HttpGet]
-        public IActionResult Login()
+        public async Task<IActionResult> Login()
         {
             if (_authApiService.IsAuthenticated())
             {
+                // Check if user is admin and redirect to admin panel
+                var isAdmin = await _authApiService.IsInRoleAsync("Admin");
+                if (isAdmin)
+                {
+                    return RedirectToAction("Index", "Admin");
+                }
                 return RedirectToAction("Index", "Home");
             }
             return View();
@@ -68,6 +74,14 @@ namespace ELibraryManagement.Web.Controllers
             if (result.Success)
             {
                 TempData["SuccessMessage"] = result.Message;
+
+                // Check if user is admin and redirect to admin panel
+                var isAdmin = await _authApiService.IsInRoleAsync("Admin");
+                if (isAdmin)
+                {
+                    return RedirectToAction("Index", "Admin");
+                }
+
                 return RedirectToAction("Index", "Home");
             }
 

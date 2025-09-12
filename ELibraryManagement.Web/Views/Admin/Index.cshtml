@@ -1,0 +1,267 @@
+@model AdminDashboardViewModel
+
+@{
+    ViewData["Title"] = "Dashboard - Quản trị hệ thống";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<!-- Page Header -->
+<div class="page-header">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h1 class="page-title">
+                <i class="fas fa-tachometer-alt me-3"></i>
+                Dashboard
+            </h1>
+            <p class="page-subtitle mb-0">Tổng quan hệ thống thư viện điện tử</p>
+        </div>
+        <div class="d-flex align-items-center">
+            <span class="badge bg-success fs-6 me-2">
+                <i class="fas fa-shield-alt me-1"></i>
+                Admin
+            </span>
+            <span class="text-muted">
+                <i class="fas fa-clock me-1"></i>
+                Cập nhật: @DateTime.Now.ToString("HH:mm dd/MM/yyyy")
+            </span>
+        </div>
+    </div>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row g-4 mb-4">
+    <div class="col-xl-3 col-md-6">
+        <div class="card stat-card stat-card-primary">
+            <div class="card-body position-relative">
+                <div class="stat-label">Tổng người dùng</div>
+                <div class="stat-number">@Model.TotalUsers</div>
+                <i class="fas fa-users stat-icon"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="card stat-card stat-card-success">
+            <div class="card-body position-relative">
+                <div class="stat-label">Tổng sách</div>
+                <div class="stat-number">@Model.TotalBooks</div>
+                <i class="fas fa-book stat-icon"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="card stat-card stat-card-info">
+            <div class="card-body position-relative">
+                <div class="stat-label">Lượt mượn</div>
+                <div class="stat-number">@Model.TotalBorrows</div>
+                <i class="fas fa-clipboard-list stat-icon"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="card stat-card stat-card-warning">
+            <div class="card-body position-relative">
+                <div class="stat-label">Đánh giá</div>
+                <div class="stat-number">@Model.TotalReviews</div>
+                <i class="fas fa-star stat-icon"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Access Cards -->
+<div class="row g-4 mb-4">
+    <!-- User Management -->
+    <div class="col-lg-6 col-xl-3">
+        <div class="card admin-card h-100">
+            <div class="card-body text-center">
+                <div class="mb-3">
+                    <i class="fas fa-users fa-3x text-primary"></i>
+                </div>
+                <h5 class="card-title">Quản lý người dùng</h5>
+                <p class="card-text text-muted">Xem và quản lý thông tin người dùng</p>
+                <a asp-action="Users" class="btn btn-primary btn-admin">
+                    <i class="fas fa-arrow-right me-1"></i>
+                    Truy cập
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Book Management -->
+    <div class="col-lg-6 col-xl-3">
+        <div class="card admin-card h-100">
+            <div class="card-body text-center">
+                <div class="mb-3">
+                    <i class="fas fa-book fa-3x text-success"></i>
+                </div>
+                <h5 class="card-title">Quản lý sách</h5>
+                <p class="card-text text-muted">Thêm, sửa, xóa và quản lý kho sách</p>
+                <a asp-action="Books" class="btn btn-success btn-admin">
+                    <i class="fas fa-arrow-right me-1"></i>
+                    Truy cập
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Borrow Management -->
+    <div class="col-lg-6 col-xl-3">
+        <div class="card admin-card h-100">
+            <div class="card-body text-center">
+                <div class="mb-3">
+                    <i class="fas fa-clipboard-list fa-3x text-info"></i>
+                </div>
+                <h5 class="card-title">Quản lý mượn sách</h5>
+                <p class="card-text text-muted">Theo dõi các giao dịch mượn trả</p>
+                <a asp-action="Borrows" class="btn btn-info btn-admin">
+                    <i class="fas fa-arrow-right me-1"></i>
+                    Truy cập
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Review Management -->
+    <div class="col-lg-6 col-xl-3">
+        <div class="card admin-card h-100">
+            <div class="card-body text-center">
+                <div class="mb-3">
+                    <i class="fas fa-star fa-3x text-warning"></i>
+                </div>
+                <h5 class="card-title">Quản lý đánh giá</h5>
+                <p class="card-text text-muted">Kiểm duyệt và quản lý đánh giá</p>
+                <a asp-action="Reviews" class="btn btn-warning btn-admin">
+                    <i class="fas fa-arrow-right me-1"></i>
+                    Truy cập
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row">
+    <div class="col-12">
+        <div class="card admin-card">
+            <div class="card-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-bolt me-2"></i>
+                    Thao tác nhanh
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <button class="btn btn-outline-primary w-100 btn-admin">
+                            <i class="fas fa-plus me-2"></i>
+                            Thêm sách mới
+                        </button>
+                    </div>
+                    <div class="col-md-3">
+                        <button class="btn btn-outline-success w-100 btn-admin">
+                            <i class="fas fa-user-plus me-2"></i>
+                            Thêm người dùng
+                        </button>
+                    </div>
+                    <div class="col-md-3">
+                        <button class="btn btn-outline-info w-100 btn-admin">
+                            <i class="fas fa-download me-2"></i>
+                            Xuất báo cáo
+                        </button>
+                    </div>
+                    <div class="col-md-3">
+                        <button class="btn btn-outline-warning w-100 btn-admin">
+                            <i class="fas fa-cog me-2"></i>
+                            Cài đặt hệ thống
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .border-left-primary {
+        border-left: 0.25rem solid #4e73df !important;
+    }
+    .border-left-success {
+        border-left: 0.25rem solid #1cc88a !important;
+    }
+    .border-left-info {
+        border-left: 0.25rem solid #36b9cc !important;
+    }
+    .border-left-warning {
+        border-left: 0.25rem solid #f6c23e !important;
+    }
+    .text-gray-800 {
+        color: #5a5c69 !important;
+    }
+    .text-gray-300 {
+        color: #dddfeb !important;
+    }
+    .text-xs {
+        font-size: 0.7rem;
+    }
+    .font-weight-bold {
+        font-weight: 700 !important;
+    }
+    .opacity-50 {
+        opacity: 0.5;
+    }
+    .btn-block {
+        width: 100%;
+    }
+</style>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Load dashboard statistics with animation
+            loadStatistics();
+            
+            // Animate statistics cards on load
+            $('.stat-card').each(function(index) {
+                $(this).delay(index * 100).animate({
+                    opacity: 1,
+                    transform: 'translateY(0)'
+                }, 500);
+            });
+            
+            // Add hover effects to admin cards
+            $('.admin-card').hover(
+                function() { $(this).addClass('hover-effect'); },
+                function() { $(this).removeClass('hover-effect'); }
+            );
+        });
+
+        function loadStatistics() {
+            // Show loading state
+            $('.stat-number').html('<i class="fas fa-spinner fa-spin"></i>');
+            
+            // Simulate loading (replace with actual API calls)
+            setTimeout(() => {
+                animateCountUp('#totalUsers', '@Model.TotalUsers');
+                animateCountUp('#totalBooks', '@Model.TotalBooks');
+                animateCountUp('#activeBorrows', '@Model.ActiveBorrows');
+                animateCountUp('#totalReviews', '@Model.TotalReviews');
+            }, 500);
+        }
+
+        function animateCountUp(selector, finalValue) {
+            let current = 0;
+            const increment = finalValue / 50;
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= finalValue) {
+                    current = finalValue;
+                    clearInterval(timer);
+                }
+                $(selector).text(Math.floor(current).toLocaleString());
+            }, 20);
+        }
+    </script>
+}

@@ -1,0 +1,324 @@
+@model List<ReviewViewModel>
+
+@{
+    ViewData["Title"] = "Quản lý đánh giá - E-Library";
+    Layout = "_AdminLayout";
+}
+
+<!-- Page Header -->
+<div class="row mb-4">
+    <div class="col-12">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <h2 class="h3 mb-0">
+                        <i class="fas fa-star me-2 text-warning"></i>
+                        Quản lý đánh giá
+                    </h2>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item">
+                                <a asp-action="Index">Quản trị</a>
+                            </li>
+                            <li class="breadcrumb-item active">Đánh giá</li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Row -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <div class="small">Tổng đánh giá</div>
+                            <div class="h4 mb-0">@Model.Count</div>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-star fa-2x opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <div class="small">5 sao</div>
+                            <div class="h4 mb-0">@Model.Count(r => r.Rating == 5)</div>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-thumbs-up fa-2x opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <div class="small">Điểm trung bình</div>
+                            <div class="h4 mb-0">@(Model.Any() ? Model.Average(r => r.Rating).ToString("F1") : "0.0")</div>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-chart-line fa-2x opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-danger text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <div class="small">1-2 sao</div>
+                            <div class="h4 mb-0">@Model.Count(r => r.Rating <= 2)</div>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-thumbs-down fa-2x opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reviews Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header bg-light">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <h5 class="mb-0">Danh sách đánh giá</h5>
+                        <div class="d-flex">
+                            <div class="input-group input-group-sm me-3" style="width: 300px;">
+                                <input type="text" class="form-control" placeholder="Tìm kiếm đánh giá..." id="searchInput">
+                                <button class="btn btn-outline-secondary" type="button">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                            <select class="form-select form-select-sm" id="ratingFilter" style="width: 150px;">
+                                <option value="">Tất cả đánh giá</option>
+                                <option value="5">5 sao</option>
+                                <option value="4">4 sao</option>
+                                <option value="3">3 sao</option>
+                                <option value="2">2 sao</option>
+                                <option value="1">1 sao</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0" id="reviewsTable">
+                            <thead class="table-light">
+                                <tr>
+                                    <th scope="col">Người đánh giá</th>
+                                    <th scope="col">Sách</th>
+                                    <th scope="col">Đánh giá</th>
+                                    <th scope="col">Nhận xét</th>
+                                    <th scope="col">Ngày tạo</th>
+                                    <th scope="col">Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var review in Model.OrderByDescending(r => r.CreatedAt))
+                                {
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="avatar avatar-sm me-2">
+                                                    <i class="fas fa-user-circle fa-2x text-muted"></i>
+                                                </div>
+                                                <div>
+                                                    <strong>@review.UserName</strong>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div>
+                                                <h6 class="mb-1">@review.BookTitle</h6>
+                                                <small class="text-muted">ID: @review.BookId</small>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="me-2">
+                                                    @for (int i = 1; i <= 5; i++)
+                                                    {
+                                                        @if (i <= review.Rating)
+                                                        {
+                                                            <i class="fas fa-star text-warning"></i>
+                                                        }
+                                                        else
+                                                        {
+                                                            <i class="far fa-star text-muted"></i>
+                                                        }
+                                                    }
+                                                </div>
+                                                <span class="badge bg-primary">@review.Rating/5</span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div style="max-width: 300px;">
+                                                @if (!string.IsNullOrEmpty(review.Comment) && review.Comment.Length > 100)
+                                                {
+                                                    <div class="comment-preview">
+                                                        <p class="mb-1">@review.Comment.Substring(0, 100)...</p>
+                                                        <button class="btn btn-sm btn-link p-0 text-decoration-none" onclick="toggleComment(this)">
+                                                            <small>Xem thêm</small>
+                                                        </button>
+                                                        <div class="comment-full d-none">
+                                                            <p class="mb-1">@review.Comment</p>
+                                                            <button class="btn btn-sm btn-link p-0 text-decoration-none" onclick="toggleComment(this)">
+                                                                <small>Thu gọn</small>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                }
+                                                else
+                                                {
+                                                    <p class="mb-0">@(review.Comment ?? "Không có nhận xét")</p>
+                                                }
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <small class="text-muted">
+                                                @review.CreatedAt.ToString("dd/MM/yyyy HH:mm")
+                                            </small>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group" role="group">
+                                                <button type="button" class="btn btn-sm btn-outline-primary" title="Xem chi tiết" onclick="viewReview(@review.Id)">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <button type="button" class="btn btn-sm btn-outline-warning" title="Chỉnh sửa" onclick="editReview(@review.Id)">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <button type="button" class="btn btn-sm btn-outline-danger" title="Xóa" onclick="deleteReview(@review.Id, '@review.UserName', '@review.BookTitle')">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card-footer bg-light">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <small class="text-muted">
+                            Hiển thị @Model.Count đánh giá
+                        </small>
+                        <nav>
+                            <ul class="pagination pagination-sm mb-0">
+                                <li class="page-item disabled">
+                                    <span class="page-link">Trước</span>
+                                </li>
+                                <li class="page-item active">
+                                    <span class="page-link">1</span>
+                                </li>
+                                <li class="page-item disabled">
+                                    <span class="page-link">Sau</span>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Xác nhận xóa đánh giá</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có chắc chắn muốn xóa đánh giá này không?</p>
+                <div id="deleteDetails"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-danger" id="confirmDelete">Xóa</button>
+            </div>
+        </div>
+    </div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Search functionality
+            $('#searchInput').on('keyup', function() {
+                var value = $(this).val().toLowerCase();
+                $('#reviewsTable tbody tr').filter(function() {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+                });
+            });
+
+            // Rating filter
+            $('#ratingFilter').on('change', function() {
+                var value = $(this).val();
+                $('#reviewsTable tbody tr').filter(function() {
+                    if (value === '') {
+                        $(this).show();
+                    } else {
+                        $(this).toggle($(this).find('.badge').text().indexOf(value + '/5') > -1);
+                    }
+                });
+            });
+        });
+
+        function toggleComment(button) {
+            var container = $(button).closest('.comment-preview');
+            container.find('.comment-preview > p, .comment-preview > button').toggleClass('d-none');
+            container.find('.comment-full').toggleClass('d-none');
+        }
+
+        function viewReview(reviewId) {
+            // Implement view review functionality
+            console.log('View review:', reviewId);
+        }
+
+        function editReview(reviewId) {
+            // Implement edit review functionality
+            console.log('Edit review:', reviewId);
+        }
+
+        let reviewToDelete = null;
+
+        function deleteReview(reviewId, userName, bookTitle) {
+            reviewToDelete = reviewId;
+            $('#deleteDetails').html(`
+                <strong>Người đánh giá:</strong> ${userName}<br>
+                <strong>Sách:</strong> ${bookTitle}
+            `);
+            $('#deleteModal').modal('show');
+        }
+
+        $('#confirmDelete').on('click', function() {
+            if (reviewToDelete) {
+                // Implement delete review functionality
+                console.log('Delete review:', reviewToDelete);
+                // Here you would make an AJAX call to delete the review
+                // For now, just close the modal
+                $('#deleteModal').modal('hide');
+                // Show success message
+                alert('Đánh giá đã được xóa thành công!');
+            }
+        });
+    </script>
+}

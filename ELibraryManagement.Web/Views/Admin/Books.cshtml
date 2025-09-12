@@ -1,0 +1,287 @@
+@model List<BookViewModel>
+
+@{
+    ViewData["Title"] = "Quản lý sách - E-Library";
+    Layout = "_AdminLayout";
+}
+
+<!-- Page Header -->
+<div class="row mb-4">
+    <div class="col-12">
+            <div class="d-flex align-items-center justify-content-between">
+                <div>
+                    <h2 class="h3 mb-0">
+                        <i class="fas fa-book me-2 text-success"></i>
+                        Quản lý sách
+                    </h2>
+                    <nav aria-label="breadcrumb">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item">
+                                <a asp-action="Index">Quản trị</a>
+                            </li>
+                            <li class="breadcrumb-item active">Sách</li>
+                        </ol>
+                    </nav>
+                </div>
+                <div>
+                    <button type="button" class="btn btn-success">
+                        <i class="fas fa-plus me-1"></i>
+                        Thêm sách mới
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Row -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card bg-success text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <div class="small">Tổng số sách</div>
+                            <div class="h4 mb-0">@Model.Count</div>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-book fa-2x opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-info text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <div class="small">Có sẵn</div>
+                            <div class="h4 mb-0">@Model.Count(b => b.AvailableCopies > 0)</div>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-check-circle fa-2x opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-warning text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <div class="small">Đang được mượn</div>
+                            <div class="h4 mb-0">@Model.Sum(b => b.TotalCopies - b.AvailableCopies)</div>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-hand-holding fa-2x opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card bg-danger text-white">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <div class="small">Hết sách</div>
+                            <div class="h4 mb-0">@Model.Count(b => b.AvailableCopies == 0)</div>
+                        </div>
+                        <div class="align-self-center">
+                            <i class="fas fa-exclamation-triangle fa-2x opacity-75"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Books Table -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow">
+                <div class="card-header bg-light">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <h5 class="mb-0">Danh sách sách</h5>
+                        <div class="d-flex">
+                            <div class="input-group input-group-sm me-3" style="width: 300px;">
+                                <input type="text" class="form-control" placeholder="Tìm kiếm sách..." id="searchInput">
+                                <button class="btn btn-outline-secondary" type="button">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                            <select class="form-select form-select-sm" id="statusFilter" style="width: 150px;">
+                                <option value="">Tất cả trạng thái</option>
+                                <option value="available">Có sẵn</option>
+                                <option value="borrowed">Đang mượn</option>
+                                <option value="outofstock">Hết sách</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0" id="booksTable">
+                            <thead class="table-light">
+                                <tr>
+                                    <th scope="col">Sách</th>
+                                    <th scope="col">Tác giả</th>
+                                    <th scope="col">Thể loại</th>
+                                    <th scope="col">ISBN</th>
+                                    <th scope="col">Tình trạng</th>
+                                    <th scope="col">Số lượng</th>
+                                    <th scope="col">Đánh giá</th>
+                                    <th scope="col">Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var book in Model)
+                                {
+                                    <tr>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <img src="@book.ImageUrl" alt="@book.Title" 
+                                                     class="me-3 rounded" 
+                                                     style="width: 60px; height: 80px; object-fit: cover;">
+                                                <div>
+                                                    <h6 class="mb-1">@book.Title</h6>
+                                                    <small class="text-muted">@(string.IsNullOrEmpty(book.Description) ? "" : (book.Description.Length > 50 ? book.Description.Substring(0, 50) + "..." : book.Description))</small>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>@book.Author</td>
+                                        <td>
+                                            <span class="badge bg-primary">@book.CategoryName</span>
+                                        </td>
+                                        <td>
+                                            @if (!string.IsNullOrEmpty(book.ISBN))
+                                            {
+                                                <code>@book.ISBN</code>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">N/A</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            @if (book.AvailableCopies > 0)
+                                            {
+                                                <span class="badge bg-success">Có sẵn</span>
+                                            }
+                                            else if (book.TotalCopies > 0)
+                                            {
+                                                <span class="badge bg-warning">Đang mượn</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge bg-danger">Hết sách</span>
+                                            }
+                                        </td>
+                                        <td>
+                                            <div class="d-flex flex-column">
+                                                <small><strong>Có sẵn:</strong> @book.AvailableCopies</small>
+                                                <small><strong>Tổng:</strong> @book.TotalCopies</small>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="me-2">
+                                                    @for (int i = 1; i <= 5; i++)
+                                                    {
+                                                        @if (i <= Math.Floor(book.AverageRating))
+                                                        {
+                                                            <i class="fas fa-star text-warning"></i>
+                                                        }
+                                                        else
+                                                        {
+                                                            <i class="far fa-star text-muted"></i>
+                                                        }
+                                                    }
+                                                </div>
+                                                <small class="text-muted">(@book.RatingCount)</small>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="btn-group" role="group">
+                                                <button type="button" class="btn btn-sm btn-outline-primary" title="Xem chi tiết">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                                <button type="button" class="btn btn-sm btn-outline-warning" title="Chỉnh sửa">
+                                                    <i class="fas fa-edit"></i>
+                                                </button>
+                                                <div class="btn-group" role="group">
+                                                    <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
+                                                        <i class="fas fa-cog"></i>
+                                                    </button>
+                                                    <ul class="dropdown-menu">
+                                                        <li><a class="dropdown-item" href="#"><i class="fas fa-plus me-2"></i>Thêm bản sao</a></li>
+                                                        <li><a class="dropdown-item" href="#"><i class="fas fa-minus me-2"></i>Giảm bản sao</a></li>
+                                                        <li><hr class="dropdown-divider"></li>
+                                                        <li><a class="dropdown-item text-danger" href="#"><i class="fas fa-trash me-2"></i>Xóa sách</a></li>
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card-footer bg-light">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <small class="text-muted">
+                            Hiển thị @Model.Count sách
+                        </small>
+                        <nav>
+                            <ul class="pagination pagination-sm mb-0">
+                                <li class="page-item disabled">
+                                    <span class="page-link">Trước</span>
+                                </li>
+                                <li class="page-item active">
+                                    <span class="page-link">1</span>
+                                </li>
+                                <li class="page-item disabled">
+                                    <span class="page-link">Sau</span>
+                                </li>
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Search functionality
+            $('#searchInput').on('keyup', function() {
+                var value = $(this).val().toLowerCase();
+                $('#booksTable tbody tr').filter(function() {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+                });
+            });
+
+            // Status filter
+            $('#statusFilter').on('change', function() {
+                var value = $(this).val();
+                $('#booksTable tbody tr').filter(function() {
+                    if (value === '') {
+                        $(this).show();
+                    } else {
+                        var statusText = $(this).find('td:nth-child(5) .badge').text().toLowerCase();
+                        if (value === 'available') {
+                            $(this).toggle(statusText.indexOf('có sẵn') > -1);
+                        } else if (value === 'borrowed') {
+                            $(this).toggle(statusText.indexOf('đang mượn') > -1);
+                        } else if (value === 'outofstock') {
+                            $(this).toggle(statusText.indexOf('hết sách') > -1);
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+}
