@@ -15,27 +15,63 @@ namespace ELibraryManagement.Web.Controllers
             _authApiService = authApiService;
         }
 
-        // GET: Book/Details/5
-        public async Task<IActionResult> Details(int id)
+        // GET: Book/Details/5 - Redirect to Home/BookDetail for consistency
+        public IActionResult Details(int id)
+        {
+            // Redirect to the main BookDetail page in HomeController
+            return RedirectToAction("BookDetail", "Home", new { id = id });
+        }
+
+        // GET: Book/BorrowedDetails/5 - Chi tiết sách đã mượn
+        public async Task<IActionResult> BorrowedDetails(int borrowRecordId)
         {
             try
             {
-                var book = await _bookApiService.GetBookByIdAsync(id);
-                if (book == null)
+                var currentUser = await _authApiService.GetCurrentUserAsync();
+                if (currentUser == null)
                 {
-                    TempData["ErrorMessage"] = "Không tìm thấy sách.";
-                    return RedirectToAction("Index", "Home");
+                    TempData["ErrorMessage"] = "Vui lòng đăng nhập để xem chi tiết.";
+                    return RedirectToAction("Login", "Account");
                 }
 
-                // Lấy sách liên quan
-                ViewBag.RelatedBooks = await _bookApiService.GetRelatedBooksAsync(id, book.CategoryName, 4);
+                var token = _authApiService.GetCurrentToken();
+                if (string.IsNullOrEmpty(token))
+                {
+                    TempData["ErrorMessage"] = "Phiên đăng nhập đã hết hạn.";
+                    return RedirectToAction("Login", "Account");
+                }
 
-                return View(book);
+                // Lấy danh sách sách đã mượn
+                var borrowedBooks = await _bookApiService.GetBorrowedBooksAsync(currentUser.Id, token);
+                var borrowedBook = borrowedBooks.FirstOrDefault(b => b.BorrowRecordId == borrowRecordId);
+
+                if (borrowedBook == null)
+                {
+                    TempData["ErrorMessage"] = "Không tìm thấy thông tin mượn sách.";
+                    return RedirectToAction("MyBooks");
+                }
+
+                // Lấy thông tin chi tiết sách
+                var bookDetails = await _bookApiService.GetBookByIdAsync(borrowedBook.BookId);
+                if (bookDetails == null)
+                {
+                    TempData["ErrorMessage"] = "Không tìm thấy thông tin sách.";
+                    return RedirectToAction("MyBooks");
+                }
+
+                // Tạo ViewModel cho borrowed book details
+                var viewModel = new BorrowedBookDetailViewModel
+                {
+                    BorrowRecord = borrowedBook,
+                    BookDetails = bookDetails
+                };
+
+                return View(viewModel);
             }
             catch (Exception ex)
             {
                 TempData["ErrorMessage"] = $"Có lỗi xảy ra: {ex.Message}";
-                return RedirectToAction("Index", "Home");
+                return RedirectToAction("MyBooks");
             }
         }
 
