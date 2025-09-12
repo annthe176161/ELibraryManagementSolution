@@ -153,6 +153,7 @@ namespace ELibraryManagement.Api.Services.Implementations
                     BookId = br.BookId,
                     BookTitle = br.Book.Title,
                     BookAuthor = br.Book.Author,
+                    BookCoverUrl = br.Book.CoverImageUrl,
                     UserId = br.UserId,
                     BorrowDate = br.BorrowDate,
                     DueDate = br.DueDate,

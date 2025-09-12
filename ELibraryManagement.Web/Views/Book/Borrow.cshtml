@@ -54,6 +54,144 @@
                         </div>
                     </div>
 
+                    <!-- Borrowing Guidelines -->
+                    <div class="borrowing-guidelines mb-4">
+                        <h5><i class="fas fa-info-circle me-2 text-primary"></i>Hướng dẫn mượn sách</h5>
+                        <div class="guidelines-content">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="guideline-card">
+                                        <h6><i class="fas fa-clock me-1"></i>Thời gian mượn</h6>
+                                        <ul>
+                                            <li>Thời gian mượn tối đa: <strong>30 ngày</strong></li>
+                                            <li>Có thể gia hạn <strong>1 lần</strong> (thêm 15 ngày)</li>
+                                            <li>Gia hạn trước ngày hết hạn <strong>3 ngày</strong></li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="guideline-card">
+                                        <h6><i class="fas fa-shield-alt me-1"></i>Quy định chung</h6>
+                                        <ul>
+                                            <li>Tối đa <strong>5 cuốn</strong> cùng lúc</li>
+                                            <li>Phải có thẻ sinh viên hợp lệ</li>
+                                            <li>Không được cho mượn lại</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Book Availability & Stats -->
+                    <div class="availability-section mb-4">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="availability-info">
+                                    <h6><i class="fas fa-check-circle text-success me-1"></i>Tình trạng sách</h6>
+                                    <div class="status-grid">
+                                        <div class="status-item">
+                                            <span class="status-label">Tổng số:</span>
+                                            <span class="status-value">5 cuốn</span>
+                                        </div>
+                                        <div class="status-item">
+                                            <span class="status-label">Còn lại:</span>
+                                            <span class="status-value text-success">3 cuốn</span>
+                                        </div>
+                                        <div class="status-item">
+                                            <span class="status-label">Đang mượn:</span>
+                                            <span class="status-value text-warning">2 cuốn</span>
+                                        </div>
+                                        <div class="status-item">
+                                            <span class="status-label">Dự kiến trả gần nhất:</span>
+                                            <span class="status-value">25/09/2025</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="student-quota">
+                                    <h6><i class="fas fa-user-graduate me-1"></i>Hạn mức của bạn</h6>
+                                    <div class="quota-info">
+                                        <div class="quota-item">
+                                            <span>Đang mượn: <strong>2/5 cuốn</strong></span>
+                                            <div class="progress">
+                                                <div class="progress-bar" style="width: 40%"></div>
+                                            </div>
+                                        </div>
+                                        <small class="text-muted">Còn có thể mượn 3 cuốn nữa</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Borrowing Timeline -->
+                    <div class="timeline-section mb-4">
+                        <h6><i class="fas fa-calendar-check me-1"></i>Lịch trình mượn trả</h6>
+                        <div class="borrowing-timeline">
+                            <div class="timeline-item current">
+                                <div class="timeline-dot"></div>
+                                <div class="timeline-content">
+                                    <h6>Hôm nay</h6>
+                                    <small>Ngày mượn sách</small>
+                                </div>
+                            </div>
+                            <div class="timeline-item future">
+                                <div class="timeline-dot"></div>
+                                <div class="timeline-content">
+                                    <h6 id="timelineRenewalDate">27/09/2025</h6>
+                                    <small>Có thể gia hạn từ ngày này</small>
+                                </div>
+                            </div>
+                            <div class="timeline-item future">
+                                <div class="timeline-dot"></div>
+                                <div class="timeline-content">
+                                    <h6 id="timelineDueDate">13/10/2025</h6>
+                                    <small>Ngày trả dự kiến</small>
+                                </div>
+                            </div>
+                            <div class="timeline-item warning">
+                                <div class="timeline-dot"></div>
+                                <div class="timeline-content">
+                                    <h6 id="timelinePenaltyDate">14/10/2025</h6>
+                                    <small>Bắt đầu tính phí phạt</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Penalty Calculator -->
+                    <div class="penalty-section mb-4">
+                        <h6><i class="fas fa-calculator me-1 text-warning"></i>Tính phí phạt dự kiến</h6>
+                        <div class="penalty-calculator">
+                            <div class="calculator-info">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="penalty-rates">
+                                            <h6>Mức phí phạt:</h6>
+                                            <ul>
+                                                <li>1-7 ngày trễ: <strong>5,000 VND/ngày</strong></li>
+                                                <li>8-14 ngày trễ: <strong>10,000 VND/ngày</strong></li>
+                                                <li>Trên 14 ngày: <strong>20,000 VND/ngày</strong></li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="penalty-consequences">
+                                            <h6>Hậu quả khi trễ hạn:</h6>
+                                            <ul>
+                                                <li>Trễ trên 7 ngày: <span class="text-warning">Cảnh báo</span></li>
+                                                <li>Trễ trên 14 ngày: <span class="text-danger">Khóa tài khoản tạm thời</span></li>
+                                                <li>Trễ trên 30 ngày: <span class="text-danger">Không được ra trường</span></li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Borrow Form -->
                     <form asp-action="Borrow" method="post" class="borrow-form">
                         <input type="hidden" asp-for="BookId" />
@@ -90,21 +228,59 @@
 
                         <!-- Terms and Conditions -->
                         <div class="terms-section mb-4">
-                            <div class="alert alert-info">
-                                <h6><i class="fas fa-exclamation-circle me-1"></i> Quy định mượn sách:</h6>
-                                <ul class="mb-0">
-                                    <li>Thời gian mượn tối đa 30 ngày</li>
-                                    <li>Trả sách đúng hạn để tránh phí phạt</li>
-                                    <li>Giữ gìn sách trong tình trạng tốt</li>
-                                    <li>Không được cho mượn lại hoặc sao chép</li>
-                                </ul>
+                            <div class="enhanced-terms">
+                                <h6><i class="fas fa-clipboard-check me-1"></i>Cam kết và điều khoản mượn sách</h6>
+                                <div class="terms-grid">
+                                    <div class="term-item">
+                                        <i class="fas fa-hand-holding-heart text-primary"></i>
+                                        <div>
+                                            <strong>Bảo quản sách tốt</strong>
+                                            <p>Không làm hỏng, tô vẽ, xé trang hoặc làm mất sách</p>
+                                        </div>
+                                    </div>
+                                    <div class="term-item">
+                                        <i class="fas fa-clock text-success"></i>
+                                        <div>
+                                            <strong>Trả đúng hạn</strong>
+                                            <p>Trả sách đúng ngày đã cam kết để tránh phí phạt</p>
+                                        </div>
+                                    </div>
+                                    <div class="term-item">
+                                        <i class="fas fa-user-shield text-info"></i>
+                                        <div>
+                                            <strong>Sử dụng cá nhân</strong>
+                                            <p>Không cho mượn lại, sao chép hoặc sử dụng vào mục đích thương mại</p>
+                                        </div>
+                                    </div>
+                                    <div class="term-item">
+                                        <i class="fas fa-exclamation-triangle text-warning"></i>
+                                        <div>
+                                            <strong>Chịu trách nhiệm</strong>
+                                            <p>Bồi thường theo quy định nếu làm mất hoặc hỏng sách</p>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
 
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="agreeTerms" required>
-                                <label class="form-check-label" for="agreeTerms">
-                                    Tôi đồng ý với các quy định mượn sách của thư viện
-                                </label>
+                            <div class="agreement-section">
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="checkbox" id="agreeTerms" required>
+                                    <label class="form-check-label" for="agreeTerms">
+                                        <strong>Tôi đã đọc, hiểu và đồng ý với tất cả các điều khoản mượn sách của thư viện</strong>
+                                    </label>
+                                </div>
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="checkbox" id="agreeResponsibility" required>
+                                    <label class="form-check-label" for="agreeResponsibility">
+                                        Tôi cam kết bảo quản sách tốt và trả đúng hạn
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="agreePenalty" required>
+                                    <label class="form-check-label" for="agreePenalty">
+                                        Tôi hiểu rõ các mức phí phạt và hậu quả khi trễ hạn trả sách
+                                    </label>
+                                </div>
                             </div>
                         </div>
 
@@ -130,13 +306,90 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script>
-        // Auto-set due date to 14 days from today if not set
         document.addEventListener('DOMContentLoaded', function () {
             const dueDateInput = document.getElementById('DueDate');
+            
+            // Auto-set due date to 14 days from today if not set
             if (!dueDateInput.value) {
                 const defaultDate = new Date();
                 defaultDate.setDate(defaultDate.getDate() + 14);
                 dueDateInput.value = defaultDate.toISOString().split('T')[0];
+            }
+
+            // Update timeline dates when due date changes
+            function updateTimeline() {
+                const dueDate = new Date(dueDateInput.value);
+                if (dueDate && !isNaN(dueDate)) {
+                    // Renewal date (3 days before due date)
+                    const renewalDate = new Date(dueDate);
+                    renewalDate.setDate(renewalDate.getDate() - 3);
+                    
+                    // Penalty start date (1 day after due date)
+                    const penaltyDate = new Date(dueDate);
+                    penaltyDate.setDate(penaltyDate.getDate() + 1);
+
+                    // Update timeline display
+                    document.getElementById('timelineRenewalDate').textContent = 
+                        renewalDate.toLocaleDateString('vi-VN');
+                    document.getElementById('timelineDueDate').textContent = 
+                        dueDate.toLocaleDateString('vi-VN');
+                    document.getElementById('timelinePenaltyDate').textContent = 
+                        penaltyDate.toLocaleDateString('vi-VN');
+                }
+            }
+
+            // Update timeline when page loads and when due date changes
+            updateTimeline();
+            dueDateInput.addEventListener('change', updateTimeline);
+
+            // Enhanced form validation
+            const submitButton = document.querySelector('button[type="submit"]');
+            const checkboxes = document.querySelectorAll('input[type="checkbox"][required]');
+            
+            function validateForm() {
+                let allChecked = true;
+                checkboxes.forEach(checkbox => {
+                    if (!checkbox.checked) {
+                        allChecked = false;
+                    }
+                });
+                
+                submitButton.disabled = !allChecked;
+                submitButton.classList.toggle('btn-secondary', !allChecked);
+                submitButton.classList.toggle('btn-primary', allChecked);
+            }
+
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', validateForm);
+            });
+            
+            // Initial validation
+            validateForm();
+
+            // Penalty calculator
+            function calculatePenalty(daysLate) {
+                let dailyFee = 0;
+                if (daysLate <= 7) {
+                    dailyFee = 5000;
+                } else if (daysLate <= 14) {
+                    dailyFee = 10000;
+                } else {
+                    dailyFee = 20000;
+                }
+                return daysLate * dailyFee;
+            }
+
+            // Show penalty preview on hover
+            const penaltySection = document.querySelector('.penalty-calculator');
+            if (penaltySection) {
+                penaltySection.addEventListener('mouseenter', function() {
+                    this.style.transform = 'scale(1.02)';
+                    this.style.transition = 'transform 0.3s ease';
+                });
+                
+                penaltySection.addEventListener('mouseleave', function() {
+                    this.style.transform = 'scale(1)';
+                });
             }
         });
     </script>

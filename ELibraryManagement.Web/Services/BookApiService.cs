@@ -97,6 +97,22 @@ namespace ELibraryManagement.Web.Services
                                 return default(T);
                             return (T)(object)prop.GetDecimal();
                         }
+                        if (typeof(T) == typeof(DateTime))
+                        {
+                            if (prop.TryGetDateTime(out DateTime dateValue))
+                                return (T)(object)dateValue;
+                            if (DateTime.TryParse(prop.GetString(), out DateTime parsedDate))
+                                return (T)(object)parsedDate;
+                        }
+                        if (typeof(T) == typeof(DateTime?))
+                        {
+                            if (prop.ValueKind == JsonValueKind.Null)
+                                return default(T);
+                            if (prop.TryGetDateTime(out DateTime dateValue))
+                                return (T)(object)dateValue;
+                            if (DateTime.TryParse(prop.GetString(), out DateTime parsedDate))
+                                return (T)(object)parsedDate;
+                        }
                     }
                 }
                 return default(T);
@@ -802,7 +818,7 @@ namespace ELibraryManagement.Web.Services
 
                     return borrowedBooks?.Select(book => new UserBorrowedBookViewModel
                     {
-                        BorrowRecordId = GetPropertyValue<int>(book, "borrowRecordId"),
+                        BorrowRecordId = GetPropertyValue<int>(book, "id"),
                         BookId = GetPropertyValue<int>(book, "bookId"),
                         BookTitle = GetPropertyValue<string>(book, "bookTitle") ?? "",
                         BookAuthor = GetPropertyValue<string>(book, "bookAuthor") ?? "",

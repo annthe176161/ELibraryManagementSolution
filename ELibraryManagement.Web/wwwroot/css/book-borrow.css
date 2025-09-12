@@ -147,6 +147,371 @@
 }
 
 .action-buttons .btn {
+/* Borrowing Guidelines */
+.borrowing-guidelines {
+    background: linear-gradient(135deg, rgba(52, 152, 219, 0.05), rgba(155, 89, 182, 0.05));
+    border-radius: 15px;
+    padding: 25px;
+    border: 1px solid rgba(52, 152, 219, 0.1);
+}
+
+.borrowing-guidelines h5 {
+    color: #2c3e50;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+.guideline-card {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    margin-bottom: 15px;
+    border-left: 4px solid #3498db;
+}
+
+.guideline-card h6 {
+    color: #2c3e50;
+    font-weight: 600;
+    margin-bottom: 15px;
+}
+
+.guideline-card ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.guideline-card li {
+    padding: 5px 0;
+    display: flex;
+    align-items: center;
+}
+
+.guideline-card li:before {
+    content: "✓";
+    color: #27ae60;
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+/* Availability Section */
+.availability-section {
+    background: linear-gradient(135deg, rgba(46, 204, 113, 0.05), rgba(26, 188, 156, 0.05));
+    border-radius: 15px;
+    padding: 25px;
+    border: 1px solid rgba(46, 204, 113, 0.1);
+}
+
+.availability-info h6, .student-quota h6 {
+    color: #2c3e50;
+    font-weight: 600;
+    margin-bottom: 15px;
+}
+
+.status-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+}
+
+.status-item {
+    background: white;
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+    text-align: center;
+}
+
+.status-label {
+    display: block;
+    font-size: 0.9rem;
+    color: #7f8c8d;
+    margin-bottom: 5px;
+}
+
+.status-value {
+    display: block;
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: #2c3e50;
+}
+
+.student-quota {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    border-left: 4px solid #9b59b6;
+}
+
+.quota-item {
+    margin-bottom: 10px;
+}
+
+.progress {
+    height: 8px;
+    background: #ecf0f1;
+    border-radius: 4px;
+    margin-top: 8px;
+}
+
+.progress-bar {
+    background: linear-gradient(135deg, #3498db, #9b59b6);
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.3s ease;
+}
+
+/* Timeline Section */
+.timeline-section {
+    background: linear-gradient(135deg, rgba(241, 196, 15, 0.05), rgba(230, 126, 34, 0.05));
+    border-radius: 15px;
+    padding: 25px;
+    border: 1px solid rgba(241, 196, 15, 0.1);
+}
+
+.timeline-section h6 {
+    color: #2c3e50;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+.borrowing-timeline {
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+    padding: 20px 0;
+}
+
+.borrowing-timeline:before {
+    content: '';
+    position: absolute;
+    top: 40px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #3498db, #f39c12, #e74c3c);
+    z-index: 1;
+}
+
+.timeline-item {
+    flex: 1;
+    text-align: center;
+    position: relative;
+    z-index: 2;
+}
+
+.timeline-dot {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    margin: 0 auto 10px;
+    border: 3px solid white;
+    box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+}
+
+.timeline-item.current .timeline-dot {
+    background: #3498db;
+}
+
+.timeline-item.future .timeline-dot {
+    background: #f39c12;
+}
+
+.timeline-item.warning .timeline-dot {
+    background: #e74c3c;
+}
+
+.timeline-content h6 {
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 5px;
+    color: #2c3e50;
+}
+
+.timeline-content small {
+    color: #7f8c8d;
+    font-size: 0.8rem;
+}
+
+/* Penalty Section */
+.penalty-section {
+    background: linear-gradient(135deg, rgba(231, 76, 60, 0.05), rgba(192, 57, 43, 0.05));
+    border-radius: 15px;
+    padding: 25px;
+    border: 1px solid rgba(231, 76, 60, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.penalty-section h6 {
+    color: #2c3e50;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+.penalty-calculator {
+    background: white;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+}
+
+.penalty-rates, .penalty-consequences {
+    background: #fafafa;
+    border-radius: 10px;
+    padding: 15px;
+}
+
+.penalty-rates h6, .penalty-consequences h6 {
+    color: #e74c3c;
+    font-size: 1rem;
+    margin-bottom: 15px;
+}
+
+.penalty-rates ul, .penalty-consequences ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.penalty-rates li, .penalty-consequences li {
+    padding: 8px 0;
+    border-bottom: 1px solid #ecf0f1;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.penalty-rates li:last-child, .penalty-consequences li:last-child {
+    border-bottom: none;
+}
+
+/* Enhanced Terms */
+.enhanced-terms {
+    background: white;
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    margin-bottom: 20px;
+}
+
+.enhanced-terms h6 {
+    color: #2c3e50;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+.terms-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.term-item {
+    display: flex;
+    align-items: flex-start;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    border-left: 4px solid #3498db;
+}
+
+.term-item i {
+    font-size: 1.5rem;
+    margin-right: 15px;
+    margin-top: 5px;
+}
+
+.term-item strong {
+    display: block;
+    color: #2c3e50;
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.term-item p {
+    color: #7f8c8d;
+    font-size: 0.9rem;
+    margin: 0;
+    line-height: 1.4;
+}
+
+.agreement-section {
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    border: 2px solid #e9ecef;
+}
+
+.agreement-section .form-check {
+    padding: 10px 15px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    border-left: 4px solid #3498db;
+}
+
+.agreement-section .form-check:last-child {
+    margin-bottom: 0;
+}
+
+.agreement-section .form-check-label {
+    font-size: 0.95rem;
+    line-height: 1.4;
+    color: #2c3e50;
+}
+
+/* Button States */
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+/* Responsive Design Updates */
+@media (max-width: 768px) {
+    .borrowing-timeline {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .borrowing-timeline:before {
+        width: 2px;
+        height: 100%;
+        left: 50%;
+        top: 0;
+        background: linear-gradient(180deg, #3498db, #f39c12, #e74c3c);
+    }
+    
+    .timeline-item {
+        margin-bottom: 30px;
+        text-align: left;
+        display: flex;
+        align-items: center;
+    }
+    
+    .timeline-item:last-child {
+        margin-bottom: 0;
+    }
+    
+    .timeline-dot {
+        margin: 0 20px 0 0;
+    }
+    
+    .status-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .terms-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .guidelines-content .col-md-6 {
+        margin-bottom: 15px;
+    }
+}
+
     font-weight: 600;
     border-radius: 12px;
     padding: 15px 30px;
