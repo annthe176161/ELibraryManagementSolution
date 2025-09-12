@@ -135,5 +135,49 @@
                 document.getElementById('returnForm_' + borrowRecordId).submit();
             }
         }
+
+        function extendBorrow(borrowRecordId, bookTitle) {
+            // Hiện modal để nhập lý do gia hạn (optional)
+            const reason = prompt(`Nhập lý do gia hạn sách "${bookTitle}" (không bắt buộc):`);
+            
+            // Nếu user click Cancel, thoát
+            if (reason === null) return;
+
+            // Hiện loading
+            const btn = event.target;
+            const originalContent = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-1"></i>Đang xử lý...';
+            btn.disabled = true;
+
+            // Gọi API gia hạn
+            fetch('/Borrow/ExtendBorrow', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `id=${borrowRecordId}&reason=${encodeURIComponent(reason || '')}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Hiện thông báo thành công
+                    alert(`Gia hạn thành công!\n\nSách: ${data.bookTitle}\nNgày trả cũ: ${data.oldDueDate}\nNgày trả mới: ${data.newDueDate}\nSố lần gia hạn: ${data.extensionCount}/2\n\n${data.message}`);
+                    
+                    // Reload trang để cập nhật thông tin
+                    location.reload();
+                } else {
+                    alert(`Gia hạn thất bại: ${data.message}`);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Có lỗi xảy ra khi gia hạn sách.');
+            })
+            .finally(() => {
+                // Khôi phục button
+                btn.innerHTML = originalContent;
+                btn.disabled = false;
+            });
+        }
     </script>
 }

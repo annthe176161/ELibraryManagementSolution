@@ -58,6 +58,43 @@ namespace ELibraryManagement.Api.Controllers
         }
 
         /// <summary>
+        /// Gia hạn sách (User tự gia hạn)
+        /// </summary>
+        [HttpPost("{id}/extend")]
+        [Authorize]
+        public async Task<IActionResult> ExtendBorrow(int id, [FromBody] ExtendBorrowRequestDto? request = null)
+        {
+            try
+            {
+                // Kiểm tra người dùng có quyền gia hạn sách này không
+                var borrowRecord = await _borrowService.GetBorrowRecordByIdAsync(id);
+                if (borrowRecord == null)
+                {
+                    return NotFound(new { message = "Không tìm thấy bản ghi mượn sách" });
+                }
+
+                var currentUserId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+                if (borrowRecord.UserId != currentUserId && !User.IsInRole("Admin"))
+                {
+                    return Forbid("Bạn không có quyền gia hạn sách này");
+                }
+
+                var result = await _borrowService.ExtendBorrowAsync(id, request?.Reason);
+
+                if (result.Success)
+                {
+                    return Ok(result);
+                }
+
+                return BadRequest(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        /// <summary>
         /// Cập nhật trạng thái borrow record - Chỉ dành cho Admin
         /// </summary>
         [HttpPut("admin/{id}/status")]

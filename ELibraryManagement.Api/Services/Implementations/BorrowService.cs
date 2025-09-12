@@ -251,5 +251,84 @@ namespace ELibraryManagement.Api.Services.Implementations
                 })
                 .ToListAsync();
         }
+
+        public async Task<ExtendBorrowResponseDto> ExtendBorrowAsync(int id, string? reason = null)
+        {
+            var borrowRecord = await _context.BorrowRecords
+                .Include(br => br.Book)
+                .FirstOrDefaultAsync(br => br.Id == id);
+
+            if (borrowRecord == null)
+            {
+                return new ExtendBorrowResponseDto
+                {
+                    Success = false,
+                    Message = "Không tìm thấy bản ghi mượn sách."
+                };
+            }
+
+            // Kiểm tra điều kiện gia hạn
+            if (!borrowRecord.CanExtend)
+            {
+                var reason_msg = "";
+                if (borrowRecord.Status != BorrowStatus.Borrowed)
+                    reason_msg = "Sách chưa được mượn hoặc đã trả.";
+                else if (borrowRecord.ReturnDate != null)
+                    reason_msg = "Sách đã được trả.";
+                else if (borrowRecord.ExtensionCount >= 2)
+                    reason_msg = "Đã hết số lần gia hạn (tối đa 2 lần).";
+                else if (borrowRecord.IsOverdue)
+                    reason_msg = "Không thể gia hạn sách quá hạn.";
+
+                return new ExtendBorrowResponseDto
+                {
+                    Success = false,
+                    BorrowRecordId = id,
+                    BookTitle = borrowRecord.Book?.Title ?? "",
+                    Message = $"Không thể gia hạn: {reason_msg}"
+                };
+            }
+
+            // Thực hiện gia hạn
+            var oldDueDate = borrowRecord.DueDate;
+            var newDueDate = borrowRecord.DueDate.AddDays(14); // Gia hạn 14 ngày
+
+            borrowRecord.DueDate = newDueDate;
+            borrowRecord.ExtensionCount++;
+            borrowRecord.LastExtensionDate = DateTime.UtcNow;
+            borrowRecord.UpdatedAt = DateTime.UtcNow;
+
+            if (!string.IsNullOrEmpty(reason))
+            {
+                borrowRecord.Notes = (borrowRecord.Notes ?? "") +
+                    $"\n[{DateTime.UtcNow:yyyy-MM-dd HH:mm}] Gia hạn lần {borrowRecord.ExtensionCount}: {reason}";
+            }
+
+            try
+            {
+                await _context.SaveChangesAsync();
+
+                return new ExtendBorrowResponseDto
+                {
+                    Success = true,
+                    BorrowRecordId = id,
+                    BookTitle = borrowRecord.Book?.Title ?? "",
+                    OldDueDate = oldDueDate,
+                    NewDueDate = newDueDate,
+                    ExtensionCount = borrowRecord.ExtensionCount,
+                    Message = $"Gia hạn thành công! Ngày trả mới: {newDueDate:dd/MM/yyyy}. Còn lại {2 - borrowRecord.ExtensionCount} lần gia hạn."
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ExtendBorrowResponseDto
+                {
+                    Success = false,
+                    BorrowRecordId = id,
+                    BookTitle = borrowRecord.Book?.Title ?? "",
+                    Message = $"Lỗi khi gia hạn: {ex.Message}"
+                };
+            }
+        }
     }
 }

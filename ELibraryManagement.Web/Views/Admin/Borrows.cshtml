@@ -262,13 +262,10 @@
             </div>
             <div class="modal-body">
                 <form id="extendForm">
-                    <div class="mb-3">
-                        <label for="currentDueDate" class="form-label">Ngày hiện tại</label>
-                        <input type="text" class="form-control" id="currentDueDate" readonly>
-                    </div>
-                    <div class="mb-3">
-                        <label for="newDueDate" class="form-label">Ngày gia hạn mới</label>
-                        <input type="date" class="form-control" id="newDueDate" required>
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Sách sẽ được gia hạn thêm <strong>14 ngày</strong> từ ngày hiện tại.
+                        Mỗi sách có thể gia hạn tối đa <strong>2 lần</strong>.
                     </div>
                     <div class="mb-3">
                         <label for="extendReason" class="form-label">Lý do gia hạn (tùy chọn)</label>
@@ -452,48 +449,30 @@
 
         function extendDue(borrowId) {
             currentBorrowId = borrowId;
-            
-            // Get current due date from the table row
-            const row = $(`button[onclick*="${borrowId}"]`).closest('tr');
-            const currentDate = row.find('td:nth-child(5)').text().trim(); // Due date column
-            
-            $('#currentDueDate').val(currentDate);
-            
-            // Set minimum date to tomorrow
-            const tomorrow = new Date();
-            tomorrow.setDate(tomorrow.getDate() + 1);
-            $('#newDueDate').attr('min', tomorrow.toISOString().split('T')[0]);
-            
             $('#extendModal').modal('show');
         }
 
         $('#confirmExtend').on('click', function() {
             if (currentBorrowId) {
-                const newDueDate = $('#newDueDate').val();
                 const reason = $('#extendReason').val();
-                
-                if (!newDueDate) {
-                    showToast('error', 'Vui lòng chọn ngày gia hạn mới');
-                    return;
-                }
                 
                 const token = localStorage.getItem('token');
                 
                 $.ajax({
-                    url: `/Admin/ExtendDueDate`,
+                    url: `/Admin/ExtendBorrow`,
                     type: 'POST',
-                    headers: {
-                        'Authorization': 'Bearer ' + token
-                    },
                     data: {
-                        borrowId: currentBorrowId,
-                        newDueDate: newDueDate,
+                        id: currentBorrowId,
                         reason: reason
                     },
                     success: function(response) {
                         $('#extendModal').modal('hide');
-                        showToast('success', 'Đã gia hạn thành công!');
-                        setTimeout(() => location.reload(), 1500);
+                        if (response.success) {
+                            showToast('success', response.message);
+                            setTimeout(() => location.reload(), 1500);
+                        } else {
+                            showToast('error', response.message);
+                        }
                     },
                     error: function(xhr) {
                         showToast('error', 'Có lỗi xảy ra khi gia hạn: ' + xhr.responseText);

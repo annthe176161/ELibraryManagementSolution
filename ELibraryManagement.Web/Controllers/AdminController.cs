@@ -10,6 +10,7 @@ namespace ELibraryManagement.Web.Controllers
         private readonly IAuthApiService _authApiService;
         private readonly IBookApiService _bookApiService;
         private readonly IReviewApiService _reviewApiService;
+        private readonly IBorrowApiService _borrowApiService;
         private readonly HttpClient _httpClient;
         private readonly IConfiguration _configuration;
         private readonly JsonSerializerOptions _jsonOptions;
@@ -18,12 +19,14 @@ namespace ELibraryManagement.Web.Controllers
             IAuthApiService authApiService,
             IBookApiService bookApiService,
             IReviewApiService reviewApiService,
+            IBorrowApiService borrowApiService,
             HttpClient httpClient,
             IConfiguration configuration)
         {
             _authApiService = authApiService;
             _bookApiService = bookApiService;
             _reviewApiService = reviewApiService;
+            _borrowApiService = borrowApiService;
             _httpClient = httpClient;
             _configuration = configuration;
             _jsonOptions = new JsonSerializerOptions
@@ -521,6 +524,34 @@ namespace ELibraryManagement.Web.Controllers
                 {
                     return Json(new { success = false, message = "Không thể xác nhận trả sách" });
                 }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Có lỗi xảy ra: {ex.Message}" });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ExtendBorrow(int id, string? reason = null)
+        {
+            var accessCheck = await CheckAdminAccessAsync();
+            if (accessCheck != null) return Json(new { success = false, message = "Unauthorized" });
+
+            try
+            {
+                var result = await _borrowApiService.ExtendBorrowAsync(id, reason);
+
+                return Json(new
+                {
+                    success = result.Success,
+                    message = result.Message,
+                    borrowRecordId = result.BorrowRecordId,
+                    bookTitle = result.BookTitle,
+                    oldDueDate = result.OldDueDate.ToString("dd/MM/yyyy"),
+                    newDueDate = result.NewDueDate.ToString("dd/MM/yyyy"),
+                    extensionCount = result.ExtensionCount,
+                    remainingExtensions = result.RemainingExtensions
+                });
             }
             catch (Exception ex)
             {

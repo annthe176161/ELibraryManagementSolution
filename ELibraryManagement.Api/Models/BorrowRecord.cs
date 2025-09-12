@@ -23,11 +23,20 @@ namespace ELibraryManagement.Api.Models
         [MaxLength(500)]
         public string? Notes { get; set; }
 
+        public int ExtensionCount { get; set; } = 0; // Số lần đã gia hạn
+
+        public DateTime? LastExtensionDate { get; set; } // Ngày gia hạn gần nhất
+
         public DateTime? ConfirmedDate { get; set; } // Ngày admin xác nhận mượn
 
         public bool IsOverdue => Status == BorrowStatus.Borrowed && ReturnDate == null && DateTime.UtcNow > DueDate;
 
         public int OverdueDays => IsOverdue ? (DateTime.UtcNow - DueDate).Days : 0;
+
+        public bool CanExtend => Status == BorrowStatus.Borrowed &&
+                                ReturnDate == null &&
+                                ExtensionCount < 2 && // Tối đa 2 lần gia hạn
+                                !IsOverdue; // Không được quá hạn
 
         // Timestamp
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

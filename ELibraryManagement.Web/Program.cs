@@ -35,6 +35,10 @@ namespace ELibraryManagement.Web
             builder.Services.AddHttpClient<IReviewApiService, ReviewApiService>();
             builder.Services.AddScoped<IReviewApiService, ReviewApiService>();
 
+            // Add Borrow services
+            builder.Services.AddHttpClient<IBorrowApiService, BorrowApiService>();
+            builder.Services.AddScoped<IBorrowApiService, BorrowApiService>();
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.

@@ -62,6 +62,11 @@ namespace ELibraryManagement.Api.DTOs
         public string? Reason { get; set; }
     }
 
+    public class ExtendBorrowRequestDto
+    {
+        public string? Reason { get; set; }
+    }
+
     public class ReturnBookResponseDto
     {
         public bool Success { get; set; }
@@ -71,6 +76,18 @@ namespace ELibraryManagement.Api.DTOs
         public string UserId { get; set; } = string.Empty;
         public DateTime ReturnDate { get; set; }
         public decimal? FineAmount { get; set; }
+        public string Message { get; set; } = string.Empty;
+    }
+
+    public class ExtendBorrowResponseDto
+    {
+        public bool Success { get; set; }
+        public int BorrowRecordId { get; set; }
+        public string BookTitle { get; set; } = string.Empty;
+        public DateTime OldDueDate { get; set; }
+        public DateTime NewDueDate { get; set; }
+        public int ExtensionCount { get; set; }
+        public int RemainingExtensions => Math.Max(0, 2 - ExtensionCount);
         public string Message { get; set; } = string.Empty;
     }
 }

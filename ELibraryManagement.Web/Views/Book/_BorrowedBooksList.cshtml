@@ -102,6 +102,16 @@
 
                                 @if (!book.ReturnDate.HasValue)
                                 {
+                                    <!-- Extend button - only if book can be extended -->
+                                    @if (!book.IsOverdue)
+                                    {
+                                        <button type="button" class="btn btn-warning btn-sm w-100 mb-1" 
+                                                onclick="extendBorrow(@book.BorrowRecordId, '@book.BookTitle')">
+                                            <i class="fas fa-calendar-plus me-1"></i>
+                                            Gia hạn sách
+                                        </button>
+                                    }
+
                                     <form id="returnForm_@book.BorrowRecordId" asp-controller="Book" asp-action="Return"
                                         asp-route-id="@book.BorrowRecordId" method="post" class="d-inline w-100">
                                         <button type="button" class="btn btn-success btn-sm w-100"
