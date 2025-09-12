@@ -1,4 +1,6 @@
 using ELibraryManagement.Web.Services;
+using ELibraryManagement.Web.Services.Interfaces;
+using ELibraryManagement.Web.Services.Implementations;
 using ELibraryManagement.Web.Middleware;
 
 namespace ELibraryManagement.Web
@@ -38,6 +40,10 @@ namespace ELibraryManagement.Web
             // Add Borrow services
             builder.Services.AddHttpClient<IBorrowApiService, BorrowApiService>();
             builder.Services.AddScoped<IBorrowApiService, BorrowApiService>();
+
+            // Add Category services
+            builder.Services.AddHttpClient<ICategoryApiService, CategoryApiService>();
+            builder.Services.AddScoped<ICategoryApiService, CategoryApiService>();
 
             var app = builder.Build();
 

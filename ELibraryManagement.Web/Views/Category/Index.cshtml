@@ -1,0 +1,269 @@
+@model CategoryListViewModel
+@{
+    ViewData["Title"] = "Quản lý danh mục";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <h3 class="card-title mb-0">
+                                <i class="fas fa-tags me-2"></i>Quản lý danh mục
+                            </h3>
+                        </div>
+                        <div class="col-auto">
+                            <a href="@Url.Action("Create")" class="btn btn-primary">
+                                <i class="fas fa-plus me-2"></i>Thêm danh mục mới
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <!-- Filter Section -->
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="includeInactive" 
+                                       @(Model.IncludeInactive ? "checked" : "") 
+                                       onchange="toggleInactiveCategories()">
+                                <label class="form-check-label" for="includeInactive">
+                                    Hiển thị danh mục không hoạt động
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="searchInput" 
+                                       placeholder="Tìm kiếm danh mục..." value="@Model.SearchTerm">
+                                <button class="btn btn-outline-secondary" type="button" onclick="searchCategories()">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    @if (Model.Categories.Any())
+                    {
+                        <!-- Statistics -->
+                        <div class="row mb-3">
+                            <div class="col-md-4">
+                                <div class="card bg-primary text-white">
+                                    <div class="card-body">
+                                        <div class="d-flex align-items-center">
+                                            <div class="flex-grow-1">
+                                                <h6 class="card-title mb-0">Tổng danh mục</h6>
+                                                <h3 class="mb-0">@Model.TotalCount</h3>
+                                            </div>
+                                            <div class="flex-shrink-0">
+                                                <i class="fas fa-tags fa-2x"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card bg-success text-white">
+                                    <div class="card-body">
+                                        <div class="d-flex align-items-center">
+                                            <div class="flex-grow-1">
+                                                <h6 class="card-title mb-0">Đang hoạt động</h6>
+                                                <h3 class="mb-0">@Model.Categories.Count(c => c.IsActive)</h3>
+                                            </div>
+                                            <div class="flex-shrink-0">
+                                                <i class="fas fa-check-circle fa-2x"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card bg-warning text-white">
+                                    <div class="card-body">
+                                        <div class="d-flex align-items-center">
+                                            <div class="flex-grow-1">
+                                                <h6 class="card-title mb-0">Không hoạt động</h6>
+                                                <h3 class="mb-0">@Model.Categories.Count(c => !c.IsActive)</h3>
+                                            </div>
+                                            <div class="flex-shrink-0">
+                                                <i class="fas fa-pause-circle fa-2x"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Categories Table -->
+                        <div class="table-responsive">
+                            <table class="table table-hover" id="categoriesTable">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Tên danh mục</th>
+                                        <th>Mô tả</th>
+                                        <th>Số sách</th>
+                                        <th>Trạng thái</th>
+                                        <th>Ngày tạo</th>
+                                        <th>Cập nhật cuối</th>
+                                        <th>Thao tác</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var category in Model.Categories)
+                                    {
+                                        <tr id="category-row-@category.Id">
+                                            <td>@category.Id</td>
+                                            <td>
+                                                <strong>@category.Name</strong>
+                                            </td>
+                                            <td>
+                                                @if (!string.IsNullOrEmpty(category.Description))
+                                                {
+                                                    <span title="@category.Description">
+                                                        @(category.Description.Length > 50 ? category.Description.Substring(0, 50) + "..." : category.Description)
+                                                    </span>
+                                                }
+                                                else
+                                                {
+                                                    <em class="text-muted">Không có mô tả</em>
+                                                }
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-info">@category.BookCount sách</span>
+                                            </td>
+                                            <td>
+                                                <span class="badge @category.StatusBadgeClass" id="status-badge-@category.Id">
+                                                    @category.StatusText
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <small>@category.CreatedAt.ToString("dd/MM/yyyy HH:mm")</small>
+                                            </td>
+                                            <td>
+                                                @if (category.UpdatedAt.HasValue)
+                                                {
+                                                    <small>@category.UpdatedAt.Value.ToString("dd/MM/yyyy HH:mm")</small>
+                                                }
+                                                else
+                                                {
+                                                    <em class="text-muted">Chưa cập nhật</em>
+                                                }
+                                            </td>
+                                            <td>
+                                                <div class="btn-group" role="group">
+                                                    <a href="@Url.Action("Edit", new { id = category.Id })" 
+                                                       class="btn btn-sm btn-outline-primary" title="Chỉnh sửa">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                    <button type="button" class="btn btn-sm btn-outline-warning" 
+                                                            onclick="toggleCategoryStatus(@category.Id)" 
+                                                            title="@(category.IsActive ? "Vô hiệu hóa" : "Kích hoạt")">
+                                                        <i class="fas fa-@(category.IsActive ? "pause" : "play")"></i>
+                                                    </button>
+                                                    <a href="@Url.Action("Delete", new { id = category.Id })" 
+                                                       class="btn btn-sm btn-outline-danger" title="Xóa">
+                                                        <i class="fas fa-trash"></i>
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="text-center py-5">
+                            <i class="fas fa-tags fa-3x text-muted mb-3"></i>
+                            <h5 class="text-muted">Chưa có danh mục nào</h5>
+                            <p class="text-muted">Hãy thêm danh mục đầu tiên để bắt đầu.</p>
+                            <a href="@Url.Action("Create")" class="btn btn-primary">
+                                <i class="fas fa-plus me-2"></i>Thêm danh mục mới
+                            </a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function toggleInactiveCategories() {
+            const includeInactive = document.getElementById('includeInactive').checked;
+            window.location.href = '@Url.Action("Index")?includeInactive=' + includeInactive;
+        }
+
+        function searchCategories() {
+            const searchTerm = document.getElementById('searchInput').value;
+            const includeInactive = document.getElementById('includeInactive').checked;
+            window.location.href = '@Url.Action("Index")?includeInactive=' + includeInactive + '&searchTerm=' + encodeURIComponent(searchTerm);
+        }
+
+        // Allow search on Enter key
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                searchCategories();
+            }
+        });
+
+        function toggleCategoryStatus(categoryId) {
+            if (!confirm('Bạn có chắc chắn muốn thay đổi trạng thái danh mục này?')) {
+                return;
+            }
+
+            const token = $('input[name="__RequestVerificationToken"]').val();
+            
+            $.ajax({
+                url: '@Url.Action("ToggleStatus")',
+                type: 'POST',
+                data: {
+                    id: categoryId,
+                    __RequestVerificationToken: token
+                },
+                success: function(response) {
+                    if (response.success) {
+                        const badge = document.getElementById('status-badge-' + categoryId);
+                        const row = document.getElementById('category-row-' + categoryId);
+                        
+                        if (response.isActive) {
+                            badge.textContent = 'Hoạt động';
+                            badge.className = 'badge bg-success';
+                        } else {
+                            badge.textContent = 'Không hoạt động';
+                            badge.className = 'badge bg-secondary';
+                        }
+                        
+                        toastr.success(response.message);
+                    } else {
+                        toastr.error(response.message);
+                    }
+                },
+                error: function() {
+                    toastr.error('Có lỗi xảy ra khi thay đổi trạng thái danh mục.');
+                }
+            });
+        }
+
+        // Initialize DataTable if available
+        $(document).ready(function() {
+            if (typeof $.fn.DataTable !== 'undefined' && $('#categoriesTable').length) {
+                $('#categoriesTable').DataTable({
+                    "language": {
+                        "url": "//cdn.datatables.net/plug-ins/1.11.5/i18n/vi.json"
+                    },
+                    "pageLength": 25,
+                    "order": [[0, "desc"]],
+                    "columnDefs": [
+                        { "orderable": false, "targets": 7 } // Disable sorting on action column
+                    ]
+                });
+            }
+        });
+    </script>
+}

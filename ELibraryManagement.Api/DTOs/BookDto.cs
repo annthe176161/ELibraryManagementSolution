@@ -70,25 +70,4 @@ namespace ELibraryManagement.Api.DTOs
         [XmlElement("Categories")]
         public List<CategoryDto>? Categories { get; set; }
     }
-
-    [DataContract(Name = "CategoryDto")]
-    [XmlRoot("CategoryDto")]
-    public class CategoryDto
-    {
-        [DataMember]
-        [XmlElement("Id")]
-        public int Id { get; set; }
-
-        [DataMember]
-        [XmlElement("Name")]
-        public string Name { get; set; } = string.Empty;
-
-        [DataMember]
-        [XmlElement("Description")]
-        public string? Description { get; set; }
-
-        [DataMember]
-        [XmlElement("Color")]
-        public string? Color { get; set; }
-    }
 }

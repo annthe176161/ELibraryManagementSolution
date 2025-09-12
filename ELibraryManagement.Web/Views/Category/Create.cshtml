@@ -1,0 +1,160 @@
+@model CreateCategoryViewModel
+@{
+    ViewData["Title"] = "Thêm danh mục mới";
+}
+
+<div class="container-fluid">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-plus me-2"></i>Thêm danh mục mới
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Create" method="post" id="createCategoryForm">
+                        @Html.AntiForgeryToken()
+                        
+                        <div class="mb-3">
+                            <label asp-for="Name" class="form-label">
+                                @Html.DisplayNameFor(m => m.Name) <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="Name" class="form-control" id="categoryName" 
+                                   placeholder="Nhập tên danh mục..." />
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                            <div id="nameExistsError" class="text-danger d-none">Tên danh mục đã tồn tại</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Description" class="form-label">@Html.DisplayNameFor(m => m.Description)</label>
+                            <textarea asp-for="Description" class="form-control" rows="3" 
+                                      placeholder="Nhập mô tả cho danh mục (tùy chọn)..."></textarea>
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input asp-for="IsActive" class="form-check-input" type="checkbox" />
+                                <label asp-for="IsActive" class="form-check-label">
+                                    @Html.DisplayNameFor(m => m.IsActive)
+                                </label>
+                            </div>
+                            <small class="form-text text-muted">
+                                Danh mục hoạt động sẽ hiển thị trong danh sách cho người dùng
+                            </small>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="@Url.Action("Index")" class="btn btn-secondary">
+                                <i class="fas fa-arrow-left me-2"></i>Quay lại
+                            </a>
+                            <button type="submit" class="btn btn-primary" id="submitBtn">
+                                <i class="fas fa-save me-2"></i>Lưu danh mục
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Help Card -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-info-circle me-2"></i>Hướng dẫn
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <ul class="mb-0">
+                        <li><strong>Tên danh mục:</strong> Tên phải là duy nhất và không được để trống</li>
+                        <li><strong>Mô tả:</strong> Thông tin bổ sung về danh mục (tùy chọn)</li>
+                        <li><strong>Trạng thái:</strong> Chỉ danh mục hoạt động mới hiển thị cho người dùng</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    <script>
+        let nameCheckTimeout;
+        let isNameValid = false;
+
+        // Real-time name validation
+        $('#categoryName').on('input', function() {
+            const name = $(this).val().trim();
+            
+            if (nameCheckTimeout) {
+                clearTimeout(nameCheckTimeout);
+            }
+
+            if (name.length > 0) {
+                nameCheckTimeout = setTimeout(() => {
+                    checkCategoryName(name);
+                }, 500);
+            } else {
+                hideNameError();
+                isNameValid = false;
+            }
+        });
+
+        function checkCategoryName(name) {
+            $.ajax({
+                url: '@Url.Action("CheckCategoryName")',
+                type: 'GET',
+                data: { name: name },
+                success: function(response) {
+                    if (response.exists) {
+                        showNameError();
+                        isNameValid = false;
+                    } else {
+                        hideNameError();
+                        isNameValid = true;
+                    }
+                },
+                error: function() {
+                    hideNameError();
+                    isNameValid = true; // Allow submission on error
+                }
+            });
+        }
+
+        function showNameError() {
+            $('#nameExistsError').removeClass('d-none');
+            $('#categoryName').addClass('is-invalid');
+        }
+
+        function hideNameError() {
+            $('#nameExistsError').addClass('d-none');
+            $('#categoryName').removeClass('is-invalid');
+        }
+
+        // Form submission validation
+        $('#createCategoryForm').on('submit', function(e) {
+            const name = $('#categoryName').val().trim();
+            
+            if (name.length === 0) {
+                e.preventDefault();
+                toastr.error('Vui lòng nhập tên danh mục.');
+                return false;
+            }
+
+            if (!isNameValid && name.length > 0) {
+                e.preventDefault();
+                toastr.error('Tên danh mục đã tồn tại. Vui lòng chọn tên khác.');
+                return false;
+            }
+
+            // Disable submit button to prevent double submission
+            $('#submitBtn').prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-2"></i>Đang lưu...');
+        });
+
+        // Auto-focus on name field
+        $(document).ready(function() {
+            $('#categoryName').focus();
+        });
+    </script>
+}

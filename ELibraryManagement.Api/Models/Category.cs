@@ -17,6 +17,8 @@ namespace ELibraryManagement.Api.Models
         [MaxLength(100)]
         public string? Color { get; set; } // For UI display
 
+        public bool IsActive { get; set; } = true;
+
         // Timestamp và soft delete
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
         public DateTime? UpdatedAt { get; set; }
