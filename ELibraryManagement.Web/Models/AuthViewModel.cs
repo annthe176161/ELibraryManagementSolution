@@ -73,6 +73,7 @@ namespace ELibraryManagement.Web.Models
         public string Email { get; set; } = string.Empty;
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
+        public string? StudentId { get; set; }
         public string? Address { get; set; }
         public string? PhoneNumber { get; set; }
         public DateTime? DateOfBirth { get; set; }
@@ -86,5 +87,57 @@ namespace ELibraryManagement.Web.Models
         public string Message { get; set; } = string.Empty;
         public string? Token { get; set; }
         public UserViewModel? User { get; set; }
+    }
+
+    public class EditProfileViewModel
+    {
+        [Display(Name = "Họ")]
+        [MaxLength(100, ErrorMessage = "Họ không được quá 100 ký tự")]
+        public string? FirstName { get; set; }
+
+        [Display(Name = "Tên")]
+        [MaxLength(100, ErrorMessage = "Tên không được quá 100 ký tự")]
+        public string? LastName { get; set; }
+
+        [Display(Name = "Mã sinh viên")]
+        [MaxLength(20, ErrorMessage = "Mã sinh viên không được quá 20 ký tự")]
+        public string? StudentId { get; set; }
+
+        [Display(Name = "Số điện thoại")]
+        [Phone(ErrorMessage = "Số điện thoại không hợp lệ")]
+        public string? PhoneNumber { get; set; }
+
+        [Display(Name = "Ngày sinh")]
+        [DataType(DataType.Date)]
+        public DateTime? DateOfBirth { get; set; }
+
+        [Display(Name = "Địa chỉ")]
+        [MaxLength(255, ErrorMessage = "Địa chỉ không được quá 255 ký tự")]
+        public string? Address { get; set; }
+
+        [Display(Name = "URL Avatar")]
+        [MaxLength(500, ErrorMessage = "URL Avatar không được quá 500 ký tự")]
+        [Url(ErrorMessage = "URL Avatar không hợp lệ")]
+        public string? AvatarUrl { get; set; }
+    }
+
+    public class ChangePasswordViewModel
+    {
+        [Required(ErrorMessage = "Vui lòng nhập mật khẩu hiện tại")]
+        [DataType(DataType.Password)]
+        [Display(Name = "Mật khẩu hiện tại")]
+        public string CurrentPassword { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Vui lòng nhập mật khẩu mới")]
+        [StringLength(100, ErrorMessage = "Mật khẩu phải có ít nhất {2} ký tự", MinimumLength = 6)]
+        [DataType(DataType.Password)]
+        [Display(Name = "Mật khẩu mới")]
+        public string NewPassword { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Vui lòng xác nhận mật khẩu mới")]
+        [DataType(DataType.Password)]
+        [Display(Name = "Xác nhận mật khẩu mới")]
+        [Compare("NewPassword", ErrorMessage = "Mật khẩu xác nhận không khớp")]
+        public string ConfirmPassword { get; set; } = string.Empty;
     }
 }

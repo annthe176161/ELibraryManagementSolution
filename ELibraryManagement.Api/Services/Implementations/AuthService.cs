@@ -237,10 +237,67 @@ namespace ELibraryManagement.Api.Services.Implementations
                 LastName = user.LastName,
                 PhoneNumber = user.PhoneNumber,
                 Address = user.Address,
+                StudentId = user.StudentId,
+                AvatarUrl = user.AvatarUrl,
                 DateOfBirth = user.DateOfBirth,
                 CreatedAt = user.CreatedAt,
                 Roles = roles.ToList()
             };
+        }
+
+        public async Task<AuthResponseDto> UpdateProfileAsync(string userId, UpdateProfileRequestDto request)
+        {
+            try
+            {
+                var user = await _userManager.FindByIdAsync(userId);
+                if (user == null)
+                {
+                    return new AuthResponseDto
+                    {
+                        Success = false,
+                        Message = "User not found."
+                    };
+                }
+
+                // Cập nhật thông tin
+                user.FirstName = request.FirstName;
+                user.LastName = request.LastName;
+                user.StudentId = request.StudentId;
+                user.PhoneNumber = request.PhoneNumber;
+                user.DateOfBirth = request.DateOfBirth;
+                user.Address = request.Address;
+                user.AvatarUrl = request.AvatarUrl;
+                user.UpdatedAt = DateTime.UtcNow;
+
+                var result = await _userManager.UpdateAsync(user);
+
+                if (!result.Succeeded)
+                {
+                    return new AuthResponseDto
+                    {
+                        Success = false,
+                        Message = "Failed to update profile: " + string.Join(", ", result.Errors.Select(e => e.Description))
+                    };
+                }
+
+                // Trả về thông tin user mới
+                var userDto = await GetUserDtoAsync(user);
+
+                return new AuthResponseDto
+                {
+                    Success = true,
+                    Message = "Profile updated successfully!",
+                    User = userDto
+                };
+            }
+            catch (Exception ex)
+            {
+                return new AuthResponseDto
+                {
+                    Success = false,
+                    Message = $"An error occurred: {ex.Message}"
+                };
+            }
         }
     }
 }

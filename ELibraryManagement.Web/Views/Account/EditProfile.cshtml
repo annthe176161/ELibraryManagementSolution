@@ -1,0 +1,182 @@
+@model EditProfileViewModel
+@{
+    ViewData["Title"] = "Chỉnh sửa thông tin cá nhân";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/auth.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+}
+
+<div class="profile-container">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="profile-card">
+                    <div class="profile-header">
+                        <div class="text-center">
+                            <h2 class="profile-name">
+                                <i class="fas fa-edit me-2"></i>
+                                Chỉnh sửa thông tin cá nhân
+                            </h2>
+                            <p class="text-muted">Cập nhật thông tin của bạn</p>
+                        </div>
+                    </div>
+
+                    <div class="profile-body">
+                        @if (TempData["SuccessMessage"] != null)
+                        {
+                            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                <i class="fas fa-check-circle me-2"></i>
+                                @TempData["SuccessMessage"]
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        }
+
+                        @if (TempData["ErrorMessage"] != null)
+                        {
+                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                <i class="fas fa-exclamation-circle me-2"></i>
+                                @TempData["ErrorMessage"]
+                                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                            </div>
+                        }
+
+                        <form asp-controller="Account" asp-action="EditProfile" method="post" class="edit-profile-form">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label asp-for="FirstName" class="form-label">
+                                            <i class="fas fa-user me-2"></i>@Html.DisplayNameFor(m => m.FirstName)
+                                        </label>
+                                        <input asp-for="FirstName" class="form-control" placeholder="Nhập họ của bạn" />
+                                        <span asp-validation-for="FirstName" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label asp-for="LastName" class="form-label">
+                                            <i class="fas fa-user me-2"></i>@Html.DisplayNameFor(m => m.LastName)
+                                        </label>
+                                        <input asp-for="LastName" class="form-control" placeholder="Nhập tên của bạn" />
+                                        <span asp-validation-for="LastName" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label asp-for="StudentId" class="form-label">
+                                            <i class="fas fa-graduation-cap me-2"></i>@Html.DisplayNameFor(m => m.StudentId)
+                                        </label>
+                                        <input asp-for="StudentId" class="form-control" placeholder="Nhập mã sinh viên" />
+                                        <span asp-validation-for="StudentId" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label asp-for="PhoneNumber" class="form-label">
+                                            <i class="fas fa-phone me-2"></i>@Html.DisplayNameFor(m => m.PhoneNumber)
+                                        </label>
+                                        <input asp-for="PhoneNumber" class="form-control" placeholder="Nhập số điện thoại" />
+                                        <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label asp-for="DateOfBirth" class="form-label">
+                                            <i class="fas fa-calendar me-2"></i>@Html.DisplayNameFor(m => m.DateOfBirth)
+                                        </label>
+                                        <input asp-for="DateOfBirth" type="date" class="form-control" />
+                                        <span asp-validation-for="DateOfBirth" class="text-danger"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label asp-for="AvatarUrl" class="form-label">
+                                            <i class="fas fa-image me-2"></i>@Html.DisplayNameFor(m => m.AvatarUrl)
+                                        </label>
+                                        <input asp-for="AvatarUrl" class="form-control" placeholder="URL hình đại diện" />
+                                        <span asp-validation-for="AvatarUrl" class="text-danger"></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group mb-4">
+                                <label asp-for="Address" class="form-label">
+                                    <i class="fas fa-map-marker-alt me-2"></i>@Html.DisplayNameFor(m => m.Address)
+                                </label>
+                                <textarea asp-for="Address" class="form-control" rows="3" placeholder="Nhập địa chỉ của bạn"></textarea>
+                                <span asp-validation-for="Address" class="text-danger"></span>
+                            </div>
+
+                            <div class="profile-actions">
+                                <button type="submit" class="btn-profile">
+                                    <i class="fas fa-save me-2"></i>
+                                    Lưu thay đổi
+                                </button>
+                                <a asp-controller="Account" asp-action="Profile" class="btn-profile" style="background: linear-gradient(135deg, #6c757d, #5a6268);">
+                                    <i class="fas fa-times me-2"></i>
+                                    Hủy bỏ
+                                </a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    
+    <script>
+        // Preview avatar
+        $('#AvatarUrl').on('input', function() {
+            const url = $(this).val();
+            if (url) {
+                // You can add avatar preview functionality here
+                console.log('Avatar URL:', url);
+            }
+        });
+
+        // Auto-dismiss alerts after 5 seconds
+        setTimeout(function() {
+            $('.alert').alert('close');
+        }, 5000);
+    </script>
+}
+
+<style>
+    .edit-profile-form .form-label {
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 0.5rem;
+    }
+    
+    .edit-profile-form .form-control {
+        border-radius: 10px;
+        border: 2px solid #e9ecef;
+        padding: 12px 15px;
+        transition: all 0.3s ease;
+    }
+    
+    .edit-profile-form .form-control:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+    
+    .edit-profile-form textarea.form-control {
+        resize: vertical;
+        min-height: 100px;
+    }
+</style>

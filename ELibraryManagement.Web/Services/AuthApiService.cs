@@ -16,6 +16,8 @@ namespace ELibraryManagement.Web.Services
         string? GetCurrentToken();
         Task<List<string>> GetCurrentUserRolesAsync();
         Task<bool> IsInRoleAsync(string roleName);
+        Task<AuthResponseViewModel> UpdateProfileAsync(EditProfileViewModel model);
+        Task<AuthResponseViewModel> ChangePasswordAsync(ChangePasswordViewModel model);
     }
 
     public class AuthApiService : IAuthApiService
@@ -382,6 +384,96 @@ namespace ELibraryManagement.Web.Services
         {
             var roles = await GetCurrentUserRolesAsync();
             return roles.Contains(roleName, StringComparer.OrdinalIgnoreCase);
+        }
+
+        public async Task<AuthResponseViewModel> UpdateProfileAsync(EditProfileViewModel model)
+        {
+            try
+            {
+                var token = GetCurrentToken();
+                if (string.IsNullOrEmpty(token))
+                {
+                    return new AuthResponseViewModel
+                    {
+                        Success = false,
+                        Message = "Bạn cần đăng nhập để cập nhật thông tin."
+                    };
+                }
+
+                _httpClient.DefaultRequestHeaders.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+                var json = JsonSerializer.Serialize(model, _jsonOptions);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                var response = await _httpClient.PutAsync($"{GetApiBaseUrl()}/api/Auth/update-profile", content);
+                var responseContent = await response.Content.ReadAsStringAsync();
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var result = JsonSerializer.Deserialize<AuthResponseViewModel>(responseContent, _jsonOptions);
+                    return result ?? new AuthResponseViewModel { Success = true, Message = "Cập nhật thông tin thành công!" };
+                }
+
+                return new AuthResponseViewModel
+                {
+                    Success = false,
+                    Message = $"Cập nhật thông tin thất bại: {responseContent}"
+                };
+            }
+            catch (Exception ex)
+            {
+                return new AuthResponseViewModel
+                {
+                    Success = false,
+                    Message = $"Có lỗi xảy ra: {ex.Message}"
+                };
+            }
+        }
+
+        public async Task<AuthResponseViewModel> ChangePasswordAsync(ChangePasswordViewModel model)
+        {
+            try
+            {
+                var token = GetCurrentToken();
+                if (string.IsNullOrEmpty(token))
+                {
+                    return new AuthResponseViewModel
+                    {
+                        Success = false,
+                        Message = "Bạn cần đăng nhập để đổi mật khẩu."
+                    };
+                }
+
+                _httpClient.DefaultRequestHeaders.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+                var json = JsonSerializer.Serialize(model, _jsonOptions);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                var response = await _httpClient.PutAsync($"{GetApiBaseUrl()}/api/Auth/change-password", content);
+                var responseContent = await response.Content.ReadAsStringAsync();
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var result = JsonSerializer.Deserialize<AuthResponseViewModel>(responseContent, _jsonOptions);
+                    return result ?? new AuthResponseViewModel { Success = true, Message = "Đổi mật khẩu thành công!" };
+                }
+
+                return new AuthResponseViewModel
+                {
+                    Success = false,
+                    Message = $"Đổi mật khẩu thất bại: {responseContent}"
+                };
+            }
+            catch (Exception ex)
+            {
+                return new AuthResponseViewModel
+                {
+                    Success = false,
+                    Message = $"Có lỗi xảy ra: {ex.Message}"
+                };
+            }
         }
     }
 }

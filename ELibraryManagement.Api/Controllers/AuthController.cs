@@ -153,6 +153,35 @@ namespace ELibraryManagement.Api.Controllers
 
             return Ok(new { Message = $"Role '{request.RoleName}' assigned successfully to user." });
         }
+
+        /// <summary>
+        /// Cập nhật thông tin cá nhân
+        /// </summary>
+        [HttpPut("update-profile")]
+        [Authorize]
+        public async Task<IActionResult> UpdateProfile([FromBody] UpdateProfileRequestDto request)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Unauthorized();
+            }
+
+            var result = await _authService.UpdateProfileAsync(userId, request);
+
+            if (!result.Success)
+            {
+                return BadRequest(result);
+            }
+
+            return Ok(result);
+        }
     }
 
     public class AssignRoleRequestDto

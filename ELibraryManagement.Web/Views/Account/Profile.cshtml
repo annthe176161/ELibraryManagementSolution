@@ -77,6 +77,27 @@
                             <div class="col-md-6">
                                 <div class="info-item">
                                     <label class="info-label">
+                                        <i class="fas fa-graduation-cap"></i>
+                                        Mã sinh viên
+                                    </label>
+                                    <p class="info-value">@(Model.StudentId ?? "Chưa cập nhật")</p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="info-item">
+                                    <label class="info-label">
+                                        <i class="fas fa-envelope"></i>
+                                        Email
+                                    </label>
+                                    <p class="info-value">@Model.Email</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="info-item">
+                                    <label class="info-label">
                                         <i class="fas fa-phone"></i>
                                         Số điện thoại
                                     </label>
@@ -118,11 +139,12 @@
                             <i class="fas fa-home"></i>
                             Về trang chủ
                         </a>
-                        <a href="#" class="btn-profile">
+                        <a asp-controller="Account" asp-action="EditProfile" class="btn-profile">
                             <i class="fas fa-edit"></i>
                             Chỉnh sửa thông tin
                         </a>
-                        <a href="#" class="btn-profile" style="background: linear-gradient(135deg, #28a745, #20c997);">
+                        <a asp-controller="Account" asp-action="ChangePassword" class="btn-profile"
+                            style="background: linear-gradient(135deg, #28a745, #20c997);">
                             <i class="fas fa-key"></i>
                             Đổi mật khẩu
                         </a>

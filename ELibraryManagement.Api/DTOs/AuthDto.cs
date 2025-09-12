@@ -63,12 +63,38 @@ namespace ELibraryManagement.Api.DTOs
         public string Email { get; set; } = string.Empty;
         public string? FirstName { get; set; }
         public string? LastName { get; set; }
+        public string? StudentId { get; set; }
         public string FullName => $"{FirstName} {LastName}".Trim();
         public string? PhoneNumber { get; set; }
         public string? Address { get; set; }
+        public string? AvatarUrl { get; set; }
         public DateTime? DateOfBirth { get; set; }
         public DateTime CreatedAt { get; set; }
         public List<string> Roles { get; set; } = new List<string>();
+    }
+
+    public class UpdateProfileRequestDto
+    {
+        [MaxLength(100)]
+        public string? FirstName { get; set; }
+
+        [MaxLength(100)]
+        public string? LastName { get; set; }
+
+        [MaxLength(20)]
+        public string? StudentId { get; set; }
+
+        [Phone]
+        public string? PhoneNumber { get; set; }
+
+        public DateTime? DateOfBirth { get; set; }
+
+        [MaxLength(255)]
+        public string? Address { get; set; }
+
+        [MaxLength(500)]
+        [Url]
+        public string? AvatarUrl { get; set; }
     }
 
     public class ChangePasswordRequestDto
