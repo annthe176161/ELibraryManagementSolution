@@ -41,3 +41,286 @@ footer {
   white-space: normal;
   line-height: normal;
 }
+
+/* ====== UNIVERSITY LIBRARY HEADER & FOOTER STYLES ====== */
+
+/* Fixed header styling */
+header.fixed-top {
+    z-index: 1030;
+}
+
+/* Top bar styling */
+.top-bar {
+    background: linear-gradient(90deg, #0066cc 0%, #004499 100%) !important;
+    font-size: 0.85rem;
+}
+
+/* University logo placeholder */
+.university-logo-placeholder {
+    display: inline-block;
+    padding: 8px;
+    background: linear-gradient(45deg, #0066cc, #004499);
+    border-radius: 50%;
+    color: white;
+    text-align: center;
+    box-shadow: 0 2px 10px rgba(0, 102, 204, 0.3);
+}
+
+.university-logo-placeholder i {
+    color: white !important;
+}
+
+/* Enhanced navbar styling */
+.navbar {
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    border-bottom: 3px solid #0066cc;
+}
+
+/* University logo and brand styling */
+.navbar-brand {
+    font-family: 'Georgia', serif;
+    text-decoration: none !important;
+}
+
+.navbar-brand:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+    transition: all 0.3s ease;
+}
+
+/* Navigation enhancements */
+.nav-link {
+    font-weight: 500;
+    transition: all 0.3s ease;
+    border-radius: 6px;
+    margin: 0 2px;
+}
+
+.nav-link:hover {
+    background-color: rgba(0, 102, 204, 0.1);
+    color: #0066cc !important;
+    transform: translateY(-1px);
+}
+
+/* Dropdown menu styling */
+.dropdown-menu {
+    border: none;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.15);
+    border-radius: 8px;
+    padding: 0.5rem 0;
+}
+
+.dropdown-item {
+    padding: 0.75rem 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.dropdown-item:hover {
+    background-color: rgba(0, 102, 204, 0.1);
+    color: #0066cc;
+    transform: translateX(5px);
+}
+
+/* User avatar styling */
+.user-avatar {
+    display: inline-block;
+}
+
+.user-avatar i {
+    background: linear-gradient(45deg, #0066cc, #004499);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Button styling - Fixed colors for login/register */
+.btn-outline-dark {
+    border-color: #333;
+    color: #333;
+    background-color: transparent;
+    transition: all 0.3s ease;
+}
+
+.btn-outline-dark:hover {
+    background-color: #333;
+    border-color: #333;
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(51, 51, 51, 0.3);
+}
+
+.btn-dark {
+    background-color: #333 !important;
+    border-color: #333 !important;
+    color: white !important;
+    transition: all 0.3s ease;
+}
+
+.btn-dark:hover {
+    background-color: #555 !important;
+    border-color: #555 !important;
+    color: white !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(51, 51, 51, 0.4);
+}
+
+.btn-primary {
+    background-color: #0066cc;
+    border-color: #0066cc;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: #004499;
+    border-color: #004499;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 102, 204, 0.3);
+}
+
+/* Remove old button hover effects that were causing visibility issues */
+.btn-outline-primary {
+    border-color: #0066cc;
+    color: #0066cc;
+    transition: all 0.3s ease;
+}
+
+.btn-outline-primary:hover {
+    background-color: #0066cc;
+    border-color: #0066cc;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 102, 204, 0.3);
+}
+
+/* Footer hover effects - Fixed for better visibility */
+.hover-effect {
+    transition: all 0.3s ease;
+    color: white !important;
+}
+
+.hover-effect:hover {
+    transform: translateY(-2px);
+    color: #ffd700 !important;
+}
+
+.hover-link {
+    transition: all 0.3s ease;
+    color: white !important;
+}
+
+.hover-link:hover {
+    color: #ffd700 !important;
+    transform: translateX(5px);
+}
+
+/* Footer social links - Enhanced visibility */
+.social-links a {
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    line-height: 40px;
+    text-align: center;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.1);
+    transition: all 0.3s ease;
+    color: white !important;
+}
+
+.social-links a:hover {
+    background: rgba(255,215,0,0.3);
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(255,215,0,0.3);
+    color: #ffd700 !important;
+}
+
+/* Footer background - Simplified for better contrast */
+footer.bg-dark {
+    background-color: #212529 !important;
+}
+
+/* Text color overrides for footer */
+footer .text-white {
+    color: white !important;
+}
+
+footer .text-white-50 {
+    color: rgba(255,255,255,0.75) !important;
+}
+
+/* Responsive adjustments */
+@media (max-width: 991.98px) {
+    .top-bar .col-md-6:last-child {
+        text-align: left !important;
+        margin-top: 0.5rem;
+    }
+    
+    .navbar-brand div:first-child {
+        font-size: 1rem !important;
+    }
+    
+    .navbar-brand div:last-child {
+        font-size: 0.8rem !important;
+    }
+}
+
+@media (max-width: 767.98px) {
+    .top-bar {
+        text-align: center;
+    }
+    
+    .top-bar .col-md-6 {
+        margin-bottom: 0.5rem;
+    }
+    
+    /* Hide search bar on mobile, move to main navigation */
+    .mx-auto {
+        order: 3;
+        width: 100% !important;
+        max-width: none !important;
+        margin-top: 1rem;
+    }
+    
+    footer .col-lg-4,
+    footer .col-lg-2,
+    footer .col-lg-3 {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+}
+
+/* Print styles */
+@media print {
+    .navbar,
+    footer,
+    .top-bar {
+        display: none !important;
+    }
+    
+    body {
+        padding-top: 0 !important;
+    }
+}
+
+/* Accessibility improvements */
+.nav-link:focus,
+.btn:focus,
+.dropdown-item:focus {
+    outline: 2px solid #ffd700;
+    outline-offset: 2px;
+}
+
+/* Loading animations */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.navbar,
+footer {
+    animation: fadeInUp 0.6s ease-out;
+}
