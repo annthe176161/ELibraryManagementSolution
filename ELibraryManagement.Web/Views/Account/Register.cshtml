@@ -3,225 +3,612 @@
     ViewData["Title"] = "Đăng ký tài khoản";
 }
 
-@section Styles {
-    <link rel="stylesheet" href="~/css/auth.css" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap"
-        rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-}
+<style>
+    /* CSS Variables - University Library Theme */
+    :root {
+        --primary-blue: #2563eb;
+        --primary-navy: #1e3a8a;
+        --accent-gold: #fbbf24;
+        --light-blue: #dbeafe;
+        --dark-gray: #374151;
+        --light-gray: #f9fafb;
+        --border-color: #e5e7eb;
+        --success-green: #10b981;
+        --warning-red: #ef4444;
+    }
 
-<div class="auth-container">
-    <div class="auth-wrapper">
-        <div class="auth-card">
-            <div class="auth-header">
-                <i class="fas fa-user-plus auth-icon"></i>
-                <h2 class="auth-title">Đăng ký tài khoản</h2>
-                <p class="auth-subtitle">Tạo tài khoản mới để sử dụng thư viện</p>
+    /* Reset and Base Styles */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        line-height: 1.6;
+        color: var(--dark-gray);
+        background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-navy) 100%);
+        min-height: 100vh;
+        overflow-x: hidden;
+    }
+
+    /* Main Container */
+    .register-container {
+        min-height: 100vh;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        max-width: 1400px;
+        margin: 0 auto;
+        background: white;
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    }
+
+    /* Left Side - University Branding */
+    .university-branding {
+        background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-navy) 100%);
+        color: white;
+        padding: 3rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .university-branding::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="books" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse"><rect width="20" height="20" fill="none"/><path d="M2 2h3v16h-3zM7 2h3v16h-3zM12 2h3v16h-3z" fill="rgba(255,255,255,0.05)"/></pattern></defs><rect width="100" height="100" fill="url(%23books)"/></svg>') repeat;
+        animation: float 20s ease-in-out infinite;
+    }
+
+    @@keyframes float {
+
+        0%,
+        100% {
+            transform: translateY(0px) rotate(0deg);
+        }
+
+        50% {
+            transform: translateY(-10px) rotate(2deg);
+        }
+    }
+
+    .university-logo {
+        font-size: 4rem;
+        margin-bottom: 1.5rem;
+        color: var(--accent-gold);
+        filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
+        z-index: 2;
+        position: relative;
+    }
+
+    .university-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        z-index: 2;
+        position: relative;
+    }
+
+    .university-subtitle {
+        font-size: 1.2rem;
+        margin-bottom: 2rem;
+        opacity: 0.9;
+        z-index: 2;
+        position: relative;
+    }
+
+    .features-list {
+        list-style: none;
+        text-align: left;
+        z-index: 2;
+        position: relative;
+        max-width: 350px;
+    }
+
+    .feature-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1rem;
+        font-size: 1.1rem;
+    }
+
+    .feature-item i {
+        color: var(--accent-gold);
+        margin-right: 1rem;
+        width: 20px;
+        text-align: center;
+    }
+
+    /* Right Side - Registration Form */
+    .register-section {
+        padding: 3rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        background: var(--light-gray);
+    }
+
+    .register-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .register-title {
+        font-size: 2rem;
+        color: var(--primary-navy);
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+    }
+
+    .register-subtitle {
+        color: #6b7280;
+        font-size: 1rem;
+    }
+
+    /* Form Styles */
+    .register-form {
+        max-width: 500px;
+        margin: 0 auto;
+        width: 100%;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group.full-width {
+        grid-column: 1 / -1;
+    }
+
+    .form-label {
+        display: block;
+        font-weight: 500;
+        color: var(--dark-gray);
+        margin-bottom: 0.5rem;
+        font-size: 0.95rem;
+    }
+
+    .form-label i {
+        color: var(--primary-blue);
+        margin-right: 0.5rem;
+        width: 16px;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 0.875rem 1rem;
+        border: 2px solid var(--border-color);
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: white;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: var(--primary-blue);
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    .form-control.is-invalid {
+        border-color: var(--warning-red);
+    }
+
+    .input-group {
+        position: relative;
+    }
+
+    .input-group .form-control {
+        padding-right: 3rem;
+    }
+
+    .toggle-password-btn {
+        position: absolute;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        padding: 0 1rem;
+        border: 2px solid var(--border-color);
+        border-left: none;
+        border-radius: 0 8px 8px 0;
+        background: white;
+        color: #6b7280;
+        transition: all 0.3s ease;
+    }
+
+    .toggle-password-btn:hover {
+        background: var(--light-blue);
+        color: var(--primary-blue);
+    }
+
+    /* Submit Button */
+    .register-btn {
+        width: 100%;
+        padding: 1rem;
+        background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-navy) 100%);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 1rem;
+    }
+
+    .register-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(37, 99, 235, 0.3);
+    }
+
+    .register-btn i {
+        margin-right: 0.5rem;
+    }
+
+    /* Footer Links */
+    .register-footer {
+        text-align: center;
+        margin-top: 2rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid var(--border-color);
+    }
+
+    .auth-links {
+        margin-bottom: 1rem;
+    }
+
+    .auth-link {
+        color: #6b7280;
+        text-decoration: none;
+        font-size: 0.95rem;
+        transition: color 0.3s ease;
+    }
+
+    .auth-link:hover {
+        color: var(--primary-blue);
+    }
+
+    .auth-link-primary {
+        color: var(--primary-blue);
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .auth-link-primary:hover {
+        color: var(--primary-navy);
+        text-decoration: underline;
+    }
+
+    /* Validation Styles */
+    .text-danger {
+        color: var(--warning-red);
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+        display: block;
+    }
+
+    .alert-danger {
+        background-color: #fee2e2;
+        border: 1px solid #fca5a5;
+        color: #dc2626;
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 1.5rem;
+    }
+
+    /* Responsive Design */
+    @@media (max-width: 1024px) {
+        .register-container {
+            grid-template-columns: 1fr;
+            max-width: 100%;
+        }
+
+        .university-branding {
+            padding: 2rem;
+            min-height: 40vh;
+        }
+
+        .university-title {
+            font-size: 2rem;
+        }
+
+        .university-logo {
+            font-size: 3rem;
+        }
+    }
+
+    @@media (max-width: 768px) {
+        .register-section {
+            padding: 2rem 1.5rem;
+        }
+
+        .form-row {
+            grid-template-columns: 1fr;
+            gap: 0;
+        }
+
+        .university-branding {
+            padding: 1.5rem;
+            min-height: 30vh;
+        }
+
+        .university-title {
+            font-size: 1.8rem;
+        }
+
+        .features-list {
+            max-width: 100%;
+        }
+    }
+
+    @@media (max-width: 480px) {
+        .register-section {
+            padding: 1.5rem 1rem;
+        }
+
+        .register-title {
+            font-size: 1.6rem;
+        }
+    }
+</style>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+<div class="register-container">
+    <!-- Left Side - University Branding -->
+    <div class="university-branding">
+        <div class="university-logo">
+            <i class="fas fa-university"></i>
+        </div>
+        <h1 class="university-title">THƯ VIỆN SỐ</h1>
+        <p class="university-subtitle">Hệ thống quản lý thư viện hiện đại</p>
+
+        <ul class="features-list">
+            <li class="feature-item">
+                <i class="fas fa-book-open"></i>
+                <span>Hàng nghìn tài liệu học thuật</span>
+            </li>
+            <li class="feature-item">
+                <i class="fas fa-search"></i>
+                <span>Tìm kiếm thông minh</span>
+            </li>
+            <li class="feature-item">
+                <i class="fas fa-mobile-alt"></i>
+                <span>Truy cập mọi lúc, mọi nơi</span>
+            </li>
+            <li class="feature-item">
+                <i class="fas fa-graduation-cap"></i>
+                <span>Hỗ trợ nghiên cứu học tập</span>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Right Side - Registration Form -->
+    <div class="register-section">
+        <div class="register-header">
+            <h2 class="register-title">Đăng ký tài khoản</h2>
+            <p class="register-subtitle">Tạo tài khoản mới để truy cập thư viện số</p>
+        </div>
+
+        <form asp-action="Register" method="post" class="register-form">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+            <!-- Basic Information -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label asp-for="UserName" class="form-label">
+                        <i class="fas fa-user"></i>
+                        Tên đăng nhập
+                    </label>
+                    <input asp-for="UserName" class="form-control" placeholder="Nhập tên đăng nhập" />
+                    <span asp-validation-for="UserName" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Email" class="form-label">
+                        <i class="fas fa-envelope"></i>
+                        Email
+                    </label>
+                    <input asp-for="Email" class="form-control" placeholder="Nhập địa chỉ email" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
             </div>
 
-            <form asp-action="Register" method="post" class="auth-form">
-                <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
-
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label asp-for="UserName" class="form-label">
-                                <i class="fas fa-user"></i>
-                                Tên đăng nhập
-                            </label>
-                            <input asp-for="UserName" class="form-control" placeholder="Nhập tên đăng nhập" />
-                            <span asp-validation-for="UserName" class="text-danger"></span>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label asp-for="Email" class="form-label">
-                                <i class="fas fa-envelope"></i>
-                                Email
-                            </label>
-                            <input asp-for="Email" class="form-control" placeholder="Nhập địa chỉ email" />
-                            <span asp-validation-for="Email" class="text-danger"></span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label asp-for="FirstName" class="form-label">
-                                <i class="fas fa-id-card"></i>
-                                Họ
-                            </label>
-                            <input asp-for="FirstName" class="form-control" placeholder="Nhập họ" />
-                            <span asp-validation-for="FirstName" class="text-danger"></span>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label asp-for="LastName" class="form-label">
-                                <i class="fas fa-id-card"></i>
-                                Tên
-                            </label>
-                            <input asp-for="LastName" class="form-control" placeholder="Nhập tên" />
-                            <span asp-validation-for="LastName" class="text-danger"></span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label asp-for="StudentId" class="form-label">
-                                <i class="fas fa-id-badge"></i>
-                                Mã sinh viên
-                            </label>
-                            <input asp-for="StudentId" class="form-control" placeholder="Nhập mã sinh viên (không bắt buộc)" />
-                            <span asp-validation-for="StudentId" class="text-danger"></span>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label asp-for="PhoneNumber" class="form-label">
-                                <i class="fas fa-phone"></i>
-                                Số điện thoại
-                            </label>
-                            <input asp-for="PhoneNumber" class="form-control" placeholder="Nhập số điện thoại" />
-                            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label asp-for="Password" class="form-label">
-                                Mật khẩu
-                            </label>
-                            <div class="input-group">
-                                <input asp-for="Password" type="password" id="Password" class="form-control"
-                                    placeholder="Nhập mật khẩu" />
-                                <button class="btn btn-outline-secondary toggle-password-btn" type="button"
-                                    onclick="togglePasswordVisibility('Password', this)">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                            </div>
-                            <span asp-validation-for="Password" class="text-danger"></span>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label asp-for="ConfirmPassword" class="form-label">
-                                Xác nhận mật khẩu
-                            </label>
-                            <div class="input-group">
-                                <input asp-for="ConfirmPassword" type="password" id="ConfirmPassword"
-                                    class="form-control" placeholder="Nhập lại mật khẩu" />
-                                <button class="btn btn-outline-secondary toggle-password-btn" type="button"
-                                    onclick="togglePasswordVisibility('ConfirmPassword', this)">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                            </div>
-                            <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label asp-for="PhoneNumber" class="form-label">
-                                <i class="fas fa-phone"></i>
-                                Số điện thoại
-                            </label>
-                            <input asp-for="PhoneNumber" class="form-control" placeholder="Nhập số điện thoại" />
-                            <span asp-validation-for="PhoneNumber" class="text-danger"></span>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            <label asp-for="DateOfBirth" class="form-label">
-                                <i class="fas fa-calendar"></i>
-                                Ngày sinh
-                            </label>
-                            <input asp-for="DateOfBirth" class="form-control" />
-                            <span asp-validation-for="DateOfBirth" class="text-danger"></span>
-                        </div>
-                    </div>
-                </div>
-
+            <!-- Personal Information -->
+            <div class="form-row">
                 <div class="form-group">
-                    <label asp-for="Address" class="form-label">
-                        <i class="fas fa-map-marker-alt"></i>
-                        Địa chỉ
+                    <label asp-for="FirstName" class="form-label">
+                        <i class="fas fa-id-card"></i>
+                        Họ
                     </label>
-                    <textarea asp-for="Address" class="form-control" rows="3" placeholder="Nhập địa chỉ"></textarea>
-                    <span asp-validation-for="Address" class="text-danger"></span>
+                    <input asp-for="FirstName" class="form-control" placeholder="Nhập họ" />
+                    <span asp-validation-for="FirstName" class="text-danger"></span>
                 </div>
+                <div class="form-group">
+                    <label asp-for="LastName" class="form-label">
+                        <i class="fas fa-id-card"></i>
+                        Tên
+                    </label>
+                    <input asp-for="LastName" class="form-control" placeholder="Nhập tên" />
+                    <span asp-validation-for="LastName" class="text-danger"></span>
+                </div>
+            </div>
 
-                <button type="submit" class="btn btn-primary auth-btn">
-                    <i class="fas fa-user-plus"></i>
-                    Đăng ký
-                </button>
-            </form>
+            <!-- Student Information -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label asp-for="StudentId" class="form-label">
+                        <i class="fas fa-id-badge"></i>
+                        Mã sinh viên
+                    </label>
+                    <input asp-for="StudentId" class="form-control" placeholder="Nhập mã sinh viên (tùy chọn)" />
+                    <span asp-validation-for="StudentId" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="PhoneNumber" class="form-label">
+                        <i class="fas fa-phone"></i>
+                        Số điện thoại
+                    </label>
+                    <input asp-for="PhoneNumber" class="form-control" placeholder="Nhập số điện thoại" />
+                    <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                </div>
+            </div>
 
-            <div class="auth-footer">
-                <div class="auth-links">
-                    <a asp-controller="Home" asp-action="Index" class="auth-link">← Quay về trang chủ</a>
+            <!-- Password Section -->
+            <div class="form-row">
+                <div class="form-group">
+                    <label asp-for="Password" class="form-label">
+                        <i class="fas fa-lock"></i>
+                        Mật khẩu
+                    </label>
+                    <div class="input-group">
+                        <input asp-for="Password" type="password" id="Password" class="form-control"
+                            placeholder="Nhập mật khẩu" />
+                        <button class="toggle-password-btn" type="button"
+                            onclick="togglePasswordVisibility('Password', this)">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <span asp-validation-for="Password" class="text-danger"></span>
                 </div>
-                <div class="auth-switch">
-                    <p>Đã có tài khoản?
-                        <a asp-controller="Account" asp-action="Login" class="auth-link-primary">
-                            <i class="fas fa-sign-in-alt"></i> Đăng nhập ngay
-                        </a>
-                    </p>
+                <div class="form-group">
+                    <label asp-for="ConfirmPassword" class="form-label">
+                        <i class="fas fa-lock"></i>
+                        Xác nhận mật khẩu
+                    </label>
+                    <div class="input-group">
+                        <input asp-for="ConfirmPassword" type="password" id="ConfirmPassword" class="form-control"
+                            placeholder="Nhập lại mật khẩu" />
+                        <button class="toggle-password-btn" type="button"
+                            onclick="togglePasswordVisibility('ConfirmPassword', this)">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                    <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
                 </div>
+            </div>
+
+            <!-- Additional Information -->
+            <div class="form-group">
+                <label asp-for="DateOfBirth" class="form-label">
+                    <i class="fas fa-calendar"></i>
+                    Ngày sinh
+                </label>
+                <input asp-for="DateOfBirth" type="date" class="form-control" />
+                <span asp-validation-for="DateOfBirth" class="text-danger"></span>
+            </div>
+
+            <div class="form-group full-width">
+                <label asp-for="Address" class="form-label">
+                    <i class="fas fa-map-marker-alt"></i>
+                    Địa chỉ
+                </label>
+                <textarea asp-for="Address" class="form-control" rows="3"
+                    placeholder="Nhập địa chỉ (tùy chọn)"></textarea>
+                <span asp-validation-for="Address" class="text-danger"></span>
+            </div>
+
+            <button type="submit" class="register-btn">
+                <i class="fas fa-user-plus"></i>
+                Đăng ký tài khoản
+            </button>
+        </form>
+
+        <div class="register-footer">
+            <div class="auth-links">
+                <a asp-controller="Home" asp-action="Index" class="auth-link">
+                    <i class="fas fa-home"></i> Quay về trang chủ
+                </a>
+            </div>
+            <div class="auth-switch">
+                <p>Đã có tài khoản?
+                    <a asp-controller="Account" asp-action="Login" class="auth-link-primary">
+                        <i class="fas fa-sign-in-alt"></i> Đăng nhập ngay
+                    </a>
+                </p>
             </div>
         </div>
     </div>
 </div>
 
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-    <script>
-        // Real-time password validation
-        document.getElementById('Password').addEventListener('input', function () {
-            const password = this.value;
-            const confirmPassword = document.getElementById('ConfirmPassword').value;
+<script>
+    // Toggle password visibility function
+    function togglePasswordVisibility(inputId, button) {
+        const input = document.getElementById(inputId);
+        const icon = button.querySelector('i');
+
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        } else {
+            input.type = 'password';
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        }
+    }
+
+    // Real-time password validation
+    document.addEventListener('DOMContentLoaded', function () {
+        const passwordInput = document.getElementById('Password');
+        const confirmPasswordInput = document.getElementById('ConfirmPassword');
+
+        function validatePasswords() {
+            const password = passwordInput.value;
+            const confirmPassword = confirmPasswordInput.value;
 
             if (confirmPassword && password !== confirmPassword) {
-                document.getElementById('ConfirmPassword').classList.add('is-invalid');
+                confirmPasswordInput.classList.add('is-invalid');
             } else {
-                document.getElementById('ConfirmPassword').classList.remove('is-invalid');
-            }
-        });
-
-        document.getElementById('ConfirmPassword').addEventListener('input', function () {
-            const password = document.getElementById('Password').value;
-            const confirmPassword = this.value;
-
-            if (password !== confirmPassword) {
-                this.classList.add('is-invalid');
-            } else {
-                this.classList.remove('is-invalid');
-            }
-        });
-
-        // Toggle password visibility function
-        function togglePasswordVisibility(inputId, button) {
-            const input = document.getElementById(inputId);
-            const icon = button.querySelector('i');
-
-            if (input.type === 'password') {
-                input.type = 'text';
-                icon.classList.remove('fa-eye');
-                icon.classList.add('fa-eye-slash');
-            } else {
-                input.type = 'password';
-                icon.classList.remove('fa-eye-slash');
-                icon.classList.add('fa-eye');
+                confirmPasswordInput.classList.remove('is-invalid');
             }
         }
-    </script>
-}
+
+        if (passwordInput && confirmPasswordInput) {
+            passwordInput.addEventListener('input', validatePasswords);
+            confirmPasswordInput.addEventListener('input', validatePasswords);
+        }
+
+        // Form validation feedback
+        const form = document.querySelector('.register-form');
+        if (form) {
+            form.addEventListener('submit', function (e) {
+                const requiredFields = form.querySelectorAll('[required]');
+                let isValid = true;
+
+                requiredFields.forEach(field => {
+                    if (!field.value.trim()) {
+                        field.classList.add('is-invalid');
+                        isValid = false;
+                    } else {
+                        field.classList.remove('is-invalid');
+                    }
+                });
+
+                if (!isValid) {
+                    e.preventDefault();
+                }
+            });
+        }
+    });
+</script>
