@@ -83,7 +83,7 @@
                             </a>
                             <ul class="dropdown-menu">
                                 <li><a class="dropdown-item" asp-area="" asp-controller="Home" asp-action="Books">
-                                        <i class="fas fa-books me-2"></i>Danh Mục Sách
+                                        <i class="fas fa-book me-2"></i>Danh Mục Sách
                                     </a></li>
                                 <li><a class="dropdown-item" href="#">
                                         <i class="fas fa-newspaper me-2"></i>Tạp Chí Khoa Học
@@ -129,7 +129,10 @@
                                     <div class="user-avatar me-2">
                                         <i class="fas fa-user-circle fa-lg text-primary"></i>
                                     </div>
-                                    <span class="fw-medium">@AuthService.GetCurrentUserName()</span>
+                                    <div class="d-flex flex-column">
+                                        <span class="fw-medium">@AuthService.GetCurrentUserName()</span>
+                                        <small class="text-muted">Sinh viên</small>
+                                    </div>
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                                     <li><a class="dropdown-item" asp-controller="Account" asp-action="Profile">
@@ -142,20 +145,20 @@
                                             <i class="fas fa-star me-2"></i>Đánh giá của tôi
                                         </a></li>
                                     <li><a class="dropdown-item" href="#">
-                                            <i class="fas fa-history me-2"></i>Lịch sử mượn sách
-                                        </a></li>
-                                    <li><a class="dropdown-item" href="#">
                                             <i class="fas fa-bookmark me-2"></i>Sách yêu thích
                                         </a></li>
                                     <li>
                                         <hr class="dropdown-divider">
                                     </li>
-                                    <li><a class="dropdown-item text-primary" asp-controller="Admin" asp-action="Index">
-                                            <i class="fas fa-tachometer-alt me-2"></i>Quản trị hệ thống
-                                        </a></li>
-                                    <li>
-                                        <hr class="dropdown-divider">
-                                    </li>
+                                    @if (await AuthService.IsInRoleAsync("Admin"))
+                                    {
+                                        <li><a class="dropdown-item text-primary" asp-controller="Admin" asp-action="Index">
+                                                <i class="fas fa-tachometer-alt me-2"></i>Quản trị hệ thống
+                                            </a></li>
+                                        <li>
+                                            <hr class="dropdown-divider">
+                                        </li>
+                                    }
                                     <li>
                                         <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
                                             <button type="submit" class="dropdown-item border-0 bg-transparent text-danger">

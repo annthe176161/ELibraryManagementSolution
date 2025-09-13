@@ -340,7 +340,12 @@ namespace ELibraryManagement.Web.Services
                     var fullName = context.Session.GetString("FullName");
                     var userName = context.Session.GetString("UserName");
                     var email = context.Session.GetString("Email");
-                    return fullName ?? userName ?? email ?? "User";
+
+                    // Clean the name by removing any leading/trailing dashes and extra spaces
+                    var name = fullName ?? userName ?? email ?? "User";
+                    name = name.Trim().TrimStart('-').TrimEnd('-').Trim();
+
+                    return string.IsNullOrEmpty(name) ? "User" : name;
                 }
                 return "User";
             }

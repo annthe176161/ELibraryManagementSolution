@@ -133,6 +133,15 @@ header.fixed-top {
     -webkit-text-fill-color: transparent;
 }
 
+/* Override Bootstrap dropdown toggle to remove any unwanted content */
+.dropdown-toggle::after {
+    display: none !important;
+}
+
+.dropdown-toggle::before {
+    display: none !important;
+}
+
 /* Button styling - Fixed colors for login/register */
 .btn-outline-dark {
     border-color: #333;
