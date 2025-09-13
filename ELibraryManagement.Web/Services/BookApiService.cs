@@ -1,4 +1,5 @@
 using ELibraryManagement.Web.Models;
+using Microsoft.Extensions.Logging;
 using System.Text.Json;
 
 namespace ELibraryManagement.Web.Services
@@ -6,6 +7,7 @@ namespace ELibraryManagement.Web.Services
     public interface IBookApiService
     {
         Task<List<BookViewModel>> GetAvailableBooksAsync();
+        Task<PagedResult<BookViewModel>> GetAvailableBooksPagedAsync(string? search, string? category, string? author, string? sortBy, int page = 1, int pageSize = 12);
         Task<List<BookViewModel>> GetAvailableBooksAsync(string? search, string? category, string? author, string? sortBy, int page = 1, int pageSize = 12);
         Task<BookViewModel?> GetBookByIdAsync(int id);
         Task<List<BookViewModel>> GetRelatedBooksAsync(int excludeId, string? categoryName, int count = 4);
@@ -27,13 +29,15 @@ namespace ELibraryManagement.Web.Services
     {
         private readonly HttpClient _httpClient;
         private readonly IConfiguration _configuration;
+        private readonly ILogger<BookApiService> _logger;
         private readonly JsonSerializerOptions _jsonOptions;
 
-        public BookApiService(HttpClient httpClient, IConfiguration configuration)
+        public BookApiService(HttpClient httpClient, IConfiguration configuration, ILogger<BookApiService> logger)
         {
             _httpClient = httpClient;
             _httpClient.Timeout = TimeSpan.FromSeconds(30); // Set timeout
             _configuration = configuration;
+            _logger = logger;
             _jsonOptions = new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true
@@ -54,15 +58,27 @@ namespace ELibraryManagement.Web.Services
         {
             try
             {
+                _logger.LogInformation("GetAvailableBooksAsync (simple) called");
+
                 var apiBaseUrl = GetApiBaseUrl();
-                var response = await _httpClient.GetAsync($"{apiBaseUrl}/api/Book/available");
+                var fullUrl = $"{apiBaseUrl}/api/Book/available";
+
+                _logger.LogInformation("Making API call to: {Url}", fullUrl);
+
+                var response = await _httpClient.GetAsync(fullUrl);
+
+                _logger.LogInformation("API response status: {StatusCode}", response.StatusCode);
 
                 if (response.IsSuccessStatusCode)
                 {
                     var content = await response.Content.ReadAsStringAsync();
+
+                    _logger.LogInformation("API response content length: {Length}", content.Length);
+                    _logger.LogDebug("API response content: {Content}", content);
+
                     var books = JsonSerializer.Deserialize<List<dynamic>>(content, _jsonOptions);
 
-                    return books?.Select(book => new BookViewModel
+                    var bookViewModels = books?.Select(book => new BookViewModel
                     {
                         Id = GetPropertyValue<int>(book, "id"),
                         Title = GetPropertyValue<string>(book, "title") ?? string.Empty,
@@ -76,12 +92,22 @@ namespace ELibraryManagement.Web.Services
                         AvailableCopies = GetPropertyValue<int>(book, "availableQuantity"),
                         CategoryName = GetCategoryName(book)
                     }).ToList() ?? new List<BookViewModel>();
+
+                    _logger.LogInformation("Parsed {BookCount} books successfully", bookViewModels.Count);
+
+                    return bookViewModels;
+                }
+                else
+                {
+                    _logger.LogError("API call failed with status: {StatusCode}", response.StatusCode);
                 }
 
                 return new List<BookViewModel>();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                _logger.LogError(ex, "Error in GetAvailableBooksAsync (simple)");
+
                 return new List<BookViewModel>();
             }
         }
@@ -127,6 +153,226 @@ namespace ELibraryManagement.Web.Services
             catch
             {
                 return default(T)!;
+            }
+        }
+
+        public async Task<PagedResult<BookViewModel>> GetAvailableBooksPagedAsync(string? search, string? category, string? author, string? sortBy, int page = 1, int pageSize = 6)
+        {
+            try
+            {
+                _logger.LogInformation("GetAvailableBooksPagedAsync called with search='{Search}', category='{Category}', author='{Author}', sortBy='{SortBy}', page={Page}, pageSize={PageSize}",
+                    search, category, author, sortBy, page, pageSize);
+
+                var apiBaseUrl = GetApiBaseUrl();
+
+                // Use simple API call and filter client-side since OData filtering is not working properly
+                var fullUrl = $"{apiBaseUrl}/api/Book/available";
+
+                _logger.LogInformation("Making API call to: {Url}", fullUrl);
+
+                var response = await _httpClient.GetAsync(fullUrl);
+
+                _logger.LogInformation("API response status: {StatusCode}", response.StatusCode);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+
+                    _logger.LogInformation("API response content length: {Length}", content.Length);
+                    _logger.LogDebug("API response content: {Content}", content);
+
+                    // Parse response as array
+                    var jsonDocument = JsonDocument.Parse(content);
+                    var root = jsonDocument.RootElement;
+
+                    List<BookViewModel> allBooks = new List<BookViewModel>();
+
+                    if (root.ValueKind == JsonValueKind.Array)
+                    {
+                        _logger.LogInformation("Response is regular array with {Count} items", root.GetArrayLength());
+                        allBooks = ParseBookList(root);
+                    }
+                    else
+                    {
+                        _logger.LogWarning("Unknown response format: {ValueKind}, trying to parse as regular array", root.ValueKind);
+                        allBooks = ParseBookList(root);
+                    }
+
+                    // Apply client-side filtering
+                    var filteredBooks = allBooks.AsQueryable();
+
+                    if (!string.IsNullOrEmpty(search))
+                    {
+                        var searchLower = search.ToLower();
+                        filteredBooks = filteredBooks.Where(b =>
+                            b.Title.ToLower().Contains(searchLower) ||
+                            b.Author.ToLower().Contains(searchLower) ||
+                            b.Description.ToLower().Contains(searchLower));
+                    }
+
+                    if (!string.IsNullOrEmpty(category))
+                    {
+                        var categoryLower = category.ToLower();
+                        filteredBooks = filteredBooks.Where(b =>
+                            b.CategoryName.ToLower().Contains(categoryLower));
+                    }
+
+                    if (!string.IsNullOrEmpty(author))
+                    {
+                        var authorLower = author.ToLower();
+                        filteredBooks = filteredBooks.Where(b =>
+                            b.Author.ToLower().Contains(authorLower));
+                    }
+
+                    // Apply client-side sorting
+                    if (!string.IsNullOrEmpty(sortBy))
+                    {
+                        filteredBooks = sortBy switch
+                        {
+                            "title" => filteredBooks.OrderBy(b => b.Title),
+                            "title_desc" => filteredBooks.OrderByDescending(b => b.Title),
+                            "author" => filteredBooks.OrderBy(b => b.Author),
+                            "author_desc" => filteredBooks.OrderByDescending(b => b.Author),
+                            "year" => filteredBooks.OrderByDescending(b => b.PublicationYear),
+                            "year_asc" => filteredBooks.OrderBy(b => b.PublicationYear),
+                            _ => filteredBooks.OrderBy(b => b.Title)
+                        };
+                    }
+                    else
+                    {
+                        filteredBooks = filteredBooks.OrderBy(b => b.Title);
+                    }
+
+                    var filteredList = filteredBooks.ToList();
+                    int totalCount = filteredList.Count;
+
+                    // Apply client-side pagination
+                    var startIndex = (page - 1) * pageSize;
+                    var pagedBooks = filteredList.Skip(startIndex).Take(pageSize).ToList();
+
+                    _logger.LogInformation("Total books after filtering: {TotalCount}, showing page {Page} with {CurrentCount} books", totalCount, page, pagedBooks.Count);
+
+                    return new PagedResult<BookViewModel>
+                    {
+                        Items = pagedBooks,
+                        TotalCount = totalCount,
+                        PageNumber = page,
+                        PageSize = pageSize
+                    };
+                }
+                else
+                {
+                    _logger.LogError("API call failed with status: {StatusCode}", response.StatusCode);
+                }
+
+                return new PagedResult<BookViewModel>
+                {
+                    Items = new List<BookViewModel>(),
+                    TotalCount = 0,
+                    PageNumber = page,
+                    PageSize = pageSize
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in GetAvailableBooksPagedAsync for page {Page}, pageSize {PageSize}", page, pageSize);
+
+                return new PagedResult<BookViewModel>
+                {
+                    Items = new List<BookViewModel>(),
+                    TotalCount = 0,
+                    PageNumber = page,
+                    PageSize = pageSize
+                };
+            }
+        }
+
+        private List<BookViewModel> ParseBookList(JsonElement element)
+        {
+            var books = new List<BookViewModel>();
+
+            if (element.ValueKind == JsonValueKind.Array)
+            {
+                foreach (var bookElement in element.EnumerateArray())
+                {
+                    books.Add(ParseBookFromJson(bookElement));
+                }
+            }
+
+            return books;
+        }
+
+        private BookViewModel ParseBookFromJson(JsonElement book)
+        {
+            return new BookViewModel
+            {
+                Id = GetPropertyValue<int>(book, "id"),
+                Title = GetPropertyValue<string>(book, "title") ?? string.Empty,
+                Author = GetPropertyValue<string>(book, "author") ?? string.Empty,
+                ISBN = GetPropertyValue<string>(book, "isbn") ?? string.Empty,
+                Publisher = GetPropertyValue<string>(book, "publisher") ?? string.Empty,
+                PublicationYear = GetPropertyValue<int>(book, "publicationYear"),
+                Description = GetPropertyValue<string>(book, "description") ?? string.Empty,
+                ImageUrl = GetPropertyValue<string>(book, "coverImageUrl") ?? string.Empty,
+                TotalCopies = GetPropertyValue<int>(book, "quantity"),
+                AvailableCopies = GetPropertyValue<int>(book, "availableQuantity"),
+                CategoryName = GetCategoryName(book)
+            };
+        }
+
+        private async Task<int> GetTotalBookCountAsync(string? search, string? category, string? author)
+        {
+            try
+            {
+                var apiBaseUrl = GetApiBaseUrl();
+                var queryParams = new List<string>();
+
+                // Build same filters as main query
+                var filters = new List<string>();
+
+                if (!string.IsNullOrEmpty(search))
+                {
+                    filters.Add($"(contains(tolower(title), '{search.ToLower()}') or contains(tolower(author), '{search.ToLower()}') or contains(tolower(description), '{search.ToLower()}'))");
+                }
+
+                if (!string.IsNullOrEmpty(category))
+                {
+                    filters.Add($"categories/any(c: contains(tolower(c/name), '{category.ToLower()}'))");
+                }
+
+                if (!string.IsNullOrEmpty(author))
+                {
+                    filters.Add($"contains(tolower(author), '{author.ToLower()}')");
+                }
+
+                if (filters.Any())
+                {
+                    queryParams.Add($"$filter={string.Join(" and ", filters)}");
+                }
+
+                queryParams.Add("$count=true");
+                queryParams.Add("$top=0"); // We only want the count
+
+                var queryString = queryParams.Any() ? "?" + string.Join("&", queryParams) : "";
+                var response = await _httpClient.GetAsync($"{apiBaseUrl}/api/Book/available{queryString}");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+                    var jsonDocument = JsonDocument.Parse(content);
+                    var root = jsonDocument.RootElement;
+
+                    if (root.TryGetProperty("@odata.count", out var countElement))
+                    {
+                        return countElement.GetInt32();
+                    }
+                }
+
+                return 0;
+            }
+            catch
+            {
+                return 0;
             }
         }
 

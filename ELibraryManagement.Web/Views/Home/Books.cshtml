@@ -1,21 +1,677 @@
 @model List<ELibraryManagement.Web.Models.BookViewModel>
 @{
-    ViewData["Title"] = "Thư Viện Sách Việt Nam - Kho Tàng Tri Thức";
+    ViewData["Title"] = "Thư Viện Sách Điện Tử - Kho Tàng Tri Thức";
 }
 
-@section Styles {
-    <link rel="stylesheet" href="~/css/books.css" asp-append-version="true">
-    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap"
-        rel="stylesheet">
-}
+<style>
+    /* CSS Variables - University Library Theme */
+    :root {
+        --primary-blue: #2563eb;
+        --primary-navy: #1e3a8a;
+        --accent-gold: #fbbf24;
+        --light-blue: #dbeafe;
+        --dark-gray: #374151;
+        --light-gray: #f9fafb;
+        --border-color: #e5e7eb;
+        --success-green: #10b981;
+        --warning-red: #ef4444;
+        --white: #ffffff;
+    }
+
+    /* Reset and Base Styles */
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        line-height: 1.6;
+        color: var(--dark-gray);
+        background: var(--light-gray);
+    }
+
+    /* Page Header */
+    .books-header {
+        background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-navy) 100%);
+        color: white;
+        padding: 4rem 0;
+        margin-bottom: 3rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .books-header::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="books" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse"><rect width="20" height="20" fill="none"/><path d="M2 2h3v16h-3zM7 2h3v16h-3zM12 2h3v16h-3z" fill="rgba(255,255,255,0.05)"/></pattern></defs><rect width="100" height="100" fill="url(%23books)"/></svg>') repeat;
+        animation: float 20s ease-in-out infinite;
+    }
+
+    @@keyframes float {
+        0%, 100% { transform: translateY(0px) rotate(0deg); }
+        50% { transform: translateY(-10px) rotate(2deg); }
+    }
+
+    .books-header .container {
+        position: relative;
+        z-index: 2;
+    }
+
+    .books-header h1 {
+        font-size: 3rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    }
+
+    .books-header p {
+        font-size: 1.3rem;
+        opacity: 0.9;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    /* Filter Section */
+    .filter-section {
+        background: var(--white);
+        border-radius: 16px;
+        padding: 2rem;
+        margin-bottom: 3rem;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+        border: 1px solid var(--border-color);
+    }
+
+    .filter-title {
+        color: var(--primary-navy);
+        font-size: 1.5rem;
+        margin-bottom: 1.5rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .filter-title i {
+        color: var(--accent-gold);
+    }
+
+    /* Form Styles */
+    .filter-form .row {
+        margin: 0;
+    }
+
+    .filter-form .row > div {
+        padding: 0 0.75rem;
+    }
+
+    .form-label {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-weight: 500;
+        color: var(--dark-gray);
+        margin-bottom: 0.5rem;
+        font-size: 0.95rem;
+    }
+
+    .form-label i {
+        color: var(--primary-blue);
+        width: 16px;
+    }
+
+    .form-control, .form-select {
+        border: 2px solid var(--border-color);
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: var(--white);
+    }
+
+    .form-control:focus, .form-select:focus {
+        outline: none;
+        border-color: var(--primary-blue);
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    /* Filter Buttons */
+    .filter-buttons {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1.5rem;
+        flex-wrap: wrap;
+    }
+
+    .btn-filter, .btn-clear {
+        padding: 0.875rem 2rem;
+        border-radius: 8px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 1rem;
+    }
+
+    .btn-filter {
+        background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-navy) 100%);
+        color: white;
+    }
+
+    .btn-filter:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(37, 99, 235, 0.3);
+    }
+
+    .btn-clear {
+        background: var(--light-gray);
+        color: var(--dark-gray);
+        border: 2px solid var(--border-color);
+    }
+
+    .btn-clear:hover {
+        background: var(--border-color);
+        transform: translateY(-1px);
+    }
+
+    /* Results Header */
+    .results-header {
+        background: var(--white);
+        padding: 1.5rem 2rem;
+        border-radius: 12px;
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        border-left: 4px solid var(--accent-gold);
+    }
+
+    .results-count {
+        font-size: 1.1rem;
+        font-weight: 500;
+        color: var(--dark-gray);
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .results-count i {
+        color: var(--primary-blue);
+    }
+
+    /* Books Grid */
+    .books-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+        gap: 2rem;
+        margin-bottom: 3rem;
+        align-items: start;
+    }
+
+    /* Book Card */
+    .book-card {
+        background: var(--white);
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+        border: 1px solid var(--border-color);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .book-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+    }
+
+    .card-img-container {
+        position: relative;
+        height: 250px;
+        overflow: hidden;
+        background: var(--light-blue);
+        flex-shrink: 0;
+    }
+
+    .card-img-top {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.3s ease;
+    }
+
+    .book-card:hover .card-img-top {
+        transform: scale(1.05);
+    }
+
+    .placeholder-image {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: var(--primary-blue);
+        background: linear-gradient(135deg, var(--light-blue) 0%, rgba(37, 99, 235, 0.1) 100%);
+    }
+
+    .placeholder-image i {
+        margin-bottom: 0.5rem;
+        opacity: 0.7;
+    }
+
+    .book-badge {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background: var(--success-green);
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    /* Card Body */
+    .card-body {
+        padding: 1.5rem;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .card-title {
+        margin-bottom: 1rem;
+    }
+
+    .book-title-link {
+        color: var(--primary-navy);
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 1.1rem;
+        line-height: 1.4;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        transition: color 0.3s ease;
+        min-height: 2.8rem;
+    }
+
+    .book-title-link:hover {
+        color: var(--primary-blue);
+    }
+
+    .card-text {
+        margin-bottom: 0.75rem;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .card-text i {
+        color: var(--primary-blue);
+        width: 16px;
+    }
+
+    .card-text:last-of-type {
+        margin-bottom: 1.5rem;
+        line-height: 1.5;
+        color: #6b7280;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        flex: 1;
+        min-height: 4.5rem;
+    }
+
+    /* Book Info Grid */
+    .book-info {
+        border-top: 1px solid var(--border-color);
+        padding-top: 1.5rem;
+        margin-top: auto;
+    }
+
+    .book-meta-grid {
+        display: grid;
+        grid-template-columns: 1fr auto;
+        gap: 1rem;
+        margin-bottom: 1rem;
+        align-items: center;
+    }
+
+    .availability {
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    .text-success {
+        color: var(--success-green) !important;
+    }
+
+    .text-danger {
+        color: var(--warning-red) !important;
+    }
+
+    .text-info {
+        color: var(--primary-blue) !important;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    /* Book Actions */
+    .book-actions-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.75rem;
+    }
+
+    .action-btn {
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
+        font-weight: 500;
+        text-decoration: none;
+        text-align: center;
+        transition: all 0.3s ease;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        font-size: 0.9rem;
+    }
+
+    .btn-info {
+        background: var(--light-blue);
+        color: var(--primary-blue);
+        border: 1px solid rgba(37, 99, 235, 0.2);
+    }
+
+    .btn-info:hover {
+        background: var(--primary-blue);
+        color: white;
+        transform: translateY(-1px);
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-navy) 100%);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
+    }
+
+    .btn-secondary {
+        background: #6b7280;
+        color: white;
+        opacity: 0.7;
+        cursor: not-allowed;
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        background: var(--white);
+        border-radius: 16px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+    }
+
+    .empty-state-icon {
+        font-size: 4rem;
+        color: var(--primary-blue);
+        margin-bottom: 1.5rem;
+        opacity: 0.7;
+    }
+
+    .empty-state h4 {
+        color: var(--primary-navy);
+        margin-bottom: 1rem;
+        font-size: 1.5rem;
+    }
+
+    .empty-state p {
+        color: #6b7280;
+        margin-bottom: 2rem;
+        max-width: 500px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .empty-state-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .btn-view-all, .btn-home {
+        padding: 1rem 2rem;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .btn-view-all {
+        background: var(--primary-blue);
+        color: white;
+    }
+
+    .btn-view-all:hover {
+        background: var(--primary-navy);
+        transform: translateY(-2px);
+    }
+
+    .btn-home {
+        background: var(--light-gray);
+        color: var(--dark-gray);
+        border: 2px solid var(--border-color);
+    }
+
+    .btn-home:hover {
+        background: var(--border-color);
+        transform: translateY(-1px);
+    }
+
+    /* Pagination Styles */
+    .pagination-container {
+        display: flex;
+        justify-content: center;
+        margin: 3rem 0;
+    }
+
+    .pagination {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .pagination-item {
+        display: flex;
+        align-items: center;
+    }
+
+    .pagination-link {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 2.5rem;
+        height: 2.5rem;
+        padding: 0.5rem 0.75rem;
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        border: 1px solid var(--border-color);
+        background: var(--white);
+        color: var(--dark-gray);
+    }
+
+    .pagination-link:hover {
+        background: var(--light-blue);
+        color: var(--primary-blue);
+        border-color: var(--primary-blue);
+        transform: translateY(-1px);
+    }
+
+    .pagination-link.active {
+        background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-navy) 100%);
+        color: white;
+        border-color: var(--primary-blue);
+    }
+
+    .pagination-link.disabled {
+        background: var(--light-gray);
+        color: #9ca3af;
+        cursor: not-allowed;
+        opacity: 0.6;
+    }
+
+    .pagination-link.disabled:hover {
+        background: var(--light-gray);
+        color: #9ca3af;
+        border-color: var(--border-color);
+        transform: none;
+    }
+
+    .pagination-info {
+        background: var(--white);
+        padding: 1rem 2rem;
+        border-radius: 12px;
+        margin-bottom: 2rem;
+        text-align: center;
+        color: var(--dark-gray);
+        border: 1px solid var(--border-color);
+        font-weight: 500;
+    }
+
+    .pagination-ellipsis {
+        padding: 0.5rem;
+        color: #9ca3af;
+        font-weight: 500;
+    }
+
+    /* Responsive Design */
+    @@media (max-width: 768px) {
+        .books-header {
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+        }
+
+        .books-header h1 {
+            font-size: 2rem;
+        }
+
+        .books-header p {
+            font-size: 1.1rem;
+        }
+
+        .filter-section {
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .filter-buttons {
+            justify-content: center;
+        }
+
+        .btn-filter, .btn-clear {
+            flex: 1;
+            min-width: 140px;
+        }
+
+        .books-grid {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+
+        .book-actions-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .empty-state {
+            padding: 3rem 1.5rem;
+        }
+
+        .empty-state-actions {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .btn-view-all, .btn-home {
+            width: 100%;
+            max-width: 250px;
+        }
+
+        .pagination {
+            flex-wrap: wrap;
+            gap: 0.25rem;
+        }
+
+        .pagination-link {
+            min-width: 2rem;
+            height: 2rem;
+            font-size: 0.875rem;
+        }
+
+        .pagination-info {
+            padding: 0.75rem 1rem;
+            font-size: 0.9rem;
+        }
+    }
+
+    @@media (max-width: 480px) {
+        .filter-section {
+            padding: 1rem;
+        }
+
+        .results-header {
+            padding: 1rem 1.5rem;
+        }
+
+        .card-body {
+            padding: 1rem;
+        }
+    }
+</style>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
 <!-- Page Header -->
 <section class="books-header">
     <div class="container">
         <div class="row justify-content-center text-center">
             <div class="col-lg-8">
-                <h1>📚 Thư Viện Sách Việt Nam</h1>
-                <p>Khám phá kho tàng tri thức với hàng nghìn đầu sách chất lượng từ khắp thế giới</p>
+                <h1><i class="fas fa-university"></i> Thư Viện Sách Điện Tử</h1>
+                <p>Khám phá kho tàng tri thức với hàng nghìn đầu sách chất lượng hoàn toàn miễn phí</p>
             </div>
         </div>
     </div>
@@ -25,7 +681,7 @@
 <div class="container">
     <div class="filter-section">
         <h3 class="filter-title">
-            <i class="fas fa-filter"></i>
+            <i class="fas fa-search"></i>
             Tìm Kiếm & Lọc Sách
         </h3>
 
@@ -95,31 +751,8 @@
                         <option value="author" selected="@(ViewBag.SortBy == "author")">Tác giả (A-Z)</option>
                         <option value="author_desc" selected="@(ViewBag.SortBy == "author_desc")">Tác giả (Z-A)</option>
                         <option value="year" selected="@(ViewBag.SortBy == "year")">Năm xuất bản (Mới nhất)</option>
-                        <option value="year_asc" selected="@(ViewBag.SortBy == "year_asc")">Năm xuất bản (Cũ nhất)
-                        </option>
-                        <option value="price" selected="@(ViewBag.SortBy == "price")">Giá (Thấp đến cao)</option>
-                        <option value="price_desc" selected="@(ViewBag.SortBy == "price_desc")">Giá (Cao đến thấp)
-                        </option>
+                        <option value="year_asc" selected="@(ViewBag.SortBy == "year_asc")">Năm xuất bản (Cũ nhất)</option>
                     </select>
-                </div>
-
-                <!-- Price Range -->
-                <div class="col-md-3 mb-3">
-                    <label class="form-label">
-                        <i class="fas fa-dollar-sign"></i>
-                        Giá từ (VND)
-                    </label>
-                    <input type="number" name="minPrice" class="form-control" placeholder="0" min="0" step="1000"
-                        value="@ViewBag.MinPrice">
-                </div>
-
-                <div class="col-md-3 mb-3">
-                    <label class="form-label">
-                        <i class="fas fa-dollar-sign"></i>
-                        Giá đến (VND)
-                    </label>
-                    <input type="number" name="maxPrice" class="form-control" placeholder="1000000" min="0" step="1000"
-                        value="@ViewBag.MaxPrice">
                 </div>
             </div>
 
@@ -130,7 +763,7 @@
                     Tìm Kiếm
                 </button>
                 <a href="@Url.Action("Books", "Home")" class="btn-clear">
-                    <i class="fas fa-eraser"></i>
+                    <i class="fas fa-refresh"></i>
                     Xóa Bộ Lọc
                 </a>
             </div>
@@ -173,7 +806,7 @@
                         }
                         else
                         {
-                            <div class="book-badge" style="background: #dc3545;">Hết sách</div>
+                            <div class="book-badge" style="background: #ef4444;">Hết sách</div>
                         }
                     </div>
 
@@ -265,6 +898,137 @@
                 </div>
             }
         </div>
+
+        <!-- Pagination -->
+        @if (ViewBag.TotalPages > 1)
+        {
+            <div class="pagination-info">
+                Hiển thị <strong>@ViewBag.StartItem</strong> - <strong>@ViewBag.EndItem</strong> trong tổng số <strong>@ViewBag.TotalCount</strong> cuốn sách
+            </div>
+
+            <div class="pagination-container">
+                <ul class="pagination">
+                    <!-- Previous Page -->
+                    @if (ViewBag.HasPreviousPage)
+                    {
+                        <li class="pagination-item">
+                            <a href="@Url.Action("Books", "Home", new { 
+                                search = ViewBag.Search, 
+                                category = ViewBag.Category, 
+                                author = ViewBag.Author, 
+                                sortBy = ViewBag.SortBy, 
+                                page = ViewBag.Page - 1, 
+                                pageSize = ViewBag.PageSize 
+                            })" class="pagination-link">
+                                <i class="fas fa-chevron-left"></i>
+                            </a>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="pagination-item">
+                            <span class="pagination-link disabled">
+                                <i class="fas fa-chevron-left"></i>
+                            </span>
+                        </li>
+                    }
+
+                    <!-- First Page -->
+                    @if (ViewBag.Page > 3)
+                    {
+                        <li class="pagination-item">
+                            <a href="@Url.Action("Books", "Home", new { 
+                                search = ViewBag.Search, 
+                                category = ViewBag.Category, 
+                                author = ViewBag.Author, 
+                                sortBy = ViewBag.SortBy, 
+                                page = 1, 
+                                pageSize = ViewBag.PageSize 
+                            })" class="pagination-link">1</a>
+                        </li>
+                        @if (ViewBag.Page > 4)
+                        {
+                            <li class="pagination-item">
+                                <span class="pagination-ellipsis">...</span>
+                            </li>
+                        }
+                    }
+
+                    <!-- Page Numbers -->
+                    @{
+                        int startPage = Math.Max(1, ViewBag.Page - 2);
+                        int endPage = Math.Min(ViewBag.TotalPages, ViewBag.Page + 2);
+                    }
+
+                    @for (int i = startPage; i <= endPage; i++)
+                    {
+                        <li class="pagination-item">
+                            @if (i == ViewBag.Page)
+                            {
+                                <span class="pagination-link active">@i</span>
+                            }
+                            else
+                            {
+                                <a href="@Url.Action("Books", "Home", new { 
+                                    search = ViewBag.Search, 
+                                    category = ViewBag.Category, 
+                                    author = ViewBag.Author, 
+                                    sortBy = ViewBag.SortBy, 
+                                    page = i, 
+                                    pageSize = ViewBag.PageSize 
+                                })" class="pagination-link">@i</a>
+                            }
+                        </li>
+                    }
+
+                    <!-- Last Page -->
+                    @if (ViewBag.Page < ViewBag.TotalPages - 2)
+                    {
+                        @if (ViewBag.Page < ViewBag.TotalPages - 3)
+                        {
+                            <li class="pagination-item">
+                                <span class="pagination-ellipsis">...</span>
+                            </li>
+                        }
+                        <li class="pagination-item">
+                            <a href="@Url.Action("Books", "Home", new { 
+                                search = ViewBag.Search, 
+                                category = ViewBag.Category, 
+                                author = ViewBag.Author, 
+                                sortBy = ViewBag.SortBy, 
+                                page = ViewBag.TotalPages, 
+                                pageSize = ViewBag.PageSize 
+                            })" class="pagination-link">@ViewBag.TotalPages</a>
+                        </li>
+                    }
+
+                    <!-- Next Page -->
+                    @if (ViewBag.HasNextPage)
+                    {
+                        <li class="pagination-item">
+                            <a href="@Url.Action("Books", "Home", new { 
+                                search = ViewBag.Search, 
+                                category = ViewBag.Category, 
+                                author = ViewBag.Author, 
+                                sortBy = ViewBag.SortBy, 
+                                page = ViewBag.Page + 1, 
+                                pageSize = ViewBag.PageSize 
+                            })" class="pagination-link">
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="pagination-item">
+                            <span class="pagination-link disabled">
+                                <i class="fas fa-chevron-right"></i>
+                            </span>
+                        </li>
+                    }
+                </ul>
+            </div>
+        }
     }
     else
     {
@@ -291,100 +1055,143 @@
     }
 </div>
 
-@section Scripts {
-    <script>
-        // Wait for DOM to be fully loaded
-        document.addEventListener('DOMContentLoaded', function () {
-            // Auto-submit form when sort option changes
-            const sortSelect = document.querySelector('select[name="sortBy"]');
-            if (sortSelect) {
-                sortSelect.addEventListener('change', function () {
-                    console.log('Sort changed:', this.value);
-                    this.form.submit();
-                });
-            }
-
-            // Auto-submit form when category changes
-            const categorySelect = document.querySelector('select[name="category"]');
-            if (categorySelect) {
-                categorySelect.addEventListener('change', function () {
-                    console.log('Category changed:', this.value);
-                    this.form.submit();
-                });
-            }
-
-            // Auto-submit form when author changes
-            const authorSelect = document.querySelector('select[name="author"]');
-            if (authorSelect) {
-                authorSelect.addEventListener('change', function () {
-                    console.log('Author changed:', this.value);
-                    this.form.submit();
-                });
-            }
-
-            // Add loading animation to filter form
-            const filterForm = document.querySelector('.filter-form');
-            if (filterForm) {
-                filterForm.addEventListener('submit', function (e) {
-                    console.log('Form submitted');
-                    const submitButton = this.querySelector('.btn-filter');
-                    if (submitButton) {
-                        const originalText = submitButton.innerHTML;
-                        submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang tìm kiếm...';
-                        submitButton.disabled = true;
-
-                        // Re-enable button after 3 seconds (in case of error)
-                        setTimeout(() => {
-                            submitButton.innerHTML = originalText;
-                            submitButton.disabled = false;
-                        }, 3000);
-                    }
-                });
-            }
-        });
-
-        // Smooth scroll to results when filter is applied
-        if (window.location.search) {
-            setTimeout(() => {
-                const resultsSection = document.querySelector('.results-header');
-                if (resultsSection) {
-                    resultsSection.scrollIntoView({
-                        behavior: 'smooth',
-                        block: 'start'
-                    });
+<script>
+    // Wait for DOM to be fully loaded
+    document.addEventListener('DOMContentLoaded', function () {
+        // Auto-submit form when sort option changes
+        const sortSelect = document.querySelector('select[name="sortBy"]');
+        if (sortSelect) {
+            sortSelect.addEventListener('change', function () {
+                console.log('Sort changed:', this.value);
+                // Reset to page 1 when changing sort
+                const form = this.form;
+                const pageInput = form.querySelector('input[name="page"]');
+                if (pageInput) pageInput.value = '1';
+                else {
+                    const hiddenPageInput = document.createElement('input');
+                    hiddenPageInput.type = 'hidden';
+                    hiddenPageInput.name = 'page';
+                    hiddenPageInput.value = '1';
+                    form.appendChild(hiddenPageInput);
                 }
-            }, 100);
+                form.submit();
+            });
         }
 
-        // Image lazy loading fallback
-        document.querySelectorAll('.card-img-top').forEach(img => {
-            img.addEventListener('error', function () {
-                this.style.display = 'none';
-                this.nextElementSibling.style.display = 'flex';
+        // Auto-submit form when category changes
+        const categorySelect = document.querySelector('select[name="category"]');
+        if (categorySelect) {
+            categorySelect.addEventListener('change', function () {
+                console.log('Category changed:', this.value);
+                // Reset to page 1 when changing category
+                const form = this.form;
+                const pageInput = form.querySelector('input[name="page"]');
+                if (pageInput) pageInput.value = '1';
+                else {
+                    const hiddenPageInput = document.createElement('input');
+                    hiddenPageInput.type = 'hidden';
+                    hiddenPageInput.name = 'page';
+                    hiddenPageInput.value = '1';
+                    form.appendChild(hiddenPageInput);
+                }
+                form.submit();
             });
-        });
+        }
 
-        // Add animation to book cards on scroll
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -100px 0px'
-        };
+        // Auto-submit form when author changes
+        const authorSelect = document.querySelector('select[name="author"]');
+        if (authorSelect) {
+            authorSelect.addEventListener('change', function () {
+                console.log('Author changed:', this.value);
+                // Reset to page 1 when changing author
+                const form = this.form;
+                const pageInput = form.querySelector('input[name="page"]');
+                if (pageInput) pageInput.value = '1';
+                else {
+                    const hiddenPageInput = document.createElement('input');
+                    hiddenPageInput.type = 'hidden';
+                    hiddenPageInput.name = 'page';
+                    hiddenPageInput.value = '1';
+                    form.appendChild(hiddenPageInput);
+                }
+                form.submit();
+            });
+        }
 
-        const observer = new IntersectionObserver(function (entries) {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.style.opacity = '1';
-                    entry.target.style.transform = 'translateY(0)';
+        // Add loading animation to filter form
+        const filterForm = document.querySelector('.filter-form');
+        if (filterForm) {
+            filterForm.addEventListener('submit', function (e) {
+                console.log('Form submitted');
+                
+                // Reset to page 1 when searching
+                const pageInput = this.querySelector('input[name="page"]');
+                if (pageInput) pageInput.value = '1';
+                else {
+                    const hiddenPageInput = document.createElement('input');
+                    hiddenPageInput.type = 'hidden';
+                    hiddenPageInput.name = 'page';
+                    hiddenPageInput.value = '1';
+                    this.appendChild(hiddenPageInput);
+                }
+                
+                const submitButton = this.querySelector('.btn-filter');
+                if (submitButton) {
+                    const originalText = submitButton.innerHTML;
+                    submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang tìm kiếm...';
+                    submitButton.disabled = true;
+
+                    // Re-enable button after 3 seconds (in case of error)
+                    setTimeout(() => {
+                        submitButton.innerHTML = originalText;
+                        submitButton.disabled = false;
+                    }, 3000);
                 }
             });
-        }, observerOptions);
+        }
+    });
 
-        // Initialize animations
-        document.querySelectorAll('.book-card').forEach((card, index) => {
-            card.style.opacity = '0';
-            card.style.transform = 'translateY(30px)';
-            card.style.transition = `opacity 0.6s ease ${index * 0.1}s, transform 0.6s ease ${index * 0.1}s`;
-            observer.observe(card);
+    // Smooth scroll to results when filter is applied
+    if (window.location.search) {
+        setTimeout(() => {
+            const resultsSection = document.querySelector('.results-header');
+            if (resultsSection) {
+                resultsSection.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        }, 100);
+    }
+
+    // Image lazy loading fallback
+    document.querySelectorAll('.card-img-top').forEach(img => {
+        img.addEventListener('error', function () {
+            this.style.display = 'none';
+            this.nextElementSibling.style.display = 'flex';
         });
-    </script>
-}
+    });
+
+    // Add animation to book cards on scroll
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -100px 0px'
+    };
+
+    const observer = new IntersectionObserver(function (entries) {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+            }
+        });
+    }, observerOptions);
+
+    // Initialize animations
+    document.querySelectorAll('.book-card').forEach((card, index) => {
+        card.style.opacity = '0';
+        card.style.transform = 'translateY(30px)';
+        card.style.transition = `opacity 0.6s ease ${index * 0.1}s, transform 0.6s ease ${index * 0.1}s`;
+        observer.observe(card);
+    });
+</script>

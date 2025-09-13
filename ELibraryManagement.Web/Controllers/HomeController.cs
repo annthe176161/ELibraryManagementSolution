@@ -29,30 +29,87 @@ namespace ELibraryManagement.Web.Controllers
             return View();
         }
 
-        public async Task<IActionResult> Books(string? search, string? category, string? author, string? sortBy, int page = 1, int pageSize = 12)
+        public async Task<IActionResult> Books(string? search, string? category, string? author, string? sortBy, int page = 1, int pageSize = 6)
         {
             try
             {
-                var books = await _bookApiService.GetAvailableBooksAsync(search, category, author, sortBy, page, pageSize);
+                // Try the new paged method first, fallback to old method if needed
+                try
+                {
+                    var pagedBooks = await _bookApiService.GetAvailableBooksPagedAsync(search, category, author, sortBy, page, pageSize);
 
-                // Lấy danh sách categories và authors để hiển thị trong filter
-                var categories = await _bookApiService.GetCategoriesAsync();
-                var authors = await _bookApiService.GetAuthorsAsync();
+                    // Lấy danh sách categories và authors để hiển thị trong filter
+                    var categories = await _bookApiService.GetCategoriesAsync();
+                    var authors = await _bookApiService.GetAuthorsAsync();
 
-                ViewBag.Categories = categories;
-                ViewBag.Authors = authors;
+                    ViewBag.Categories = categories;
+                    ViewBag.Authors = authors;
+                    ViewBag.Search = search;
+                    ViewBag.Category = category;
+                    ViewBag.Author = author;
+                    ViewBag.SortBy = sortBy;
+                    ViewBag.Page = page;
+                    ViewBag.PageSize = pageSize;
+                    ViewBag.TotalCount = pagedBooks.TotalCount;
+                    ViewBag.TotalPages = pagedBooks.TotalPages;
+                    ViewBag.HasPreviousPage = pagedBooks.HasPreviousPage;
+                    ViewBag.HasNextPage = pagedBooks.HasNextPage;
+                    ViewBag.StartItem = pagedBooks.StartItem;
+                    ViewBag.EndItem = pagedBooks.EndItem;
+
+                    return View(pagedBooks.Items);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "Paged method failed, falling back to regular method");
+
+                    // Fallback to old method
+                    var books = await _bookApiService.GetAvailableBooksAsync(search, category, author, sortBy, page, pageSize);
+
+                    // Lấy danh sách categories và authors để hiển thị trong filter
+                    var categories = await _bookApiService.GetCategoriesAsync();
+                    var authors = await _bookApiService.GetAuthorsAsync();
+
+                    ViewBag.Categories = categories;
+                    ViewBag.Authors = authors;
+                    ViewBag.Search = search;
+                    ViewBag.Category = category;
+                    ViewBag.Author = author;
+                    ViewBag.SortBy = sortBy;
+                    ViewBag.Page = page;
+                    ViewBag.PageSize = pageSize;
+
+                    // Set default pagination values for fallback
+                    ViewBag.TotalCount = books.Count;
+                    ViewBag.TotalPages = 1;
+                    ViewBag.HasPreviousPage = false;
+                    ViewBag.HasNextPage = false;
+                    ViewBag.StartItem = books.Any() ? 1 : 0;
+                    ViewBag.EndItem = books.Count;
+
+                    return View(books);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error loading books");
+
+                // Set empty pagination values for error case
+                ViewBag.Categories = new List<string>();
+                ViewBag.Authors = new List<string>();
                 ViewBag.Search = search;
                 ViewBag.Category = category;
                 ViewBag.Author = author;
                 ViewBag.SortBy = sortBy;
                 ViewBag.Page = page;
                 ViewBag.PageSize = pageSize;
+                ViewBag.TotalCount = 0;
+                ViewBag.TotalPages = 0;
+                ViewBag.HasPreviousPage = false;
+                ViewBag.HasNextPage = false;
+                ViewBag.StartItem = 0;
+                ViewBag.EndItem = 0;
 
-                return View(books);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error loading books");
                 return View(new List<BookViewModel>());
             }
         }
