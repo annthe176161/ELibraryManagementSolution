@@ -1,100 +1,608 @@
 @model ELibraryManagement.Web.Models.LoginViewModel
 @{
-    ViewData["Title"] = "Đăng nhập";
+    ViewData["Title"] = "Đăng nhập - ELibrary";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
-@section Styles {
-    <link rel="stylesheet" href="~/css/auth.css" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap"
-        rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-}
+<style>
+    /* CSS đồng bộ với theme thư viện */
+    :root {
+        --primary-blue: #2563eb;
+        --primary-navy: #1e3a8a;
+        --accent-green: #059669;
+        --accent-gold: #fbbf24;
+        --white: #ffffff;
+        --gray-50: #f9fafb;
+        --gray-100: #f3f4f6;
+        --gray-200: #e5e7eb;
+        --gray-300: #d1d5db;
+        --gray-400: #9ca3af;
+        --gray-500: #6b7280;
+        --gray-600: #4b5563;
+        --gray-700: #374151;
+        --gray-800: #1f2937;
+        --gray-900: #111827;
+        --gradient-primary: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-navy) 100%);
+        --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
 
-<div class="auth-container">
-    <div class="auth-wrapper">
-        <div class="auth-card">
-            <div class="auth-header">
-                <i class="fas fa-sign-in-alt auth-icon"></i>
-                <h2 class="auth-title">Đăng nhập</h2>
-                <p class="auth-subtitle">Chào mừng bạn quay trở lại</p>
+    .university-login-container {
+        min-height: 100vh;
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .university-login-container::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="academic" patternUnits="userSpaceOnUse" width="100" height="100"><rect width="100" height="100" fill="none"/><g fill="%232563eb" fill-opacity="0.02"><circle cx="20" cy="20" r="2"/><circle cx="80" cy="20" r="2"/><circle cx="20" cy="80" r="2"/><circle cx="80" cy="80" r="2"/><rect x="45" y="10" width="10" height="80" rx="2"/><rect x="10" y="45" width="80" height="10" rx="2"/></g></pattern></defs><rect width="100" height="100" fill="url(%23academic)"/></svg>') repeat;
+        opacity: 0.6;
+    }
+
+    .login-wrapper {
+        background: white;
+        border-radius: 24px;
+        box-shadow: var(--shadow-xl);
+        padding: 0;
+        width: 100%;
+        max-width: 900px;
+        position: relative;
+        z-index: 2;
+        overflow: hidden;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        min-height: 600px;
+    }
+
+    .login-brand-section {
+        background: var(--gradient-primary);
+        padding: 3rem 2.5rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        color: white;
+        position: relative;
+    }
+
+    .login-brand-section::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="1" fill="rgba(255,255,255,0.1)"/></svg>') repeat;
+        background-size: 50px 50px;
+        opacity: 0.3;
+    }
+
+    .university-brand {
+        position: relative;
+        z-index: 2;
+    }
+
+    .university-logo-main {
+        width: 100px;
+        height: 100px;
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(15px);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        border: 3px solid rgba(255, 255, 255, 0.2);
+        transition: all 0.3s ease;
+    }
+
+    .university-logo-main:hover {
+        transform: scale(1.05);
+        background: rgba(255, 255, 255, 0.2);
+    }
+
+    .university-logo-main i {
+        font-size: 2.5rem;
+        color: white;
+    }
+
+    .brand-title {
+        font-size: 1.8rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .brand-subtitle {
+        font-size: 1rem;
+        opacity: 0.9;
+        margin-bottom: 2rem;
+    }
+
+    .brand-features {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .brand-feature {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.75rem 1rem;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 12px;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        transition: all 0.3s ease;
+    }
+
+    .brand-feature:hover {
+        background: rgba(255, 255, 255, 0.15);
+        transform: translateX(5px);
+    }
+
+    .brand-feature i {
+        color: var(--accent-gold);
+        font-size: 1.1rem;
+    }
+
+    .login-form-section {
+        padding: 3rem 2.5rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .form-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .form-title {
+        color: var(--gray-900);
+        font-size: 1.75rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        font-family: 'Poppins', sans-serif;
+    }
+
+    .form-subtitle {
+        color: var(--gray-600);
+        font-size: 0.95rem;
+        margin: 0;
+    }
+
+    .modern-form-group {
+        margin-bottom: 1.5rem;
+        position: relative;
+    }
+
+    .modern-label {
+        display: block;
+        color: var(--gray-700);
+        font-size: 0.875rem;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .modern-label i {
+        color: var(--primary-blue);
+        font-size: 0.9rem;
+    }
+
+    .modern-input {
+        width: 100%;
+        padding: 0.875rem 1rem;
+        border: 2px solid var(--gray-200);
+        border-radius: 12px;
+        font-size: 0.95rem;
+        font-family: inherit;
+        transition: all 0.3s ease;
+        background: var(--gray-50);
+        box-sizing: border-box;
+    }
+
+    .modern-input:focus {
+        outline: none;
+        border-color: var(--primary-blue);
+        background: white;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    .modern-input::placeholder {
+        color: var(--gray-400);
+    }
+
+    .password-group {
+        position: relative;
+    }
+
+    .password-toggle-btn {
+        position: absolute;
+        right: 0.75rem;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: var(--gray-400);
+        cursor: pointer;
+        padding: 0.5rem;
+        border-radius: 6px;
+        transition: all 0.3s ease;
+    }
+
+    .password-toggle-btn:hover {
+        color: var(--primary-blue);
+        background: rgba(37, 99, 235, 0.1);
+    }
+
+    .form-options-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        font-size: 0.875rem;
+    }
+
+    .modern-checkbox {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        cursor: pointer;
+    }
+
+    .modern-checkbox input[type="checkbox"] {
+        margin: 0;
+        accent-color: var(--primary-blue);
+    }
+
+    .forgot-password-link {
+        color: var(--primary-blue);
+        text-decoration: none;
+        font-weight: 500;
+        transition: color 0.3s ease;
+    }
+
+    .forgot-password-link:hover {
+        color: var(--primary-navy);
+        text-decoration: underline;
+    }
+
+    .primary-login-btn {
+        width: 100%;
+        padding: 0.875rem 1.5rem;
+        background: var(--gradient-primary);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        box-shadow: var(--shadow-lg);
+    }
+
+    .primary-login-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-xl);
+    }
+
+    .primary-login-btn:active {
+        transform: translateY(0);
+    }
+
+    .login-divider {
+        text-align: center;
+        position: relative;
+        margin: 1.5rem 0;
+        color: var(--gray-500);
+        font-size: 0.875rem;
+    }
+
+    .login-divider::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: var(--gray-200);
+    }
+
+    .login-divider span {
+        background: white;
+        padding: 0 1rem;
+        position: relative;
+    }
+
+    .google-login-button {
+        width: 100%;
+        padding: 0.875rem 1rem;
+        background: white;
+        border: 2px solid var(--gray-200);
+        border-radius: 12px;
+        color: var(--gray-700);
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+        font-size: 0.95rem;
+    }
+
+    .google-login-button:hover {
+        border-color: var(--primary-blue);
+        background: var(--gray-50);
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .google-icon {
+        color: #4285f4;
+        font-size: 1.1rem;
+    }
+
+    .form-footer {
+        text-align: center;
+        padding-top: 1.5rem;
+        border-top: 1px solid var(--gray-200);
+    }
+
+    .register-prompt {
+        color: var(--gray-600);
+        margin-bottom: 1rem;
+        font-size: 0.9rem;
+    }
+
+    .register-link {
+        color: var(--primary-blue);
+        text-decoration: none;
+        font-weight: 600;
+        transition: color 0.3s ease;
+    }
+
+    .register-link:hover {
+        color: var(--primary-navy);
+        text-decoration: underline;
+    }
+
+    .back-home-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--gray-500);
+        text-decoration: none;
+        font-size: 0.875rem;
+        transition: color 0.3s ease;
+    }
+
+    .back-home-link:hover {
+        color: var(--primary-blue);
+    }
+
+    .modern-alert {
+        border-radius: 12px;
+        border: none;
+        padding: 0.875rem 1rem;
+        margin-bottom: 1.5rem;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .alert-success {
+        background: #ecfdf5;
+        color: #065f46;
+        border-left: 4px solid #10b981;
+    }
+
+    .alert-danger {
+        background: #fef2f2;
+        color: #991b1b;
+        border-left: 4px solid #ef4444;
+    }
+
+    .validation-error {
+        color: #dc2626;
+        font-size: 0.8rem;
+        margin-top: 0.25rem;
+        display: block;
+    }
+
+    /* Responsive Design */
+    @@media (max-width: 768px) {
+        .login-wrapper {
+            grid-template-columns: 1fr;
+            max-width: 450px;
+        }
+
+        .login-brand-section {
+            order: 2;
+            padding: 2rem 1.5rem;
+            min-height: auto;
+        }
+
+        .login-form-section {
+            order: 1;
+            padding: 2rem 1.5rem;
+        }
+
+        .brand-features {
+            flex-direction: row;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+
+        .brand-feature {
+            flex: 1;
+            min-width: 120px;
+            text-align: center;
+            flex-direction: column;
+            gap: 0.5rem;
+            padding: 0.75rem 0.5rem;
+        }
+
+        .form-title {
+            font-size: 1.5rem;
+        }
+
+        .brand-title {
+            font-size: 1.5rem;
+        }
+
+        .form-options-row {
+            flex-direction: column;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+    }
+
+    @@media (max-width: 480px) {
+        .university-login-container {
+            padding: 15px;
+        }
+
+        .login-wrapper {
+            border-radius: 16px;
+        }
+
+        .login-brand-section,
+        .login-form-section {
+            padding: 1.5rem 1rem;
+        }
+    }
+</style>
+
+<div class="university-login-container">
+    <div class="login-wrapper">
+        <!-- Left Side - University Branding -->
+        <div class="login-brand-section">
+            <div class="university-brand">
+                <div class="university-logo-main">
+                    <i class="fas fa-university"></i>
+                </div>
+                <h1 class="brand-title">THƯ VIỆN SỐ</h1>
+                <p class="brand-subtitle">Hệ thống thư viện trường đại học hiện đại</p>
+
+                <div class="brand-features">
+                    <div class="brand-feature">
+                        <i class="fas fa-book-open"></i>
+                        <span>10,000+ Đầu sách</span>
+                    </div>
+                    <div class="brand-feature">
+                        <i class="fas fa-clock"></i>
+                        <span>Truy cập 24/7</span>
+                    </div>
+                    <div class="brand-feature">
+                        <i class="fas fa-download"></i>
+                        <span>Tải về miễn phí</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Side - Login Form -->
+        <div class="login-form-section">
+            <div class="form-header">
+                <h2 class="form-title">Đăng nhập</h2>
+                <p class="form-subtitle">Sử dụng thông tin sinh viên để truy cập thư viện</p>
             </div>
 
             @if (TempData["SuccessMessage"] != null)
             {
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <div class="modern-alert alert-success">
                     <i class="fas fa-check-circle"></i>
                     @TempData["SuccessMessage"]
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
                 </div>
             }
 
-            <form asp-action="Login" method="post" class="auth-form">
-                <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+            <form asp-action="Login" method="post">
+                <div asp-validation-summary="ModelOnly" class="modern-alert alert-danger"></div>
 
-                <div class="form-group">
-                    <label asp-for="UserNameOrEmail" class="form-label">
+                <div class="modern-form-group">
+                    <label asp-for="UserNameOrEmail" class="modern-label">
                         <i class="fas fa-user"></i>
-                        Tên đăng nhập hoặc Email
+                        Mã sinh viên hoặc Email
                     </label>
-                    <input asp-for="UserNameOrEmail" class="form-control" placeholder="Nhập tên đăng nhập hoặc email"
-                        autofocus />
-                    <span asp-validation-for="UserNameOrEmail" class="text-danger"></span>
+                    <input asp-for="UserNameOrEmail" class="modern-input"
+                        placeholder="Nhập mã sinh viên hoặc email của bạn..." autofocus />
+                    <span asp-validation-for="UserNameOrEmail" class="validation-error"></span>
                 </div>
 
-                <div class="form-group">
-                    <label asp-for="Password" class="form-label">
+                <div class="modern-form-group">
+                    <label asp-for="Password" class="modern-label">
                         <i class="fas fa-lock"></i>
                         Mật khẩu
                     </label>
-                    <div class="password-input">
-                        <input asp-for="Password" id="Password" class="form-control" placeholder="Nhập mật khẩu" />
-                        <i class="fas fa-eye password-toggle" onclick="togglePassword('Password')"></i>
+                    <div class="password-group">
+                        <input asp-for="Password" id="Password" class="modern-input" type="password"
+                            placeholder="Nhập mật khẩu của bạn..." />
+                        <button type="button" class="password-toggle-btn" onclick="togglePassword()">
+                            <i class="fas fa-eye" id="toggleIcon"></i>
+                        </button>
                     </div>
-                    <span asp-validation-for="Password" class="text-danger"></span>
+                    <span asp-validation-for="Password" class="validation-error"></span>
                 </div>
 
-                <div class="form-group">
-                    <div class="form-check remember-me">
-                        <input asp-for="RememberMe" class="form-check-input" />
-                        <label asp-for="RememberMe" class="form-check-label">
-                            Ghi nhớ đăng nhập
-                        </label>
-                    </div>
+                <div class="form-options-row">
+                    <label class="modern-checkbox">
+                        <input asp-for="RememberMe" type="checkbox" />
+                        <span>Ghi nhớ đăng nhập</span>
+                    </label>
+                    <a asp-action="ForgotPassword" class="forgot-password-link">Quên mật khẩu?</a>
                 </div>
 
-                <button type="submit" class="btn btn-primary auth-btn">
+                <button type="submit" class="primary-login-btn">
                     <i class="fas fa-sign-in-alt"></i>
-                    Đăng nhập
+                    <span>Đăng nhập ngay</span>
                 </button>
             </form>
 
-            <div class="auth-divider">
-                <span>hoặc</span>
+            <div class="login-divider">
+                <span>hoặc đăng nhập bằng</span>
             </div>
 
-            <!-- Google Login Button -->
-            <div class="d-flex justify-content-center">
-                <button type="button" class="btn btn-outline-secondary google-btn" onclick="showGoogleMessage()">
-                    <i class="fab fa-google"></i>
-                    Đăng nhập bằng Google
-                </button>
-            </div>
+            <button type="button" class="google-login-button" onclick="showGoogleMessage()">
+                <i class="fab fa-google google-icon"></i>
+                <span>Đăng nhập với Google</span>
             </button>
 
-            <div class="auth-footer">
-                <div class="auth-links">
-                    <a asp-action="ForgotPassword" class="auth-link">Quên mật khẩu?</a>
-                    <a asp-controller="Home" asp-action="Index" class="auth-link">← Quay về trang chủ</a>
-                </div>
-                <div class="auth-switch">
-                    <p>Chưa có tài khoản?
-                        <a asp-controller="Account" asp-action="Register" class="auth-link-primary">
-                            <i class="fas fa-user-plus"></i> Đăng ký ngay
-                        </a>
-                    </p>
-                </div>
+            <div class="form-footer">
+                <p class="register-prompt">
+                    Chưa có tài khoản?
+                    <a asp-controller="Account" asp-action="Register" class="register-link">
+                        Đăng ký ngay
+                    </a>
+                </p>
+                <a asp-controller="Home" asp-action="Index" class="back-home-link">
+                    <i class="fas fa-arrow-left"></i>
+                    <span>Quay về trang chủ</span>
+                </a>
             </div>
         </div>
     </div>
@@ -103,35 +611,31 @@
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
     <script>
-        function togglePassword(fieldId) {
-            const field = document.getElementById(fieldId);
-            const toggle = field.nextElementSibling;
+        function togglePassword() {
+            const field = document.getElementById('Password');
+            const icon = document.getElementById('toggleIcon');
 
             if (field.type === 'password') {
                 field.type = 'text';
-                toggle.classList.remove('fa-eye');
-                toggle.classList.add('fa-eye-slash');
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
             } else {
                 field.type = 'password';
-                toggle.classList.remove('fa-eye-slash');
-                toggle.classList.add('fa-eye');
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
             }
         }
 
-        // Auto-focus on username field when page loads
+        function showGoogleMessage() {
+            alert('Tính năng đăng nhập với Google sẽ sớm được cập nhật!');
+        }
+
+        // Auto-focus vào trường username
         document.addEventListener('DOMContentLoaded', function () {
-            const usernameField = document.getElementById('UserNameOrEmail');
+            const usernameField = document.querySelector('input[name="UserNameOrEmail"]');
             if (usernameField) {
                 usernameField.focus();
             }
         });
-
-        function showGoogleMessage() {
-            // Show a simple alert message
-            alert('Chức năng này sẽ được cập nhật sau!');
-
-            // Alternative: Show a toast notification if you have a toast library
-            // You can also create a custom modal or notification
-        }
     </script>
 }
