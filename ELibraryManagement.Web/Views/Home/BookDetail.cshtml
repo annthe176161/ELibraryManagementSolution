@@ -554,7 +554,7 @@
                     {
                         if (Model.AvailableCopies > 0)
                         {
-                            <a href="@Url.Action("BorrowBook", "Borrow", new { bookId = Model.Id })" class="borrow-button">
+                            <a href="@Url.Action("Borrow", "Book", new { id = Model.Id })" class="borrow-button">
                                 <i class="fas fa-hand-holding"></i>
                                 Mượn sách ngay
                             </a>

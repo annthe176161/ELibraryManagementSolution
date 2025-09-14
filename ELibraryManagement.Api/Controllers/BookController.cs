@@ -52,19 +52,35 @@ namespace ELibraryManagement.Api.Controllers
         [Authorize]
         public async Task<IActionResult> BorrowBook([FromBody] BorrowBookRequestDto request)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                return BadRequest(ModelState);
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
+
+                var result = await _bookService.BorrowBookAsync(request);
+
+                if (string.IsNullOrEmpty(result.Message) || !result.Message.Contains("successfully"))
+                {
+                    return BadRequest(result);
+                }
+
+                return Ok(result);
             }
-
-            var result = await _bookService.BorrowBookAsync(request);
-
-            if (string.IsNullOrEmpty(result.Message) || !result.Message.Contains("successfully"))
+            catch (Exception ex)
             {
-                return BadRequest(result);
-            }
+                // Log the exception details for debugging
+                Console.WriteLine($"Error in BorrowBook: {ex.Message}");
+                Console.WriteLine($"Stack trace: {ex.StackTrace}");
 
-            return Ok(result);
+                return StatusCode(500, new
+                {
+                    message = "Internal server error",
+                    details = ex.Message,
+                    stackTrace = ex.StackTrace
+                });
+            }
         }
 
         /// <summary>

@@ -30,5 +30,6 @@ namespace ELibraryManagement.Api.Models
         public virtual ICollection<BorrowRecord> BorrowRecords { get; set; } = new List<BorrowRecord>();
         public virtual ICollection<Review> Reviews { get; set; } = new List<Review>();
         public virtual ICollection<Fine> Fines { get; set; } = new List<Fine>();
+        public virtual UserStatus? UserStatus { get; set; }
     }
 }

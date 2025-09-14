@@ -102,13 +102,26 @@ namespace ELibraryManagement.Web.Controllers
                     return RedirectToAction("Index", "Home");
                 }
 
+                // Get current user information
+                var currentUser = await _authApiService.GetCurrentUserAsync();
+
                 var borrowViewModel = new BorrowBookViewModel
                 {
                     BookId = book.Id,
                     BookTitle = book.Title,
                     BookAuthor = book.Author,
                     BookCoverUrl = book.ImageUrl,
-                    DueDate = DateTime.Today.AddDays(14) // Mặc định 14 ngày
+                    DueDate = DateTime.Today.AddDays(14), // Default 14 days
+                    StudentInfo = new StudentInfoViewModel
+                    {
+                        StudentId = currentUser?.StudentId ?? "SV001234567",
+                        FullName = $"{currentUser?.FirstName} {currentUser?.LastName}".Trim() ?? userName ?? "Nguyễn Văn An",
+                        Email = currentUser?.Email ?? "anNV@fpt.edu.vn",
+                        PhoneNumber = currentUser?.PhoneNumber ?? "0123 456 789",
+                        Major = "Công nghệ thông tin", // This might come from a different field or table
+                        AcademicYear = "2021 - 2025", // This might be calculated from registration date
+                        StudentStatus = "Đang học" // This might come from user status
+                    }
                 };
 
                 return View(borrowViewModel);

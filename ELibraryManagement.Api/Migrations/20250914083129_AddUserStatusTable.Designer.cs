@@ -4,6 +4,7 @@ using ELibraryManagement.Api.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ELibraryManagement.Api.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250914083129_AddUserStatusTable")]
+    partial class AddUserStatusTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -199,7 +202,7 @@ namespace ELibraryManagement.Api.Migrations
                             AvailableQuantity = 8,
                             AverageRating = 4.5,
                             CoverImageUrl = "https://cdn1.fahasa.com/media/catalog/product/d/n/dntttttuntitled.jpg",
-                            CreatedAt = new DateTime(2025, 9, 14, 8, 32, 8, 958, DateTimeKind.Utc).AddTicks(49),
+                            CreatedAt = new DateTime(2025, 9, 14, 8, 31, 28, 677, DateTimeKind.Utc).AddTicks(5181),
                             Description = "Cuốn sách về nghệ thuật giao tiếp và thu phục lòng người",
                             ISBN = "9786047770560",
                             IsDeleted = false,
@@ -218,7 +221,7 @@ namespace ELibraryManagement.Api.Migrations
                             AvailableQuantity = 12,
                             AverageRating = 4.3000001907348633,
                             CoverImageUrl = "https://lh4.googleusercontent.com/proxy/92QuMwJnEjAGTfNMAB9joNXoouO9NuduIgBPaKtL0h0UPvaeTFj3Xef967P3mbrE7F1J5cfnvn2PKw8cwIINHMhxf9L2C3bPRQ2Ef14EVeZAIb_rdt3WzLOb98FXMVhAs2lNuT9ABlcODTeUqt5z27FQ8fQE4ZtQEw",
-                            CreatedAt = new DateTime(2025, 9, 14, 8, 32, 8, 958, DateTimeKind.Utc).AddTicks(53),
+                            CreatedAt = new DateTime(2025, 9, 14, 8, 31, 28, 677, DateTimeKind.Utc).AddTicks(5186),
                             Description = "Sách về phát triển bản thân và thành công",
                             ISBN = "9786047770577",
                             IsDeleted = false,
@@ -237,7 +240,7 @@ namespace ELibraryManagement.Api.Migrations
                             AvailableQuantity = 6,
                             AverageRating = 4.6999998092651367,
                             CoverImageUrl = "https://upload.wikimedia.org/wikipedia/vi/b/b1/T%E1%BA%AFt_%C4%91%C3%A8n-Nh%C3%A3_Nam.jpeg",
-                            CreatedAt = new DateTime(2025, 9, 14, 8, 32, 8, 958, DateTimeKind.Utc).AddTicks(56),
+                            CreatedAt = new DateTime(2025, 9, 14, 8, 31, 28, 677, DateTimeKind.Utc).AddTicks(5262),
                             Description = "Tác phẩm kinh điển của văn học Việt Nam",
                             ISBN = "9786047770584",
                             IsDeleted = false,
@@ -256,7 +259,7 @@ namespace ELibraryManagement.Api.Migrations
                             AvailableQuantity = 10,
                             AverageRating = 4.1999998092651367,
                             CoverImageUrl = "https://images.nxbbachkhoa.vn/Picture/2024/5/8/image-20240508180323597.jpg",
-                            CreatedAt = new DateTime(2025, 9, 14, 8, 32, 8, 958, DateTimeKind.Utc).AddTicks(59),
+                            CreatedAt = new DateTime(2025, 9, 14, 8, 31, 28, 677, DateTimeKind.Utc).AddTicks(5266),
                             Description = "Sách hướng dẫn lập trình C# từ cơ bản đến nâng cao",
                             ISBN = "9786047770591",
                             IsDeleted = false,
@@ -275,7 +278,7 @@ namespace ELibraryManagement.Api.Migrations
                             AvailableQuantity = 18,
                             AverageRating = 4.4000000953674316,
                             CoverImageUrl = "https://cdn1.fahasa.com/media/catalog/product/8/9/8935236401296.jpg",
-                            CreatedAt = new DateTime(2025, 9, 14, 8, 32, 8, 958, DateTimeKind.Utc).AddTicks(61),
+                            CreatedAt = new DateTime(2025, 9, 14, 8, 31, 28, 677, DateTimeKind.Utc).AddTicks(5270),
                             Description = "Những bí quyết thực tế để thành công trong kinh doanh",
                             ISBN = "9786047770607",
                             IsDeleted = false,
@@ -294,7 +297,7 @@ namespace ELibraryManagement.Api.Migrations
                             AvailableQuantity = 5,
                             AverageRating = 4.5999999046325684,
                             CoverImageUrl = "https://sachvuii.com/wp-content/uploads/2024/06/Ebook-Lich-su-Viet-Nam.jpg",
-                            CreatedAt = new DateTime(2025, 9, 14, 8, 32, 8, 958, DateTimeKind.Utc).AddTicks(66),
+                            CreatedAt = new DateTime(2025, 9, 14, 8, 31, 28, 677, DateTimeKind.Utc).AddTicks(5273),
                             Description = "Tổng quan về lịch sử Việt Nam từ cổ đại đến hiện đại",
                             ISBN = "9786047770614",
                             IsDeleted = false,
@@ -313,7 +316,7 @@ namespace ELibraryManagement.Api.Migrations
                             AvailableQuantity = 22,
                             AverageRating = 4.0999999046325684,
                             CoverImageUrl = "https://salt.tikicdn.com/cache/w1200/ts/product/6d/30/f5/88c01835d4b7107e03373bcc346c028f.jpg",
-                            CreatedAt = new DateTime(2025, 9, 14, 8, 32, 8, 958, DateTimeKind.Utc).AddTicks(71),
+                            CreatedAt = new DateTime(2025, 9, 14, 8, 31, 28, 677, DateTimeKind.Utc).AddTicks(5277),
                             Description = "Bộ sưu tập công thức nấu ăn ngon và đơn giản",
                             ISBN = "9786047770621",
                             IsDeleted = false,
@@ -332,7 +335,7 @@ namespace ELibraryManagement.Api.Migrations
                             AvailableQuantity = 28,
                             AverageRating = 4.8000001907348633,
                             CoverImageUrl = "https://product.hstatic.net/1000237375/product/100-truyen-co-tich-viet-nam-440.jpg",
-                            CreatedAt = new DateTime(2025, 9, 14, 8, 32, 8, 958, DateTimeKind.Utc).AddTicks(75),
+                            CreatedAt = new DateTime(2025, 9, 14, 8, 31, 28, 677, DateTimeKind.Utc).AddTicks(5280),
                             Description = "Tuyển tập truyện cổ tích Việt Nam cho thiếu nhi",
                             ISBN = "9786047770638",
                             IsDeleted = false,
@@ -500,7 +503,7 @@ namespace ELibraryManagement.Api.Migrations
                         {
                             Id = 1,
                             Color = "#FF6B6B",
-                            CreatedAt = new DateTime(2025, 9, 14, 8, 32, 8, 957, DateTimeKind.Utc).AddTicks(9973),
+                            CreatedAt = new DateTime(2025, 9, 14, 8, 31, 28, 677, DateTimeKind.Utc).AddTicks(5119),
                             Description = "Các tác phẩm tiểu thuyết, truyện dài",
                             IsActive = true,
                             IsDeleted = false,
@@ -510,7 +513,7 @@ namespace ELibraryManagement.Api.Migrations
                         {
                             Id = 2,
                             Color = "#4ECDC4",
-                            CreatedAt = new DateTime(2025, 9, 14, 8, 32, 8, 957, DateTimeKind.Utc).AddTicks(9975),
+                            CreatedAt = new DateTime(2025, 9, 14, 8, 31, 28, 677, DateTimeKind.Utc).AddTicks(5122),
                             Description = "Sách phi hư cấu, sách thực tế",
                             IsActive = true,
                             IsDeleted = false,
@@ -520,7 +523,7 @@ namespace ELibraryManagement.Api.Migrations
                         {
                             Id = 3,
                             Color = "#45B7D1",
-                            CreatedAt = new DateTime(2025, 9, 14, 8, 32, 8, 957, DateTimeKind.Utc).AddTicks(9977),
+                            CreatedAt = new DateTime(2025, 9, 14, 8, 31, 28, 677, DateTimeKind.Utc).AddTicks(5124),
                             Description = "Sách khoa học và công nghệ",
                             IsActive = true,
                             IsDeleted = false,
@@ -530,7 +533,7 @@ namespace ELibraryManagement.Api.Migrations
                         {
                             Id = 4,
                             Color = "#96CEB4",
-                            CreatedAt = new DateTime(2025, 9, 14, 8, 32, 8, 957, DateTimeKind.Utc).AddTicks(9978),
+                            CreatedAt = new DateTime(2025, 9, 14, 8, 31, 28, 677, DateTimeKind.Utc).AddTicks(5126),
                             Description = "Sách lịch sử và văn hóa",
                             IsActive = true,
                             IsDeleted = false,
@@ -540,7 +543,7 @@ namespace ELibraryManagement.Api.Migrations
                         {
                             Id = 5,
                             Color = "#FECA57",
-                            CreatedAt = new DateTime(2025, 9, 14, 8, 32, 8, 957, DateTimeKind.Utc).AddTicks(9980),
+                            CreatedAt = new DateTime(2025, 9, 14, 8, 31, 28, 677, DateTimeKind.Utc).AddTicks(5127),
                             Description = "Tiểu sử và hồi ký",
                             IsActive = true,
                             IsDeleted = false,
@@ -550,7 +553,7 @@ namespace ELibraryManagement.Api.Migrations
                         {
                             Id = 6,
                             Color = "#FF9FF3",
-                            CreatedAt = new DateTime(2025, 9, 14, 8, 32, 8, 957, DateTimeKind.Utc).AddTicks(9981),
+                            CreatedAt = new DateTime(2025, 9, 14, 8, 31, 28, 677, DateTimeKind.Utc).AddTicks(5129),
                             Description = "Sách lập trình và phát triển phần mềm",
                             IsActive = true,
                             IsDeleted = false,
@@ -560,7 +563,7 @@ namespace ELibraryManagement.Api.Migrations
                         {
                             Id = 7,
                             Color = "#54A0FF",
-                            CreatedAt = new DateTime(2025, 9, 14, 8, 32, 8, 957, DateTimeKind.Utc).AddTicks(9982),
+                            CreatedAt = new DateTime(2025, 9, 14, 8, 31, 28, 677, DateTimeKind.Utc).AddTicks(5131),
                             Description = "Sách kinh doanh và kinh tế",
                             IsActive = true,
                             IsDeleted = false,
@@ -570,7 +573,7 @@ namespace ELibraryManagement.Api.Migrations
                         {
                             Id = 8,
                             Color = "#FF8A65",
-                            CreatedAt = new DateTime(2025, 9, 14, 8, 32, 8, 957, DateTimeKind.Utc).AddTicks(9984),
+                            CreatedAt = new DateTime(2025, 9, 14, 8, 31, 28, 677, DateTimeKind.Utc).AddTicks(5132),
                             Description = "Tác phẩm văn học Việt Nam",
                             IsActive = true,
                             IsDeleted = false,
@@ -580,7 +583,7 @@ namespace ELibraryManagement.Api.Migrations
                         {
                             Id = 9,
                             Color = "#81C784",
-                            CreatedAt = new DateTime(2025, 9, 14, 8, 32, 8, 957, DateTimeKind.Utc).AddTicks(9985),
+                            CreatedAt = new DateTime(2025, 9, 14, 8, 31, 28, 677, DateTimeKind.Utc).AddTicks(5134),
                             Description = "Sách dành cho thiếu nhi",
                             IsActive = true,
                             IsDeleted = false,
@@ -590,7 +593,7 @@ namespace ELibraryManagement.Api.Migrations
                         {
                             Id = 10,
                             Color = "#FFB74D",
-                            CreatedAt = new DateTime(2025, 9, 14, 8, 32, 8, 957, DateTimeKind.Utc).AddTicks(9987),
+                            CreatedAt = new DateTime(2025, 9, 14, 8, 31, 28, 677, DateTimeKind.Utc).AddTicks(5135),
                             Description = "Sách công thức nấu ăn",
                             IsActive = true,
                             IsDeleted = false,
@@ -781,7 +784,13 @@ namespace ELibraryManagement.Api.Migrations
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("UserId1")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("UserId");
+
+                    b.HasIndex("UserId1");
 
                     b.ToTable("UserStatuses");
                 });
@@ -1036,8 +1045,8 @@ namespace ELibraryManagement.Api.Migrations
             modelBuilder.Entity("ELibraryManagement.Api.Models.UserStatus", b =>
                 {
                     b.HasOne("ELibraryManagement.Api.Models.ApplicationUser", "User")
-                        .WithOne("UserStatus")
-                        .HasForeignKey("ELibraryManagement.Api.Models.UserStatus", "UserId")
+                        .WithMany()
+                        .HasForeignKey("UserId1")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1102,8 +1111,6 @@ namespace ELibraryManagement.Api.Migrations
                     b.Navigation("Fines");
 
                     b.Navigation("Reviews");
-
-                    b.Navigation("UserStatus");
                 });
 
             modelBuilder.Entity("ELibraryManagement.Api.Models.Book", b =>

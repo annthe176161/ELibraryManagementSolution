@@ -153,9 +153,13 @@ namespace ELibraryManagement.Web.Controllers
                     ViewBag.RecentReviews = new List<object>();
                 }
 
-                // Truyền thông tin authentication vào View
-                ViewBag.IsAuthenticated = _authApiService.IsAuthenticated();
-                ViewBag.AuthToken = _authApiService.GetCurrentToken();
+                // Truyền thông tin authentication vào View - sử dụng cùng logic với BorrowController
+                var sessionToken = HttpContext.Session.GetString("AuthToken");
+                var cookieToken = HttpContext.Request.Cookies["AuthToken"];
+                var isAuthenticated = !string.IsNullOrEmpty(sessionToken) || !string.IsNullOrEmpty(cookieToken);
+
+                ViewBag.IsAuthenticated = isAuthenticated;
+                ViewBag.AuthToken = !string.IsNullOrEmpty(sessionToken) ? sessionToken : cookieToken;
 
                 return View(book);
             }

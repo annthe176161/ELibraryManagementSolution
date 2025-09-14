@@ -1,396 +1,840 @@
 @model ELibraryManagement.Web.Models.BorrowBookViewModel
 @{
-    ViewData["Title"] = "Mượn sách - " + Model.BookTitle;
+    ViewData["Title"] = "Xác nhận mượn sách - " + Model.BookTitle;
 }
 
-@section Styles {
-    <link rel="stylesheet" href="~/css/book-borrow.css" />
-}
+<style>
+    body {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .borrow-container {
+        background: transparent;
+        padding: 2rem 0;
+    }
+
+    .borrow-card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        margin-bottom: 2rem;
+    }
+
+    .borrow-header {
+        background: linear-gradient(135deg, #2563eb 0%, #1e3a8a 100%);
+        color: white;
+        padding: 2rem;
+        text-align: center;
+        position: relative;
+    }
+
+    .borrow-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="books" patternUnits="userSpaceOnUse" width="20" height="20"><rect width="20" height="20" fill="none"/><rect x="2" y="3" width="3" height="14" fill="rgba(255,255,255,0.1)"/><rect x="6" y="2" width="3" height="15" fill="rgba(255,255,255,0.08)"/><rect x="10" y="4" width="3" height="13" fill="rgba(255,255,255,0.06)"/></pattern></defs><rect width="100" height="100" fill="url(%23books)"/></svg>') repeat;
+        opacity: 0.3;
+    }
+
+    .borrow-header h2 {
+        margin: 0;
+        font-size: 2rem;
+        font-weight: 700;
+        position: relative;
+        z-index: 1;
+    }
+
+    .borrow-header p {
+        margin: 0.5rem 0 0 0;
+        opacity: 0.9;
+        font-size: 1.1rem;
+        position: relative;
+        z-index: 1;
+    }
+
+    .content-section {
+        padding: 2rem;
+    }
+
+    .student-info-card {
+        background: linear-gradient(135deg, #f8faff 0%, #e8f2ff 100%);
+        border: 2px solid #e2e8f0;
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .student-info-card::before {
+        content: '🎓';
+        position: absolute;
+        top: -10px;
+        right: -10px;
+        font-size: 3rem;
+        opacity: 0.1;
+        transform: rotate(15deg);
+    }
+
+    .student-info-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+
+    .student-info-title {
+        color: #2563eb;
+        font-size: 1.3rem;
+        font-weight: 700;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .edit-profile-link {
+        background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        text-decoration: none;
+        font-size: 0.9rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+    }
+
+    .edit-profile-link:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(16, 163, 74, 0.3);
+        color: white;
+        text-decoration: none;
+    }
+
+    .student-info-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1rem;
+    }
+
+    .info-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.75rem;
+        background: white;
+        border-radius: 10px;
+        border: 1px solid #e2e8f0;
+        transition: all 0.3s ease;
+    }
+
+    .info-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .info-icon {
+        background: linear-gradient(135deg, #2563eb 0%, #1e3a8a 100%);
+        color: white;
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.1rem;
+    }
+
+    .info-content h6 {
+        margin: 0;
+        color: #374151;
+        font-size: 0.85rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .info-content p {
+        margin: 0.25rem 0 0 0;
+        color: #1f2937;
+        font-size: 1rem;
+        font-weight: 600;
+    }
+
+    .book-info-section {
+        background: linear-gradient(135deg, #fff7ed 0%, #fed7aa 100%);
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        border: 2px solid #f97316;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .book-info-section::before {
+        content: '📚';
+        position: absolute;
+        top: -15px;
+        right: -15px;
+        font-size: 4rem;
+        opacity: 0.1;
+        transform: rotate(-15deg);
+    }
+
+    .book-cover {
+        text-align: center;
+        margin-bottom: 1rem;
+    }
+
+    .book-cover img {
+        max-height: 200px;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        transition: transform 0.3s ease;
+    }
+
+    .book-cover img:hover {
+        transform: scale(1.05);
+    }
+
+    .book-placeholder {
+        background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+        color: white;
+        padding: 3rem;
+        border-radius: 12px;
+        text-align: center;
+    }
+
+    .book-details h4 {
+        color: #ea580c;
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+    }
+
+    .book-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+
+    .book-author {
+        background: white;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        color: #ea580c;
+        font-weight: 600;
+        border: 2px solid #fed7aa;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .rental-price {
+        background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .guidelines-section {
+        background: linear-gradient(135deg, #f0f9ff 0%, #dbeafe 100%);
+        border: 2px solid #3b82f6;
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .guidelines-title {
+        color: #1e40af;
+        font-size: 1.3rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .guidelines-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        gap: 1.5rem;
+    }
+
+    .guideline-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        border-left: 4px solid #3b82f6;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+
+    .guideline-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    .guideline-card h6 {
+        color: #1e40af;
+        font-size: 1.1rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .guideline-card ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .guideline-card li {
+        color: #374151;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: flex-start;
+        gap: 0.5rem;
+        line-height: 1.5;
+        word-wrap: break-word;
+    }
+
+    .guideline-card li strong {
+        white-space: nowrap;
+    }
+
+    .guideline-card li::before {
+        content: '✓';
+        color: #16a34a;
+        font-weight: bold;
+        font-size: 1.1rem;
+        flex-shrink: 0;
+        margin-top: 0.1rem;
+    }
+
+    .form-section {
+        background: #f8fafc;
+        border-radius: 15px;
+        padding: 2rem;
+        border: 2px solid #e2e8f0;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+        color: #374151;
+        font-weight: 600;
+        font-size: 1rem;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .form-control {
+        border: 2px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 0.75rem;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .terms-section {
+        background: linear-gradient(135deg, #fefce8 0%, #fef3c7 100%);
+        border: 2px solid #f59e0b;
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .terms-title {
+        color: #d97706;
+        font-size: 1.3rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .terms-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .term-item {
+        background: white;
+        border-radius: 10px;
+        padding: 1rem;
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+        border: 1px solid #fbbf24;
+        transition: all 0.3s ease;
+    }
+
+    .term-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .term-item i {
+        font-size: 1.5rem;
+        margin-top: 0.25rem;
+    }
+
+    .term-item strong {
+        color: #d97706;
+        font-size: 1rem;
+    }
+
+    .term-item p {
+        color: #6b7280;
+        margin: 0.25rem 0 0 0;
+        font-size: 0.9rem;
+        line-height: 1.4;
+    }
+
+    .agreement-section {
+        background: white;
+        border-radius: 10px;
+        padding: 1.5rem;
+        border: 2px solid #fbbf24;
+    }
+
+    .form-check {
+        margin-bottom: 1rem;
+    }
+
+    .form-check-input:checked {
+        background-color: #f59e0b;
+        border-color: #f59e0b;
+    }
+
+    .form-check-label {
+        color: #374151;
+        font-weight: 500;
+        margin-left: 0.5rem;
+    }
+
+    .action-buttons {
+        text-align: center;
+        padding-top: 1rem;
+    }
+
+    .btn {
+        padding: 0.75rem 2rem;
+        border-radius: 10px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        border: none;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        text-decoration: none;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #2563eb 0%, #1e3a8a 100%);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(37, 99, 235, 0.3);
+    }
+
+    .btn-outline-secondary {
+        background: transparent;
+        color: #6b7280;
+        border: 2px solid #e5e7eb;
+    }
+
+    .btn-outline-secondary:hover {
+        background: #f3f4f6;
+        color: #374151;
+        transform: translateY(-2px);
+    }
+
+    .alert {
+        border-radius: 10px;
+        border: none;
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .alert-danger {
+        background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+        color: #dc2626;
+        border-left: 4px solid #dc2626;
+    }
+
+    @@media (max-width: 768px) {
+        .borrow-header h2 {
+            font-size: 1.5rem;
+        }
+        
+        .student-info-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .guidelines-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .terms-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .student-info-header {
+            flex-direction: column;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+    }
+</style>
 
 <div class="borrow-container">
     <div class="container py-5">
         <div class="row justify-content-center">
-            <div class="col-lg-8">
+            <div class="col-lg-10">
                 <div class="borrow-card">
                     <div class="borrow-header">
                         <h2>
-                            <i class="fas fa-book-open me-2"></i>
-                            Mượn sách
+                            <i class="fas fa-university me-2"></i>
+                            XÁC NHẬN MƯỢN SÁCH
                         </h2>
-                        <p class="text-muted">Vui lòng xác nhận thông tin mượn sách</p>
+                        <p>Thư viện Đại học FPT - Hệ thống quản lý mượn trả sách điện tử</p>
                     </div>
 
-                    <!-- Book Information -->
-                    <div class="book-info-section">
-                        <div class="row">
-                            <div class="col-md-3">
-                                <div class="book-cover">
-                                    @if (!string.IsNullOrEmpty(Model.BookCoverUrl))
-                                    {
-                                        <img src="@Model.BookCoverUrl" alt="@Model.BookTitle" class="img-fluid rounded">
-                                    }
-                                    else
-                                    {
-                                        <div class="book-placeholder">
-                                            <i class="fas fa-book fa-3x"></i>
-                                        </div>
-                                    }
-                                </div>
+                    <div class="content-section">
+                        <!-- Student Information -->
+                        <div class="student-info-card">
+                            <div class="student-info-header">
+                                <h5 class="student-info-title">
+                                    <i class="fas fa-user-graduate"></i>
+                                    Thông tin sinh viên
+                                </h5>
+                                <a href="@Url.Action("Profile", "Account")" class="edit-profile-link">
+                                    <i class="fas fa-edit"></i>
+                                    Chỉnh sửa thông tin
+                                </a>
                             </div>
-                            <div class="col-md-9">
-                                <div class="book-details">
-                                    <h4 class="book-title">@Model.BookTitle</h4>
-                                    <p class="book-author">
-                                        <i class="fas fa-user me-1"></i>
-                                        @Model.BookAuthor
-                                    </p>
-
-                                    <div class="rental-price">
-                                        <i class="fas fa-gift text-success me-1"></i>
-                                        <strong class="text-success">Miễn phí mượn</strong>
+                            <div class="student-info-grid">
+                                <div class="info-item">
+                                    <div class="info-icon">
+                                        <i class="fas fa-id-card"></i>
+                                    </div>
+                                    <div class="info-content">
+                                        <h6>Mã sinh viên</h6>
+                                        <p>@(Model.StudentInfo?.StudentId ?? "SV001234567")</p>
+                                    </div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-icon">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    <div class="info-content">
+                                        <h6>Họ và tên</h6>
+                                        <p>@(Model.StudentInfo?.FullName ?? "Nguyễn Văn An")</p>
+                                    </div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-icon">
+                                        <i class="fas fa-envelope"></i>
+                                    </div>
+                                    <div class="info-content">
+                                        <h6>Email</h6>
+                                        <p>@(Model.StudentInfo?.Email ?? "anNV@fpt.edu.vn")</p>
+                                    </div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-icon">
+                                        <i class="fas fa-phone"></i>
+                                    </div>
+                                    <div class="info-content">
+                                        <h6>Số điện thoại</h6>
+                                        <p>@(Model.StudentInfo?.PhoneNumber ?? "0123 456 789")</p>
+                                    </div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-icon">
+                                        <i class="fas fa-graduation-cap"></i>
+                                    </div>
+                                    <div class="info-content">
+                                        <h6>Chuyên ngành</h6>
+                                        <p>@(Model.StudentInfo?.Major ?? "Công nghệ thông tin")</p>
+                                    </div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-icon">
+                                        <i class="fas fa-calendar-alt"></i>
+                                    </div>
+                                    <div class="info-content">
+                                        <h6>Khóa học</h6>
+                                        <p>@(Model.StudentInfo?.AcademicYear ?? "2021 - 2025")</p>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Borrowing Guidelines -->
-                    <div class="borrowing-guidelines mb-4">
-                        <h5><i class="fas fa-info-circle me-2 text-primary"></i>Hướng dẫn mượn sách</h5>
-                        <div class="guidelines-content">
+                        <!-- Book Information -->
+                        <div class="book-info-section">
                             <div class="row">
-                                <div class="col-md-6">
-                                    <div class="guideline-card">
-                                        <h6><i class="fas fa-clock me-1"></i>Thời gian mượn</h6>
-                                        <ul>
-                                            <li>Thời gian mượn tối đa: <strong>30 ngày</strong></li>
-                                            <li>Có thể gia hạn <strong>1 lần</strong> (thêm 15 ngày)</li>
-                                            <li>Gia hạn trước ngày hết hạn <strong>3 ngày</strong></li>
-                                        </ul>
+                                <div class="col-md-3">
+                                    <div class="book-cover">
+                                        @if (!string.IsNullOrEmpty(Model.BookCoverUrl))
+                                        {
+                                            <img src="@Model.BookCoverUrl" alt="@Model.BookTitle" class="img-fluid">
+                                        }
+                                        else
+                                        {
+                                            <div class="book-placeholder">
+                                                <i class="fas fa-book fa-3x"></i>
+                                            </div>
+                                        }
                                     </div>
                                 </div>
-                                <div class="col-md-6">
-                                    <div class="guideline-card">
-                                        <h6><i class="fas fa-shield-alt me-1"></i>Quy định chung</h6>
-                                        <ul>
-                                            <li>Tối đa <strong>5 cuốn</strong> cùng lúc</li>
-                                            <li>Phải có thẻ sinh viên hợp lệ</li>
-                                            <li>Không được cho mượn lại</li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Book Availability & Stats -->
-                    <div class="availability-section mb-4">
-                        <div class="row">
-                            <div class="col-md-8">
-                                <div class="availability-info">
-                                    <h6><i class="fas fa-check-circle text-success me-1"></i>Tình trạng sách</h6>
-                                    <div class="status-grid">
-                                        <div class="status-item">
-                                            <span class="status-label">Tổng số:</span>
-                                            <span class="status-value">5 cuốn</span>
-                                        </div>
-                                        <div class="status-item">
-                                            <span class="status-label">Còn lại:</span>
-                                            <span class="status-value text-success">3 cuốn</span>
-                                        </div>
-                                        <div class="status-item">
-                                            <span class="status-label">Đang mượn:</span>
-                                            <span class="status-value text-warning">2 cuốn</span>
-                                        </div>
-                                        <div class="status-item">
-                                            <span class="status-label">Dự kiến trả gần nhất:</span>
-                                            <span class="status-value">25/09/2025</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="student-quota">
-                                    <h6><i class="fas fa-user-graduate me-1"></i>Hạn mức của bạn</h6>
-                                    <div class="quota-info">
-                                        <div class="quota-item">
-                                            <span>Đang mượn: <strong>2/5 cuốn</strong></span>
-                                            <div class="progress">
-                                                <div class="progress-bar" style="width: 40%"></div>
+                                <div class="col-md-9">
+                                    <div class="book-details">
+                                        <h4>@Model.BookTitle</h4>
+                                        <div class="book-meta">
+                                            <div class="book-author">
+                                                <i class="fas fa-user"></i>
+                                                @Model.BookAuthor
+                                            </div>
+                                            <div class="rental-price">
+                                                <i class="fas fa-gift"></i>
+                                                Miễn phí mượn
                                             </div>
                                         </div>
-                                        <small class="text-muted">Còn có thể mượn 3 cuốn nữa</small>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Borrowing Timeline -->
-                    <div class="timeline-section mb-4">
-                        <h6><i class="fas fa-calendar-check me-1"></i>Lịch trình mượn trả</h6>
-                        <div class="borrowing-timeline">
-                            <div class="timeline-item current">
-                                <div class="timeline-dot"></div>
-                                <div class="timeline-content">
-                                    <h6>Hôm nay</h6>
-                                    <small>Ngày mượn sách</small>
+                        <!-- Borrowing Guidelines -->
+                        <div class="guidelines-section">
+                            <h5 class="guidelines-title">
+                                <i class="fas fa-info-circle"></i>
+                                Quy định mượn sách của thư viện
+                            </h5>
+                            <div class="guidelines-grid">
+                                <div class="guideline-card">
+                                    <h6><i class="fas fa-clock"></i>Thời gian mượn</h6>
+                                    <ul>
+                                        <li>Thời gian mượn tối đa: <strong>30 ngày</strong></li>
+                                        <li>Gia hạn: Tối đa <strong>2 lần</strong>, mỗi lần <strong>15 ngày</strong></li>
+                                        <li>Sinh viên được mượn tối đa <strong>5 cuốn</strong></li>
+                                    </ul>
                                 </div>
-                            </div>
-                            <div class="timeline-item future">
-                                <div class="timeline-dot"></div>
-                                <div class="timeline-content">
-                                    <h6 id="timelineRenewalDate">27/09/2025</h6>
-                                    <small>Có thể gia hạn từ ngày này</small>
+                                <div class="guideline-card">
+                                    <h6><i class="fas fa-money-bill-wave"></i>Phí dịch vụ</h6>
+                                    <ul>
+                                        <li>Mượn sách: <strong>Miễn phí</strong></li>
+                                        <li>Phí trễ hạn: <strong>2,000đ/ngày/cuốn</strong></li>
+                                        <li>Phí làm mất sách: <strong>150% giá sách</strong></li>
+                                    </ul>
                                 </div>
-                            </div>
-                            <div class="timeline-item future">
-                                <div class="timeline-dot"></div>
-                                <div class="timeline-content">
-                                    <h6 id="timelineDueDate">13/10/2025</h6>
-                                    <small>Ngày trả dự kiến</small>
+                                <div class="guideline-card">
+                                    <h6><i class="fas fa-shield-alt"></i>Quy định chung</h6>
+                                    <ul>
+                                        <li>Phải có thẻ sinh viên hợp lệ</li>
+                                        <li>Không được cho mượn lại</li>
+                                        <li>Chỉ mượn trong khuôn viên trường</li>
+                                        <li>Trả sách đúng giờ làm việc thư viện</li>
+                                    </ul>
                                 </div>
-                            </div>
-                            <div class="timeline-item warning">
-                                <div class="timeline-dot"></div>
-                                <div class="timeline-content">
-                                    <h6 id="timelinePenaltyDate">14/10/2025</h6>
-                                    <small>Bắt đầu tính phí phạt</small>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Penalty Calculator -->
-                    <div class="penalty-section mb-4">
-                        <h6><i class="fas fa-calculator me-1 text-warning"></i>Tính phí phạt dự kiến</h6>
-                        <div class="penalty-calculator">
-                            <div class="calculator-info">
-                                <div class="row">
-                                    <div class="col-md-6">
-                                        <div class="penalty-rates">
-                                            <h6>Mức phí phạt:</h6>
-                                            <ul>
-                                                <li>1-7 ngày trễ: <strong>5,000 VND/ngày</strong></li>
-                                                <li>8-14 ngày trễ: <strong>10,000 VND/ngày</strong></li>
-                                                <li>Trên 14 ngày: <strong>20,000 VND/ngày</strong></li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="penalty-consequences">
-                                            <h6>Hậu quả khi trễ hạn:</h6>
-                                            <ul>
-                                                <li>Trễ trên 7 ngày: <span class="text-warning">Cảnh báo</span></li>
-                                                <li>Trễ trên 14 ngày: <span class="text-danger">Khóa tài khoản tạm thời</span></li>
-                                                <li>Trễ trên 30 ngày: <span class="text-danger">Không được ra trường</span></li>
-                                            </ul>
-                                        </div>
-                                    </div>
+                                <div class="guideline-card">
+                                    <h6><i class="fas fa-user-shield"></i>Trách nhiệm sinh viên</h6>
+                                    <ul>
+                                        <li>Bảo quản sách cẩn thận</li>
+                                        <li>Không tô vẽ, xé trang</li>
+                                        <li>Báo cáo kịp thời nếu hỏng</li>
+                                        <li>Tuân thủ nội quy thư viện</li>
+                                    </ul>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Borrow Form -->
-                    <form asp-action="Borrow" method="post" class="borrow-form">
-                        <input type="hidden" asp-for="BookId" />
-                        <input type="hidden" asp-for="BookTitle" />
-                        <input type="hidden" asp-for="BookAuthor" />
-                        <input type="hidden" asp-for="BookCoverUrl" />
+                        <!-- Form Section -->
+                        <form asp-action="Borrow" method="post" class="form-section">
+                            <input type="hidden" asp-for="BookId" />
+                            <input type="hidden" asp-for="BookTitle" />
+                            <input type="hidden" asp-for="BookAuthor" />
+                            <input type="hidden" asp-for="BookCoverUrl" />
 
-                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+                            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
 
-                        <div class="form-group mb-4">
-                            <label asp-for="DueDate" class="form-label">
-                                <i class="fas fa-calendar-alt me-1"></i>
-                                Ngày trả dự kiến
-                            </label>
-                            <input asp-for="DueDate" class="form-control" type="date"
-                                min="@DateTime.Today.AddDays(1).ToString("yyyy-MM-dd")"
-                                max="@DateTime.Today.AddDays(30).ToString("yyyy-MM-dd")" />
-                            <div class="form-text">
-                                <i class="fas fa-info-circle me-1"></i>
-                                Thời gian mượn tối đa 30 ngày
+                            <div class="form-group">
+                                <label asp-for="DueDate" class="form-label">
+                                    <i class="fas fa-calendar-alt"></i>
+                                    Ngày trả dự kiến
+                                </label>
+                                <input asp-for="DueDate" class="form-control" type="date"
+                                    min="@DateTime.Today.AddDays(1).ToString("yyyy-MM-dd")"
+                                    max="@DateTime.Today.AddDays(30).ToString("yyyy-MM-dd")" />
+                                <div class="form-text">
+                                    <i class="fas fa-info-circle"></i>
+                                    Thời gian mượn tối đa 30 ngày từ hôm nay
+                                </div>
+                                <span asp-validation-for="DueDate" class="text-danger"></span>
                             </div>
-                            <span asp-validation-for="DueDate" class="text-danger"></span>
-                        </div>
 
-                        <div class="form-group mb-4">
-                            <label asp-for="Notes" class="form-label">
-                                <i class="fas fa-sticky-note me-1"></i>
-                                Ghi chú (Tùy chọn)
-                            </label>
-                            <textarea asp-for="Notes" class="form-control" rows="3"
-                                placeholder="Nhập ghi chú nếu có..."></textarea>
-                            <span asp-validation-for="Notes" class="text-danger"></span>
-                        </div>
+                            <div class="form-group">
+                                <label asp-for="Notes" class="form-label">
+                                    <i class="fas fa-sticky-note"></i>
+                                    Ghi chú (Tùy chọn)
+                                </label>
+                                <textarea asp-for="Notes" class="form-control" rows="3"
+                                    placeholder="Nhập ghi chú về mục đích sử dụng, dự án nghiên cứu..."></textarea>
+                                <span asp-validation-for="Notes" class="text-danger"></span>
+                            </div>
 
-                        <!-- Terms and Conditions -->
-                        <div class="terms-section mb-4">
-                            <div class="enhanced-terms">
-                                <h6><i class="fas fa-clipboard-check me-1"></i>Cam kết và điều khoản mượn sách</h6>
+                            <!-- Terms and Conditions -->
+                            <div class="terms-section">
+                                <h6 class="terms-title">
+                                    <i class="fas fa-clipboard-check"></i>
+                                    Cam kết và điều khoản mượn sách
+                                </h6>
                                 <div class="terms-grid">
                                     <div class="term-item">
                                         <i class="fas fa-hand-holding-heart text-primary"></i>
                                         <div>
                                             <strong>Bảo quản sách tốt</strong>
-                                            <p>Không làm hỏng, tô vẽ, xé trang hoặc làm mất sách</p>
+                                            <p>Cam kết không làm hỏng, tô vẽ, xé trang hoặc làm mất sách. Sử dụng sách cẩn thận và giữ gìn như tài sản của trường.</p>
                                         </div>
                                     </div>
                                     <div class="term-item">
                                         <i class="fas fa-clock text-success"></i>
                                         <div>
                                             <strong>Trả đúng hạn</strong>
-                                            <p>Trả sách đúng ngày đã cam kết để tránh phí phạt</p>
+                                            <p>Trả sách đúng ngày đã cam kết. Nếu cần gia hạn, thực hiện trước 3 ngày hết hạn để tránh phí phạt.</p>
                                         </div>
                                     </div>
                                     <div class="term-item">
                                         <i class="fas fa-user-shield text-info"></i>
                                         <div>
                                             <strong>Sử dụng cá nhân</strong>
-                                            <p>Không cho mượn lại, sao chép hoặc sử dụng vào mục đích thương mại</p>
+                                            <p>Chỉ sinh viên mượn được sử dụng. Không được cho mượn lại, sao chép toàn bộ hoặc sử dụng vào mục đích thương mại.</p>
                                         </div>
                                     </div>
                                     <div class="term-item">
                                         <i class="fas fa-exclamation-triangle text-warning"></i>
                                         <div>
                                             <strong>Chịu trách nhiệm</strong>
-                                            <p>Bồi thường theo quy định nếu làm mất hoặc hỏng sách</p>
+                                            <p>Bồi thường 100% giá trị sách nếu làm mất. Thanh toán phí phạt nếu trả trễ theo quy định của thư viện.</p>
                                         </div>
+                                    </div>
+                                </div>
+
+                                <div class="agreement-section">
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="agreeTerms" required>
+                                        <label class="form-check-label" for="agreeTerms">
+                                            <strong>Tôi đã đọc, hiểu và đồng ý với tất cả các quy định mượn sách của thư viện. Cam kết bảo quản sách tốt, trả đúng hạn, chịu trách nhiệm về sách đã mượn và thanh toán phí phạt nếu vi phạm quy định. Xác nhận thông tin cá nhân trên là chính xác và cập nhật.</strong>
+                                        </label>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="agreement-section">
-                                <div class="form-check mb-3">
-                                    <input class="form-check-input" type="checkbox" id="agreeTerms" required>
-                                    <label class="form-check-label" for="agreeTerms">
-                                        <strong>Tôi đã đọc, hiểu và đồng ý với tất cả các điều khoản mượn sách của thư viện</strong>
-                                    </label>
-                                </div>
-                                <div class="form-check mb-3">
-                                    <input class="form-check-input" type="checkbox" id="agreeResponsibility" required>
-                                    <label class="form-check-label" for="agreeResponsibility">
-                                        Tôi cam kết bảo quản sách tốt và trả đúng hạn
-                                    </label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="agreePenalty" required>
-                                    <label class="form-check-label" for="agreePenalty">
-                                        Tôi hiểu rõ các mức phí phạt và hậu quả khi trễ hạn trả sách
-                                    </label>
-                                </div>
+                            <!-- Action Buttons -->
+                            <div class="action-buttons">
+                                <button type="submit" class="btn btn-primary btn-lg me-3">
+                                    <i class="fas fa-check"></i>
+                                    Xác nhận mượn sách
+                                </button>
+                                <a asp-controller="Home" asp-action="BookDetail" asp-route-id="@Model.BookId"
+                                    class="btn btn-outline-secondary btn-lg">
+                                    <i class="fas fa-arrow-left"></i>
+                                    Quay lại
+                                </a>
                             </div>
-                        </div>
-
-                        <!-- Action Buttons -->
-                        <div class="action-buttons">
-                            <button type="submit" class="btn btn-primary btn-lg me-3">
-                                <i class="fas fa-check me-2"></i>
-                                Xác nhận mượn sách
-                            </button>
-                            <a asp-controller="Home" asp-action="BookDetail" asp-route-id="@Model.BookId"
-                                class="btn btn-outline-secondary btn-lg">
-                                <i class="fas fa-arrow-left me-2"></i>
-                                Quay lại
-                            </a>
-                        </div>
-                    </form>
+                        </form>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-@section Scripts {
-    <partial name="_ValidationScriptsPartial" />
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const dueDateInput = document.getElementById('DueDate');
-            
-            // Auto-set due date to 14 days from today if not set
-            if (!dueDateInput.value) {
-                const defaultDate = new Date();
-                defaultDate.setDate(defaultDate.getDate() + 14);
-                dueDateInput.value = defaultDate.toISOString().split('T')[0];
-            }
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const dueDateInput = document.querySelector('input[name="DueDate"]');
+        
+        // Auto-set due date to 14 days from today if not set
+        if (dueDateInput && !dueDateInput.value) {
+            const defaultDate = new Date();
+            defaultDate.setDate(defaultDate.getDate() + 14);
+            dueDateInput.value = defaultDate.toISOString().split('T')[0];
+        }
 
-            // Update timeline dates when due date changes
-            function updateTimeline() {
-                const dueDate = new Date(dueDateInput.value);
-                if (dueDate && !isNaN(dueDate)) {
-                    // Renewal date (3 days before due date)
-                    const renewalDate = new Date(dueDate);
-                    renewalDate.setDate(renewalDate.getDate() - 3);
-                    
-                    // Penalty start date (1 day after due date)
-                    const penaltyDate = new Date(dueDate);
-                    penaltyDate.setDate(penaltyDate.getDate() + 1);
-
-                    // Update timeline display
-                    document.getElementById('timelineRenewalDate').textContent = 
-                        renewalDate.toLocaleDateString('vi-VN');
-                    document.getElementById('timelineDueDate').textContent = 
-                        dueDate.toLocaleDateString('vi-VN');
-                    document.getElementById('timelinePenaltyDate').textContent = 
-                        penaltyDate.toLocaleDateString('vi-VN');
-                }
-            }
-
-            // Update timeline when page loads and when due date changes
-            updateTimeline();
-            dueDateInput.addEventListener('change', updateTimeline);
-
-            // Enhanced form validation
-            const submitButton = document.querySelector('button[type="submit"]');
-            const checkboxes = document.querySelectorAll('input[type="checkbox"][required]');
-            
-            function validateForm() {
-                let allChecked = true;
-                checkboxes.forEach(checkbox => {
-                    if (!checkbox.checked) {
-                        allChecked = false;
-                    }
-                });
-                
-                submitButton.disabled = !allChecked;
-                submitButton.classList.toggle('btn-secondary', !allChecked);
-                submitButton.classList.toggle('btn-primary', allChecked);
-            }
-
+        // Form validation for checkboxes
+        const submitButton = document.querySelector('button[type="submit"]');
+        const checkboxes = document.querySelectorAll('input[type="checkbox"][required]');
+        
+        function validateForm() {
+            let allChecked = true;
             checkboxes.forEach(checkbox => {
-                checkbox.addEventListener('change', validateForm);
+                if (!checkbox.checked) {
+                    allChecked = false;
+                }
             });
             
-            // Initial validation
-            validateForm();
-
-            // Penalty calculator
-            function calculatePenalty(daysLate) {
-                let dailyFee = 0;
-                if (daysLate <= 7) {
-                    dailyFee = 5000;
-                } else if (daysLate <= 14) {
-                    dailyFee = 10000;
-                } else {
-                    dailyFee = 20000;
-                }
-                return daysLate * dailyFee;
+            submitButton.disabled = !allChecked;
+            if (allChecked) {
+                submitButton.classList.remove('btn-secondary');
+                submitButton.classList.add('btn-primary');
+            } else {
+                submitButton.classList.remove('btn-primary');
+                submitButton.classList.add('btn-secondary');
             }
+        }
 
-            // Show penalty preview on hover
-            const penaltySection = document.querySelector('.penalty-calculator');
-            if (penaltySection) {
-                penaltySection.addEventListener('mouseenter', function() {
-                    this.style.transform = 'scale(1.02)';
-                    this.style.transition = 'transform 0.3s ease';
-                });
-                
-                penaltySection.addEventListener('mouseleave', function() {
-                    this.style.transform = 'scale(1)';
-                });
-            }
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', validateForm);
         });
-    </script>
-}
+        
+        // Initial validation
+        validateForm();
+
+        // Smooth animations for cards
+        const cards = document.querySelectorAll('.info-item, .guideline-card, .term-item');
+        cards.forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-3px)';
+            });
+            card.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+    });
+</script>

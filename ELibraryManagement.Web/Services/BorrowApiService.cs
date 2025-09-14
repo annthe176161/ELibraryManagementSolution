@@ -7,6 +7,7 @@ namespace ELibraryManagement.Web.Services
     public interface IBorrowApiService
     {
         Task<ExtendBorrowResponseViewModel> ExtendBorrowAsync(int borrowId, string? reason = null);
+        Task<BorrowResult> BorrowBookAsync(int bookId);
         Task<bool> IsAuthenticatedAsync();
     }
 
@@ -42,7 +43,12 @@ namespace ELibraryManagement.Web.Services
 
         public async Task<bool> IsAuthenticatedAsync()
         {
-            var token = GetCurrentToken();
+            // Kiểm tra token từ cả Session và Cookie
+            var sessionToken = _httpContextAccessor.HttpContext?.Session.GetString("Token");
+            var cookieToken = _httpContextAccessor.HttpContext?.Request.Cookies["AuthToken"];
+
+            var token = !string.IsNullOrEmpty(sessionToken) ? sessionToken : cookieToken;
+
             return !string.IsNullOrEmpty(token);
         }
 
@@ -89,6 +95,66 @@ namespace ELibraryManagement.Web.Services
                     Success = false,
                     Message = $"Có lỗi xảy ra: {ex.Message}"
                 };
+            }
+        }
+
+        public async Task<BorrowResult> BorrowBookAsync(int bookId)
+        {
+            try
+            {
+                var token = _httpContextAccessor.HttpContext?.Request.Cookies["AuthToken"];
+                if (string.IsNullOrEmpty(token))
+                {
+                    return new BorrowResult { Success = false, Message = "Vui lòng đăng nhập để mượn sách." };
+                }
+
+                _httpClient.DefaultRequestHeaders.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+                var apiUrl = $"{_configuration["ApiSettings:BaseUrl"]}/api/Borrow/borrow";
+                var requestContent = new StringContent(
+                    JsonSerializer.Serialize(new { BookId = bookId }),
+                    Encoding.UTF8,
+                    "application/json");
+
+                var response = await _httpClient.PostAsync(apiUrl, requestContent);
+                var responseContent = await response.Content.ReadAsStringAsync();
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var jsonDocument = JsonDocument.Parse(responseContent);
+                    var root = jsonDocument.RootElement;
+
+                    return new BorrowResult
+                    {
+                        Success = true,
+                        Message = "Mượn sách thành công!",
+                        BorrowRecordId = root.TryGetProperty("borrowRecordId", out var borrowIdProp) ?
+                            borrowIdProp.GetInt32() : null
+                    };
+                }
+                else
+                {
+                    var errorMessage = "Không thể mượn sách";
+                    if (!string.IsNullOrEmpty(responseContent))
+                    {
+                        try
+                        {
+                            var errorJson = JsonDocument.Parse(responseContent);
+                            if (errorJson.RootElement.TryGetProperty("message", out var messageProp))
+                            {
+                                errorMessage = messageProp.GetString() ?? errorMessage;
+                            }
+                        }
+                        catch { }
+                    }
+
+                    return new BorrowResult { Success = false, Message = errorMessage };
+                }
+            }
+            catch (Exception ex)
+            {
+                return new BorrowResult { Success = false, Message = $"Có lỗi xảy ra: {ex.Message}" };
             }
         }
     }

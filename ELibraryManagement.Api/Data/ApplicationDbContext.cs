@@ -80,9 +80,27 @@ namespace ELibraryManagement.Api.Data
                 .HasForeignKey(f => f.BorrowRecordId)
                 .OnDelete(DeleteBehavior.SetNull);
 
+            // Configure UserStatus relationships
+            modelBuilder.Entity<UserStatus>()
+                .HasKey(us => us.UserId);
+
+            modelBuilder.Entity<UserStatus>()
+                .HasOne(us => us.User)
+                .WithOne(u => u.UserStatus)
+                .HasForeignKey<UserStatus>(us => us.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
             // Configure decimal properties
             modelBuilder.Entity<Fine>()
                 .Property(f => f.Amount)
+                .HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<UserStatus>()
+                .Property(us => us.TotalOutstandingFines)
+                .HasColumnType("decimal(18,2)");
+
+            modelBuilder.Entity<FineActionHistory>()
+                .Property(fah => fah.Amount)
                 .HasColumnType("decimal(18,2)");
 
             // Configure indexes for performance

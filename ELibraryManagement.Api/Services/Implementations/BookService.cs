@@ -9,10 +9,12 @@ namespace ELibraryManagement.Api.Services.Implementations
     public class BookService : IBookService
     {
         private readonly ApplicationDbContext _context;
+        private readonly IUserStatusService _userStatusService;
 
-        public BookService(ApplicationDbContext context)
+        public BookService(ApplicationDbContext context, IUserStatusService userStatusService)
         {
             _context = context;
+            _userStatusService = userStatusService;
         }
 
         public IQueryable<BookDto> GetAvailableBooksQueryable()
@@ -85,6 +87,25 @@ namespace ELibraryManagement.Api.Services.Implementations
 
         public async Task<BorrowBookResponseDto> BorrowBookAsync(BorrowBookRequestDto request)
         {
+            // Check if user can borrow
+            var canBorrow = await _userStatusService.CanUserBorrowAsync(request.UserId);
+            if (!canBorrow)
+            {
+                var userStatus = await _userStatusService.GetUserStatusAsync(request.UserId);
+                if (userStatus.AccountStatus == UserAccountStatus.Blocked)
+                {
+                    throw new InvalidOperationException($"Your account is blocked. Reason: {userStatus.BlockReason}");
+                }
+                if (userStatus.CurrentBorrowCount >= userStatus.MaxBorrowLimit)
+                {
+                    throw new InvalidOperationException($"You have reached your borrowing limit ({userStatus.MaxBorrowLimit} books).");
+                }
+                if (userStatus.TotalOutstandingFines > 50000)
+                {
+                    throw new InvalidOperationException($"You have outstanding fines of {userStatus.TotalOutstandingFines:N0} VND. Please pay your fines before borrowing.");
+                }
+            }
+
             // Check if book exists and is available
             var book = await _context.Books.FindAsync(request.BookId);
             if (book == null)
@@ -123,6 +144,9 @@ namespace ELibraryManagement.Api.Services.Implementations
 
             // Decrease available quantity
             book.AvailableQuantity--;
+
+            // Update user status - increment borrow count
+            await _userStatusService.IncrementBorrowCountAsync(request.UserId);
 
             // Save changes
             _context.BorrowRecords.Add(borrowRecord);
@@ -186,11 +210,21 @@ namespace ELibraryManagement.Api.Services.Implementations
             var isOverdue = returnDate > borrowRecord.DueDate;
             decimal? fineAmount = null;
 
-            // Calculate fine if overdue (e.g., $1 per day)
+            // Calculate fine if overdue using VND rates
             if (isOverdue)
             {
                 var overdueDays = (returnDate - borrowRecord.DueDate).Days;
-                fineAmount = overdueDays * 1.0m; // $1 per day fine
+
+                // Progressive fine rates as per business rules
+                decimal dailyRate = 0;
+                if (overdueDays <= 7)
+                    dailyRate = 2000; // 2,000 VND per day for first week
+                else if (overdueDays <= 14)
+                    dailyRate = 5000; // 5,000 VND per day for second week
+                else
+                    dailyRate = 10000; // 10,000 VND per day after 2 weeks
+
+                fineAmount = overdueDays * dailyRate;
 
                 // Create a fine record
                 var fine = new Fine
@@ -204,6 +238,9 @@ namespace ELibraryManagement.Api.Services.Implementations
                 };
 
                 _context.Fines.Add(fine);
+
+                // Add fine to user status
+                await _userStatusService.AddFineAsync(borrowRecord.UserId, fineAmount.Value);
             }
 
             // Update borrow record
@@ -213,6 +250,9 @@ namespace ELibraryManagement.Api.Services.Implementations
 
             // Increase available quantity
             borrowRecord.Book.AvailableQuantity++;
+
+            // Decrease user's current borrow count
+            await _userStatusService.DecrementBorrowCountAsync(borrowRecord.UserId);
 
             await _context.SaveChangesAsync();
 
@@ -225,7 +265,7 @@ namespace ELibraryManagement.Api.Services.Implementations
                 UserId = borrowRecord.UserId,
                 ReturnDate = returnDate,
                 FineAmount = fineAmount,
-                Message = isOverdue ? $"Book returned successfully. Fine: ${fineAmount:F2}" : "Book returned successfully."
+                Message = isOverdue ? $"Book returned successfully. Fine: {fineAmount:N0} VND" : "Book returned successfully."
             };
         }
 

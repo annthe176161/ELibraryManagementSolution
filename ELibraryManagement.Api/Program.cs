@@ -62,6 +62,7 @@ namespace ELibraryManagement.Api
             builder.Services.AddScoped<IBorrowService, BorrowService>();
             builder.Services.AddScoped<ICategoryService, CategoryService>();
             builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
+            builder.Services.AddScoped<IUserStatusService, UserStatusService>();
 
             // Configure Cloudinary
             builder.Services.AddSingleton(provider =>

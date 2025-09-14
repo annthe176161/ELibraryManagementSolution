@@ -18,6 +18,9 @@ namespace ELibraryManagement.Web.Models
         [Display(Name = "Ghi chú")]
         [MaxLength(500, ErrorMessage = "Ghi chú không được quá 500 ký tự")]
         public string? Notes { get; set; }
+
+        // Student Information
+        public StudentInfoViewModel? StudentInfo { get; set; }
     }
 
     public class BorrowBookRequestViewModel
