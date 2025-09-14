@@ -119,6 +119,9 @@ namespace ELibraryManagement.Web.Models
         [MaxLength(500, ErrorMessage = "URL Avatar không được quá 500 ký tự")]
         [Url(ErrorMessage = "URL Avatar không hợp lệ")]
         public string? AvatarUrl { get; set; }
+
+        [Display(Name = "Tải lên ảnh đại diện")]
+        public IFormFile? AvatarFile { get; set; }
     }
 
     public class ChangePasswordViewModel

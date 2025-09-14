@@ -181,11 +181,31 @@ namespace ELibraryManagement.Web.Controllers
 
             try
             {
+                // Nếu có file avatar được upload, upload lên Cloudinary trước
+                if (model.AvatarFile != null && model.AvatarFile.Length > 0)
+                {
+                    var uploadResult = await _authApiService.UploadAvatarAsync(model.AvatarFile);
+                    if (uploadResult.Success)
+                    {
+                        // Nếu upload thành công, cập nhật AvatarUrl
+                        TempData["SuccessMessage"] = "Upload avatar thành công!";
+                    }
+                    else
+                    {
+                        TempData["ErrorMessage"] = uploadResult.Message;
+                        return View(model);
+                    }
+                }
+
+                // Cập nhật thông tin profile
                 var result = await _authApiService.UpdateProfileAsync(model);
 
                 if (result.Success)
                 {
-                    TempData["SuccessMessage"] = result.Message;
+                    if (string.IsNullOrEmpty(TempData["SuccessMessage"]?.ToString()))
+                    {
+                        TempData["SuccessMessage"] = result.Message;
+                    }
                     return RedirectToAction("Profile");
                 }
 

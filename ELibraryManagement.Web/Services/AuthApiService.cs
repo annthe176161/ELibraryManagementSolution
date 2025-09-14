@@ -20,6 +20,7 @@ namespace ELibraryManagement.Web.Services
         Task<AuthResponseViewModel> ChangePasswordAsync(ChangePasswordViewModel model);
         Task<AuthResponseViewModel> ForgotPasswordAsync(ForgotPasswordViewModel model);
         Task<AuthResponseViewModel> ResetPasswordAsync(ResetPasswordViewModel model);
+        Task<AuthResponseViewModel> UploadAvatarAsync(IFormFile file);
     }
 
     public class AuthApiService : IAuthApiService
@@ -549,6 +550,63 @@ namespace ELibraryManagement.Web.Services
                 {
                     Success = false,
                     Message = $"Reset mật khẩu thất bại: {responseContent}"
+                };
+            }
+            catch (Exception ex)
+            {
+                return new AuthResponseViewModel
+                {
+                    Success = false,
+                    Message = $"Có lỗi xảy ra: {ex.Message}"
+                };
+            }
+        }
+
+        public async Task<AuthResponseViewModel> UploadAvatarAsync(IFormFile file)
+        {
+            try
+            {
+                if (file == null || file.Length == 0)
+                {
+                    return new AuthResponseViewModel
+                    {
+                        Success = false,
+                        Message = "Vui lòng chọn file ảnh!"
+                    };
+                }
+
+                var token = GetCurrentToken();
+                if (string.IsNullOrEmpty(token))
+                {
+                    return new AuthResponseViewModel
+                    {
+                        Success = false,
+                        Message = "Bạn cần đăng nhập để thực hiện chức năng này!"
+                    };
+                }
+
+                using var formData = new MultipartFormDataContent();
+                using var fileStream = file.OpenReadStream();
+                using var streamContent = new StreamContent(fileStream);
+                streamContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(file.ContentType);
+                formData.Add(streamContent, "file", file.FileName);
+
+                _httpClient.DefaultRequestHeaders.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+                var response = await _httpClient.PostAsync($"{GetApiBaseUrl()}/api/User/upload-avatar", formData);
+                var responseContent = await response.Content.ReadAsStringAsync();
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var result = JsonSerializer.Deserialize<AuthResponseViewModel>(responseContent, _jsonOptions);
+                    return result ?? new AuthResponseViewModel { Success = true, Message = "Upload avatar thành công!" };
+                }
+
+                return new AuthResponseViewModel
+                {
+                    Success = false,
+                    Message = $"Upload avatar thất bại: {responseContent}"
                 };
             }
             catch (Exception ex)

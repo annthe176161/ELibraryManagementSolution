@@ -15,6 +15,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OData.ModelBuilder;
 using Microsoft.OpenApi.Models;
 using System.Text;
+using CloudinaryDotNet;
 
 namespace ELibraryManagement.Api
 {
@@ -60,6 +61,18 @@ namespace ELibraryManagement.Api
             builder.Services.AddScoped<IReviewService, ReviewService>();
             builder.Services.AddScoped<IBorrowService, BorrowService>();
             builder.Services.AddScoped<ICategoryService, CategoryService>();
+            builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
+
+            // Configure Cloudinary
+            builder.Services.AddSingleton(provider =>
+            {
+                var config = provider.GetRequiredService<IConfiguration>();
+                return new Cloudinary(new Account(
+                    config["Cloudinary:CloudName"],
+                    config["Cloudinary:ApiKey"],
+                    config["Cloudinary:ApiSecret"]
+                ));
+            });
 
             // Add CORS
             builder.Services.AddCors(options =>

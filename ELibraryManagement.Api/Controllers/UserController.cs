@@ -13,10 +13,12 @@ namespace ELibraryManagement.Api.Controllers
     public class UserController : ControllerBase
     {
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly ICloudinaryService _cloudinaryService;
 
-        public UserController(UserManager<ApplicationUser> userManager)
+        public UserController(UserManager<ApplicationUser> userManager, ICloudinaryService cloudinaryService)
         {
             _userManager = userManager;
+            _cloudinaryService = cloudinaryService;
         }
 
         /// <summary>
@@ -94,10 +96,114 @@ namespace ELibraryManagement.Api.Controllers
                 FullName = $"{u.FirstName} {u.LastName}".Trim(),
                 u.PhoneNumber,
                 u.Address,
-                u.DateOfBirth
+                u.DateOfBirth,
+                u.AvatarUrl
             }).ToList();
 
             return Ok(users);
+        }
+
+        /// <summary>
+        /// Upload avatar cho user
+        /// </summary>
+        [HttpPost("upload-avatar")]
+        [Authorize]
+        public async Task<IActionResult> UploadAvatar(IFormFile file)
+        {
+            try
+            {
+                if (file == null || file.Length == 0)
+                {
+                    return BadRequest("No file provided");
+                }
+
+                var userId = User.Identity?.Name;
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return Unauthorized("User not found");
+                }
+
+                var user = await _userManager.FindByNameAsync(userId);
+                if (user == null)
+                {
+                    return NotFound("User not found");
+                }
+
+                // Upload ảnh lên Cloudinary
+                var imageUrl = await _cloudinaryService.UploadImageAsync(file, "avatars");
+                if (imageUrl == null)
+                {
+                    return BadRequest("Failed to upload image");
+                }
+
+                // Cập nhật AvatarUrl trong database
+                user.AvatarUrl = imageUrl;
+                var result = await _userManager.UpdateAsync(user);
+
+                if (result.Succeeded)
+                {
+                    return Ok(new
+                    {
+                        Message = "Avatar uploaded successfully",
+                        AvatarUrl = imageUrl
+                    });
+                }
+
+                return BadRequest("Failed to update user avatar");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Upload avatar cho user theo ID (Admin only)
+        /// </summary>
+        [HttpPost("upload-avatar/{userId}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> UploadAvatarForUser(string userId, IFormFile file)
+        {
+            try
+            {
+                if (file == null || file.Length == 0)
+                {
+                    return BadRequest("No file provided");
+                }
+
+                var user = await _userManager.FindByIdAsync(userId);
+                if (user == null)
+                {
+                    return NotFound("User not found");
+                }
+
+                // Upload ảnh lên Cloudinary
+                var imageUrl = await _cloudinaryService.UploadImageAsync(file, "avatars");
+                if (imageUrl == null)
+                {
+                    return BadRequest("Failed to upload image");
+                }
+
+                // Cập nhật AvatarUrl trong database
+                user.AvatarUrl = imageUrl;
+                var result = await _userManager.UpdateAsync(user);
+
+                if (result.Succeeded)
+                {
+                    return Ok(new
+                    {
+                        Message = "Avatar uploaded successfully",
+                        AvatarUrl = imageUrl,
+                        UserId = userId
+                    });
+                }
+
+                return BadRequest("Failed to update user avatar");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
         }
     }
 }

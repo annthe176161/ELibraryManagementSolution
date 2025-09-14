@@ -229,7 +229,7 @@
                             </div>
                         }
 
-                        <form asp-controller="Account" asp-action="EditProfile" method="post">
+                        <form asp-controller="Account" asp-action="EditProfile" method="post" enctype="multipart/form-data">
                             @Html.AntiForgeryToken()
                             
                             <!-- Student ID - Highlighted Section -->
@@ -302,10 +302,30 @@
                             <div class="form-group">
                                 <label class="form-label" asp-for="AvatarUrl">
                                     <i class="fas fa-image"></i>
-                                    URL Avatar
+                                    URL Avatar (tùy chọn)
                                 </label>
                                 <input asp-for="AvatarUrl" class="form-control" placeholder="Nhập link ảnh đại diện" />
                                 <span asp-validation-for="AvatarUrl" class="invalid-feedback"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label" asp-for="AvatarFile">
+                                    <i class="fas fa-upload"></i>
+                                    Hoặc tải lên ảnh đại diện
+                                </label>
+                                <input asp-for="AvatarFile" type="file" class="form-control" 
+                                       accept="image/*" 
+                                       onchange="previewAvatar(this)" />
+                                <span asp-validation-for="AvatarFile" class="invalid-feedback"></span>
+                                <small class="form-text text-muted">
+                                    Chọn file ảnh (JPG, PNG, GIF, WebP). Kích thước tối đa: 5MB.
+                                </small>
+                                
+                                <!-- Preview ảnh -->
+                                <div id="avatar-preview" class="mt-3" style="display: none;">
+                                    <img id="preview-img" src="" alt="Preview" 
+                                         style="max-width: 200px; max-height: 200px; border-radius: 10px; border: 2px solid #e2e8f0;" />
+                                </div>
                             </div>
 
                             <div class="form-actions">
@@ -330,6 +350,42 @@
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
     
     <script>
+        // Preview avatar function
+        function previewAvatar(input) {
+            const preview = document.getElementById('avatar-preview');
+            const previewImg = document.getElementById('preview-img');
+            
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                
+                // Validate file type
+                const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+                if (!allowedTypes.includes(file.type)) {
+                    alert('Vui lòng chọn file ảnh hợp lệ (JPG, PNG, GIF, WebP)');
+                    input.value = '';
+                    preview.style.display = 'none';
+                    return;
+                }
+                
+                // Validate file size (5MB)
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('Kích thước file quá lớn. Vui lòng chọn file nhỏ hơn 5MB');
+                    input.value = '';
+                    preview.style.display = 'none';
+                    return;
+                }
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    previewImg.src = e.target.result;
+                    preview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            } else {
+                preview.style.display = 'none';
+            }
+        }
+
         // Auto-dismiss alerts after 5 seconds
         setTimeout(function() {
             const alerts = document.querySelectorAll('.alert');
