@@ -4,30 +4,213 @@
 }
 
 @section Styles {
-    <link rel="stylesheet" href="~/css/auth.css" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap"
-        rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* University Library Edit Profile Styles */
+        .edit-profile-container {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            padding: 2rem 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        .edit-profile-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+        }
+
+        .edit-profile-header {
+            background: linear-gradient(135deg, #2563eb 0%, #1e3a8a 100%);
+            color: white;
+            padding: 2.5rem 2rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .edit-profile-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") repeat;
+            opacity: 0.1;
+        }
+
+        .edit-profile-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .edit-profile-subtitle {
+            opacity: 0.9;
+            position: relative;
+            z-index: 2;
+        }
+
+        .edit-profile-body {
+            padding: 2.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 0.75rem;
+            font-size: 0.875rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .form-label i {
+            color: #2563eb;
+            width: 16px;
+        }
+
+        .form-control {
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: #f8fafc;
+        }
+
+        .form-control:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+            background: white;
+        }
+
+        .form-control.is-invalid {
+            border-color: #dc3545;
+        }
+
+        .invalid-feedback {
+            display: block;
+            color: #dc3545;
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+        }
+
+        .student-id-group {
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            border: 2px solid #3b82f6;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .student-id-group .form-label {
+            color: #1e3a8a;
+            font-weight: 700;
+        }
+
+        .student-id-group .form-control {
+            border-color: #3b82f6;
+            background: white;
+        }
+
+        .btn-update {
+            background: linear-gradient(135deg, #2563eb 0%, #1e3a8a 100%);
+            color: white;
+            border: none;
+            padding: 0.875rem 2rem;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+
+        .btn-update:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(37, 99, 235, 0.3);
+            color: white;
+        }
+
+        .btn-cancel {
+            background: #6b7280;
+            color: white;
+            border: none;
+            padding: 0.875rem 2rem;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            margin-right: 1rem;
+        }
+
+        .btn-cancel:hover {
+            background: #4b5563;
+            transform: translateY(-2px);
+            color: white;
+            text-decoration: none;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .alert {
+            border-radius: 10px;
+            border: none;
+            padding: 1rem 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .alert-success {
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            color: #1e3a8a;
+            border-left: 4px solid #3b82f6;
+        }
+
+        .alert-danger {
+            background: linear-gradient(135deg, #fef2f2 0%, #fecaca 100%);
+            color: #dc2626;
+            border-left: 4px solid #ef4444;
+        }
+    </style>
 }
 
-<div class="profile-container">
+<div class="edit-profile-container">
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-lg-8">
-                <div class="profile-card">
-                    <div class="profile-header">
-                        <div class="text-center">
-                            <h2 class="profile-name">
-                                <i class="fas fa-edit me-2"></i>
-                                Chỉnh sửa thông tin cá nhân
-                            </h2>
-                            <p class="text-muted">Cập nhật thông tin của bạn</p>
-                        </div>
+                <div class="edit-profile-card">
+                    <div class="edit-profile-header">
+                        <h2 class="edit-profile-title">
+                            <i class="fas fa-user-edit me-2"></i>
+                            Chỉnh sửa thông tin cá nhân
+                        </h2>
+                        <p class="edit-profile-subtitle">Cập nhật thông tin của bạn để hoàn thiện hồ sơ</p>
                     </div>
 
-                    <div class="profile-body">
+                    <div class="edit-profile-body">
                         @if (TempData["SuccessMessage"] != null)
                         {
                             <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -46,87 +229,94 @@
                             </div>
                         }
 
-                        <form asp-controller="Account" asp-action="EditProfile" method="post" class="edit-profile-form">
+                        <form asp-controller="Account" asp-action="EditProfile" method="post">
+                            @Html.AntiForgeryToken()
+                            
+                            <!-- Student ID - Highlighted Section -->
+                            <div class="student-id-group">
+                                <div class="form-group">
+                                    <label class="form-label" asp-for="StudentId">
+                                        <i class="fas fa-graduation-cap"></i>
+                                        Mã số sinh viên
+                                    </label>
+                                    <input asp-for="StudentId" class="form-control" placeholder="Nhập mã số sinh viên" />
+                                    <span asp-validation-for="StudentId" class="invalid-feedback"></span>
+                                </div>
+                            </div>
+
                             <div class="row">
                                 <div class="col-md-6">
-                                    <div class="form-group mb-3">
-                                        <label asp-for="FirstName" class="form-label">
-                                            <i class="fas fa-user me-2"></i>@Html.DisplayNameFor(m => m.FirstName)
+                                    <div class="form-group">
+                                        <label class="form-label" asp-for="FirstName">
+                                            <i class="fas fa-user"></i>
+                                            Họ
                                         </label>
-                                        <input asp-for="FirstName" class="form-control" placeholder="Nhập họ của bạn" />
-                                        <span asp-validation-for="FirstName" class="text-danger"></span>
+                                        <input asp-for="FirstName" class="form-control" placeholder="Nhập họ" />
+                                        <span asp-validation-for="FirstName" class="invalid-feedback"></span>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
-                                    <div class="form-group mb-3">
-                                        <label asp-for="LastName" class="form-label">
-                                            <i class="fas fa-user me-2"></i>@Html.DisplayNameFor(m => m.LastName)
+                                    <div class="form-group">
+                                        <label class="form-label" asp-for="LastName">
+                                            <i class="fas fa-user"></i>
+                                            Tên
                                         </label>
-                                        <input asp-for="LastName" class="form-control" placeholder="Nhập tên của bạn" />
-                                        <span asp-validation-for="LastName" class="text-danger"></span>
+                                        <input asp-for="LastName" class="form-control" placeholder="Nhập tên" />
+                                        <span asp-validation-for="LastName" class="invalid-feedback"></span>
                                     </div>
                                 </div>
                             </div>
 
                             <div class="row">
                                 <div class="col-md-6">
-                                    <div class="form-group mb-3">
-                                        <label asp-for="StudentId" class="form-label">
-                                            <i class="fas fa-graduation-cap me-2"></i>@Html.DisplayNameFor(m => m.StudentId)
-                                        </label>
-                                        <input asp-for="StudentId" class="form-control" placeholder="Nhập mã sinh viên" />
-                                        <span asp-validation-for="StudentId" class="text-danger"></span>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group mb-3">
-                                        <label asp-for="PhoneNumber" class="form-label">
-                                            <i class="fas fa-phone me-2"></i>@Html.DisplayNameFor(m => m.PhoneNumber)
+                                    <div class="form-group">
+                                        <label class="form-label" asp-for="PhoneNumber">
+                                            <i class="fas fa-phone"></i>
+                                            Số điện thoại
                                         </label>
                                         <input asp-for="PhoneNumber" class="form-control" placeholder="Nhập số điện thoại" />
-                                        <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                                        <span asp-validation-for="PhoneNumber" class="invalid-feedback"></span>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label class="form-label" asp-for="DateOfBirth">
+                                            <i class="fas fa-calendar"></i>
+                                            Ngày sinh
+                                        </label>
+                                        <input asp-for="DateOfBirth" class="form-control" type="date" />
+                                        <span asp-validation-for="DateOfBirth" class="invalid-feedback"></span>
                                     </div>
                                 </div>
                             </div>
 
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <div class="form-group mb-3">
-                                        <label asp-for="DateOfBirth" class="form-label">
-                                            <i class="fas fa-calendar me-2"></i>@Html.DisplayNameFor(m => m.DateOfBirth)
-                                        </label>
-                                        <input asp-for="DateOfBirth" type="date" class="form-control" />
-                                        <span asp-validation-for="DateOfBirth" class="text-danger"></span>
-                                    </div>
-                                </div>
-                                <div class="col-md-6">
-                                    <div class="form-group mb-3">
-                                        <label asp-for="AvatarUrl" class="form-label">
-                                            <i class="fas fa-image me-2"></i>@Html.DisplayNameFor(m => m.AvatarUrl)
-                                        </label>
-                                        <input asp-for="AvatarUrl" class="form-control" placeholder="URL hình đại diện" />
-                                        <span asp-validation-for="AvatarUrl" class="text-danger"></span>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="form-group mb-4">
-                                <label asp-for="Address" class="form-label">
-                                    <i class="fas fa-map-marker-alt me-2"></i>@Html.DisplayNameFor(m => m.Address)
+                            <div class="form-group">
+                                <label class="form-label" asp-for="Address">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                    Địa chỉ
                                 </label>
-                                <textarea asp-for="Address" class="form-control" rows="3" placeholder="Nhập địa chỉ của bạn"></textarea>
-                                <span asp-validation-for="Address" class="text-danger"></span>
+                                <textarea asp-for="Address" class="form-control" rows="3" placeholder="Nhập địa chỉ"></textarea>
+                                <span asp-validation-for="Address" class="invalid-feedback"></span>
                             </div>
 
-                            <div class="profile-actions">
-                                <button type="submit" class="btn-profile">
-                                    <i class="fas fa-save me-2"></i>
-                                    Lưu thay đổi
-                                </button>
-                                <a asp-controller="Account" asp-action="Profile" class="btn-profile" style="background: linear-gradient(135deg, #6c757d, #5a6268);">
-                                    <i class="fas fa-times me-2"></i>
+                            <div class="form-group">
+                                <label class="form-label" asp-for="AvatarUrl">
+                                    <i class="fas fa-image"></i>
+                                    URL Avatar
+                                </label>
+                                <input asp-for="AvatarUrl" class="form-control" placeholder="Nhập link ảnh đại diện" />
+                                <span asp-validation-for="AvatarUrl" class="invalid-feedback"></span>
+                            </div>
+
+                            <div class="form-actions">
+                                <a asp-controller="Account" asp-action="Profile" class="btn-cancel">
+                                    <i class="fas fa-times"></i>
                                     Hủy bỏ
                                 </a>
+                                <button type="submit" class="btn-update">
+                                    <i class="fas fa-save"></i>
+                                    Cập nhật thông tin
+                                </button>
                             </div>
                         </form>
                     </div>
@@ -140,43 +330,34 @@
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
     
     <script>
-        // Preview avatar
-        $('#AvatarUrl').on('input', function() {
-            const url = $(this).val();
-            if (url) {
-                // You can add avatar preview functionality here
-                console.log('Avatar URL:', url);
-            }
-        });
-
         // Auto-dismiss alerts after 5 seconds
         setTimeout(function() {
-            $('.alert').alert('close');
+            const alerts = document.querySelectorAll('.alert');
+            alerts.forEach(alert => {
+                alert.style.transition = 'opacity 0.5s ease';
+                alert.style.opacity = '0';
+                setTimeout(() => alert.remove(), 500);
+            });
         }, 5000);
+
+        // Form validation enhancements
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.querySelector('form');
+            const inputs = form.querySelectorAll('input, textarea, select');
+            
+            inputs.forEach(input => {
+                input.addEventListener('blur', function() {
+                    if (this.value && !this.checkValidity()) {
+                        this.classList.add('is-invalid');
+                    } else {
+                        this.classList.remove('is-invalid');
+                    }
+                });
+                
+                input.addEventListener('input', function() {
+                    this.classList.remove('is-invalid');
+                });
+            });
+        });
     </script>
 }
-
-<style>
-    .edit-profile-form .form-label {
-        font-weight: 600;
-        color: #495057;
-        margin-bottom: 0.5rem;
-    }
-    
-    .edit-profile-form .form-control {
-        border-radius: 10px;
-        border: 2px solid #e9ecef;
-        padding: 12px 15px;
-        transition: all 0.3s ease;
-    }
-    
-    .edit-profile-form .form-control:focus {
-        border-color: #007bff;
-        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
-    }
-    
-    .edit-profile-form textarea.form-control {
-        resize: vertical;
-        min-height: 100px;
-    }
-</style>

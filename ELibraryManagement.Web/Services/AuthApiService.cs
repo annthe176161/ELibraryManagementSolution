@@ -315,6 +315,7 @@ namespace ELibraryManagement.Web.Services
                         Email = GetJsonProperty<string>(userElement, "email"),
                         FirstName = GetJsonProperty<string>(userElement, "firstName"),
                         LastName = GetJsonProperty<string>(userElement, "lastName"),
+                        StudentId = GetJsonProperty<string>(userElement, "studentId"),
                         Address = GetJsonProperty<string>(userElement, "address"),
                         PhoneNumber = GetJsonProperty<string>(userElement, "phoneNumber"),
                         DateOfBirth = GetJsonProperty<DateTime?>(userElement, "dateOfBirth"),
