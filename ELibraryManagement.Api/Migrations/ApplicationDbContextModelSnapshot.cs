@@ -189,7 +189,7 @@ namespace ELibraryManagement.Api.Migrations
 
                     b.HasIndex("Title", "Author");
 
-                    b.ToTable("Books");
+                    b.ToTable("Books", (string)null);
 
                     b.HasData(
                         new
@@ -358,7 +358,7 @@ namespace ELibraryManagement.Api.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.ToTable("BookCategories");
+                    b.ToTable("BookCategories", (string)null);
 
                     b.HasData(
                         new
@@ -455,7 +455,7 @@ namespace ELibraryManagement.Api.Migrations
 
                     b.HasIndex("UserId", "BookId", "BorrowDate");
 
-                    b.ToTable("BorrowRecords");
+                    b.ToTable("BorrowRecords", (string)null);
                 });
 
             modelBuilder.Entity("ELibraryManagement.Api.Models.Category", b =>
@@ -493,7 +493,7 @@ namespace ELibraryManagement.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Categories");
+                    b.ToTable("Categories", (string)null);
 
                     b.HasData(
                         new
@@ -661,7 +661,7 @@ namespace ELibraryManagement.Api.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Fines");
+                    b.ToTable("Fines", (string)null);
                 });
 
             modelBuilder.Entity("ELibraryManagement.Api.Models.FineActionHistory", b =>
@@ -705,7 +705,7 @@ namespace ELibraryManagement.Api.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("FineActionHistories");
+                    b.ToTable("FineActionHistories", (string)null);
                 });
 
             modelBuilder.Entity("ELibraryManagement.Api.Models.Review", b =>
@@ -746,7 +746,7 @@ namespace ELibraryManagement.Api.Migrations
                     b.HasIndex("BookId", "UserId")
                         .IsUnique();
 
-                    b.ToTable("Reviews");
+                    b.ToTable("Reviews", (string)null);
                 });
 
             modelBuilder.Entity("ELibraryManagement.Api.Models.UserStatus", b =>
@@ -783,7 +783,7 @@ namespace ELibraryManagement.Api.Migrations
 
                     b.HasKey("UserId");
 
-                    b.ToTable("UserStatuses");
+                    b.ToTable("UserStatuses", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
