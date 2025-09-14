@@ -4,120 +4,601 @@
     ViewData["Title"] = "Đánh giá của tôi";
 }
 
-<div class="container mt-4">
-    <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h3>
-            <i class="fas fa-star text-warning me-2"></i>Đánh giá của tôi
-        </h3>
-        <a asp-controller="Book" asp-action="MyBooks" class="btn btn-outline-primary">
-            <i class="fas fa-book me-1"></i>Sách của tôi
-        </a>
-    </div>
+@section Styles {
+    <style>
+        /* FPT University Theme */
+        .fpt-header {
+            background: linear-gradient(135deg, #1e3a8a, #3b82f6, #60a5fa);
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
 
-    @if (Model == null || !Model.Any())
-    {
-        <!-- Empty State -->
-        <div class="text-center py-5">
-            <div class="empty-state">
-                <i class="fas fa-star-o fa-4x text-muted mb-3"></i>
-                <h4 class="text-muted">Chưa có đánh giá nào</h4>
-                <p class="text-muted">
-                    Bạn chưa đánh giá cuốn sách nào. Hãy trả sách và viết đánh giá để chia sẻ trải nghiệm với cộng đồng.
-                </p>
-                <a asp-controller="Home" asp-action="Index" class="btn btn-primary mt-3">
-                    <i class="fas fa-search me-1"></i>Khám phá sách
-                </a>
+        .fpt-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 100" fill="white" opacity="0.1"><polygon points="0,100 1000,0 1000,100"/></svg>');
+            background-size: cover;
+        }
+
+        .fpt-title {
+            position: relative;
+            z-index: 2;
+        }
+
+        .fpt-title h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .fpt-title h2 {
+            font-size: 1.2rem;
+            font-weight: 400;
+            opacity: 0.9;
+            margin-bottom: 0;
+        }
+
+        .user-stats {
+            background: rgba(255,255,255,0.1);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .stats-item {
+            text-align: center;
+        }
+
+        .stats-number {
+            font-size: 2rem;
+            font-weight: 700;
+            display: block;
+        }
+
+        .stats-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        /* Navigation Button */
+        .nav-button {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 0.75rem;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-button:hover {
+            background: rgba(255,255,255,0.3);
+            border-color: rgba(255,255,255,0.5);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .nav-button i {
+            margin-right: 0.5rem;
+        }
+
+        /* Review Container */
+        .reviews-container {
+            min-height: 60vh;
+        }
+
+        /* Review Cards */
+        .review-card {
+            background: white;
+            border: none;
+            border-radius: 1rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+
+        .review-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+        }
+
+        .review-card-body {
+            padding: 1.5rem;
+        }
+
+        .book-cover-container {
+            position: relative;
+        }
+
+        .book-cover {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .book-cover:hover {
+            transform: scale(1.05);
+        }
+
+        .review-content {
+            flex: 1;
+            padding-left: 1.5rem;
+        }
+
+        .book-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1e3a8a;
+            text-decoration: none;
+            transition: color 0.3s ease;
+            margin-bottom: 0.75rem;
+            display: block;
+        }
+
+        .book-title:hover {
+            color: #3b82f6;
+        }
+
+        .review-meta {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .rating-display {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            border: 1px solid #f59e0b;
+        }
+
+        .rating-stars {
+            display: flex;
+            gap: 0.1rem;
+        }
+
+        .rating-stars i {
+            font-size: 1rem;
+        }
+
+        .rating-number {
+            font-weight: 600;
+            color: #d97706;
+            font-size: 0.9rem;
+        }
+
+        .review-date {
+            color: #6b7280;
+            font-size: 0.9rem;
+            background: #f8fafc;
+            padding: 0.375rem 0.75rem;
+            border-radius: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+        }
+
+        .review-comment {
+            font-size: 1rem;
+            line-height: 1.6;
+            color: #374151;
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background: #f8fafc;
+            border-radius: 0.75rem;
+            border-left: 4px solid #3b82f6;
+            position: relative;
+        }
+
+        .review-comment::before {
+            content: '"';
+            font-size: 2rem;
+            color: #3b82f6;
+            position: absolute;
+            top: 0.5rem;
+            left: 0.5rem;
+            font-family: Georgia, serif;
+        }
+
+        .comment-text {
+            padding-left: 1.5rem;
+        }
+
+        .read-more {
+            color: #3b82f6;
+            text-decoration: none;
+            font-weight: 500;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .read-more:hover {
+            color: #1e40af;
+            text-decoration: underline;
+        }
+
+        .review-updated {
+            font-size: 0.85rem;
+            color: #9ca3af;
+            font-style: italic;
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+            margin-top: 0.5rem;
+        }
+
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            align-items: end;
+        }
+
+        .btn-edit {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            padding: 0.5rem 1rem;
+            font-weight: 500;
+            font-size: 0.875rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+            box-shadow: 0 2px 8px rgba(245, 158, 11, 0.3);
+        }
+
+        .btn-edit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
+            color: white;
+        }
+
+        .btn-delete {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            padding: 0.5rem 1rem;
+            font-weight: 500;
+            font-size: 0.875rem;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.375rem;
+            box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+            cursor: pointer;
+        }
+
+        .btn-delete:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+        }
+
+        /* Empty State */
+        .empty-state-container {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .empty-state-icon {
+            font-size: 4rem;
+            color: #d1d5db;
+            margin-bottom: 1.5rem;
+        }
+
+        .empty-state-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #6b7280;
+            margin-bottom: 1rem;
+        }
+
+        .empty-state-description {
+            color: #9ca3af;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+
+        .btn-primary-fpt {
+            background: linear-gradient(135deg, #3b82f6, #1e40af);
+            color: white;
+            border: none;
+            border-radius: 0.75rem;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-primary-fpt:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+            color: white;
+        }
+
+        .btn-primary-fpt i {
+            margin-right: 0.5rem;
+        }
+
+        /* Modal Enhancements */
+        .modal-content {
+            border: none;
+            border-radius: 1rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: white;
+            border-radius: 1rem 1rem 0 0;
+            border: none;
+        }
+
+        .modal-title {
+            font-weight: 600;
+        }
+
+        .btn-close {
+            color: white;
+            opacity: 0.8;
+        }
+
+        .btn-close:hover {
+            opacity: 1;
+        }
+
+        /* Responsive Design */
+        @@media (max-width: 768px) {
+            .fpt-title h1 {
+                font-size: 2rem;
+            }
+
+            .fpt-title h2 {
+                font-size: 1rem;
+            }
+
+            .user-stats {
+                margin-top: 1rem;
+            }
+
+            .review-content {
+                padding-left: 0;
+                padding-top: 1rem;
+            }
+
+            .book-cover {
+                height: 120px;
+            }
+
+            .action-buttons {
+                flex-direction: row;
+                justify-content: space-between;
+                margin-top: 1rem;
+            }
+
+            .review-meta {
+                flex-wrap: wrap;
+                gap: 0.5rem;
+            }
+        }
+
+        @@media (max-width: 576px) {
+            .reviews-container {
+                padding: 0 1rem;
+            }
+
+            .review-card-body {
+                padding: 1rem;
+            }
+
+            .rating-display, .review-date {
+                font-size: 0.8rem;
+                padding: 0.375rem 0.75rem;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                align-items: stretch;
+                gap: 0.5rem;
+            }
+        }
+    </style>
+}
+
+<!-- FPT University Header -->
+<div class="fpt-header">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <div class="fpt-title">
+                    <h1>
+                        <i class="fas fa-university me-3"></i>
+                        Thư viện FPT University
+                    </h1>
+                    <h2>
+                        <i class="fas fa-star me-2"></i>
+                        Đánh giá của tôi
+                    </h2>
+                </div>
             </div>
-        </div>
-    }
-    else
-    {
-        <!-- Reviews List -->
-        <div class="row">
-            @foreach (var review in Model)
-            {
-                <div class="col-md-12 mb-4">
-                    <div class="card shadow-sm review-card">
-                        <div class="card-body">
-                            <div class="row">
-                                <!-- Book Info -->
-                                <div class="col-md-2">
-                                    <img src="@(string.IsNullOrEmpty(review.BookCoverUrl) ? "/images/no-cover.jpg" : review.BookCoverUrl)" 
-                                         alt="@review.BookTitle" 
-                                         class="img-fluid rounded shadow-sm"
-                                         style="max-height: 120px; object-fit: cover;">
+            <div class="col-md-4">
+                <div class="d-flex justify-content-end">
+                    <a asp-controller="Book" asp-action="MyBooks" class="nav-button">
+                        <i class="fas fa-book"></i>Sách của tôi
+                    </a>
+                </div>
+                @if (Model != null && Model.Any())
+                {
+                    <div class="user-stats mt-3">
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="stats-item">
+                                    <span class="stats-number">@Model.Count</span>
+                                    <span class="stats-label">Đánh giá</span>
                                 </div>
-                                
-                                <!-- Review Content -->
-                                <div class="col-md-8">
-                                    <div class="d-flex justify-content-between align-items-start mb-2">
-                                        <h5 class="mb-1">
-                                            <a asp-controller="Home" asp-action="BookDetail" asp-route-id="@review.BookId" 
-                                               class="text-decoration-none">
-                                                @review.BookTitle
-                                            </a>
-                                        </h5>
-                                        <small class="text-muted">@review.CreatedAt.ToString("dd/MM/yyyy")</small>
-                                    </div>
-                                    
-                                    <!-- Rating Display -->
-                                    <div class="mb-2">
-                                        <div class="d-flex align-items-center">
-                                            @for (int i = 1; i <= 5; i++)
-                                            {
-                                                <i class="fas fa-star @(i <= review.Rating ? "text-warning" : "text-muted")"></i>
-                                            }
-                                            <span class="ms-2 fw-bold">@review.Rating/5</span>
-                                        </div>
-                                    </div>
-                                    
-                                    <!-- Comment -->
-                                    <p class="text-muted mb-2">
-                                        @if (review.Comment.Length > 150)
-                                        {
-                                            <span>@review.Comment.Substring(0, 150)...</span>
-                                            <a href="#" class="read-more" data-full-text="@review.Comment">Xem thêm</a>
-                                        }
-                                        else
-                                        {
-                                            @review.Comment
-                                        }
-                                    </p>
-                                    
-                                    @if (review.UpdatedAt.HasValue && review.UpdatedAt > review.CreatedAt)
-                                    {
-                                        <small class="text-muted">
-                                            <i class="fas fa-edit me-1"></i>Đã chỉnh sửa: @review.UpdatedAt.Value.ToString("dd/MM/yyyy HH:mm")
-                                        </small>
-                                    }
-                                </div>
-                                
-                                <!-- Actions -->
-                                <div class="col-md-2 text-end">
-                                    @if (review.CanEdit)
-                                    {
-                                        <div class="btn-group-vertical" role="group">
-                                            <a asp-action="Edit" asp-route-id="@review.Id" 
-                                               class="btn btn-sm btn-outline-warning mb-1">
-                                                <i class="fas fa-edit me-1"></i>Sửa
-                                            </a>
-                                            <button type="button" 
-                                                    class="btn btn-sm btn-outline-danger delete-review" 
-                                                    data-review-id="@review.Id"
-                                                    data-book-title="@review.BookTitle">
-                                                <i class="fas fa-trash me-1"></i>Xóa
-                                            </button>
-                                        </div>
-                                    }
+                            </div>
+                            <div class="col-6">
+                                <div class="stats-item">
+                                    <span class="stats-number">@Model.Average(r => r.Rating).ToString("F1")</span>
+                                    <span class="stats-label">Trung bình</span>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            }
+                }
+            </div>
         </div>
-    }
+    </div>
+</div>
+
+<div class="reviews-container">
+    <div class="container">
+
+        @if (Model == null || !Model.Any())
+        {
+            <!-- Empty State -->
+            <div class="empty-state-container">
+                <div class="empty-state-icon">
+                    <i class="fas fa-star"></i>
+                </div>
+                <h4 class="empty-state-title">Chưa có đánh giá nào</h4>
+                <div class="empty-state-description">
+                    Bạn chưa đánh giá cuốn sách nào. <br>
+                    Hãy trả sách và viết đánh giá để chia sẻ trải nghiệm với cộng đồng sinh viên FPU!
+                </div>
+                <a asp-controller="Home" asp-action="Index" class="btn-primary-fpt">
+                    <i class="fas fa-search"></i>Khám phá sách
+                </a>
+            </div>
+        }
+        else
+        {
+            <!-- Reviews List -->
+            <div class="row">
+                @foreach (var review in Model)
+                {
+                    <div class="col-12 mb-4">
+                        <div class="review-card">
+                            <div class="review-card-body">
+                                <div class="row align-items-start">
+                                    <!-- Book Cover -->
+                                    <div class="col-md-2">
+                                        <div class="book-cover-container">
+                                            <img src="@(string.IsNullOrEmpty(review.BookCoverUrl) ? "/images/no-cover.jpg" : review.BookCoverUrl)" 
+                                                 alt="@review.BookTitle" 
+                                                 class="book-cover">
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Review Content -->
+                                    <div class="col-md-8">
+                                        <div class="review-content">
+                                            <a asp-controller="Home" asp-action="BookDetail" asp-route-id="@review.BookId" 
+                                               class="book-title">
+                                                @review.BookTitle
+                                            </a>
+                                            
+                                            <!-- Review Meta -->
+                                            <div class="review-meta">
+                                                <div class="rating-display">
+                                                    <div class="rating-stars">
+                                                        @for (int i = 1; i <= 5; i++)
+                                                        {
+                                                            <i class="fas fa-star @(i <= review.Rating ? "text-warning" : "text-muted")"></i>
+                                                        }
+                                                    </div>
+                                                    <span class="rating-number">@review.Rating/5</span>
+                                                </div>
+                                                <div class="review-date">
+                                                    <i class="fas fa-calendar-alt"></i>
+                                                    @review.CreatedAt.ToString("dd/MM/yyyy")
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- Comment -->
+                                            @if (!string.IsNullOrEmpty(review.Comment))
+                                            {
+                                                <div class="review-comment">
+                                                    <div class="comment-text">
+                                                        @if (review.Comment.Length > 150)
+                                                        {
+                                                            <span>@review.Comment.Substring(0, 150)...</span>
+                                                            <a href="#" class="read-more" data-full-text="@review.Comment">Xem thêm</a>
+                                                        }
+                                                        else
+                                                        {
+                                                            @review.Comment
+                                                        }
+                                                    </div>
+                                                </div>
+                                            }
+                                            
+                                            @if (review.UpdatedAt.HasValue && review.UpdatedAt > review.CreatedAt)
+                                            {
+                                                <div class="review-updated">
+                                                    <i class="fas fa-edit"></i>
+                                                    Đã chỉnh sửa: @review.UpdatedAt.Value.ToString("dd/MM/yyyy HH:mm")
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Action Buttons -->
+                                    <div class="col-md-2">
+                                        <div class="action-buttons">
+                                            @if (review.CanEdit)
+                                            {
+                                                <a asp-controller="Review" asp-action="Edit" asp-route-id="@review.Id" 
+                                                   class="btn-edit">
+                                                    <i class="fas fa-edit"></i>Sửa
+                                                </a>
+                                                <button type="button" 
+                                                        class="btn-delete delete-review" 
+                                                        data-review-id="@review.Id"
+                                                        data-book-title="@review.BookTitle">
+                                                    <i class="fas fa-trash"></i>Xóa
+                                                </button>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
 </div>
 
 <!-- Delete Confirmation Modal -->
@@ -126,7 +607,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="deleteModalLabel">
-                    <i class="fas fa-exclamation-triangle text-warning me-2"></i>Xác nhận xóa
+                    <i class="fas fa-exclamation-triangle me-2"></i>Xác nhận xóa đánh giá
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -135,7 +616,9 @@
                 <p class="text-muted">Hành động này không thể hoàn tác.</p>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="fas fa-times me-1"></i>Hủy
+                </button>
                 <button type="button" class="btn btn-danger" id="confirm-delete">
                     <i class="fas fa-trash me-1"></i>Xóa đánh giá
                 </button>
@@ -162,6 +645,9 @@
                 if (reviewToDelete) {
                     const token = $('input[name="__RequestVerificationToken"]').val();
                     
+                    // Show loading state
+                    $(this).prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i>Đang xóa...');
+                    
                     $.ajax({
                         url: '@Url.Action("Delete", "Review")',
                         type: 'POST',
@@ -171,17 +657,22 @@
                         },
                         success: function(response) {
                             if (response.success) {
-                                location.reload();
+                                // Show success message and reload
+                                showNotification('Đã xóa đánh giá thành công!', 'success');
+                                setTimeout(() => {
+                                    location.reload();
+                                }, 1000);
                             } else {
-                                alert('Có lỗi xảy ra: ' + response.message);
+                                showNotification('Có lỗi xảy ra: ' + response.message, 'error');
                             }
                         },
                         error: function() {
-                            alert('Có lỗi xảy ra khi xóa đánh giá.');
+                            showNotification('Có lỗi xảy ra khi xóa đánh giá.', 'error');
                         },
                         complete: function() {
                             $('#deleteModal').modal('hide');
                             reviewToDelete = null;
+                            $('#confirm-delete').prop('disabled', false).html('<i class="fas fa-trash me-1"></i>Xóa đánh giá');
                         }
                     });
                 }
@@ -192,61 +683,42 @@
                 e.preventDefault();
                 const fullText = $(this).data('full-text');
                 const parent = $(this).parent();
-                parent.html(fullText);
+                parent.html('<div class="comment-text">' + fullText + '</div>');
             });
+
+            // Add notification function
+            function showNotification(message, type) {
+                const alertClass = type === 'success' ? 'alert-success' : 'alert-danger';
+                const iconClass = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-triangle';
+                
+                const notification = $(`
+                    <div class="alert ${alertClass} alert-dismissible fade show position-fixed" 
+                         style="top: 20px; right: 20px; z-index: 9999; min-width: 300px;">
+                        <i class="fas ${iconClass} me-2"></i>
+                        ${message}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                `);
+                
+                $('body').append(notification);
+                
+                // Auto dismiss after 5 seconds
+                setTimeout(() => {
+                    notification.alert('close');
+                }, 5000);
+            }
+
+            // Add smooth hover effects
+            $('.review-card').hover(
+                function() {
+                    $(this).find('.book-cover').addClass('hover');
+                },
+                function() {
+                    $(this).find('.book-cover').removeClass('hover');
+                }
+            );
         });
     </script>
-
-    <style>
-        .review-card {
-            transition: box-shadow 0.2s ease;
-            border: 1px solid #e9ecef;
-        }
-
-        .review-card:hover {
-            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
-        }
-
-        .empty-state {
-            max-width: 400px;
-            margin: 0 auto;
-        }
-
-        .btn-group-vertical .btn {
-            border-radius: 0.375rem !important;
-        }
-
-        .read-more {
-            color: #007bff;
-            text-decoration: none;
-            cursor: pointer;
-        }
-
-        .read-more:hover {
-            text-decoration: underline;
-        }
-
-        .star {
-            font-size: 1rem;
-        }
-
-        .card-body {
-            padding: 1.5rem;
-        }
-
-        .btn-sm {
-            font-size: 0.875rem;
-            padding: 0.375rem 0.75rem;
-        }
-
-        h5 a {
-            color: #333;
-        }
-
-        h5 a:hover {
-            color: #007bff;
-        }
-    </style>
 
     @Html.AntiForgeryToken()
 }
