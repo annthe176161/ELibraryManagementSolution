@@ -184,29 +184,55 @@ namespace ELibraryManagement.Web.Services
             try
             {
                 var apiBaseUrl = GetApiBaseUrl();
-                var response = await _httpClient.GetAsync($"{apiBaseUrl}/api/Review/book/{bookId}?page={page}&pageSize={pageSize}");
 
-                if (response.IsSuccessStatusCode)
+                // Get reviews list
+                var reviewsResponse = await _httpClient.GetAsync($"{apiBaseUrl}/api/Review/book/{bookId}?page={page}&pageSize={pageSize}");
+
+                // Get summary data for rating statistics
+                var summaryResponse = await _httpClient.GetAsync($"{apiBaseUrl}/api/Review/book/{bookId}/summary");
+
+                if (reviewsResponse.IsSuccessStatusCode)
                 {
-                    var responseContent = await response.Content.ReadAsStringAsync();
-                    var data = JsonSerializer.Deserialize<dynamic>(responseContent, _jsonOptions);
+                    var reviewsContent = await reviewsResponse.Content.ReadAsStringAsync();
+                    var reviewsData = JsonSerializer.Deserialize<dynamic>(reviewsContent, _jsonOptions);
 
-                    var reviewsData = GetPropertyValue<List<dynamic>>(data, "reviews") ?? new List<dynamic>();
+                    var reviewsList = GetPropertyValue<List<dynamic>>(reviewsData, "reviews") ?? new List<dynamic>();
                     var reviews = new List<ReviewViewModel>();
-                    foreach (var reviewData in reviewsData)
+                    foreach (var reviewData in reviewsList)
                     {
                         reviews.Add(MapToReviewViewModel(reviewData));
                     }
 
-                    return new ReviewListViewModel
+                    var result = new ReviewListViewModel
                     {
                         Reviews = reviews,
-                        TotalCount = GetPropertyValue<int>(data, "totalCount"),
-                        Page = GetPropertyValue<int>(data, "page"),
-                        PageSize = GetPropertyValue<int>(data, "pageSize"),
-                        TotalPages = GetPropertyValue<int>(data, "totalPages"),
+                        TotalCount = GetPropertyValue<int>(reviewsData, "totalCount"),
+                        Page = GetPropertyValue<int>(reviewsData, "page"),
+                        PageSize = GetPropertyValue<int>(reviewsData, "pageSize"),
+                        TotalPages = GetPropertyValue<int>(reviewsData, "totalPages"),
                         BookId = bookId
                     };
+
+                    // Add summary data if available
+                    if (summaryResponse.IsSuccessStatusCode)
+                    {
+                        var summaryContent = await summaryResponse.Content.ReadAsStringAsync();
+                        var summaryData = JsonSerializer.Deserialize<dynamic>(summaryContent, _jsonOptions);
+
+                        result.AverageRating = GetPropertyValue<double>(summaryData, "averageRating");
+
+                        // Build rating distribution dictionary
+                        result.RatingDistribution = new Dictionary<int, int>
+                        {
+                            { 5, GetPropertyValue<int>(summaryData, "fiveStarCount") },
+                            { 4, GetPropertyValue<int>(summaryData, "fourStarCount") },
+                            { 3, GetPropertyValue<int>(summaryData, "threeStarCount") },
+                            { 2, GetPropertyValue<int>(summaryData, "twoStarCount") },
+                            { 1, GetPropertyValue<int>(summaryData, "oneStarCount") }
+                        };
+                    }
+
+                    return result;
                 }
 
                 return new ReviewListViewModel { BookId = bookId };

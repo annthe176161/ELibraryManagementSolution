@@ -4,202 +4,641 @@
     ViewData["Title"] = $"Đánh giá sách: {Model.BookTitle}";
 }
 
-<div class="container mt-4">
-    <!-- Header -->
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h3>
-            <i class="fas fa-comments text-primary me-2"></i>Đánh giá sách: @Model.BookTitle
-        </h3>
-        <a asp-controller="Home" asp-action="BookDetail" asp-route-id="@Model.BookId" class="btn btn-outline-primary">
-            <i class="fas fa-arrow-left me-1"></i>Quay lại chi tiết sách
-        </a>
-    </div>
+@section Styles {
+    <style>
+        /* FPT University Theme */
+        .fpt-header {
+            background: linear-gradient(135deg, #1e3a8a, #3b82f6, #60a5fa);
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+        }
 
-    <!-- Summary -->
-    @if (Model.TotalReviews > 0)
-    {
-        <div class="row mb-4">
-            <div class="col-md-6">
-                <div class="card text-center">
-                    <div class="card-body">
-                        <h2 class="text-warning mb-1">@Model.AverageRating.ToString("F1")</h2>
-                        <div class="mb-2">
-                            @for (int i = 1; i <= 5; i++)
-                            {
-                                <i class="fas fa-star @(i <= Math.Round(Model.AverageRating) ? "text-warning" : "text-muted")"></i>
-                            }
-                        </div>
-                        <p class="text-muted mb-0">@Model.TotalReviews đánh giá</p>
-                    </div>
+        .fpt-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 100" fill="white" opacity="0.1"><polygon points="0,100 1000,0 1000,100"/></svg>');
+            background-size: cover;
+        }
+
+        .fpt-title {
+            position: relative;
+            z-index: 2;
+        }
+
+        .fpt-title h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .fpt-title h2 {
+            font-size: 1.2rem;
+            font-weight: 400;
+            opacity: 0.9;
+            margin-bottom: 0;
+        }
+
+        .book-quick-info {
+            text-align: right;
+        }
+
+        .book-quick-info h4 {
+            font-weight: 600;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+
+        /* Review Container */
+        .review-container {
+            min-height: 60vh;
+        }
+
+        /* Rating Summary Cards */
+        .rating-summary {
+            margin-bottom: 2rem;
+        }
+
+        .rating-overview-card {
+            background: linear-gradient(135deg, #f8fafc, #e2e8f0);
+            border: none;
+            border-radius: 1rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            text-align: center;
+            padding: 2rem 1.5rem;
+        }
+
+        .rating-overview-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .rating-score {
+            font-size: 3rem;
+            font-weight: 700;
+            color: #f59e0b;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 2px 4px rgba(245, 158, 11, 0.3);
+        }
+
+        .rating-score.no-rating {
+            font-size: 1.5rem;
+            color: #6b7280;
+        }
+
+        .rating-stars {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .rating-count {
+            font-size: 1.1rem;
+            color: #6b7280;
+            font-weight: 500;
+        }
+
+        .distribution-card {
+            background: white;
+            border: none;
+            border-radius: 1rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .distribution-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .distribution-card .card-header {
+            background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+            color: white;
+            border: none;
+            border-radius: 1rem 1rem 0 0;
+            padding: 1.5rem;
+        }
+
+        .distribution-card .card-title {
+            font-weight: 600;
+            font-size: 1.2rem;
+            margin-bottom: 0;
+        }
+
+        .distribution-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding: 0.5rem 0;
+        }
+
+        .distribution-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .rating-label {
+            min-width: 80px;
+            font-weight: 600;
+            color: #374151;
+            display: flex;
+            align-items: center;
+        }
+
+        .rating-label i {
+            color: #f59e0b;
+            margin-right: 0.5rem;
+        }
+
+        .progress-container {
+            flex: 1;
+            margin: 0 1rem;
+        }
+
+        .progress {
+            height: 10px;
+            border-radius: 10px;
+            background-color: #e5e7eb;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            background: linear-gradient(90deg, #f59e0b, #f97316);
+            border-radius: 10px;
+            transition: width 0.6s ease;
+        }
+
+        .count-label {
+            min-width: 40px;
+            text-align: right;
+            font-weight: 600;
+            color: #6b7280;
+        }
+
+        /* Review Cards */
+        .review-card {
+            background: white;
+            border: none;
+            border-radius: 1rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            transition: all 0.3s ease;
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+
+        .review-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+        }
+
+        .review-header {
+            padding: 1.5rem 1.5rem 1rem 1.5rem;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
+
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3b82f6, #60a5fa);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3);
+        }
+
+        .user-avatar i {
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .user-details h6 {
+            margin: 0;
+            font-weight: 600;
+            color: #1e293b;
+        }
+
+        .user-details .date {
+            font-size: 0.9rem;
+            color: #64748b;
+            margin-top: 0.25rem;
+        }
+
+        .review-rating {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .review-rating .stars {
+            font-size: 1.2rem;
+        }
+
+        .review-rating .rating-number {
+            font-weight: 600;
+            color: #f59e0b;
+            font-size: 1.1rem;
+        }
+
+        .review-content {
+            padding: 1rem 1.5rem 1.5rem 1.5rem;
+        }
+
+        .review-comment {
+            font-size: 1rem;
+            line-height: 1.6;
+            color: #374151;
+            margin-bottom: 1rem;
+        }
+
+        .review-updated {
+            font-size: 0.85rem;
+            color: #9ca3af;
+            font-style: italic;
+        }
+
+        /* Empty State */
+        .empty-state-container {
+            text-align: center;
+            padding: 4rem 2rem;
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .empty-state-icon {
+            font-size: 4rem;
+            color: #d1d5db;
+            margin-bottom: 1.5rem;
+        }
+
+        .empty-state-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #6b7280;
+            margin-bottom: 1rem;
+        }
+
+        .empty-state-description {
+            color: #9ca3af;
+            font-size: 1.1rem;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+
+        /* Navigation Buttons */
+        .nav-button {
+            background: linear-gradient(135deg, #3b82f6, #1e40af);
+            color: white;
+            border: none;
+            border-radius: 0.75rem;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+        }
+
+        .nav-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+            color: white;
+        }
+
+        .nav-button i {
+            margin-right: 0.5rem;
+        }
+
+        /* Pagination */
+        .pagination {
+            justify-content: center;
+            margin-top: 2rem;
+        }
+
+        .pagination .page-link {
+            color: #3b82f6;
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            margin: 0 0.25rem;
+            padding: 0.75rem 1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .pagination .page-item.active .page-link {
+            background: linear-gradient(135deg, #3b82f6, #1e40af);
+            border-color: #3b82f6;
+            color: white;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+        }
+
+        .pagination .page-link:hover {
+            background-color: #f1f5f9;
+            border-color: #3b82f6;
+            color: #1e40af;
+            transform: translateY(-1px);
+        }
+
+        /* Responsive Design */
+        @@media (max-width: 768px) {
+            .fpt-title h1 {
+                font-size: 2rem;
+            }
+
+            .fpt-title h2 {
+                font-size: 1rem;
+            }
+
+            .book-quick-info {
+                text-align: left;
+                margin-top: 1rem;
+            }
+
+            .rating-overview-card {
+                padding: 1.5rem 1rem;
+                margin-bottom: 1rem;
+            }
+
+            .rating-score {
+                font-size: 2.5rem;
+            }
+
+            .distribution-card .card-header {
+                padding: 1rem;
+            }
+
+            .review-header {
+                padding: 1rem;
+            }
+
+            .review-content {
+                padding: 1rem;
+            }
+
+            .user-avatar {
+                width: 40px;
+                height: 40px;
+            }
+
+            .user-avatar i {
+                font-size: 1.2rem;
+            }
+        }
+
+        @@media (max-width: 576px) {
+            .rating-label {
+                min-width: 60px;
+                font-size: 0.9rem;
+            }
+
+            .distribution-row {
+                margin-bottom: 0.75rem;
+            }
+
+            .pagination .page-link {
+                padding: 0.5rem 0.75rem;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+}
+
+<!-- FPT University Header -->
+<div class="fpt-header">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <div class="fpt-title">
+                    <h1>
+                        <i class="fas fa-university me-3"></i>
+                        Thư viện FPT University
+                    </h1>
+                    <h2>
+                        <i class="fas fa-comments me-2"></i>
+                        Đánh giá và nhận xét từ sinh viên
+                    </h2>
                 </div>
             </div>
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-body">
-                        <h6 class="card-title">Phân bố đánh giá</h6>
-                        @for (int rating = 5; rating >= 1; rating--)
+            <div class="col-md-4">
+                <div class="book-quick-info">
+                    <h4 class="mb-1">@Model.BookTitle</h4>
+                    <p class="mb-0 opacity-75">Chi tiết đánh giá từ cộng đồng</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="review-container">
+    <div class="container">
+        <!-- Navigation Button -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h3 class="mb-0" style="color: #1e3a8a; font-weight: 600;">
+                <i class="fas fa-book-open me-2"></i>@Model.BookTitle
+            </h3>
+            <a asp-controller="Home" asp-action="BookDetail" asp-route-id="@Model.BookId" class="nav-button">
+                <i class="fas fa-arrow-left"></i>Quay lại chi tiết sách
+            </a>
+        </div>
+
+        <!-- Rating Summary -->
+        <div class="rating-summary">
+            <div class="row">
+                <div class="col-lg-6 mb-4">
+                    <div class="rating-overview-card">
+                        @if (Model.TotalReviews > 0)
                         {
-                            var count = Model.RatingDistribution.GetValueOrDefault(rating, 0);
-                            var percentage = Model.TotalReviews > 0 ? (double)count / Model.TotalReviews * 100 : 0;
-                            
-                            <div class="d-flex align-items-center mb-1">
-                                <span class="me-2" style="min-width: 60px;">@rating sao</span>
-                                <div class="progress flex-grow-1 me-2" style="height: 8px;">
-                                    <div class="progress-bar bg-warning" 
-                                         role="progressbar" 
-                                         style="width: @percentage%" 
-                                         aria-valuenow="@percentage" 
-                                         aria-valuemin="0" 
-                                         aria-valuemax="100"></div>
-                                </div>
-                                <span class="text-muted" style="min-width: 30px;">@count</span>
+                            <div class="rating-score">@Model.AverageRating.ToString("F1")</div>
+                            <div class="rating-stars">
+                                @for (int i = 1; i <= 5; i++)
+                                {
+                                    <i class="fas fa-star @(i <= Math.Round(Model.AverageRating) ? "text-warning" : "text-muted")"></i>
+                                }
+                            </div>
+                            <div class="rating-count">
+                                <i class="fas fa-users me-2"></i>
+                                @Model.TotalReviews @(Model.TotalReviews == 1 ? "đánh giá" : "đánh giá")
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="rating-score no-rating">Chưa có đánh giá</div>
+                            <div class="rating-stars">
+                                @for (int i = 1; i <= 5; i++)
+                                {
+                                    <i class="fas fa-star text-muted"></i>
+                                }
+                            </div>
+                            <div class="rating-count">
+                                <i class="fas fa-users me-2"></i>
+                                0 đánh giá
                             </div>
                         }
                     </div>
                 </div>
-            </div>
-        </div>
-    }
-
-    @if (Model.Reviews == null || !Model.Reviews.Any())
-    {
-        <!-- Empty State -->
-        <div class="text-center py-5">
-            <div class="empty-state">
-                <i class="fas fa-comment-slash fa-4x text-muted mb-3"></i>
-                <h4 class="text-muted">Chưa có đánh giá nào</h4>
-                <p class="text-muted">
-                    Cuốn sách này chưa có đánh giá từ độc giả. Hãy là người đầu tiên chia sẻ trải nghiệm của bạn!
-                </p>
-                <a asp-controller="Home" asp-action="BookDetail" asp-route-id="@Model.BookId" class="btn btn-primary mt-3">
-                    <i class="fas fa-arrow-left me-1"></i>Quay lại chi tiết sách
-                </a>
-            </div>
-        </div>
-    }
-    else
-    {
-        <!-- Reviews List -->
-        <div class="row">
-            @foreach (var review in Model.Reviews)
-            {
-                <div class="col-md-12 mb-4">
-                    <div class="card shadow-sm review-card">
+                <div class="col-lg-6 mb-4">
+                    <div class="distribution-card">
+                        <div class="card-header">
+                            <h5 class="distribution-card-title">
+                                <i class="fas fa-chart-bar me-2"></i>
+                                Phân bố đánh giá
+                            </h5>
+                        </div>
                         <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-start mb-3">
-                                <div class="d-flex align-items-center">
-                                    <div class="user-avatar me-3">
-                                        <i class="fas fa-user-circle fa-2x text-muted"></i>
-                                    </div>
-                                    <div>
-                                        <h6 class="mb-1">@review.UserName</h6>
-                                        <small class="text-muted">@review.CreatedAt.ToString("dd/MM/yyyy")</small>
-                                    </div>
-                                </div>
-                                <div class="d-flex align-items-center">
-                                    @for (int i = 1; i <= 5; i++)
-                                    {
-                                        <i class="fas fa-star @(i <= review.Rating ? "text-warning" : "text-muted")"></i>
-                                    }
-                                    <span class="ms-2 fw-bold">@review.Rating/5</span>
-                                </div>
-                            </div>
-                            
-                            <!-- Comment -->
-                            <p class="mb-2">@review.Comment</p>
-                            
-                            @if (review.UpdatedAt.HasValue && review.UpdatedAt > review.CreatedAt)
+                            @for (int rating = 5; rating >= 1; rating--)
                             {
-                                <small class="text-muted">
-                                    <i class="fas fa-edit me-1"></i>Đã chỉnh sửa: @review.UpdatedAt.Value.ToString("dd/MM/yyyy HH:mm")
-                                </small>
+                                var count = Model.RatingDistribution != null && Model.RatingDistribution.ContainsKey(rating) ? Model.RatingDistribution[rating] : 0;
+                                var percentage = Model.TotalReviews > 0 ? (double)count / Model.TotalReviews * 100 : 0;
+                                
+                                <div class="distribution-row">
+                                    <div class="rating-label">
+                                        <i class="fas fa-star"></i>
+                                        @rating sao
+                                    </div>
+                                    <div class="progress-container">
+                                        <div class="progress">
+                                            <div class="progress-bar" 
+                                                 role="progressbar" 
+                                                 style="width: @percentage.ToString("F1", System.Globalization.CultureInfo.InvariantCulture)%" 
+                                                 aria-valuenow="@percentage" 
+                                                 aria-valuemin="0" 
+                                                 aria-valuemax="100"></div>
+                                        </div>
+                                    </div>
+                                    <div class="count-label">@count</div>
+                                </div>
                             }
                         </div>
                     </div>
                 </div>
-            }
+            </div>
         </div>
 
-        <!-- Pagination -->
-        @if (Model.TotalPages > 1)
+        @if (Model.Reviews == null || !Model.Reviews.Any())
         {
-            <nav aria-label="Pagination">
-                <ul class="pagination justify-content-center">
-                    @if (Model.CurrentPage > 1)
-                    {
-                        <li class="page-item">
-                            <a class="page-link" asp-route-page="@(Model.CurrentPage - 1)">
-                                <i class="fas fa-chevron-left"></i>
-                            </a>
-                        </li>
-                    }
-
-                    @for (int i = Math.Max(1, Model.CurrentPage - 2); i <= Math.Min(Model.TotalPages, Model.CurrentPage + 2); i++)
-                    {
-                        <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
-                            <a class="page-link" asp-route-page="@i">@i</a>
-                        </li>
-                    }
-
-                    @if (Model.CurrentPage < Model.TotalPages)
-                    {
-                        <li class="page-item">
-                            <a class="page-link" asp-route-page="@(Model.CurrentPage + 1)">
-                                <i class="fas fa-chevron-right"></i>
-                            </a>
-                        </li>
-                    }
-                </ul>
-            </nav>
+            <!-- Empty State -->
+            <div class="empty-state-container">
+                <div class="empty-state-icon">
+                    <i class="fas fa-comment-slash"></i>
+                </div>
+                <h4 class="empty-state-title">Chưa có đánh giá nào</h4>
+                <div class="empty-state-description">
+                    Cuốn sách này chưa có đánh giá từ độc giả. <br>
+                    Hãy là người đầu tiên chia sẻ trải nghiệm của bạn với cộng đồng sinh viên FPU!
+                </div>
+                <a asp-controller="Home" asp-action="BookDetail" asp-route-id="@Model.BookId" class="nav-button">
+                    <i class="fas fa-arrow-left"></i>Quay lại chi tiết sách
+                </a>
+            </div>
         }
-    }
+        else
+        {
+            <!-- Reviews List -->
+            <div class="reviews-list">
+                @foreach (var review in Model.Reviews)
+                {
+                    <div class="review-card">
+                        <!-- Review Header -->
+                        <div class="review-header">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div class="user-info">
+                                    <div class="user-avatar">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    <div class="user-details">
+                                        <h6>@review.UserName</h6>
+                                        <div class="date">
+                                            <i class="fas fa-calendar-alt me-1"></i>
+                                            @review.CreatedAt.ToString("dd/MM/yyyy")
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="review-rating">
+                                    <div class="stars">
+                                        @for (int i = 1; i <= 5; i++)
+                                        {
+                                            <i class="fas fa-star @(i <= review.Rating ? "text-warning" : "text-muted")"></i>
+                                        }
+                                    </div>
+                                    <div class="rating-number">@review.Rating/5</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Review Content -->
+                        <div class="review-content">
+                            @if (!string.IsNullOrEmpty(review.Comment))
+                            {
+                                <div class="review-comment">
+                                    <i class="fas fa-quote-left me-2 text-muted"></i>
+                                    @review.Comment
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="review-comment text-muted">
+                                    <i class="fas fa-star me-2"></i>
+                                    Người dùng chỉ đánh giá sao mà không có nhận xét.
+                                </div>
+                            }
+                            
+                            @if (review.UpdatedAt.HasValue && review.UpdatedAt > review.CreatedAt)
+                            {
+                                <div class="review-updated">
+                                    <i class="fas fa-edit me-1"></i>
+                                    Đã chỉnh sửa: @review.UpdatedAt.Value.ToString("dd/MM/yyyy HH:mm")
+                                </div>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <!-- Pagination -->
+            @if (Model.TotalPages > 1)
+            {
+                <nav aria-label="Pagination" class="mt-4">
+                    <ul class="pagination">
+                        @if (Model.CurrentPage > 1)
+                        {
+                            <li class="page-item">
+                                <a class="page-link" asp-route-page="@(Model.CurrentPage - 1)" asp-route-bookId="@Model.BookId">
+                                    <i class="fas fa-chevron-left"></i>
+                                </a>
+                            </li>
+                        }
+
+                        @for (int i = Math.Max(1, Model.CurrentPage - 2); i <= Math.Min(Model.TotalPages, Model.CurrentPage + 2); i++)
+                        {
+                            <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                                <a class="page-link" asp-route-page="@i" asp-route-bookId="@Model.BookId">@i</a>
+                            </li>
+                        }
+
+                        @if (Model.CurrentPage < Model.TotalPages)
+                        {
+                            <li class="page-item">
+                                <a class="page-link" asp-route-page="@(Model.CurrentPage + 1)" asp-route-bookId="@Model.BookId">
+                                    <i class="fas fa-chevron-right"></i>
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </nav>
+            }
+        }
+    </div>
 </div>
-
-<style>
-    .review-card {
-        transition: box-shadow 0.2s ease;
-        border: 1px solid #e9ecef;
-    }
-
-    .review-card:hover {
-        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
-    }
-
-    .empty-state {
-        max-width: 400px;
-        margin: 0 auto;
-    }
-
-    .user-avatar {
-        min-width: 40px;
-    }
-
-    .progress {
-        background-color: #e9ecef;
-    }
-
-    .star {
-        font-size: 0.9rem;
-    }
-
-    .card-body {
-        padding: 1.5rem;
-    }
-
-    .pagination .page-link {
-        color: #007bff;
-        border: 1px solid #dee2e6;
-    }
-
-    .pagination .page-item.active .page-link {
-        background-color: #007bff;
-        border-color: #007bff;
-        color: white;
-    }
-
-    .pagination .page-link:hover {
-        background-color: #e9ecef;
-        border-color: #dee2e6;
-        color: #0056b3;
-    }
-</style>
