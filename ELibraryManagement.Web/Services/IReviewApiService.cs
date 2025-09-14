@@ -14,7 +14,7 @@ namespace ELibraryManagement.Web.Services
         Task<ReviewResponseViewModel> DeleteReviewAsync(int reviewId, string token);
 
         // Lấy review theo ID
-        Task<ReviewViewModel?> GetReviewByIdAsync(int reviewId);
+        Task<ReviewViewModel?> GetReviewByIdAsync(int reviewId, string token);
 
         // Lấy reviews của một sách với phân trang
         Task<ReviewListViewModel> GetBookReviewsAsync(int bookId, int page = 1, int pageSize = 10);

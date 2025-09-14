@@ -154,7 +154,7 @@ namespace ELibraryManagement.Web.Controllers
                     return RedirectToAction("Login", "Account");
                 }
 
-                var review = await _reviewApiService.GetReviewByIdAsync(id);
+                var review = await _reviewApiService.GetReviewByIdAsync(id, token);
                 if (review == null)
                 {
                     TempData["ErrorMessage"] = "Không tìm thấy đánh giá.";
@@ -173,7 +173,7 @@ namespace ELibraryManagement.Web.Controllers
                     Rating = review.Rating,
                     Comment = review.Comment,
                     BookTitle = review.BookTitle,
-                    BookCoverUrl = "" // Sẽ cần lấy từ book details nếu cần
+                    BookCoverUrl = review.BookCoverUrl
                 };
 
                 return View(model);

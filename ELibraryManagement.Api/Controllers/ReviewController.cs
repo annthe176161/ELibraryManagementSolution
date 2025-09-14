@@ -112,7 +112,6 @@ namespace ELibraryManagement.Api.Controllers
         /// Lấy review theo ID
         /// </summary>
         [HttpGet("{id}")]
-        [AllowAnonymous]
         public async Task<IActionResult> GetReviewById(int id)
         {
             var review = await _reviewService.GetReviewByIdAsync(id);

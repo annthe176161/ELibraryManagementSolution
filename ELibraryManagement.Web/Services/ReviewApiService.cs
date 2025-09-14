@@ -156,11 +156,12 @@ namespace ELibraryManagement.Web.Services
             }
         }
 
-        public async Task<ReviewViewModel?> GetReviewByIdAsync(int reviewId)
+        public async Task<ReviewViewModel?> GetReviewByIdAsync(int reviewId, string token)
         {
             try
             {
                 var apiBaseUrl = GetApiBaseUrl();
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
                 var response = await _httpClient.GetAsync($"{apiBaseUrl}/api/Review/{reviewId}");
 
                 if (response.IsSuccessStatusCode)
@@ -401,6 +402,7 @@ namespace ELibraryManagement.Web.Services
                 UserAvatarUrl = GetPropertyValue<string>(reviewData, "userAvatarUrl") ?? "",
                 BookId = GetPropertyValue<int>(reviewData, "bookId"),
                 BookTitle = GetPropertyValue<string>(reviewData, "bookTitle") ?? "",
+                BookCoverUrl = GetPropertyValue<string>(reviewData, "bookCoverUrl") ?? "",
                 Rating = GetPropertyValue<int>(reviewData, "rating"),
                 Comment = GetPropertyValue<string>(reviewData, "comment"),
                 ReviewDate = GetPropertyValue<DateTime>(reviewData, "reviewDate"),
