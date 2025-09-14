@@ -5,370 +5,574 @@
 }
 
 @section Styles {
-    <link rel="stylesheet" href="~/css/book-detail.css" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap"
-        rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* Modern University Library Book Detail Styles */
+        .book-detail-container {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            min-height: 100vh;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            padding: 2rem 0;
+        }
+
+        .breadcrumb-nav {
+            background: white;
+            padding: 1rem 0;
+            border-bottom: 1px solid #e2e8f0;
+            margin-bottom: 2rem;
+        }
+
+        .breadcrumb {
+            margin: 0;
+            background: none;
+            padding: 0;
+        }
+
+        .breadcrumb-item a {
+            color: #2563eb;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .breadcrumb-item a:hover {
+            color: #1e3a8a;
+        }
+
+        .breadcrumb-item.active {
+            color: #6b7280;
+            font-weight: 600;
+        }
+
+        .main-book-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 2rem;
+        }
+
+        .book-header-section {
+            background: linear-gradient(135deg, #2563eb 0%, #1e3a8a 100%);
+            color: white;
+            padding: 2rem;
+            position: relative;
+        }
+
+        .book-header-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") repeat;
+        }
+
+        .book-content {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 2rem;
+            padding: 2rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .book-image-container {
+            position: relative;
+        }
+
+        .book-cover {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s ease;
+        }
+
+        .book-cover:hover {
+            transform: translateY(-5px);
+        }
+
+        .availability-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 0.875rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .badge-available {
+            background: rgba(16, 185, 129, 0.9);
+            color: white;
+        }
+
+        .badge-unavailable {
+            background: rgba(239, 68, 68, 0.9);
+            color: white;
+        }
+
+        .book-info-header {
+            position: relative;
+            z-index: 2;
+        }
+
+        .book-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
+
+        .book-author {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-bottom: 0.5rem;
+        }
+
+        .book-meta {
+            display: flex;
+            gap: 2rem;
+            margin-top: 1rem;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .book-body {
+            padding: 2rem;
+        }
+
+        .info-section {
+            background: #f8fafc;
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid #e2e8f0;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1e3a8a;
+            margin-bottom: 1rem;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+        }
+
+        .info-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: white;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+
+        .info-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .info-item i {
+            width: 20px;
+            text-align: center;
+        }
+
+        .description-section {
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border: 1px solid #3b82f6;
+        }
+
+        .description-text {
+            line-height: 1.6;
+            color: #374151;
+            margin: 0;
+        }
+
+        .borrow-rules-section {
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            border-radius: 15px;
+            padding: 1.5rem;
+            border: 1px solid #16a34a;
+        }
+
+        .rules-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .rule-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.25rem;
+            border: 1px solid #bbf7d0;
+            transition: all 0.3s ease;
+        }
+
+        .rule-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.15);
+        }
+
+        .rule-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 700;
+            color: #065f46;
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+
+        .rule-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .rule-list li {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.5rem 0;
+            font-size: 0.9rem;
+            color: #374151;
+        }
+
+        .rule-list li i {
+            color: #16a34a;
+            width: 16px;
+        }
+
+        .borrow-button {
+            background: linear-gradient(135deg, #16a34a 0%, #15803d 100%);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            margin-top: 1.5rem;
+        }
+
+        .borrow-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(16, 163, 74, 0.3);
+            color: white;
+            text-decoration: none;
+        }
+
+        .borrow-button:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1rem;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2563eb;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: #6b7280;
+            margin-top: 0.25rem;
+        }
+
+        @@media (max-width: 768px) {
+            .book-content {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+            
+            .book-title {
+                font-size: 1.5rem;
+            }
+            
+            .info-grid,
+            .rules-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 }
 
-<!-- Breadcrumb Navigation -->
-<nav aria-label="breadcrumb" class="breadcrumb-nav">
-    <div class="container">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item">
-                <a href="@Url.Action("Index", "Home")">
-                    <i class="fas fa-home me-1"></i>Trang Chủ
-                </a>
-            </li>
-            <li class="breadcrumb-item">
-                <a href="@Url.Action("Books", "Home")">
-                    <i class="fas fa-book me-1"></i>Danh Sách Sách
-                </a>
-            </li>
-            <li class="breadcrumb-item active" aria-current="page">@Model.Title</li>
-        </ol>
+<div class="book-detail-container">
+    <!-- Breadcrumb Navigation -->
+    <div class="breadcrumb-nav">
+        <div class="container">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item">
+                        <a href="@Url.Action("Index", "Home")">
+                            <i class="fas fa-home"></i> Trang chủ
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <a href="@Url.Action("Books", "Home")">
+                            <i class="fas fa-books"></i> Thư viện sách
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item active" aria-current="page">
+                        @Model.Title
+                    </li>
+                </ol>
+            </nav>
+        </div>
     </div>
-</nav>
 
-<!-- Main Book Detail Section -->
-<div class="container book-detail-container">
-    <div class="row">
-        <!-- Book Image and Quick Actions -->
-        <div class="col-lg-5 mb-4">
-            <div class="book-image-section">
-                <div class="book-cover-wrapper">
-                    <img src="@Model.ImageUrl" alt="@Model.Title" class="book-cover"
-                        onerror="this.src='/images/default-book-cover.jpg'">
-                    <div class="book-badge">
-                        @if (Model.AvailableCopies > 0)
-                        {
-                            <span class="badge-available">📚 Có Sẵn</span>
-                        }
-                        else
-                        {
-                            <span class="badge-unavailable">❌ Hết Sách</span>
-                        }
-                    </div>
-                </div>
-
-                <!-- Quick Actions -->
-                <div class="quick-actions mt-4">
-                    @if (Model.AvailableCopies > 0)
-                    {
-                        <button class="btn btn-borrow btn-lg w-100 mb-3" onclick="borrowBook(@Model.Id)">
-                            <i class="fas fa-book-reader me-2"></i>
-                            Mượn Sách Ngay
-                        </button>
-                    }
-                    else
-                    {
-                        <button class="btn btn-unavailable btn-lg w-100 mb-3" disabled>
-                            <i class="fas fa-clock me-2"></i>
-                            Đặt Hàng Chờ
-                        </button>
-                    }
-
-                    <div class="row">
-                        <div class="col-6">
-                            <button class="btn btn-outline-primary w-100" onclick="addToWishlist(@Model.Id)">
-                                <i class="fas fa-heart me-1"></i>Yêu Thích
-                            </button>
-                        </div>
-                        <div class="col-6">
-                            <button class="btn btn-outline-secondary w-100" onclick="shareBook(@Model.Id)">
-                                <i class="fas fa-share-alt me-1"></i>Chia Sẻ
-                            </button>
+    <div class="container">
+        <!-- Main Book Card -->
+        <div class="main-book-card">
+            <!-- Book Header Section -->
+            <div class="book-header-section">
+                <div class="book-content">
+                    <div class="book-image-container">
+                        <img src="@Model.ImageUrl" alt="@Model.Title" class="book-cover" 
+                             onerror="this.src='/images/default-book-cover.jpg';">
+                        <div class="availability-badge @(Model.AvailableCopies > 0 ? "badge-available" : "badge-unavailable")">
+                            @if (Model.AvailableCopies > 0)
+                            {
+                                <i class="fas fa-check-circle"></i> <text>Có sẵn</text>
+                            }
+                            else
+                            {
+                                <i class="fas fa-times-circle"></i> <text>Hết sách</text>
+                            }
                         </div>
                     </div>
-                </div>
-
-                <!-- Book Stats -->
-                <div class="book-stats mt-4">
-                    <div class="stat-item">
-                        <div class="stat-label">Đánh Giá</div>
-                        <div class="stat-value">
-                            <div class="rating-display">
-                                @for (int i = 1; i <= 5; i++)
-                                {
-                                    if (i <= Model.AverageRating)
-                                    {
-                                        <i class="fas fa-star text-warning"></i>
-                                    }
-                                    else if (i - 0.5 <= (double)Model.AverageRating)
-                                    {
-                                        <i class="fas fa-star-half-alt text-warning"></i>
-                                    }
-                                    else
-                                    {
-                                        <i class="far fa-star text-muted"></i>
-                                    }
-                                }
-                                <span class="rating-text ms-2">@Model.AverageRating.ToString("F1")/5.0</span>
+                    
+                    <div class="book-info-header">
+                        <h1 class="book-title">@Model.Title</h1>
+                        <p class="book-author">
+                            <i class="fas fa-user-edit"></i> Tác giả: @Model.Author
+                        </p>
+                        
+                        <div class="book-meta">
+                            <div class="meta-item">
+                                <i class="fas fa-tag"></i>
+                                @Model.CategoryName
                             </div>
-                            <small class="text-muted">(@Model.RatingCount lượt đánh giá)</small>
-                        </div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-label">Tình Trạng</div>
-                        <div class="stat-value">
-                            <span class="available-info">
-                                @Model.AvailableCopies/@Model.TotalCopies cuốn có sẵn
-                            </span>
+                            <div class="meta-item">
+                                <i class="fas fa-calendar"></i>
+                                @Model.PublicationYear
+                            </div>
+                            <div class="meta-item">
+                                <i class="fas fa-star"></i>
+                                @(Model.AverageRating > 0 ? Model.AverageRating.ToString("F1") : "Chưa có đánh giá")
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Book Information -->
-        <div class="col-lg-7">
-            <div class="book-info-section">
-                <div class="book-header">
-                    <h1 class="book-title">@Model.Title</h1>
-                    <p class="book-author">
-                        <i class="fas fa-user-edit me-2 text-primary"></i>
-                        Tác giả: <strong>@Model.Author</strong>
-                    </p>
+            <!-- Book Statistics -->
+            <div class="book-body">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value">@Model.TotalCopies</div>
+                        <div class="stat-label">Tổng số bản</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">@Model.AvailableCopies</div>
+                        <div class="stat-label">Có sẵn</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">@(Model.TotalCopies - Model.AvailableCopies)</div>
+                        <div class="stat-label">Đã mượn</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">@(Model.AverageRating > 0 ? Model.AverageRating.ToString("F1") : "N/A")</div>
+                        <div class="stat-label">Đánh giá TB</div>
+                    </div>
+                </div>
 
-                    <div class="book-price">
-                        <span class="price-label">Trạng thái:</span>
-                        <span class="price-value text-success">Miễn phí mượn</span>
+                <!-- Book Information Section -->
+                <div class="info-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-info-circle"></i>
+                        Thông tin chi tiết
+                    </h3>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <i class="fas fa-user-edit text-blue-600"></i>
+                            <div>
+                                <strong>Tác giả:</strong><br>
+                                @Model.Author
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-building text-purple-600"></i>
+                            <div>
+                                <strong>Nhà xuất bản:</strong><br>
+                                @Model.Publisher
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-calendar-alt text-green-600"></i>
+                            <div>
+                                <strong>Năm xuất bản:</strong><br>
+                                @Model.PublicationYear
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-tag text-orange-600"></i>
+                            <div>
+                                <strong>Thể loại:</strong><br>
+                                @Model.CategoryName
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-barcode text-red-600"></i>
+                            <div>
+                                <strong>ISBN:</strong><br>
+                                @Model.ISBN
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-file-alt text-indigo-600"></i>
+                            <div>
+                                <strong>Số trang:</strong><br>
+                                @Model.PageCount trang
+                            </div>
+                        </div>
                     </div>
                 </div>
 
                 <!-- Book Description -->
-                <div class="book-description">
-                    <h5 class="section-title">📖 Mô Tả Sách</h5>
-                    <p class="description-text">@Model.Description</p>
-                </div>
+                @if (!string.IsNullOrEmpty(Model.Description))
+                {
+                    <div class="description-section">
+                        <h3 class="section-title">
+                            <i class="fas fa-align-left"></i>
+                            Mô tả nội dung
+                        </h3>
+                        <p class="description-text">@Model.Description</p>
+                    </div>
+                }
 
-                <!-- Book Details -->
-                <div class="book-details">
-                    <h5 class="section-title">📋 Thông Tin Chi Tiết</h5>
-                    <div class="details-grid">
-                        <div class="detail-item">
-                            <span class="detail-label">📚 Thể Loại:</span>
-                            <span class="detail-value">@Model.CategoryName</span>
+                <!-- University Library Borrowing Rules -->
+                <div class="borrow-rules-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-university"></i>
+                        Quy định mượn sách - Thư viện Đại học
+                    </h3>
+                    
+                    <div class="rules-grid">
+                        <div class="rule-card">
+                            <div class="rule-header">
+                                <i class="fas fa-clock"></i>
+                                Thời gian mượn
+                            </div>
+                            <ul class="rule-list">
+                                <li><i class="fas fa-check"></i> Thời gian mượn tối đa: <strong>30 ngày</strong></li>
+                                <li><i class="fas fa-check"></i> Gia hạn: Tối đa 2 lần, mỗi lần 15 ngày</li>
+                                <li><i class="fas fa-check"></i> Sinh viên được mượn tối đa 5 cuốn</li>
+                            </ul>
                         </div>
-                        <div class="detail-item">
-                            <span class="detail-label">🏢 Nhà Xuất Bản:</span>
-                            <span class="detail-value">@Model.Publisher</span>
+
+                        <div class="rule-card">
+                            <div class="rule-header">
+                                <i class="fas fa-money-bill-wave"></i>
+                                Phí dịch vụ
+                            </div>
+                            <ul class="rule-list">
+                                <li><i class="fas fa-check"></i> Mượn sách: <strong>Miễn phí</strong></li>
+                                <li><i class="fas fa-check"></i> Phí trễ hạn: 2,000đ/ngày/cuốn</li>
+                                <li><i class="fas fa-check"></i> Phí làm mất sách: 150% giá sách</li>
+                            </ul>
                         </div>
-                        <div class="detail-item">
-                            <span class="detail-label">📅 Năm Xuất Bản:</span>
-                            <span class="detail-value">@Model.PublicationYear</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="detail-label">🔢 Mã ISBN:</span>
-                            <span class="detail-value isbn-value" title="@Model.ISBN">@Model.ISBN</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="detail-label">🌐 Ngôn Ngữ:</span>
-                            <span class="detail-value">@Model.Language</span>
-                        </div>
-                        <div class="detail-item">
-                            <span class="detail-label">📄 Số Trang:</span>
-                            <span class="detail-value">@Model.PageCount trang</span>
+
+                        <div class="rule-card">
+                            <div class="rule-header">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                Lưu ý quan trọng
+                            </div>
+                            <ul class="rule-list">
+                                <li><i class="fas fa-check"></i> Cần mang thẻ sinh viên khi mượn/trả</li>
+                                <li><i class="fas fa-check"></i> Kiểm tra sách trước khi mượn</li>
+                                <li><i class="fas fa-check"></i> Liên hệ thủ thư nếu cần hỗ trợ</li>
+                            </ul>
                         </div>
                     </div>
-                </div>
 
-                <!-- Borrowing Information -->
-                <div class="borrowing-info">
-                    <h5 class="section-title">ℹ️ Quy Định Mượn Sách Thư Viện</h5>
-                    <div class="info-list">
-                        <div class="info-section">
-                            <h6 class="info-section-title">
-                                <i class="fas fa-clock text-primary me-2"></i>
-                                Thời Gian Mượn Sách
-                            </h6>
-                            <div class="info-item">
-                                <i class="fas fa-calendar-alt text-primary me-2"></i>
-                                <span>Thời gian mượn tối đa: <strong>14 ngày</strong></span>
-                            </div>
-                            <div class="info-item">
-                                <i class="fas fa-redo text-success me-2"></i>
-                                <span>Có thể gia hạn: <strong>1 lần (7 ngày)</strong> nếu không có người đặt
-                                    trước</span>
-                            </div>
-                            <div class="info-item">
-                                <i class="fas fa-users text-info me-2"></i>
-                                <span>Số sách được mượn tối đa: <strong>5 cuốn/sinh viên</strong></span>
-                            </div>
-                        </div>
-
-                        <div class="info-section">
-                            <h6 class="info-section-title">
-                                <i class="fas fa-exclamation-triangle text-warning me-2"></i>
-                                Chế Tài Vi Phạm
-                            </h6>
-                            <div class="info-item warning">
-                                <i class="fas fa-money-bill-wave text-warning me-2"></i>
-                                <span>Phí phạt quá hạn: <strong>5,000đ/ngày/cuốn</strong></span>
-                            </div>
-                            <div class="info-item warning">
-                                <i class="fas fa-ban text-danger me-2"></i>
-                                <span>Quá hạn trên 30 ngày: <strong>Khóa tài khoản thư viện</strong></span>
-                            </div>
-                            <div class="info-item warning">
-                                <i class="fas fa-graduation-cap text-danger me-2"></i>
-                                <span>Nợ sách khi tốt nghiệp: <strong>Không được cấp bằng</strong></span>
-                            </div>
-                            <div class="info-item warning">
-                                <i class="fas fa-file-contract text-danger me-2"></i>
-                                <span>Nợ phí phạt trên 100,000đ: <strong>Khóa tài khoản đăng ký học phần</strong></span>
-                            </div>
-                        </div>
-
-                        <div class="info-section">
-                            <h6 class="info-section-title">
-                                <i class="fas fa-shield-alt text-info me-2"></i>
-                                Bồi Thường & Bảo Hiểm
-                            </h6>
-                            <div class="info-item">
-                                <i class="fas fa-book-dead text-danger me-2"></i>
-                                <span>Mất sách: <strong>Bồi thường 120% giá trị hoặc mua sách mới cùng
-                                        loại</strong></span>
-                            </div>
-                            <div class="info-item">
-                                <i class="fas fa-cut text-warning me-2"></i>
-                                <span>Hư hỏng sách: <strong>Bồi thường 50-100% tùy mức độ</strong></span>
-                            </div>
-                            <div class="info-item">
-                                <i class="fas fa-water text-primary me-2"></i>
-                                <span>Ướt, rách, viết vẽ: <strong>Phạt 20,000-50,000đ</strong></span>
-                            </div>
-                        </div>
-
-                        <div class="info-section">
-                            <h6 class="info-section-title">
-                                <i class="fas fa-info-circle text-success me-2"></i>
-                                Lưu Ý Quan Trọng
-                            </h6>
-                            <div class="info-item">
-                                <i class="fas fa-id-card text-success me-2"></i>
-                                <span>Cần thẻ sinh viên có hiệu lực để mượn sách</span>
-                            </div>
-                            <div class="info-item">
-                                <i class="fas fa-bell text-info me-2"></i>
-                                <span>Nhận thông báo nhắc nhở qua email trước 3 ngày hết hạn</span>
-                            </div>
-                            <div class="info-item">
-                                <i class="fas fa-mobile-alt text-primary me-2"></i>
-                                <span>Có thể gia hạn online qua website hoặc app mobile</span>
-                            </div>
-                            <div class="info-item">
-                                <i class="fas fa-question-circle text-secondary me-2"></i>
-                                <span>Liên hệ thủ thư: <strong>library@university.edu.vn</strong> hoặc <strong>(024)
-                                        3869-xxxx</strong></span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Reviews Section -->
-<div class="reviews-section bg-light py-5">
-    <div class="container">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h3 class="section-title mb-0">
-                <i class="fas fa-comments text-primary me-2"></i>
-                Đánh Giá & Nhận Xét
-            </h3>
-            <a asp-controller="Review" asp-action="BookReviews" asp-route-bookId="@Model.Id" class="btn btn-outline-primary">
-                <i class="fas fa-eye me-1"></i>Xem Tất Cả
-            </a>
-        </div>
-
-        <div class="row">
-            <!-- Rating Summary -->
-            <div class="col-md-4 mb-4">
-                <div class="card rating-summary-card h-100">
-                    <div class="card-body text-center">
-                        <h2 class="rating-number text-warning mb-2">@Model.AverageRating.ToString("F1")</h2>
-                        <div class="rating-stars mb-2">
-                            @for (int i = 1; i <= 5; i++)
-                            {
-                                <i class="fas fa-star @(i <= Math.Round(Model.AverageRating) ? "text-warning" : "text-muted")"></i>
-                            }
-                        </div>
-                        <p class="text-muted mb-3">
-                            @Model.RatingCount @(Model.RatingCount == 1 ? "đánh giá" : "đánh giá")
-                        </p>
-                        
-                        @if (User.Identity?.IsAuthenticated == true)
+                    <!-- Borrow Button -->
+                    @if (ViewBag.IsAuthenticated)
+                    {
+                        if (Model.AvailableCopies > 0)
                         {
-                            <div class="review-actions">
-                                <a asp-controller="Review" asp-action="Create" asp-route-bookId="@Model.Id" 
-                                   class="btn btn-primary btn-sm">
-                                    <i class="fas fa-star me-1"></i>Viết Đánh Giá
-                                </a>
-                            </div>
+                            <a href="@Url.Action("BorrowBook", "Borrow", new { bookId = Model.Id })" class="borrow-button">
+                                <i class="fas fa-hand-holding"></i>
+                                Mượn sách ngay
+                            </a>
                         }
                         else
                         {
-                            <p class="text-muted small">
-                                <a asp-controller="Account" asp-action="Login" class="text-decoration-none">
-                                    Đăng nhập để viết đánh giá
-                                </a>
-                            </p>
-                        }
-                    </div>
-                </div>
-            </div>
-
-            <!-- Recent Reviews -->
-            <div class="col-md-8">
-                <div class="recent-reviews">
-                    @if (ViewBag.RecentReviews != null && ((IEnumerable<dynamic>)ViewBag.RecentReviews).Any())
-                    {
-                        @foreach (var review in (IEnumerable<dynamic>)ViewBag.RecentReviews)
-                        {
-                            <div class="review-item card mb-3">
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between align-items-start mb-2">
-                                        <div class="d-flex align-items-center">
-                                            <div class="reviewer-avatar me-2">
-                                                <i class="fas fa-user-circle fa-2x text-muted"></i>
-                                            </div>
-                                            <div>
-                                                <h6 class="reviewer-name mb-0">@review.UserName</h6>
-                                                <small class="text-muted">@review.CreatedAt</small>
-                                            </div>
-                                        </div>
-                                        <div class="review-rating">
-                                            @for (int i = 1; i <= 5; i++)
-                                            {
-                                                <i class="fas fa-star @(i <= review.Rating ? "text-warning" : "text-muted") small"></i>
-                                            }
-                                        </div>
-                                    </div>
-                                    <p class="review-comment mb-0">
-                                        @(review.Comment.Length > 150 ? review.Comment.Substring(0, 150) + "..." : review.Comment)
-                                    </p>
-                                </div>
-                            </div>
+                            <button class="borrow-button" disabled>
+                                <i class="fas fa-times-circle"></i>
+                                Hết sách
+                            </button>
                         }
                     }
                     else
                     {
-                        <div class="text-center py-4">
-                            <i class="fas fa-comment-slash fa-3x text-muted mb-3"></i>
-                            <h5 class="text-muted">Chưa có đánh giá nào</h5>
-                            <p class="text-muted">Hãy là người đầu tiên chia sẻ cảm nhận về cuốn sách này!</p>
-                            @if (User.Identity?.IsAuthenticated == true)
-                            {
-                                <a asp-controller="Review" asp-action="Create" asp-route-bookId="@Model.Id" 
-                                   class="btn btn-primary mt-2">
-                                    <i class="fas fa-star me-1"></i>Viết Đánh Giá Đầu Tiên
-                                </a>
-                            }
-                        </div>
+                        <a href="@Url.Action("Login", "Account")" class="borrow-button">
+                            <i class="fas fa-sign-in-alt"></i>
+                            Đăng nhập để mượn sách
+                        </a>
                     }
                 </div>
             </div>
@@ -376,191 +580,12 @@
     </div>
 </div>
 
-<!-- Related Books Section -->
-@if (ViewBag.RelatedBooks != null && ((List<BookViewModel>)ViewBag.RelatedBooks).Any())
-{
-    <div class="related-books-section">
-        <div class="container">
-            <h3 class="section-title text-center mb-5">
-                <i class="fas fa-books me-2"></i>
-                Sách Cùng Thể Loại
-            </h3>
-            <div class="row">
-                @foreach (var book in (List<BookViewModel>)ViewBag.RelatedBooks)
-                {
-                    <div class="col-lg-3 col-md-6 mb-4">
-                        <div class="related-book-card">
-                            <div class="book-image">
-                                <img src="@book.ImageUrl" alt="@book.Title" onerror="this.src='/images/default-book-cover.jpg'">
-                                <div class="book-overlay">
-                                    <a href="@Url.Action("BookDetail", new { id = book.Id })"
-                                        class="btn btn-outline-white btn-sm">
-                                        <i class="fas fa-eye me-1"></i>Xem Chi Tiết
-                                    </a>
-                                </div>
-                            </div>
-                            <div class="book-content">
-                                <h6 class="book-title">@book.Title</h6>
-                                <p class="book-author">@book.Author</p>
-                                <div class="book-rating">
-                                    @for (int i = 1; i <= 5; i++)
-                                    {
-                                        if (i <= book.AverageRating)
-                                        {
-                                            <i class="fas fa-star text-warning"></i>
-                                        }
-                                        else
-                                        {
-                                            <i class="far fa-star text-muted"></i>
-                                        }
-                                    }
-                                </div>
-                                <div class="book-price">
-                                    <span class="text-success">Miễn phí</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                }
-            </div>
-        </div>
-    </div>
-}
-
 @section Scripts {
     <script>
-        // Borrow book function
         function borrowBook(bookId) {
-            console.log('borrowBook called with bookId:', bookId);
-            console.log('isUserLoggedIn:', isUserLoggedIn());
-
-            // Kiểm tra đăng nhập
-            if (!isUserLoggedIn()) {
-                console.log('User not logged in, showing login dialog');
-                Swal.fire({
-                    title: '🔐 Cần Đăng Nhập',
-                    text: 'Bạn cần đăng nhập để mượn sách. Chuyển đến trang đăng nhập?',
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#da251e',
-                    cancelButtonColor: '#6c757d',
-                    confirmButtonText: 'Đăng Nhập',
-                    cancelButtonText: 'Hủy',
-                    customClass: {
-                        popup: 'swal-vietnamese'
-                    }
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        window.location.href = '/Account/Login';
-                    }
-                });
-                return;
-            }
-
-            console.log('User is logged in, showing confirm dialog');
-            // Confirm borrow
-            Swal.fire({
-                title: '📚 Xác Nhận Mượn Sách',
-                text: `Bạn có chắc chắn muốn mượn sách "${@Html.Raw(Json.Serialize(Model.Title))}"?`,
-                icon: 'question',
-                showCancelButton: true,
-                confirmButtonColor: '#da251e',
-                cancelButtonColor: '#6c757d',
-                confirmButtonText: 'Mượn Ngay',
-                cancelButtonText: 'Hủy',
-                customClass: {
-                    popup: 'swal-vietnamese'
-                }
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    // Show loading
-                    Swal.fire({
-                        title: 'Đang xử lý...',
-                        text: 'Vui lòng chờ trong giây lát',
-                        allowOutsideClick: false,
-                        didOpen: () => {
-                            Swal.showLoading();
-                        }
-                    });
-
-                    // Redirect to Book/Borrow page
-                    setTimeout(() => {
-                        window.location.href = `/Book/Borrow/${bookId}`;
-                    }, 500);
-                }
-            });
-        }
-
-        // Add to wishlist function
-        function addToWishlist(bookId) {
-            Swal.fire({
-                title: '💝 Thêm Vào Yêu Thích',
-                text: 'Tính năng này sẽ được phát triển trong phiên bản tiếp theo!',
-                icon: 'info',
-                confirmButtonColor: '#da251e'
-            });
-        }
-
-        // Share book function
-        function shareBook(bookId) {
-            const bookUrl = window.location.href;
-            const bookTitle = @Html.Raw(Json.Serialize(Model.Title));
-
-            if (navigator.share) {
-                navigator.share({
-                    title: bookTitle,
-                    text: `Tôi vừa tìm thấy cuốn sách hay: ${bookTitle}`,
-                    url: bookUrl
-                }).catch(console.error);
-            } else {
-                // Fallback: copy to clipboard
-                navigator.clipboard.writeText(bookUrl).then(() => {
-                    Swal.fire({
-                        title: '📋 Đã Sao Chép',
-                        text: 'Link sách đã được sao chép vào clipboard!',
-                        icon: 'success',
-                        timer: 2000,
-                        showConfirmButton: false
-                    });
-                });
+            if (confirm('Bạn có chắc chắn muốn mượn sách này?')) {
+                window.location.href = '@Url.Action("BorrowBook", "Borrow")?bookId=' + bookId;
             }
         }
-
-        // Check if user is logged in
-        function isUserLoggedIn() {
-            // Use server-side authentication check
-            return @Html.Raw(Json.Serialize(ViewBag.IsAuthenticated ?? false));
-        }
-
-        // Get auth token
-        function getAuthToken() {
-            return @Html.Raw(Json.Serialize(ViewBag.AuthToken ?? ""));
-        }
-
-        // Initialize page
-        document.addEventListener('DOMContentLoaded', function () {
-            // Add smooth scrolling to related books
-            const relatedBooksCards = document.querySelectorAll('.related-book-card');
-            relatedBooksCards.forEach(card => {
-                card.addEventListener('mouseenter', function () {
-                    this.style.transform = 'translateY(-5px)';
-                });
-                card.addEventListener('mouseleave', function () {
-                    this.style.transform = 'translateY(0)';
-                });
-            });
-
-            // Book cover animation
-            const bookCover = document.querySelector('.book-cover');
-            bookCover.addEventListener('mouseenter', function () {
-                this.style.transform = 'scale(1.05) rotateY(5deg)';
-            });
-            bookCover.addEventListener('mouseleave', function () {
-                this.style.transform = 'scale(1) rotateY(0deg)';
-            });
-        });
     </script>
-
-    <!-- SweetAlert2 for beautiful alerts -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 }
