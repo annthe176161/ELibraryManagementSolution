@@ -45,6 +45,19 @@ appsettings.Development.json
 # Uncomment if you want to ignore appsettings.json (contains secrets)
 # appsettings.json
 
+# User Secrets (already handled by .NET Core, but good to be explicit)
+secrets.json
+
+# Environment variables files
+.env
+.env.local
+.env.production
+
+# API Keys and sensitive config files
+*secrets*
+*apikey*
+*clientsecret*
+
 # EF Migrations (uncomment if you don't want to push migrations)
 # Migrations/
 
