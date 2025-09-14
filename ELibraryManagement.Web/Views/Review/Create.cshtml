@@ -4,31 +4,421 @@
     ViewData["Title"] = "Đánh giá sách";
 }
 
-<div class="container mt-4">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card shadow">
-                <div class="card-header bg-primary text-white">
-                    <h4 class="mb-0">
-                        <i class="fas fa-star me-2"></i>Đánh giá sách
-                    </h4>
+@section Styles {
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* FPT University Theme */
+        .fpt-header {
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #60a5fa 100%);
+            color: white;
+            padding: 2rem 0;
+            margin-bottom: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .fpt-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><defs><pattern id="books" patternUnits="userSpaceOnUse" width="20" height="20"><rect width="20" height="20" fill="none"/><rect x="2" y="8" width="3" height="8" fill="white" opacity="0.05"/><rect x="6" y="6" width="3" height="10" fill="white" opacity="0.05"/><rect x="10" y="7" width="3" height="9" fill="white" opacity="0.05"/><rect x="14" y="5" width="3" height="11" fill="white" opacity="0.05"/></pattern></defs><rect width="100" height="100" fill="url(%23books)"/></svg>') repeat;
+            pointer-events: none;
+        }
+
+        .fpt-title {
+            position: relative;
+            z-index: 1;
+        }
+
+        .fpt-title h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            margin-bottom: 0.5rem;
+        }
+
+        .fpt-title h2 {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        .review-container {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem 0;
+        }
+
+        .review-card {
+            background: white;
+            border-radius: 2rem;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            border: none;
+            overflow: hidden;
+        }
+
+        .review-header {
+            background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .review-header h4 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .review-header p {
+            opacity: 0.9;
+            margin: 0;
+        }
+
+        .book-info-section {
+            background: linear-gradient(135deg, #f8fafc, #e9ecef);
+            padding: 2rem;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .book-cover-container {
+            position: relative;
+            text-align: center;
+        }
+
+        .book-cover {
+            border-radius: 1rem;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            max-height: 250px;
+            width: auto;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .book-cover:hover {
+            transform: scale(1.05);
+        }
+
+        .book-details h5 {
+            color: #1e3a8a;
+            font-weight: 700;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .book-meta {
+            color: #6b7280;
+            font-size: 1rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .book-meta i {
+            color: #3b82f6;
+            width: 20px;
+        }
+
+        .info-alert {
+            background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+            border: 1px solid #3b82f6;
+            border-radius: 1rem;
+            color: #1e40af;
+            padding: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .form-section {
+            padding: 2.5rem;
+        }
+
+        .section-title {
+            color: #1e3a8a;
+            font-weight: 700;
+            font-size: 1.25rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .section-title i {
+            margin-right: 0.75rem;
+            color: #3b82f6;
+        }
+
+        .rating-section {
+            background: linear-gradient(135deg, #fffbeb, #fef3c7);
+            border: 2px solid #f59e0b;
+            border-radius: 1.5rem;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .star-rating {
+            display: flex;
+            justify-content: center;
+            gap: 0.75rem;
+            margin: 1.5rem 0;
+        }
+
+        .star {
+            font-size: 3rem;
+            color: #d1d5db;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .star:hover,
+        .star.active {
+            color: #fbbf24;
+            transform: scale(1.1);
+        }
+
+        .star.selected {
+            color: #f59e0b;
+            animation: bounce 0.5s ease;
+        }
+
+        @@keyframes bounce {
+
+            0%,
+            20%,
+            50%,
+            80%,
+            100% {
+                transform: translateY(0);
+            }
+
+            40% {
+                transform: translateY(-10px);
+            }
+
+            60% {
+                transform: translateY(-5px);
+            }
+        }
+
+        .rating-description {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #92400e;
+            margin-top: 1rem;
+            min-height: 1.5rem;
+        }
+
+        .comment-section {
+            margin-bottom: 2rem;
+        }
+
+        .form-label {
+            color: #1e3a8a;
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+        }
+
+        .form-control {
+            border: 2px solid #e5e7eb;
+            border-radius: 1rem;
+            padding: 1rem 1.5rem;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .form-text {
+            color: #6b7280;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+        }
+
+        .action-buttons {
+            background: #f8fafc;
+            padding: 2rem;
+            border-top: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.875rem 2rem;
+            border-radius: 1rem;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            border: none;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6, #1e40af);
+            color: white;
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(59, 130, 246, 0.4);
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+        }
+
+        .btn-secondary {
+            background: #6b7280;
+            color: white;
+            box-shadow: 0 4px 15px rgba(107, 114, 128, 0.3);
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(107, 114, 128, 0.4);
+            background: #4b5563;
+        }
+
+        .btn i {
+            margin-right: 0.5rem;
+        }
+
+        .text-danger {
+            color: #ef4444 !important;
+            font-weight: 500;
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            display: block;
+        }
+
+        /* Responsive Design */
+        @@media (max-width: 768px) {
+            .fpt-title h1 {
+                font-size: 2rem;
+            }
+
+            .fpt-title h2 {
+                font-size: 1rem;
+            }
+
+            .book-info-section {
+                padding: 1.5rem;
+            }
+
+            .form-section {
+                padding: 1.5rem;
+            }
+
+            .action-buttons {
+                flex-direction: column-reverse;
+                gap: 1rem;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .star {
+                font-size: 2.5rem;
+            }
+
+            .rating-section {
+                padding: 1.5rem;
+            }
+        }
+
+        @@media (max-width: 576px) {
+            .review-container {
+                padding: 1rem 0;
+            }
+
+            .star {
+                font-size: 2rem;
+                gap: 0.5rem;
+            }
+
+            .book-cover {
+                max-height: 200px;
+            }
+        }
+    </style>
+}
+
+<!-- FPT University Header -->
+<div class="fpt-header">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-8">
+                <div class="fpt-title">
+                    <h1>
+                        <i class="fas fa-university me-3"></i>
+                        Thư viện FPT University
+                    </h1>
+                    <h2>
+                        <i class="fas fa-star me-2"></i>
+                        Đánh giá và nhận xét sách
+                    </h2>
                 </div>
-                <div class="card-body">
+            </div>
+            <div class="col-md-4 text-end">
+                <div class="book-quick-info">
+                    <h4 class="mb-1">@Model.BookTitle</h4>
+                    <p class="mb-0 opacity-75">@Model.BookAuthor</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="review-container">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 col-xl-7">
+                <div class="review-card">
+                    <!-- Review Header -->
+                    <div class="review-header">
+                        <h4>
+                            <i class="fas fa-star-half-alt me-2"></i>
+                            Chia sẻ đánh giá của bạn
+                        </h4>
+                        <p>Giúp các sinh viên khác có thêm thông tin tham khảo về cuốn sách này</p>
+                    </div>
+
                     <!-- Book Information -->
-                    <div class="row mb-4">
-                        <div class="col-md-3">
-                            <img src="@Model.BookCoverUrl" alt="@Model.BookTitle" 
-                                 class="img-fluid rounded shadow-sm" 
-                                 style="max-height: 200px; object-fit: cover;">
-                        </div>
-                        <div class="col-md-9 d-flex flex-column justify-content-center">
-                            <h5 class="mb-2">@Model.BookTitle</h5>
-                            <p class="text-muted mb-1">
-                                <i class="fas fa-user me-1"></i>Tác giả: @Model.BookAuthor
-                            </p>
-                            <div class="alert alert-info mt-3">
-                                <i class="fas fa-info-circle me-2"></i>
-                                Chia sẻ trải nghiệm của bạn về cuốn sách này để giúp các bạn sinh viên khác có thêm thông tin tham khảo.
+                    <div class="book-info-section">
+                        <div class="row align-items-center">
+                            <div class="col-md-4">
+                                <div class="book-cover-container">
+                                    <img src="@Model.BookCoverUrl" alt="@Model.BookTitle" class="book-cover img-fluid"
+                                        onerror="this.src='/images/default-book-cover.jpg'">
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <div class="book-details">
+                                    <h5>@Model.BookTitle</h5>
+                                    <p class="book-meta">
+                                        <i class="fas fa-user"></i>
+                                        Tác giả: @Model.BookAuthor
+                                    </p>
+                                    <div class="info-alert">
+                                        <i class="fas fa-lightbulb me-2"></i>
+                                        <strong>Mẹo:</strong> Hãy chia sẻ những điểm hay, điểm chưa hay của sách,
+                                        nội dung có phù hợp với chuyên ngành không để giúp các bạn sinh viên khác.
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -40,11 +430,11 @@
                         <input type="hidden" asp-for="BorrowRecordId" />
 
                         <!-- Rating Section -->
-                        <div class="mb-4">
-                            <label class="form-label fw-bold">
-                                <i class="fas fa-star text-warning me-1"></i>Đánh giá sao *
+                        <div class="rating-section">
+                            <label class="form-label">
+                                <i class="fas fa-star me-2"></i>Đánh giá của bạn *
                             </label>
-                            <div class="rating-container">
+                            <div class="star-rating-container">
                                 <div class="star-rating" id="star-rating">
                                     @for (int i = 1; i <= 5; i++)
                                     {
@@ -54,37 +444,39 @@
                                     }
                                 </div>
                                 <input type="hidden" asp-for="Rating" id="rating-input" />
-                                <div class="rating-text mt-2">
-                                    <small id="rating-description" class="text-muted">Chọn số sao để đánh giá</small>
+                                <div class="rating-description" id="rating-description">
+                                    Chọn số sao để đánh giá
                                 </div>
                             </div>
                             <span asp-validation-for="Rating" class="text-danger"></span>
                         </div>
 
                         <!-- Comment Section -->
-                        <div class="mb-4">
-                            <label asp-for="Comment" class="form-label fw-bold">
-                                <i class="fas fa-comment me-1"></i>Nhận xét chi tiết
-                            </label>
-                            <textarea asp-for="Comment" 
-                                      class="form-control" 
-                                      rows="5" 
-                                      placeholder="Chia sẻ cảm nhận của bạn về nội dung, phong cách viết, tính hữu ích của cuốn sách..."></textarea>
-                            <span asp-validation-for="Comment" class="text-danger"></span>
-                            <div class="form-text">
-                                Tối thiểu 10 ký tự, tối đa 1000 ký tự
+                        <div class="form-section">
+                            <div class="comment-section">
+                                <label asp-for="Comment" class="form-label">
+                                    <i class="fas fa-comment-dots me-2"></i>Nhận xét chi tiết
+                                </label>
+                                <textarea asp-for="Comment" class="form-control" rows="6"
+                                    placeholder="Chia sẻ cảm nhận của bạn về nội dung, phong cách viết, tính hữu ích của cuốn sách... Hãy viết những thông tin có giá trị để giúp các bạn sinh viên khác."></textarea>
+                                <span asp-validation-for="Comment" class="text-danger"></span>
+                                <div class="form-text">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    Tối thiểu 10 ký tự, tối đa 1000 ký tự. Hãy chia sẻ những điểm hay và chưa hay của
+                                    sách.
+                                </div>
                             </div>
-                        </div>
 
-                        <!-- Action Buttons -->
-                        <div class="d-flex justify-content-end gap-2">
-                            <a asp-controller="Home" asp-action="BookDetail" asp-route-id="@Model.BookId" 
-                               class="btn btn-secondary">
-                                <i class="fas fa-arrow-left me-1"></i>Quay lại
-                            </a>
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-paper-plane me-1"></i>Gửi đánh giá
-                            </button>
+                            <!-- Action Buttons -->
+                            <div class="action-buttons">
+                                <a asp-controller="Home" asp-action="BookDetail" asp-route-id="@Model.BookId"
+                                    class="btn btn-secondary">
+                                    <i class="fas fa-arrow-left me-2"></i>Quay lại
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-paper-plane me-2"></i>Gửi đánh giá
+                                </button>
+                            </div>
                         </div>
                     </form>
                 </div>
@@ -95,42 +487,49 @@
 
 @section Scripts {
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
             const stars = $('.star');
             const ratingInput = $('#rating-input');
             const ratingDescription = $('#rating-description');
-            
+
             const ratingTexts = {
-                1: "⭐ Rất tệ - Không khuyến khích đọc",
-                2: "⭐⭐ Tệ - Có nhiều điểm cần cải thiện",
-                3: "⭐⭐⭐ Trung bình - Có thể đọc",
-                4: "⭐⭐⭐⭐ Tốt - Đáng đọc",
-                5: "⭐⭐⭐⭐⭐ Xuất sắc - Rất khuyến khích đọc"
+                1: "Rất tệ - Không khuyến khích đọc",
+                2: "Tệ - Có nhiều điểm cần cải thiện",
+                3: "Trung bình - Có thể đọc",
+                4: "Tốt - Đáng đọc và khuyến khích",
+                5: "Xuất sắc - Rất khuyến khích đọc"
             };
 
             // Set initial rating if exists
             const initialRating = parseInt(ratingInput.val()) || 0;
             if (initialRating > 0) {
                 updateStars(initialRating);
+                ratingDescription.text(ratingTexts[initialRating]);
             }
 
             // Star click handler
-            stars.on('click', function() {
+            stars.on('click', function () {
                 const rating = parseInt($(this).data('rating'));
                 ratingInput.val(rating);
                 updateStars(rating);
                 ratingDescription.text(ratingTexts[rating]);
+
+                // Add bounce animation
+                $(this).addClass('bounce');
+                setTimeout(() => {
+                    $(this).removeClass('bounce');
+                }, 600);
             });
 
             // Star hover handler
-            stars.on('mouseenter', function() {
+            stars.on('mouseenter', function () {
                 const rating = parseInt($(this).data('rating'));
                 highlightStars(rating);
                 ratingDescription.text(ratingTexts[rating]);
             });
 
             // Reset on mouse leave
-            $('.star-rating').on('mouseleave', function() {
+            $('.star-rating').on('mouseleave', function () {
                 const currentRating = parseInt(ratingInput.val()) || 0;
                 updateStars(currentRating);
                 if (currentRating > 0) {
@@ -141,93 +540,48 @@
             });
 
             function highlightStars(rating) {
-                stars.each(function(index) {
+                stars.each(function (index) {
                     const star = $(this);
                     if (index < rating) {
-                        star.addClass('active').removeClass('inactive');
+                        star.addClass('hover').removeClass('inactive');
                     } else {
-                        star.removeClass('active').addClass('inactive');
+                        star.removeClass('hover').addClass('inactive');
                     }
                 });
             }
 
             function updateStars(rating) {
-                stars.each(function(index) {
+                stars.each(function (index) {
                     const star = $(this);
+                    star.removeClass('hover inactive bounce');
                     if (index < rating) {
-                        star.addClass('selected').removeClass('unselected');
+                        star.addClass('selected');
                     } else {
-                        star.removeClass('selected').addClass('unselected');
+                        star.removeClass('selected');
                     }
                 });
             }
+
+            // Form validation enhancement
+            $('form').on('submit', function (e) {
+                const rating = parseInt(ratingInput.val());
+                if (!rating || rating < 1 || rating > 5) {
+                    e.preventDefault();
+                    alert('Vui lòng chọn đánh giá sao trước khi gửi!');
+                    return false;
+                }
+
+                // Show loading state
+                const submitBtn = $(this).find('button[type="submit"]');
+                submitBtn.prop('disabled', true);
+                submitBtn.html('<i class="fas fa-spinner fa-spin me-2"></i>Đang gửi...');
+            });
         });
     </script>
-
-    <style>
-        .star-rating {
-            display: flex;
-            gap: 5px;
-            cursor: pointer;
-        }
-
-        .star {
-            font-size: 2rem;
-            color: #ddd;
-            transition: color 0.2s ease;
-            cursor: pointer;
-        }
-
-        .star:hover,
-        .star.active {
-            color: #ffc107;
-        }
-
-        .star.selected {
-            color: #ffc107;
-        }
-
-        .star.unselected {
-            color: #ddd;
-        }
-
-        .star.inactive {
-            color: #ccc;
-        }
-
-        .rating-container {
-            padding: 15px;
-            border: 1px solid #e9ecef;
-            border-radius: 8px;
-            background-color: #f8f9fa;
-        }
-
-        .card {
-            border: none;
-            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-        }
-
-        .card-header {
-            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .form-label.fw-bold {
-            color: #495057;
-        }
-
-        .btn {
-            border-radius: 6px;
-            padding: 8px 16px;
-        }
-
-        .alert-info {
-            border-left: 4px solid #17a2b8;
-            background-color: #d1ecf1;
-            border-color: #bee5eb;
-        }
-    </style>
 }
 
 @section ValidationScripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }
