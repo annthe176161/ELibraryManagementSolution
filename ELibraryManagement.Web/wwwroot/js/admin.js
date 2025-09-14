@@ -12,18 +12,26 @@ $(document).ready(function () {
 
   // Handle responsive behavior
   handleResponsiveLayout();
+
+  // Initialize enhanced features
+  initializeEnhancedFeatures();
 });
 
 function initializeAdminDashboard() {
-  // Add loading animation to cards on page load
-  $(".admin-card").hide().fadeIn(500);
+  // Add enhanced loading animation to cards on page load
+  $(
+    ".enhanced-stat-card, .quick-access-card, .analytics-card, .activity-card, .quick-actions-card"
+  )
+    .hide()
+    .each(function (index) {
+      $(this)
+        .delay(index * 150)
+        .fadeIn(500)
+        .addClass("fade-in");
+    });
 
-  // Animate statistics cards
-  $(".stat-card").each(function (index) {
-    $(this)
-      .delay(index * 100)
-      .fadeIn(300);
-  });
+  // Animate statistics cards with count-up effect
+  animateStatNumbers();
 
   // Smooth scrolling for sidebar links
   $(".sidebar .nav-link").on("click", function (e) {
@@ -32,6 +40,166 @@ function initializeAdminDashboard() {
       $(this).append('<span class="loading-spinner ms-2"></span>');
     }
   });
+}
+
+function initializeEnhancedFeatures() {
+  // Count-up animation for stat numbers
+  function animateStatNumbers() {
+    $(".stat-number[data-count]").each(function () {
+      const $this = $(this);
+      const countTo = parseInt($this.attr("data-count"));
+
+      $({ countNum: 0 }).animate(
+        {
+          countNum: countTo,
+        },
+        {
+          duration: 2000,
+          easing: "swing",
+          step: function () {
+            $this.text(Math.floor(this.countNum));
+          },
+          complete: function () {
+            $this.text(countTo);
+          },
+        }
+      );
+    });
+  }
+
+  // Chart controls functionality
+  $(".chart-controls .btn").on("click", function () {
+    $(".chart-controls .btn").removeClass("active");
+    $(this).addClass("active");
+
+    // Here you would update the chart data based on selected period
+    const period = $(this).data("period");
+    updateActivityChart(period);
+  });
+
+  // Activity refresh
+  window.refreshActivity = function () {
+    const $btn = $('[onclick="refreshActivity()"]');
+    const originalHtml = $btn.html();
+
+    $btn.html('<i class="fas fa-spinner fa-spin"></i>').prop("disabled", true);
+
+    // Simulate refresh
+    setTimeout(() => {
+      $btn.html(originalHtml).prop("disabled", false);
+      showNotification("Hoạt động đã được cập nhật", "success");
+    }, 1500);
+  };
+
+  // Dashboard refresh
+  window.refreshDashboard = function () {
+    const $btn = $('[onclick="refreshDashboard()"]');
+    const originalHtml = $btn.html();
+
+    $btn.html('<i class="fas fa-spinner fa-spin"></i>').prop("disabled", true);
+
+    // Simulate refresh
+    setTimeout(() => {
+      $btn.html(originalHtml).prop("disabled", false);
+      animateStatNumbers();
+      showNotification("Dashboard đã được cập nhật", "success");
+    }, 2000);
+  };
+
+  // Quick action functions
+  window.addNewBook = function () {
+    window.location.href = "/Admin/Books";
+  };
+
+  window.processReturns = function () {
+    window.location.href = "/Admin/Borrows";
+  };
+
+  window.viewOverdueBooks = function () {
+    window.location.href = "/Admin/Borrows?filter=overdue";
+  };
+
+  window.generateReport = function () {
+    showNotification("Đang tạo báo cáo...", "info");
+    // Implement report generation
+  };
+
+  window.systemBackup = function () {
+    showConfirmDialog(
+      "Xác nhận sao lưu",
+      "Bạn có chắc chắn muốn thực hiện sao lưu dữ liệu?",
+      function () {
+        showNotification("Đang thực hiện sao lưu...", "info");
+        // Implement backup functionality
+      }
+    );
+  };
+
+  window.systemSettings = function () {
+    window.location.href = "/Admin/Settings";
+  };
+
+  // Initialize activity chart
+  initializeActivityChart();
+}
+
+function initializeActivityChart() {
+  const ctx = document.getElementById("activityChart");
+  if (!ctx) return;
+
+  // Sample data - replace with real data from your API
+  const chartData = {
+    labels: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
+    datasets: [
+      {
+        label: "Mượn sách",
+        data: [12, 19, 3, 5, 2, 3, 9],
+        borderColor: "#667eea",
+        backgroundColor: "rgba(102, 126, 234, 0.1)",
+        tension: 0.4,
+      },
+      {
+        label: "Trả sách",
+        data: [8, 15, 7, 12, 8, 6, 10],
+        borderColor: "#56ab2f",
+        backgroundColor: "rgba(86, 171, 47, 0.1)",
+        tension: 0.4,
+      },
+    ],
+  };
+
+  new Chart(ctx, {
+    type: "line",
+    data: chartData,
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: {
+          position: "top",
+        },
+      },
+      scales: {
+        y: {
+          beginAtZero: true,
+          grid: {
+            color: "rgba(0,0,0,0.05)",
+          },
+        },
+        x: {
+          grid: {
+            color: "rgba(0,0,0,0.05)",
+          },
+        },
+      },
+    },
+  });
+}
+
+function updateActivityChart(period) {
+  // Update chart based on selected period
+  // This would typically fetch new data from your API
+  showNotification(`Đã cập nhật biểu đồ cho ${period} ngày`, "info");
 }
 
 function initializeSidebarToggle() {

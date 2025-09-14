@@ -84,39 +84,83 @@ namespace ELibraryManagement.Web.Controllers
                 var dashboardData = new AdminDashboardViewModel();
 
                 // Get total users count
-                var usersResponse = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/User");
-                if (usersResponse.IsSuccessStatusCode)
+                try
                 {
-                    var usersContent = await usersResponse.Content.ReadAsStringAsync();
-                    var users = JsonSerializer.Deserialize<List<AdminUserViewModel>>(usersContent, _jsonOptions);
-                    dashboardData.TotalUsers = users?.Count ?? 0;
+                    var usersResponse = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/User");
+                    if (usersResponse.IsSuccessStatusCode)
+                    {
+                        var usersContent = await usersResponse.Content.ReadAsStringAsync();
+                        var users = JsonSerializer.Deserialize<List<AdminUserViewModel>>(usersContent, _jsonOptions);
+                        dashboardData.TotalUsers = users?.Count ?? 0;
+                    }
+                    else
+                    {
+                        dashboardData.TotalUsers = 0;
+                    }
+                }
+                catch (Exception)
+                {
+                    dashboardData.TotalUsers = 0;
                 }
 
                 // Get total books count
-                var booksResponse = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Book");
-                if (booksResponse.IsSuccessStatusCode)
+                try
                 {
-                    var booksContent = await booksResponse.Content.ReadAsStringAsync();
-                    var books = JsonSerializer.Deserialize<List<BookViewModel>>(booksContent, _jsonOptions);
-                    dashboardData.TotalBooks = books?.Count ?? 0;
+                    var booksResponse = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Book/admin/all");
+                    if (booksResponse.IsSuccessStatusCode)
+                    {
+                        var booksContent = await booksResponse.Content.ReadAsStringAsync();
+                        var books = JsonSerializer.Deserialize<List<BookViewModel>>(booksContent, _jsonOptions);
+                        dashboardData.TotalBooks = books?.Count ?? 0;
+                    }
+                    else
+                    {
+                        dashboardData.TotalBooks = 0;
+                    }
+                }
+                catch (Exception)
+                {
+                    dashboardData.TotalBooks = 0;
                 }
 
                 // Get total borrow records count
-                var borrowsResponse = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Book/borrow-records");
-                if (borrowsResponse.IsSuccessStatusCode)
+                try
                 {
-                    var borrowsContent = await borrowsResponse.Content.ReadAsStringAsync();
-                    var borrows = JsonSerializer.Deserialize<List<object>>(borrowsContent, _jsonOptions);
-                    dashboardData.TotalBorrows = borrows?.Count ?? 0;
+                    var borrowsResponse = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Borrow/admin/all");
+                    if (borrowsResponse.IsSuccessStatusCode)
+                    {
+                        var borrowsContent = await borrowsResponse.Content.ReadAsStringAsync();
+                        var borrows = JsonSerializer.Deserialize<List<object>>(borrowsContent, _jsonOptions);
+                        dashboardData.TotalBorrows = borrows?.Count ?? 0;
+                    }
+                    else
+                    {
+                        dashboardData.TotalBorrows = 0;
+                    }
+                }
+                catch (Exception)
+                {
+                    dashboardData.TotalBorrows = 0;
                 }
 
                 // Get total reviews count
-                var reviewsResponse = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Review/all");
-                if (reviewsResponse.IsSuccessStatusCode)
+                try
                 {
-                    var reviewsContent = await reviewsResponse.Content.ReadAsStringAsync();
-                    var reviews = JsonSerializer.Deserialize<List<object>>(reviewsContent, _jsonOptions);
-                    dashboardData.TotalReviews = reviews?.Count ?? 0;
+                    var reviewsResponse = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Review/all");
+                    if (reviewsResponse.IsSuccessStatusCode)
+                    {
+                        var reviewsContent = await reviewsResponse.Content.ReadAsStringAsync();
+                        var reviews = JsonSerializer.Deserialize<List<object>>(reviewsContent, _jsonOptions);
+                        dashboardData.TotalReviews = reviews?.Count ?? 0;
+                    }
+                    else
+                    {
+                        dashboardData.TotalReviews = 0;
+                    }
+                }
+                catch (Exception)
+                {
+                    dashboardData.TotalReviews = 0;
                 }
 
                 return View(dashboardData);

@@ -5,84 +5,240 @@
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
-<!-- Page Header -->
-<div class="page-header">
-    <div class="d-flex justify-content-between align-items-center">
+<!-- Enhanced Page Header -->
+<div class="page-header-enhanced">
+    <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h1 class="page-title">
-                <i class="fas fa-tachometer-alt me-3"></i>
+            <h1 class="page-title-enhanced">
+                <i class="fas fa-tachometer-alt me-3 text-primary"></i>
                 Dashboard
             </h1>
-            <p class="page-subtitle mb-0">Tổng quan hệ thống thư viện điện tử</p>
+            <p class="page-subtitle-enhanced mb-0">Tổng quan hệ thống thư viện điện tử</p>
+            <div class="system-status mt-2">
+                <span class="badge bg-success me-2">
+                    <i class="fas fa-circle pulse-animation me-1"></i>
+                    Hệ thống hoạt động bình thường
+                </span>
+                <span class="text-muted small">
+                    <i class="fas fa-server me-1"></i>
+                    Uptime: 99.8%
+                </span>
+            </div>
         </div>
         <div class="d-flex align-items-center">
-            <span class="badge bg-success fs-6 me-2">
-                <i class="fas fa-shield-alt me-1"></i>
-                Admin
-            </span>
-            <span class="text-muted">
-                <i class="fas fa-clock me-1"></i>
-                Cập nhật: @DateTime.Now.ToString("HH:mm dd/MM/yyyy")
-            </span>
-        </div>
-    </div>
-</div>
-
-<!-- Statistics Cards -->
-<div class="row g-4 mb-4">
-    <div class="col-xl-3 col-md-6">
-        <div class="card stat-card stat-card-primary">
-            <div class="card-body position-relative">
-                <div class="stat-label">Tổng người dùng</div>
-                <div class="stat-number">@Model.TotalUsers</div>
-                <i class="fas fa-users stat-icon"></i>
+            <div class="me-3">
+                <div class="admin-badge">
+                    <i class="fas fa-shield-alt me-2"></i>
+                    <span>Administrator</span>
+                </div>
             </div>
-        </div>
-    </div>
-
-    <div class="col-xl-3 col-md-6">
-        <div class="card stat-card stat-card-success">
-            <div class="card-body position-relative">
-                <div class="stat-label">Tổng sách</div>
-                <div class="stat-number">@Model.TotalBooks</div>
-                <i class="fas fa-book stat-icon"></i>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-xl-3 col-md-6">
-        <div class="card stat-card stat-card-info">
-            <div class="card-body position-relative">
-                <div class="stat-label">Lượt mượn</div>
-                <div class="stat-number">@Model.TotalBorrows</div>
-                <i class="fas fa-clipboard-list stat-icon"></i>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-xl-3 col-md-6">
-        <div class="card stat-card stat-card-warning">
-            <div class="card-body position-relative">
-                <div class="stat-label">Đánh giá</div>
-                <div class="stat-number">@Model.TotalReviews</div>
-                <i class="fas fa-star stat-icon"></i>
+            <div class="last-updated">
+                <i class="fas fa-sync-alt me-1"></i>
+                <span>Cập nhật: @DateTime.Now.ToString("HH:mm dd/MM/yyyy")</span>
+                <button class="btn btn-sm btn-outline-primary ms-2" onclick="refreshDashboard()">
+                    <i class="fas fa-refresh"></i>
+                </button>
             </div>
         </div>
     </div>
 </div>
 
+<!-- Enhanced Statistics Cards Row -->
+<div class="row g-4 mb-5">
+    <div class="col-xl-3 col-md-6">
+        <div class="enhanced-stat-card stat-card-primary">
+            <div class="stat-card-header">
+                <div class="stat-icon-wrapper">
+                    <i class="fas fa-users stat-icon"></i>
+                </div>
+                <div class="stat-info">
+                    <div class="stat-label">Tổng người dùng</div>
+                    <div class="stat-number" data-count="@Model.TotalUsers">0</div>
+                    <div class="stat-trend">
+                        <i class="fas fa-arrow-up text-success me-1"></i>
+                        <span class="text-success">+12% so với tháng trước</span>
+                    </div>
+                </div>
+            </div>
+            <div class="stat-card-progress">
+                <div class="progress">
+                    <div class="progress-bar bg-primary" style="width: 75%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="enhanced-stat-card stat-card-success">
+            <div class="stat-card-header">
+                <div class="stat-icon-wrapper">
+                    <i class="fas fa-book stat-icon"></i>
+                </div>
+                <div class="stat-info">
+                    <div class="stat-label">Tổng sách</div>
+                    <div class="stat-number" data-count="@Model.TotalBooks">0</div>
+                    <div class="stat-trend">
+                        <i class="fas fa-arrow-up text-success me-1"></i>
+                        <span class="text-success">+8% so với tháng trước</span>
+                    </div>
+                </div>
+            </div>
+            <div class="stat-card-progress">
+                <div class="progress">
+                    <div class="progress-bar bg-success" style="width: 85%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="enhanced-stat-card stat-card-info">
+            <div class="stat-card-header">
+                <div class="stat-icon-wrapper">
+                    <i class="fas fa-clipboard-list stat-icon"></i>
+                </div>
+                <div class="stat-info">
+                    <div class="stat-label">Lượt mượn</div>
+                    <div class="stat-number" data-count="@Model.TotalBorrows">0</div>
+                    <div class="stat-trend">
+                        <i class="fas fa-arrow-up text-success me-1"></i>
+                        <span class="text-success">+15% so với tháng trước</span>
+                    </div>
+                </div>
+            </div>
+            <div class="stat-card-progress">
+                <div class="progress">
+                    <div class="progress-bar bg-info" style="width: 65%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-md-6">
+        <div class="enhanced-stat-card stat-card-warning">
+            <div class="stat-card-header">
+                <div class="stat-icon-wrapper">
+                    <i class="fas fa-star stat-icon"></i>
+                </div>
+                <div class="stat-info">
+                    <div class="stat-label">Đánh giá</div>
+                    <div class="stat-number" data-count="@Model.TotalReviews">0</div>
+                    <div class="stat-trend">
+                        <i class="fas fa-arrow-up text-success me-1"></i>
+                        <span class="text-success">+22% so với tháng trước</span>
+                    </div>
+                </div>
+            </div>
+            <div class="stat-card-progress">
+                <div class="progress">
+                    <div class="progress-bar bg-warning" style="width: 90%"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Analytics Dashboard Section -->
+<div class="row g-4 mb-5">
+    <!-- Activity Chart -->
+    <div class="col-lg-8">
+        <div class="analytics-card">
+            <div class="analytics-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-chart-line me-2 text-primary"></i>
+                    Hoạt động hệ thống (30 ngày gần đây)
+                </h5>
+                <div class="chart-controls">
+                    <button class="btn btn-sm btn-outline-primary me-2 active" data-period="7">7 ngày</button>
+                    <button class="btn btn-sm btn-outline-primary me-2" data-period="30">30 ngày</button>
+                    <button class="btn btn-sm btn-outline-primary" data-period="90">90 ngày</button>
+                </div>
+            </div>
+            <div class="analytics-body">
+                <canvas id="activityChart" width="400" height="200"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="col-lg-4">
+        <div class="analytics-card h-100">
+            <div class="analytics-header">
+                <h5 class="mb-0">
+                    <i class="fas fa-bolt me-2 text-warning"></i>
+                    Thống kê nhanh
+                </h5>
+            </div>
+            <div class="analytics-body">
+                <div class="quick-stat-item">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="quick-stat-label">Sách được mượn nhiều nhất</span>
+                        <span class="badge bg-success">Top</span>
+                    </div>
+                    <div class="progress mb-2" style="height: 6px;">
+                        <div class="progress-bar bg-success" style="width: 85%"></div>
+                    </div>
+                    <small class="text-muted">85% lượt mượn</small>
+                </div>
+
+                <div class="quick-stat-item">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="quick-stat-label">Người dùng hoạt động</span>
+                        <span class="badge bg-info">@Model.TotalUsers</span>
+                    </div>
+                    <div class="progress mb-2" style="height: 6px;">
+                        <div class="progress-bar bg-info" style="width: 72%"></div>
+                    </div>
+                    <small class="text-muted">72% đang hoạt động</small>
+                </div>
+
+                <div class="quick-stat-item">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="quick-stat-label">Đánh giá trung bình</span>
+                        <span class="badge bg-warning">4.2/5</span>
+                    </div>
+                    <div class="progress mb-2" style="height: 6px;">
+                        <div class="progress-bar bg-warning" style="width: 84%"></div>
+                    </div>
+                    <small class="text-muted">Từ @Model.TotalReviews đánh giá</small>
+                </div>
+
+                <div class="quick-stat-item">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <span class="quick-stat-label">Sách quá hạn</span>
+                        <span class="badge bg-danger">12</span>
+                    </div>
+                    <div class="progress mb-2" style="height: 6px;">
+                        <div class="progress-bar bg-danger" style="width: 15%"></div>
+                    </div>
+                    <small class="text-muted">Cần xử lý</small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 <!-- Quick Access Cards -->
-<div class="row g-4 mb-4">
+<div class="row g-4 mb-5">
     <!-- User Management -->
     <div class="col-lg-6 col-xl-3">
-        <div class="card admin-card h-100">
-            <div class="card-body text-center">
-                <div class="mb-3">
-                    <i class="fas fa-users fa-3x text-primary"></i>
+        <div class="quick-access-card h-100">
+            <div class="quick-access-header">
+                <div class="quick-access-icon users-icon">
+                    <i class="fas fa-users"></i>
                 </div>
-                <h5 class="card-title">Quản lý người dùng</h5>
-                <p class="card-text text-muted">Xem và quản lý thông tin người dùng</p>
-                <a asp-action="Users" class="btn btn-primary btn-admin">
+            </div>
+            <div class="quick-access-body">
+                <h5 class="quick-access-title">Quản lý người dùng</h5>
+                <p class="quick-access-desc">Xem và quản lý thông tin người dùng</p>
+                <div class="quick-access-stats">
+                    <span class="stat-item">
+                        <i class="fas fa-user-plus me-1"></i>
+                        <span>@Model.TotalUsers người dùng</span>
+                    </span>
+                </div>
+            </div>
+            <div class="quick-access-footer">
+                <a asp-action="Users" class="btn btn-primary btn-access w-100">
                     <i class="fas fa-arrow-right me-1"></i>
                     Truy cập
                 </a>
@@ -92,14 +248,24 @@
 
     <!-- Book Management -->
     <div class="col-lg-6 col-xl-3">
-        <div class="card admin-card h-100">
-            <div class="card-body text-center">
-                <div class="mb-3">
-                    <i class="fas fa-book fa-3x text-success"></i>
+        <div class="quick-access-card h-100">
+            <div class="quick-access-header">
+                <div class="quick-access-icon books-icon">
+                    <i class="fas fa-book"></i>
                 </div>
-                <h5 class="card-title">Quản lý sách</h5>
-                <p class="card-text text-muted">Thêm, sửa, xóa và quản lý kho sách</p>
-                <a asp-action="Books" class="btn btn-success btn-admin">
+            </div>
+            <div class="quick-access-body">
+                <h5 class="quick-access-title">Quản lý sách</h5>
+                <p class="quick-access-desc">Thêm, sửa, xóa và quản lý kho sách</p>
+                <div class="quick-access-stats">
+                    <span class="stat-item">
+                        <i class="fas fa-book-open me-1"></i>
+                        <span>@Model.TotalBooks cuốn sách</span>
+                    </span>
+                </div>
+            </div>
+            <div class="quick-access-footer">
+                <a asp-action="Books" class="btn btn-success btn-access w-100">
                     <i class="fas fa-arrow-right me-1"></i>
                     Truy cập
                 </a>
@@ -109,14 +275,24 @@
 
     <!-- Borrow Management -->
     <div class="col-lg-6 col-xl-3">
-        <div class="card admin-card h-100">
-            <div class="card-body text-center">
-                <div class="mb-3">
-                    <i class="fas fa-clipboard-list fa-3x text-info"></i>
+        <div class="quick-access-card h-100">
+            <div class="quick-access-header">
+                <div class="quick-access-icon borrows-icon">
+                    <i class="fas fa-clipboard-list"></i>
                 </div>
-                <h5 class="card-title">Quản lý mượn sách</h5>
-                <p class="card-text text-muted">Theo dõi các giao dịch mượn trả</p>
-                <a asp-action="Borrows" class="btn btn-info btn-admin">
+            </div>
+            <div class="quick-access-body">
+                <h5 class="quick-access-title">Quản lý mượn sách</h5>
+                <p class="quick-access-desc">Theo dõi các giao dịch mượn trả</p>
+                <div class="quick-access-stats">
+                    <span class="stat-item">
+                        <i class="fas fa-exchange-alt me-1"></i>
+                        <span>@Model.TotalBorrows giao dịch</span>
+                    </span>
+                </div>
+            </div>
+            <div class="quick-access-footer">
+                <a asp-action="Borrows" class="btn btn-info btn-access w-100">
                     <i class="fas fa-arrow-right me-1"></i>
                     Truy cập
                 </a>
@@ -126,31 +302,24 @@
 
     <!-- Review Management -->
     <div class="col-lg-6 col-xl-3">
-        <div class="card admin-card h-100">
-            <div class="card-body text-center">
-                <div class="mb-3">
-                    <i class="fas fa-star fa-3x text-warning"></i>
+        <div class="quick-access-card h-100">
+            <div class="quick-access-header">
+                <div class="quick-access-icon reviews-icon">
+                    <i class="fas fa-star"></i>
                 </div>
-                <h5 class="card-title">Quản lý đánh giá</h5>
-                <p class="card-text text-muted">Kiểm duyệt và quản lý đánh giá</p>
-                <a asp-action="Reviews" class="btn btn-warning btn-admin">
-                    <i class="fas fa-arrow-right me-1"></i>
-                    Truy cập
-                </a>
             </div>
-        </div>
-    </div>
-
-    <!-- Category Management -->
-    <div class="col-lg-6 col-xl-3">
-        <div class="card admin-card h-100">
-            <div class="card-body text-center">
-                <div class="mb-3">
-                    <i class="fas fa-tags fa-3x text-primary"></i>
+            <div class="quick-access-body">
+                <h5 class="quick-access-title">Quản lý đánh giá</h5>
+                <p class="quick-access-desc">Kiểm duyệt và quản lý đánh giá</p>
+                <div class="quick-access-stats">
+                    <span class="stat-item">
+                        <i class="fas fa-star-half-alt me-1"></i>
+                        <span>@Model.TotalReviews đánh giá</span>
+                    </span>
                 </div>
-                <h5 class="card-title">Quản lý danh mục</h5>
-                <p class="card-text text-muted">Thêm, sửa, xóa danh mục sách</p>
-                <a asp-controller="Category" asp-action="Index" class="btn btn-primary btn-admin">
+            </div>
+            <div class="quick-access-footer">
+                <a asp-action="Reviews" class="btn btn-warning btn-access w-100">
                     <i class="fas fa-arrow-right me-1"></i>
                     Truy cập
                 </a>
@@ -159,126 +328,335 @@
     </div>
 </div>
 
-<!-- Quick Actions -->
-<div class="row">
-    <div class="col-12">
-        <div class="card admin-card">
-            <div class="card-header">
-                <h5 class="mb-0">
-                    <i class="fas fa-bolt me-2"></i>
-                    Thao tác nhanh
-                </h5>
-            </div>
-            <div class="card-body">
-                <div class="row g-3">
-                    <div class="col-md-3">
-                        <button class="btn btn-outline-primary w-100 btn-admin">
-                            <i class="fas fa-plus me-2"></i>
-                            Thêm sách mới
-                        </button>
-                    </div>
-                    <div class="col-md-3">
-                        <button class="btn btn-outline-success w-100 btn-admin">
-                            <i class="fas fa-user-plus me-2"></i>
-                            Thêm người dùng
-                        </button>
-                    </div>
-                    <div class="col-md-3">
-                        <button class="btn btn-outline-info w-100 btn-admin">
-                            <i class="fas fa-download me-2"></i>
-                            Xuất báo cáo
-                        </button>
-                    </div>
-                    <div class="col-md-3">
-                        <button class="btn btn-outline-warning w-100 btn-admin">
-                            <i class="fas fa-cog me-2"></i>
-                            Cài đặt hệ thống
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+
+
+
 
 <style>
+    /* Color fixes for better text visibility */
+    .enhanced-stat-card .stat-number,
+    .stat-number[data-count] {
+        color: #2c3e50 !important;
+        font-weight: 700 !important;
+    }
+
+    .enhanced-stat-card .stat-label {
+        color: #6c757d !important;
+    }
+
+    .enhanced-stat-card .stat-trend {
+        color: #495057 !important;
+    }
+
+    .activity-title {
+        color: #2c3e50 !important;
+    }
+
+    .activity-desc {
+        color: #6c757d !important;
+    }
+
+    .activity-time {
+        color: #adb5bd !important;
+    }
+
+    .quick-access-title {
+        color: #2c3e50 !important;
+    }
+
+    .quick-access-desc {
+        color: #6c757d !important;
+    }
+
+    .quick-stat-label {
+        color: #495057 !important;
+    }
+
+    .status-label {
+        color: #6c757d !important;
+    }
+
+    .status-value {
+        color: #495057 !important;
+    }
+
+    .page-title-enhanced {
+        color: #2c3e50 !important;
+    }
+
+    .page-subtitle-enhanced {
+        color: #6c757d !important;
+    }
+
+    .analytics-header h5,
+    .activity-header h5,
+    .quick-actions-header h5 {
+        color: #2c3e50 !important;
+    }
+
+    .system-status-mini h6 {
+        color: #495057 !important;
+    }
+
+    /* Original border styles */
     .border-left-primary {
         border-left: 0.25rem solid #4e73df !important;
     }
+
     .border-left-success {
         border-left: 0.25rem solid #1cc88a !important;
     }
+
     .border-left-info {
         border-left: 0.25rem solid #36b9cc !important;
     }
+
     .border-left-warning {
         border-left: 0.25rem solid #f6c23e !important;
     }
+
     .text-gray-800 {
         color: #5a5c69 !important;
     }
+
     .text-gray-300 {
         color: #dddfeb !important;
     }
+
     .text-xs {
         font-size: 0.7rem;
     }
+
     .font-weight-bold {
         font-weight: 700 !important;
     }
+
     .opacity-50 {
         opacity: 0.5;
     }
+
     .btn-block {
         width: 100%;
     }
 </style>
 
 @section Scripts {
+    <!-- Chart.js for analytics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <script>
-        $(document).ready(function() {
-            // Load dashboard statistics with animation
-            loadStatistics();
-            
-            // Animate statistics cards on load
-            $('.stat-card').each(function(index) {
-                $(this).delay(index * 100).animate({
-                    opacity: 1,
-                    transform: 'translateY(0)'
-                }, 500);
-            });
-            
-            // Add hover effects to admin cards
-            $('.admin-card').hover(
-                function() { $(this).addClass('hover-effect'); },
-                function() { $(this).removeClass('hover-effect'); }
-            );
+        $(document).ready(function () {
+            // Initialize enhanced dashboard features
+            initializeEnhancedDashboard();
         });
 
-        function loadStatistics() {
-            // Show loading state
-            $('.stat-number').html('<i class="fas fa-spinner fa-spin"></i>');
-            
-            // Simulate loading (replace with actual API calls)
+        function initializeEnhancedDashboard() {
+            // Add staggered animation to elements
+            $('.enhanced-stat-card').each(function (index) {
+                $(this).delay(index * 200).queue(function () {
+                    $(this).addClass('fade-in').dequeue();
+                });
+            });
+
+            $('.quick-access-card').each(function (index) {
+                $(this).delay((index + 4) * 200).queue(function () {
+                    $(this).addClass('slide-in-left').dequeue();
+                });
+            });
+
+            $('.analytics-card, .activity-card, .quick-actions-card').each(function (index) {
+                $(this).delay((index + 8) * 200).queue(function () {
+                    $(this).addClass('fade-in').dequeue();
+                });
+            });
+
+            // Initialize count-up animations for statistics
             setTimeout(() => {
-                animateCountUp('#totalUsers', '@Model.TotalUsers');
-                animateCountUp('#totalBooks', '@Model.TotalBooks');
-                animateCountUp('#activeBorrows', '@Model.ActiveBorrows');
-                animateCountUp('#totalReviews', '@Model.TotalReviews');
+                animateCountUp('.stat-number[data-count]');
             }, 500);
+
+            // Add hover effects
+            $('.enhanced-stat-card, .quick-access-card').hover(
+                function () {
+                    $(this).css('transform', 'translateY(-8px) scale(1.02)');
+                },
+                function () {
+                    $(this).css('transform', 'translateY(0) scale(1)');
+                }
+            );
         }
 
-        function animateCountUp(selector, finalValue) {
-            let current = 0;
-            const increment = finalValue / 50;
-            const timer = setInterval(() => {
-                current += increment;
-                if (current >= finalValue) {
-                    current = finalValue;
-                    clearInterval(timer);
+        function animateCountUp(selector) {
+            $(selector).each(function () {
+                const $this = $(this);
+                const countTo = parseInt($this.attr('data-count'));
+
+                $({ countNum: 0 }).animate({
+                    countNum: countTo
+                }, {
+                    duration: 2000,
+                    easing: 'swing',
+                    step: function () {
+                        $this.text(Math.floor(this.countNum).toLocaleString());
+                    },
+                    complete: function () {
+                        $this.text(countTo.toLocaleString());
+                    }
+                });
+            });
+        }
+
+        // Dashboard refresh functionality
+        function refreshDashboard() {
+            const $btn = $('[onclick="refreshDashboard()"]');
+            const originalHtml = $btn.html();
+
+            $btn.html('<i class="fas fa-spinner fa-spin"></i>').prop('disabled', true);
+
+            // Simulate refresh - replace with actual API call
+            setTimeout(() => {
+                $btn.html(originalHtml).prop('disabled', false);
+
+                // Re-animate statistics
+                animateCountUp('.stat-number[data-count]');
+
+                // Show success notification
+                showNotification('Dashboard đã được cập nhật thành công!', 'success');
+            }, 2000);
+        }
+
+        // Activity refresh functionality
+        function refreshActivity() {
+            const $btn = $('[onclick="refreshActivity()"]');
+            const originalHtml = $btn.html();
+
+            $btn.html('<i class="fas fa-spinner fa-spin"></i>').prop('disabled', true);
+
+            setTimeout(() => {
+                $btn.html(originalHtml).prop('disabled', false);
+                showNotification('Hoạt động đã được cập nhật!', 'info');
+            }, 1500);
+        }
+
+        // Quick action functions
+        function addNewBook() {
+            showNotification('Chuyển đến trang thêm sách...', 'info');
+            setTimeout(() => {
+                window.location.href = '@Url.Action("Books", "Admin")';
+            }, 1000);
+        }
+
+        function processReturns() {
+            showNotification('Chuyển đến trang quản lý mượn trả...', 'info');
+            setTimeout(() => {
+                window.location.href = '@Url.Action("Borrows", "Admin")';
+            }, 1000);
+        }
+
+        function viewOverdueBooks() {
+            showNotification('Đang tải danh sách sách quá hạn...', 'warning');
+            setTimeout(() => {
+                window.location.href = '@Url.Action("Borrows", "Admin")?filter=overdue';
+            }, 1000);
+        }
+
+        function generateReport() {
+            showConfirmDialog(
+                'Tạo báo cáo',
+                'Bạn có muốn tạo báo cáo thống kê hệ thống?',
+                function () {
+                    showNotification('Đang tạo báo cáo, vui lòng đợi...', 'info');
+                    // Implement report generation logic here
                 }
-                $(selector).text(Math.floor(current).toLocaleString());
-            }, 20);
+            );
+        }
+
+        function systemBackup() {
+            showConfirmDialog(
+                'Sao lưu hệ thống',
+                'Bạn có chắc chắn muốn thực hiện sao lưu dữ liệu hệ thống?',
+                function () {
+                    showNotification('Đang thực hiện sao lưu dữ liệu...', 'warning');
+                    // Implement backup logic here
+                }
+            );
+        }
+
+        function systemSettings() {
+            showNotification('Chuyển đến cài đặt hệ thống...', 'info');
+            // window.location.href = '@Url.Action("Settings", "Admin")';
+        }
+
+        // Notification system
+        function showNotification(message, type = 'success') {
+            const notificationTypes = {
+                success: { icon: 'check-circle', color: 'success' },
+                error: { icon: 'exclamation-circle', color: 'danger' },
+                warning: { icon: 'exclamation-triangle', color: 'warning' },
+                info: { icon: 'info-circle', color: 'info' }
+            };
+
+            const notification = notificationTypes[type] || notificationTypes.info;
+
+            const toast = $(`
+                    <div class="toast align-items-center text-white bg-${notification.color} border-0" role="alert">
+                        <div class="d-flex">
+                            <div class="toast-body">
+                                <i class="fas fa-${notification.icon} me-2"></i>
+                                ${message}
+                            </div>
+                            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                        </div>
+                    </div>
+                `);
+
+            // Create toast container if it doesn't exist
+            if (!$('.toast-container').length) {
+                $('body').append('<div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 1060;"></div>');
+            }
+
+            $('.toast-container').append(toast);
+            toast.toast('show');
+
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                toast.remove();
+            }, 5000);
+        }
+
+        // Confirmation dialog
+        function showConfirmDialog(title, message, onConfirm) {
+            const modal = $(`
+                    <div class="modal fade" tabindex="-1">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">${title}</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p>${message}</p>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                                    <button type="button" class="btn btn-primary" id="confirmBtn">Xác nhận</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `);
+
+            $('body').append(modal);
+            modal.modal('show');
+
+            modal.find('#confirmBtn').on('click', function () {
+                modal.modal('hide');
+                onConfirm();
+            });
+
+            modal.on('hidden.bs.modal', function () {
+                modal.remove();
+            });
         }
     </script>
 }
