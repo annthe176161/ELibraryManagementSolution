@@ -61,7 +61,7 @@ namespace ELibraryManagement.Api.Controllers
 
                 var result = await _bookService.BorrowBookAsync(request);
 
-                if (string.IsNullOrEmpty(result.Message) || !result.Message.Contains("successfully"))
+                if (string.IsNullOrEmpty(result.Message) || !result.Message.Contains("thành công"))
                 {
                     return BadRequest(result);
                 }
@@ -185,10 +185,10 @@ namespace ELibraryManagement.Api.Controllers
                 var result = await _bookService.DeleteBookAsync(id);
                 if (!result)
                 {
-                    return NotFound(new { message = $"Book with ID {id} not found" });
+                    return NotFound(new { message = $"Không tìm thấy sách với ID {id}" });
                 }
 
-                return Ok(new { message = "Book deleted successfully" });
+                return Ok(new { message = "Xóa sách thành công" });
             }
             catch (InvalidOperationException ex)
             {

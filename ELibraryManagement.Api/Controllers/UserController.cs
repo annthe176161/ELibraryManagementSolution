@@ -46,7 +46,7 @@ namespace ELibraryManagement.Api.Controllers
             {
                 return Ok(new
                 {
-                    Message = "Test user created successfully",
+                    Message = "Tạo người dùng test thành công",
                     UserId = testUser.Id,
                     UserName = testUser.UserName,
                     Email = testUser.Email,
@@ -67,7 +67,7 @@ namespace ELibraryManagement.Api.Controllers
 
             if (user == null)
             {
-                return NotFound("User not found");
+                return NotFound("Không tìm thấy người dùng");
             }
 
             return Ok(new
@@ -120,20 +120,20 @@ namespace ELibraryManagement.Api.Controllers
                 var userId = User.Identity?.Name;
                 if (string.IsNullOrEmpty(userId))
                 {
-                    return Unauthorized("User not found");
+                    return Unauthorized("Không tìm thấy người dùng");
                 }
 
                 var user = await _userManager.FindByNameAsync(userId);
                 if (user == null)
                 {
-                    return NotFound("User not found");
+                    return NotFound("Không tìm thấy người dùng");
                 }
 
                 // Upload ảnh lên Cloudinary
                 var imageUrl = await _cloudinaryService.UploadImageAsync(file, "avatars");
                 if (imageUrl == null)
                 {
-                    return BadRequest("Failed to upload image");
+                    return BadRequest("Không thể tải lên hình ảnh");
                 }
 
                 // Cập nhật AvatarUrl trong database
@@ -144,12 +144,12 @@ namespace ELibraryManagement.Api.Controllers
                 {
                     return Ok(new
                     {
-                        Message = "Avatar uploaded successfully",
+                        Message = "Tải lên avatar thành công",
                         AvatarUrl = imageUrl
                     });
                 }
 
-                return BadRequest("Failed to update user avatar");
+                return BadRequest("Không thể cập nhật avatar người dùng");
             }
             catch (Exception ex)
             {
@@ -174,14 +174,14 @@ namespace ELibraryManagement.Api.Controllers
                 var user = await _userManager.FindByIdAsync(userId);
                 if (user == null)
                 {
-                    return NotFound("User not found");
+                    return NotFound("Không tìm thấy người dùng");
                 }
 
                 // Upload ảnh lên Cloudinary
                 var imageUrl = await _cloudinaryService.UploadImageAsync(file, "avatars");
                 if (imageUrl == null)
                 {
-                    return BadRequest("Failed to upload image");
+                    return BadRequest("Không thể tải lên hình ảnh");
                 }
 
                 // Cập nhật AvatarUrl trong database
@@ -192,13 +192,13 @@ namespace ELibraryManagement.Api.Controllers
                 {
                     return Ok(new
                     {
-                        Message = "Avatar uploaded successfully",
+                        Message = "Tải lên avatar thành công",
                         AvatarUrl = imageUrl,
                         UserId = userId
                     });
                 }
 
-                return BadRequest("Failed to update user avatar");
+                return BadRequest("Không thể cập nhật avatar người dùng");
             }
             catch (Exception ex)
             {

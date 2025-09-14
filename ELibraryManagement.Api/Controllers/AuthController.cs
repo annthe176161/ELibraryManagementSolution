@@ -112,10 +112,10 @@ namespace ELibraryManagement.Api.Controllers
 
             if (!result)
             {
-                return BadRequest(new { Message = "Failed to change password. Please check your current password." });
+                return BadRequest(new { Message = "Không thể đổi mật khẩu. Vui lòng kiểm tra mật khẩu hiện tại." });
             }
 
-            return Ok(new { Message = "Password changed successfully." });
+            return Ok(new { Message = "Đổi mật khẩu thành công." });
         }
 
         /// <summary>
@@ -152,10 +152,10 @@ namespace ELibraryManagement.Api.Controllers
 
             if (!result)
             {
-                return BadRequest(new { Message = "Failed to assign role." });
+                return BadRequest(new { Message = "Không thể gán vai trò." });
             }
 
-            return Ok(new { Message = $"Role '{request.RoleName}' assigned successfully to user." });
+            return Ok(new { Message = $"Đã gán vai trò '{request.RoleName}' thành công cho người dùng." });
         }
 
         /// <summary>
@@ -251,7 +251,7 @@ namespace ELibraryManagement.Api.Controllers
             var info = await _signInManager.GetExternalLoginInfoAsync();
             if (info == null)
             {
-                return BadRequest(new { success = false, message = "External login error" });
+                return BadRequest(new { success = false, message = "Lỗi đăng nhập bên ngoài" });
             }
 
             var result = await _authService.HandleGoogleLoginAsync(info);
@@ -274,7 +274,7 @@ namespace ELibraryManagement.Api.Controllers
         {
             if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(token))
             {
-                return BadRequest("Invalid email confirmation request.");
+                return BadRequest("Yêu cầu xác nhận email không hợp lệ.");
             }
 
             var result = await _authService.ConfirmEmailAsync(userId, token);

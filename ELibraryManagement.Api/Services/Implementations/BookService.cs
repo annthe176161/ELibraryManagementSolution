@@ -94,15 +94,15 @@ namespace ELibraryManagement.Api.Services.Implementations
                 var userStatus = await _userStatusService.GetUserStatusAsync(request.UserId);
                 if (userStatus.AccountStatus == UserAccountStatus.Blocked)
                 {
-                    throw new InvalidOperationException($"Your account is blocked. Reason: {userStatus.BlockReason}");
+                    throw new InvalidOperationException($"Tài khoản của bạn đã bị khóa. Lý do: {userStatus.BlockReason}");
                 }
                 if (userStatus.CurrentBorrowCount >= userStatus.MaxBorrowLimit)
                 {
-                    throw new InvalidOperationException($"You have reached your borrowing limit ({userStatus.MaxBorrowLimit} books).");
+                    throw new InvalidOperationException($"Bạn đã đạt giới hạn mượn sách ({userStatus.MaxBorrowLimit} cuốn).");
                 }
                 if (userStatus.TotalOutstandingFines > 50000)
                 {
-                    throw new InvalidOperationException($"You have outstanding fines of {userStatus.TotalOutstandingFines:N0} VND. Please pay your fines before borrowing.");
+                    throw new InvalidOperationException($"Bạn có khoản phạt chưa thanh toán là {userStatus.TotalOutstandingFines:N0} VND. Vui lòng thanh toán phạt trước khi mượn sách.");
                 }
             }
 
@@ -110,12 +110,12 @@ namespace ELibraryManagement.Api.Services.Implementations
             var book = await _context.Books.FindAsync(request.BookId);
             if (book == null)
             {
-                throw new ArgumentException("Book not found.");
+                throw new ArgumentException("Không tìm thấy sách.");
             }
 
             if (book.AvailableQuantity <= 0)
             {
-                throw new InvalidOperationException("Book is not available for borrowing.");
+                throw new InvalidOperationException("Sách không có sẵn để mượn.");
             }
 
             // Check if user already has this book borrowed
@@ -124,7 +124,7 @@ namespace ELibraryManagement.Api.Services.Implementations
 
             if (existingBorrow)
             {
-                throw new InvalidOperationException("You have already borrowed this book.");
+                throw new InvalidOperationException("Bạn đã mượn cuốn sách này rồi.");
             }
 
             // Calculate due date (default 14 days if not provided)
@@ -161,7 +161,7 @@ namespace ELibraryManagement.Api.Services.Implementations
                 BorrowDate = borrowRecord.BorrowDate,
                 DueDate = borrowRecord.DueDate,
                 Status = borrowRecord.Status.ToString(),
-                Message = "Book borrowed successfully."
+                Message = "Mượn sách thành công."
             };
         }
 
@@ -198,12 +198,12 @@ namespace ELibraryManagement.Api.Services.Implementations
 
             if (borrowRecord == null)
             {
-                throw new ArgumentException("Borrow record not found.");
+                throw new ArgumentException("Không tìm thấy bản ghi mượn sách.");
             }
 
             if (borrowRecord.Status != BorrowStatus.Borrowed)
             {
-                throw new InvalidOperationException("This book is not currently borrowed.");
+                throw new InvalidOperationException("Cuốn sách này hiện không được mượn.");
             }
 
             var returnDate = DateTime.UtcNow;
@@ -265,7 +265,7 @@ namespace ELibraryManagement.Api.Services.Implementations
                 UserId = borrowRecord.UserId,
                 ReturnDate = returnDate,
                 FineAmount = fineAmount,
-                Message = isOverdue ? $"Book returned successfully. Fine: {fineAmount:N0} VND" : "Book returned successfully."
+                Message = isOverdue ? $"Trả sách thành công. Phạt: {fineAmount:N0} VND" : "Trả sách thành công."
             };
         }
 
@@ -309,7 +309,7 @@ namespace ELibraryManagement.Api.Services.Implementations
             }
 
             // Return the created book with categories
-            return await GetBookByIdAsync(book.Id) ?? throw new InvalidOperationException("Failed to retrieve created book");
+            return await GetBookByIdAsync(book.Id) ?? throw new InvalidOperationException("Không thể lấy thông tin sách đã tạo");
         }
 
         public async Task<BookDto> UpdateBookAsync(UpdateBookDto updateBookDto)
@@ -320,7 +320,7 @@ namespace ELibraryManagement.Api.Services.Implementations
 
             if (book == null)
             {
-                throw new ArgumentException($"Book with ID {updateBookDto.Id} not found");
+                throw new ArgumentException($"Không tìm thấy sách với ID {updateBookDto.Id}");
             }
 
             // Update book properties
@@ -360,7 +360,7 @@ namespace ELibraryManagement.Api.Services.Implementations
             await _context.SaveChangesAsync();
 
             // Return the updated book with categories
-            return await GetBookByIdAsync(book.Id) ?? throw new InvalidOperationException("Failed to retrieve updated book");
+            return await GetBookByIdAsync(book.Id) ?? throw new InvalidOperationException("Không thể lấy thông tin sách đã cập nhật");
         }
 
         public async Task<bool> DeleteBookAsync(int id)
@@ -378,7 +378,7 @@ namespace ELibraryManagement.Api.Services.Implementations
             var hasActiveBorrows = book.BorrowRecords.Any(br => br.Status == BorrowStatus.Borrowed);
             if (hasActiveBorrows)
             {
-                throw new InvalidOperationException("Cannot delete book with active borrows");
+                throw new InvalidOperationException("Không thể xóa sách đang được mượn");
             }
 
             // Soft delete

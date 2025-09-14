@@ -52,13 +52,13 @@ namespace ELibraryManagement.Api.Seeders
                     if (result.Succeeded)
                     {
                         await userManager.AddToRoleAsync(adminUser, "Admin");
-                        Console.WriteLine("Admin user created successfully!");
+                        Console.WriteLine("Tạo tài khoản admin thành công!");
                         Console.WriteLine("Email: admin@elibrary.com");
                         Console.WriteLine("Password: Admin@123");
                     }
                     else
                     {
-                        Console.WriteLine("Failed to create admin user:");
+                        Console.WriteLine("Không thể tạo tài khoản admin:");
                         foreach (var error in result.Errors)
                         {
                             Console.WriteLine($"- {error.Description}");

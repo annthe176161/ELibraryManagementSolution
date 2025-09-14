@@ -71,5 +71,29 @@ namespace ELibraryManagement.Api.Services
 
             return await SendEmailAsync(email, subject, body);
         }
+
+        public async Task<bool> SendPasswordResetEmailAsync(string email, string resetLink)
+        {
+            var subject = "Đặt lại mật khẩu - ELibrary Management";
+            var body = $@"
+                <h2>Yêu cầu đặt lại mật khẩu</h2>
+                <p>Chúng tôi đã nhận được yêu cầu đặt lại mật khẩu cho tài khoản của bạn tại ELibrary Management System.</p>
+                <p>Vui lòng nhấp vào liên kết bên dưới để đặt lại mật khẩu:</p>
+                <p><a href='{resetLink}' style='background-color: #dc3545; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;'>Đặt lại mật khẩu</a></p>
+                <p>Nếu bạn không thể nhấp vào liên kết, vui lòng sao chép và dán URL sau vào trình duyệt:</p>
+                <p>{resetLink}</p>
+                <p><strong>Lưu ý quan trọng:</strong></p>
+                <ul>
+                    <li>Liên kết này sẽ hết hạn sau 1 giờ</li>
+                    <li>Nếu bạn không yêu cầu đặt lại mật khẩu, vui lòng bỏ qua email này</li>
+                    <li>Không chia sẻ liên kết này với bất kỳ ai khác</li>
+                </ul>
+                <br>
+                <p>Trân trọng,</p>
+                <p>Đội ngũ ELibrary Management</p>
+            ";
+
+            return await SendEmailAsync(email, subject, body);
+        }
     }
 }

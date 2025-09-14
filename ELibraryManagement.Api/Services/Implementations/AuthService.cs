@@ -44,7 +44,7 @@ namespace ELibraryManagement.Api.Services.Implementations
                 return new AuthResponseDto
                 {
                     Success = false,
-                    Message = "Email already exists."
+                    Message = "Email đã tồn tại."
                 };
             }
 
@@ -54,7 +54,7 @@ namespace ELibraryManagement.Api.Services.Implementations
                 return new AuthResponseDto
                 {
                     Success = false,
-                    Message = "Username already exists."
+                    Message = "Tên đăng nhập đã tồn tại."
                 };
             }
 
@@ -97,7 +97,7 @@ namespace ELibraryManagement.Api.Services.Implementations
             return new AuthResponseDto
             {
                 Success = true,
-                Message = "User registered successfully. Please check your email to confirm your account before logging in.",
+                Message = "Đăng ký thành công. Vui lòng kiểm tra email để xác nhận tài khoản trước khi đăng nhập.",
                 Token = null, // Don't provide token until email is confirmed
                 Expiration = null,
                 User = await GetUserDtoAsync(user)
@@ -114,7 +114,7 @@ namespace ELibraryManagement.Api.Services.Implementations
                 return new AuthResponseDto
                 {
                     Success = false,
-                    Message = "Invalid username/email or password."
+                    Message = "Tên đăng nhập/email hoặc mật khẩu không hợp lệ."
                 };
             }
 
@@ -125,7 +125,7 @@ namespace ELibraryManagement.Api.Services.Implementations
                 return new AuthResponseDto
                 {
                     Success = false,
-                    Message = "Invalid username/email or password."
+                    Message = "Tên đăng nhập/email hoặc mật khẩu không hợp lệ."
                 };
             }
 
@@ -135,7 +135,7 @@ namespace ELibraryManagement.Api.Services.Implementations
                 return new AuthResponseDto
                 {
                     Success = false,
-                    Message = "Please confirm your email address before logging in. Check your email for the confirmation link."
+                    Message = "Vui lòng xác nhận địa chỉ email của bạn trước khi đăng nhập. Kiểm tra email để nhận liên kết xác nhận."
                 };
             }
 
@@ -145,7 +145,7 @@ namespace ELibraryManagement.Api.Services.Implementations
             return new AuthResponseDto
             {
                 Success = true,
-                Message = "Login successful.",
+                Message = "Đăng nhập thành công.",
                 Token = token,
                 Expiration = DateTime.UtcNow.AddHours(24),
                 User = await GetUserDtoAsync(user)
@@ -161,14 +161,14 @@ namespace ELibraryManagement.Api.Services.Implementations
                 return new AuthResponseDto
                 {
                     Success = false,
-                    Message = "User not found."
+                    Message = "Không tìm thấy người dùng."
                 };
             }
 
             return new AuthResponseDto
             {
                 Success = true,
-                Message = "User retrieved successfully.",
+                Message = "Lấy thông tin người dùng thành công.",
                 User = await GetUserDtoAsync(user)
             };
         }
@@ -277,7 +277,7 @@ namespace ELibraryManagement.Api.Services.Implementations
                     return new AuthResponseDto
                     {
                         Success = false,
-                        Message = "User not found."
+                        Message = "Không tìm thấy người dùng."
                     };
                 }
 
@@ -298,7 +298,7 @@ namespace ELibraryManagement.Api.Services.Implementations
                     return new AuthResponseDto
                     {
                         Success = false,
-                        Message = "Failed to update profile: " + string.Join(", ", result.Errors.Select(e => e.Description))
+                        Message = "Không thể cập nhật hồ sơ: " + string.Join(", ", result.Errors.Select(e => e.Description))
                     };
                 }
 
@@ -308,7 +308,7 @@ namespace ELibraryManagement.Api.Services.Implementations
                 return new AuthResponseDto
                 {
                     Success = true,
-                    Message = "Profile updated successfully!",
+                    Message = "Cập nhật hồ sơ thành công!",
                     User = userDto
                 };
             }
@@ -317,7 +317,7 @@ namespace ELibraryManagement.Api.Services.Implementations
                 return new AuthResponseDto
                 {
                     Success = false,
-                    Message = $"An error occurred: {ex.Message}"
+                    Message = $"Đã xảy ra lỗi: {ex.Message}"
                 };
             }
         }
@@ -340,9 +340,18 @@ namespace ELibraryManagement.Api.Services.Implementations
                 // Tạo password reset token
                 var token = await _userManager.GeneratePasswordResetTokenAsync(user);
 
-                // TODO: Gửi email với link reset password
-                // Trong môi trường production, bạn sẽ cần implement email service
-                // Ví dụ: await _emailService.SendPasswordResetEmailAsync(user.Email, token);
+                // Tạo link reset password
+                var encodedToken = Uri.EscapeDataString(token);
+                var encodedEmail = Uri.EscapeDataString(user.Email);
+                var resetLink = $"{_configuration["FrontendUrl"]}/Account/ResetPassword?email={encodedEmail}&token={encodedToken}";
+
+                // Gửi email với link reset password
+                var emailSent = await _emailService.SendPasswordResetEmailAsync(user.Email, resetLink);
+
+                if (!emailSent)
+                {
+                    _logger.LogWarning($"Failed to send password reset email to {email}");
+                }
 
                 // Lưu token vào log để test (chỉ dùng trong development)
                 _logger.LogInformation($"Password reset token for {email}: {token}");
@@ -491,7 +500,7 @@ namespace ELibraryManagement.Api.Services.Implementations
                 return new AuthResponseDto
                 {
                     Success = false,
-                    Message = "User not found."
+                    Message = "Không tìm thấy người dùng."
                 };
             }
 
@@ -501,14 +510,14 @@ namespace ELibraryManagement.Api.Services.Implementations
                 return new AuthResponseDto
                 {
                     Success = true,
-                    Message = "Email confirmed successfully. You can now log in to your account."
+                    Message = "Email xác nhận thành công. Bây giờ bạn có thể đăng nhập vào tài khoản."
                 };
             }
 
             return new AuthResponseDto
             {
                 Success = false,
-                Message = "Email confirmation failed. The token may be invalid or expired."
+                Message = "Xác nhận email thất bại. Token có thể không hợp lệ hoặc đã hết hạn."
             };
         }
 
@@ -520,7 +529,7 @@ namespace ELibraryManagement.Api.Services.Implementations
                 return new AuthResponseDto
                 {
                     Success = false,
-                    Message = "User not found."
+                    Message = "Không tìm thấy người dùng."
                 };
             }
 
@@ -529,7 +538,7 @@ namespace ELibraryManagement.Api.Services.Implementations
                 return new AuthResponseDto
                 {
                     Success = false,
-                    Message = "Email is already confirmed."
+                    Message = "Email đã được xác nhận."
                 };
             }
 
@@ -545,14 +554,14 @@ namespace ELibraryManagement.Api.Services.Implementations
                 return new AuthResponseDto
                 {
                     Success = true,
-                    Message = "Confirmation email sent successfully. Please check your email."
+                    Message = "Email xác nhận đã được gửi thành công. Vui lòng kiểm tra email của bạn."
                 };
             }
 
             return new AuthResponseDto
             {
                 Success = false,
-                Message = "Failed to send confirmation email. Please try again later."
+                Message = "Không thể gửi email xác nhận. Vui lòng thử lại sau."
             };
         }
 
