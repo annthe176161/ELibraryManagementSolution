@@ -18,246 +18,486 @@
                     <ol class="breadcrumb">
                         <li class="breadcrumb-item">
                             <a asp-action="Index">Quản trị</a>
-                            </li>
-                            <li class="breadcrumb-item active">Người dùng</li>
-                        </ol>
-                    </nav>
-                </div>
-                <div>
-                    <button type="button" class="btn btn-primary">
-                        <i class="fas fa-plus me-1"></i>
-                        Thêm người dùng
-                    </button>
-                </div>
+                        </li>
+                        <li class="breadcrumb-item active">Người dùng</li>
+                    </ol>
+                </nav>
+            </div>
+            <div>
+                <button type="button" class="btn btn-primary">
+                    <i class="fas fa-plus me-1"></i>
+                    Thêm người dùng
+                </button>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Statistics Row -->
-    <div class="row mb-4">
-        <div class="col-md-3">
-            <div class="card bg-primary text-white">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <div class="small">Tổng người dùng</div>
-                            <div class="h4 mb-0">@Model.Count</div>
-                        </div>
-                        <div class="align-self-center">
-                            <i class="fas fa-users fa-2x opacity-75"></i>
-                        </div>
+<!-- Statistics Row - Focused on Students -->
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <div class="small">Tổng sinh viên</div>
+                        <div class="h4 mb-0">@Model.Count(u => u.Roles.Any(r => r.Equals("User",
+                                                        StringComparison.OrdinalIgnoreCase)))</div>
                     </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card bg-success text-white">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <div class="small">Admin</div>
-                            <div class="h4 mb-0">@Model.Count(u => u.Roles.Contains("Admin"))</div>
-                        </div>
-                        <div class="align-self-center">
-                            <i class="fas fa-user-shield fa-2x opacity-75"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card bg-info text-white">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <div class="small">Thủ thư</div>
-                            <div class="h4 mb-0">@Model.Count(u => u.Roles.Contains("Librarian"))</div>
-                        </div>
-                        <div class="align-self-center">
-                            <i class="fas fa-user-tie fa-2x opacity-75"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card bg-warning text-white">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <div class="small">Người dùng thường</div>
-                            <div class="h4 mb-0">@Model.Count(u => u.Roles.Contains("User") && !u.Roles.Contains("Admin") && !u.Roles.Contains("Librarian"))</div>
-                        </div>
-                        <div class="align-self-center">
-                            <i class="fas fa-user fa-2x opacity-75"></i>
-                        </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-user-graduate fa-2x opacity-75"></i>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
-    <!-- Users Table -->
-    <div class="row">
-        <div class="col-12">
-            <div class="card shadow">
-                <div class="card-header bg-light">
-                    <div class="d-flex align-items-center justify-content-between">
-                        <h5 class="mb-0">Danh sách người dùng</h5>
-                        <div class="d-flex">
-                            <div class="input-group input-group-sm me-3" style="width: 300px;">
-                                <input type="text" class="form-control" placeholder="Tìm kiếm người dùng..." id="searchInput">
-                                <button class="btn btn-outline-secondary" type="button">
-                                    <i class="fas fa-search"></i>
-                                </button>
-                            </div>
-                            <select class="form-select form-select-sm" id="roleFilter" style="width: 150px;">
-                                <option value="">Tất cả vai trò</option>
-                                <option value="Admin">Admin</option>
-                                <option value="Librarian">Thủ thư</option>
-                                <option value="User">Người dùng</option>
-                            </select>
-                        </div>
+    <div class="col-md-4">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <div class="small">Đang hoạt động</div>
+                        <div class="h4 mb-0">@Model.Count(u => u.Roles.Any(r => r.Equals("User",
+                                                        StringComparison.OrdinalIgnoreCase)) && u.IsActive)</div>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-user-check fa-2x opacity-75"></i>
                     </div>
                 </div>
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-hover mb-0" id="usersTable">
-                            <thead class="table-light">
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card bg-warning text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <div class="small">Bị vô hiệu</div>
+                        <div class="h4 mb-0">@Model.Count(u => u.Roles.Any(r => r.Equals("User",
+                                                        StringComparison.OrdinalIgnoreCase)) && !u.IsActive)</div>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-user-slash fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Users Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow">
+            <div class="card-header bg-light">
+                <div class="d-flex align-items-center justify-content-between">
+                    <h5 class="mb-0">Danh sách sinh viên</h5>
+                    <div class="d-flex">
+                        <div class="input-group input-group-sm me-3" style="width: 300px;">
+                            <input type="text" class="form-control" placeholder="Tìm kiếm sinh viên..."
+                                id="searchInput">
+                            <button class="btn btn-outline-secondary" type="button">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                        <select class="form-select form-select-sm" id="statusFilter" style="width: 150px;">
+                            <option value="">Tất cả trạng thái</option>
+                            <option value="active">Đang hoạt động</option>
+                            <option value="inactive">Bị vô hiệu</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0" id="usersTable">
+                        <thead class="table-light">
+                            <tr>
+                                <th scope="col">Thông tin sinh viên</th>
+                                <th scope="col">Mã sinh viên</th>
+                                <th scope="col">Email & Liên hệ</th>
+                                <th scope="col">Trạng thái</th>
+                                <th scope="col">Hoạt động mượn sách</th>
+                                <th scope="col">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @{
+                                var students = Model.Where(u => u.Roles.Any(r => r.Equals("User",
+                                StringComparison.OrdinalIgnoreCase))).ToList();
+                            }
+
+                            @if (!students.Any())
+                            {
                                 <tr>
-                                    <th scope="col">Tên đăng nhập</th>
-                                    <th scope="col">Họ tên</th>
-                                    <th scope="col">Email</th>
-                                    <th scope="col">Mã sinh viên</th>
-                                    <th scope="col">Vai trò</th>
-                                    <th scope="col">Ngày tạo</th>
-                                    <th scope="col">Hoạt động</th>
-                                    <th scope="col">Thao tác</th>
+                                    <td colspan="6" class="text-center py-4">
+                                        <div class="text-muted">
+                                            <i class="fas fa-user-graduate fa-3x mb-3"></i>
+                                            <h5>Chưa có sinh viên nào</h5>
+                                            <p>Hệ thống chưa có sinh viên được đăng ký.</p>
+                                        </div>
+                                    </td>
                                 </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var user in Model)
-                                {
-                                    <tr>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                <div class="avatar avatar-sm me-2">
-                                                    <i class="fas fa-user-circle fa-2x text-muted"></i>
-                                                </div>
-                                                <div>
-                                                    <strong>@user.UserName</strong>
-                                                </div>
+                            }
+
+                            @foreach (var user in students)
+                            {
+                                <tr data-user-id="@user.Id" class="@(user.IsActive ? "" : "table-warning")">
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar avatar-sm me-3">
+                                                <i class="fas fa-user-graduate fa-2x text-primary"></i>
                                             </div>
-                                        </td>
-                                        <td>@user.FullName</td>
-                                        <td>@user.Email</td>
-                                        <td>
-                                            @if (!string.IsNullOrEmpty(user.StudentId))
+                                            <div>
+                                                <strong>@user.FullName</strong>
+                                                <br>
+                                                <small class="text-muted">@user.UserName</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        @if (!string.IsNullOrEmpty(user.StudentId))
+                                        {
+                                            <span class="badge bg-primary">@user.StudentId</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">Chưa cập nhật</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <div>
+                                            <strong>@user.Email</strong>
+                                            @if (!string.IsNullOrEmpty(user.PhoneNumber))
                                             {
-                                                <span class="badge bg-light text-dark">@user.StudentId</span>
+                                                <br>
+                                        
+                                                <small class="text-muted"><i
+                                                        class="fas fa-phone fa-sm me-1"></i>@user.PhoneNumber</small>
+                                            }
+                                        </div>
+                                    </td>
+                                    <td>
+                                        @if (user.IsActive)
+                                        {
+                                            <span class="badge bg-success">
+                                                <i class="fas fa-check-circle me-1"></i>Hoạt động
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-danger">
+                                                <i class="fas fa-ban me-1"></i>Bị vô hiệu
+                                            </span>
+                                        }
+                                        <br>
+                                        <small class="text-muted">
+                                            Tham gia: @user.CreatedAt.ToString("dd/MM/yyyy")
+                                        </small>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex flex-column">
+                                            <span class="badge bg-info mb-1">
+                                                <i class="fas fa-book-open me-1"></i>
+                                                Đang mượn: @user.ActiveBorrows
+                                            </span>
+                                            <small class="text-muted">
+                                                <i class="fas fa-history me-1"></i>
+                                                Tổng đã mượn: @user.TotalBorrows lần
+                                            </small>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <button type="button" class="btn btn-sm btn-outline-primary"
+                                                onclick="viewUserDetail('@user.Id')" title="Xem chi tiết">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            @if (user.IsActive)
+                                            {
+                                                <button type="button" class="btn btn-sm btn-outline-warning"
+                                                    onclick="disableUser('@user.Id', '@user.FullName')" title="Vô hiệu hóa">
+                                                    <i class="fas fa-ban"></i>
+                                                </button>
                                             }
                                             else
                                             {
-                                                <span class="text-muted">N/A</span>
-                                            }
-                                        </td>
-                                        <td>
-                                            @foreach (var role in user.Roles)
-                                            {
-                                                var badgeClass = role switch
-                                                {
-                                                    "Admin" => "bg-danger",
-                                                    "Librarian" => "bg-info",
-                                                    "User" => "bg-secondary",
-                                                    _ => "bg-secondary"
-                                                };
-                                                <span class="badge @badgeClass me-1">@role</span>
-                                            }
-                                        </td>
-                                        <td>
-                                            <small class="text-muted">
-                                                @user.CreatedAt.ToString("dd/MM/yyyy")
-                                            </small>
-                                        </td>
-                                        <td>
-                                            <div class="d-flex flex-column">
-                                                <small><strong>Đang mượn:</strong> @user.ActiveBorrows sách</small>
-                                                <small><strong>Tổng mượn:</strong> @user.TotalBorrows lần</small>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <div class="btn-group" role="group">
-                                                <button type="button" class="btn btn-sm btn-outline-primary" title="Xem chi tiết">
-                                                    <i class="fas fa-eye"></i>
+                                                <button type="button" class="btn btn-sm btn-outline-success"
+                                                    onclick="enableUser('@user.Id', '@user.FullName')" title="Kích hoạt">
+                                                    <i class="fas fa-check"></i>
                                                 </button>
-                                                <button type="button" class="btn btn-sm btn-outline-warning" title="Chỉnh sửa">
-                                                    <i class="fas fa-edit"></i>
-                                                </button>
-                                                <div class="btn-group" role="group">
-                                                    <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
-                                                        <i class="fas fa-cog"></i>
-                                                    </button>
-                                                    <ul class="dropdown-menu">
-                                                        <li><a class="dropdown-item" href="#"><i class="fas fa-user-tag me-2"></i>Thay đổi vai trò</a></li>
-                                                        <li><a class="dropdown-item" href="#"><i class="fas fa-lock me-2"></i>Đặt lại mật khẩu</a></li>
-                                                        <li><hr class="dropdown-divider"></li>
-                                                        <li><a class="dropdown-item text-danger" href="#"><i class="fas fa-ban me-2"></i>Vô hiệu hóa</a></li>
-                                                    </ul>
-                                                </div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
+                                            }
+                                            <button type="button" class="btn btn-sm btn-outline-info"
+                                                onclick="viewUserBorrows('@user.Id')" title="Xem lịch sử mượn">
+                                                <i class="fas fa-history"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
                 </div>
-                <div class="card-footer bg-light">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <small class="text-muted">
-                            Hiển thị @Model.Count người dùng
-                        </small>
-                        <nav>
-                            <ul class="pagination pagination-sm mb-0">
-                                <li class="page-item disabled">
-                                    <span class="page-link">Trước</span>
-                                </li>
-                                <li class="page-item active">
-                                    <span class="page-link">1</span>
-                                </li>
-                                <li class="page-item disabled">
-                                    <span class="page-link">Sau</span>
-                                </li>
-                            </ul>
-                        </nav>
-                    </div>
+            </div>
+            <div class="card-footer bg-light">
+                <div class="d-flex justify-content-between align-items-center">
+                    <small class="text-muted">
+                        Hiển thị @Model.Count(u => u.Roles.Any(r => r.Equals("User",
+                                                StringComparison.OrdinalIgnoreCase))) sinh viên
+                    </small>
+                    <nav>
+                        <ul class="pagination pagination-sm mb-0">
+                            <li class="page-item disabled">
+                                <span class="page-link">Trước</span>
+                            </li>
+                            <li class="page-item active">
+                                <span class="page-link">1</span>
+                            </li>
+                            <li class="page-item disabled">
+                                <span class="page-link">Sau</span>
+                            </li>
+                        </ul>
+                    </nav>
                 </div>
             </div>
         </div>
     </div>
+</div>
+
+<!-- User Detail Modal -->
+<div class="modal fade" id="userDetailModal" tabindex="-1" aria-labelledby="userDetailModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="userDetailModalLabel">
+                    <i class="fas fa-user-graduate me-2"></i>
+                    Chi tiết sinh viên
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="userDetailContent">
+                <div class="text-center">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Đang tải...</span>
+                    </div>
+                    <p class="mt-2">Đang tải thông tin sinh viên...</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                <button type="button" class="btn btn-primary" onclick="editUser()">
+                    <i class="fas fa-edit me-1"></i>Chỉnh sửa
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Disable User Confirmation Modal -->
+<div class="modal fade" id="disableUserModal" tabindex="-1" aria-labelledby="disableUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-warning" id="disableUserModalLabel">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Xác nhận vô hiệu hóa
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có chắc chắn muốn vô hiệu hóa sinh viên <strong id="disableUserName"></strong>?</p>
+                <div class="alert alert-warning">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Sinh viên sẽ không thể đăng nhập và mượn sách sau khi bị vô hiệu hóa.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-warning" onclick="confirmDisableUser()">
+                    <i class="fas fa-ban me-1"></i>Vô hiệu hóa
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Enable User Confirmation Modal -->
+<div class="modal fade" id="enableUserModal" tabindex="-1" aria-labelledby="enableUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-success" id="enableUserModalLabel">
+                    <i class="fas fa-check-circle me-2"></i>
+                    Xác nhận kích hoạt
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có chắc chắn muốn kích hoạt lại sinh viên <strong id="enableUserName"></strong>?</p>
+                <div class="alert alert-success">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Sinh viên sẽ có thể đăng nhập và mượn sách sau khi được kích hoạt.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-success" onclick="confirmEnableUser()">
+                    <i class="fas fa-check me-1"></i>Kích hoạt
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 
 @section Scripts {
     <script>
-        $(document).ready(function() {
+        let currentUserId = null;
+
+        $(document).ready(function () {
             // Search functionality
-            $('#searchInput').on('keyup', function() {
+            $('#searchInput').on('keyup', function () {
                 var value = $(this).val().toLowerCase();
-                $('#usersTable tbody tr').filter(function() {
+                $('#usersTable tbody tr').filter(function () {
                     $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
                 });
             });
 
-            // Role filter
-            $('#roleFilter').on('change', function() {
+            // Status filter
+            $('#statusFilter').on('change', function () {
                 var value = $(this).val();
-                $('#usersTable tbody tr').filter(function() {
+                $('#usersTable tbody tr').filter(function () {
                     if (value === '') {
                         $(this).show();
-                    } else {
-                        $(this).toggle($(this).find('.badge').text().indexOf(value) > -1);
+                    } else if (value === 'active') {
+                        $(this).toggle($(this).hasClass('table-warning') === false);
+                    } else if (value === 'inactive') {
+                        $(this).toggle($(this).hasClass('table-warning') === true);
                     }
                 });
             });
         });
+
+        // View user detail
+        function viewUserDetail(userId) {
+            currentUserId = userId;
+            $('#userDetailModal').modal('show');
+
+            // Load user details via AJAX
+            $.get(`/Admin/GetUserDetail/${userId}`)
+                .done(function (data) {
+                    $('#userDetailContent').html(data);
+                })
+                .fail(function () {
+                    $('#userDetailContent').html(`
+                            <div class="alert alert-danger">
+                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                Không thể tải thông tin sinh viên. Vui lòng thử lại.
+                            </div>
+                        `);
+                });
+        }
+
+        // Disable user
+        function disableUser(userId, userName) {
+            currentUserId = userId;
+            $('#disableUserName').text(userName);
+            $('#disableUserModal').modal('show');
+        }
+
+        // Enable user
+        function enableUser(userId, userName) {
+            currentUserId = userId;
+            $('#enableUserName').text(userName);
+            $('#enableUserModal').modal('show');
+        }
+
+        // Confirm disable user
+        function confirmDisableUser() {
+            if (!currentUserId) return;
+
+            $.post(`/Admin/DisableUser/${currentUserId}`)
+                .done(function (response) {
+                    if (response.success) {
+                        $('#disableUserModal').modal('hide');
+                        location.reload(); // Reload to update the table
+                        showToast('success', 'Đã vô hiệu hóa sinh viên thành công!');
+                    } else {
+                        showToast('error', response.message || 'Có lỗi xảy ra');
+                    }
+                })
+                .fail(function () {
+                    showToast('error', 'Không thể vô hiệu hóa sinh viên. Vui lòng thử lại.');
+                });
+        }
+
+        // Confirm enable user
+        function confirmEnableUser() {
+            if (!currentUserId) return;
+
+            $.post(`/Admin/EnableUser/${currentUserId}`)
+                .done(function (response) {
+                    if (response.success) {
+                        $('#enableUserModal').modal('hide');
+                        location.reload(); // Reload to update the table
+                        showToast('success', 'Đã kích hoạt sinh viên thành công!');
+                    } else {
+                        showToast('error', response.message || 'Có lỗi xảy ra');
+                    }
+                })
+                .fail(function () {
+                    showToast('error', 'Không thể kích hoạt sinh viên. Vui lòng thử lại.');
+                });
+        }
+
+        // View user borrow history
+        function viewUserBorrows(userId) {
+            window.location.href = `/Admin/UserBorrows/${userId}`;
+        }
+
+        // Edit user
+        function editUser() {
+            if (!currentUserId) return;
+            window.location.href = `/Admin/EditUser/${currentUserId}`;
+        }
+
+        // Show toast notification
+        function showToast(type, message) {
+            // Create toast element
+            const toastId = 'toast-' + Date.now();
+            const bgClass = type === 'success' ? 'bg-success' : 'bg-danger';
+            const icon = type === 'success' ? 'fas fa-check-circle' : 'fas fa-exclamation-circle';
+
+            const toastHtml = `
+                    <div id="${toastId}" class="toast align-items-center text-white ${bgClass} border-0" role="alert" aria-live="assertive" aria-atomic="true">
+                        <div class="d-flex">
+                            <div class="toast-body">
+                                <i class="${icon} me-2"></i>${message}
+                            </div>
+                            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                        </div>
+                    </div>
+                `;
+
+            // Add to toast container (create if doesn't exist)
+            let toastContainer = document.getElementById('toast-container');
+            if (!toastContainer) {
+                toastContainer = document.createElement('div');
+                toastContainer.id = 'toast-container';
+                toastContainer.className = 'toast-container position-fixed bottom-0 end-0 p-3';
+                document.body.appendChild(toastContainer);
+            }
+
+            toastContainer.insertAdjacentHTML('beforeend', toastHtml);
+
+            // Show toast
+            const toastElement = document.getElementById(toastId);
+            const toast = new bootstrap.Toast(toastElement, { delay: 3000 });
+            toast.show();
+
+            // Remove toast element after it's hidden
+            toastElement.addEventListener('hidden.bs.toast', function () {
+                toastElement.remove();
+            });
+        }
     </script>
 }

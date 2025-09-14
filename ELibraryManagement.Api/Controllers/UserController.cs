@@ -83,22 +83,38 @@ namespace ELibraryManagement.Api.Controllers
         }
 
         /// <summary>
-        /// Lấy danh sách tất cả users
+        /// Lấy danh sách tất cả users với thông tin đầy đủ cho admin
         /// </summary>
         [HttpGet]
-        public IActionResult GetAllUsers()
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetAllUsers()
         {
-            var users = _userManager.Users.Select(u => new
+            var users = new List<object>();
+
+            foreach (var user in _userManager.Users)
             {
-                u.Id,
-                u.UserName,
-                u.Email,
-                FullName = $"{u.FirstName} {u.LastName}".Trim(),
-                u.PhoneNumber,
-                u.Address,
-                u.DateOfBirth,
-                u.AvatarUrl
-            }).ToList();
+                var roles = await _userManager.GetRolesAsync(user);
+                users.Add(new
+                {
+                    user.Id,
+                    user.UserName,
+                    user.Email,
+                    user.FirstName,
+                    user.LastName,
+                    FullName = $"{user.FirstName} {user.LastName}".Trim(),
+                    user.PhoneNumber,
+                    user.Address,
+                    user.DateOfBirth,
+                    user.AvatarUrl,
+                    user.StudentId,
+                    user.CreatedAt,
+                    user.LockoutEnd,
+                    IsActive = user.LockoutEnd == null || user.LockoutEnd <= DateTimeOffset.UtcNow,
+                    Roles = roles.ToList(),
+                    TotalBorrows = 0, // TODO: Calculate from borrow records
+                    ActiveBorrows = 0 // TODO: Calculate from active borrow records
+                });
+            }
 
             return Ok(users);
         }
@@ -199,6 +215,114 @@ namespace ELibraryManagement.Api.Controllers
                 }
 
                 return BadRequest("Không thể cập nhật avatar người dùng");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Lấy thông tin chi tiết user theo ID cho admin
+        /// </summary>
+        [HttpGet("admin/{id}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetUserById(string id)
+        {
+            try
+            {
+                var user = await _userManager.FindByIdAsync(id);
+                if (user == null)
+                {
+                    return NotFound("Không tìm thấy người dùng");
+                }
+
+                var roles = await _userManager.GetRolesAsync(user);
+
+                var result = new
+                {
+                    user.Id,
+                    user.UserName,
+                    user.Email,
+                    user.FirstName,
+                    user.LastName,
+                    FullName = $"{user.FirstName} {user.LastName}".Trim(),
+                    user.PhoneNumber,
+                    user.Address,
+                    user.DateOfBirth,
+                    user.AvatarUrl,
+                    user.StudentId,
+                    user.CreatedAt,
+                    user.LockoutEnd,
+                    IsActive = user.LockoutEnd == null || user.LockoutEnd <= DateTimeOffset.UtcNow,
+                    Roles = roles.ToList(),
+                    TotalBorrows = 0, // TODO: Calculate from borrow records
+                    ActiveBorrows = 0 // TODO: Calculate from active borrow records
+                };
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Vô hiệu hóa user
+        /// </summary>
+        [HttpPost("{id}/disable")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> DisableUser(string id)
+        {
+            try
+            {
+                var user = await _userManager.FindByIdAsync(id);
+                if (user == null)
+                {
+                    return NotFound("Không tìm thấy người dùng");
+                }
+
+                // Set lockout end to a far future date to disable user
+                var result = await _userManager.SetLockoutEndDateAsync(user, DateTimeOffset.UtcNow.AddYears(100));
+
+                if (result.Succeeded)
+                {
+                    return Ok(new { message = "Đã vô hiệu hóa người dùng thành công" });
+                }
+
+                return BadRequest("Không thể vô hiệu hóa người dùng");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Kích hoạt user
+        /// </summary>
+        [HttpPost("{id}/enable")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> EnableUser(string id)
+        {
+            try
+            {
+                var user = await _userManager.FindByIdAsync(id);
+                if (user == null)
+                {
+                    return NotFound("Không tìm thấy người dùng");
+                }
+
+                // Remove lockout to enable user
+                var result = await _userManager.SetLockoutEndDateAsync(user, null);
+
+                if (result.Succeeded)
+                {
+                    return Ok(new { message = "Đã kích hoạt người dùng thành công" });
+                }
+
+                return BadRequest("Không thể kích hoạt người dùng");
             }
             catch (Exception ex)
             {

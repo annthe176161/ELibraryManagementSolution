@@ -602,5 +602,193 @@ namespace ELibraryManagement.Web.Controllers
                 return Json(new { success = false, message = $"Có lỗi xảy ra: {ex.Message}" });
             }
         }
+
+        // GET: Admin/GetUserDetail/{id}
+        [HttpGet]
+        public async Task<IActionResult> GetUserDetail(string id)
+        {
+            var accessCheck = await CheckAdminAccessAsync();
+            if (accessCheck != null) return PartialView("_UserDetailPartial", null);
+
+            try
+            {
+                var token = _authApiService.GetCurrentToken();
+                _httpClient.DefaultRequestHeaders.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+                var response = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/User/admin/{id}");
+                if (response.IsSuccessStatusCode)
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+                    var user = JsonSerializer.Deserialize<AdminUserViewModel>(content, _jsonOptions);
+                    return PartialView("_UserDetailPartial", user);
+                }
+                return PartialView("_UserDetailPartial", null);
+            }
+            catch (Exception)
+            {
+                return PartialView("_UserDetailPartial", null);
+            }
+        }
+
+        // POST: Admin/DisableUser/{id}
+        [HttpPost]
+        public async Task<IActionResult> DisableUser(string id)
+        {
+            var accessCheck = await CheckAdminAccessAsync();
+            if (accessCheck != null) return Json(new { success = false, message = "Unauthorized" });
+
+            try
+            {
+                var token = _authApiService.GetCurrentToken();
+                _httpClient.DefaultRequestHeaders.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+                var response = await _httpClient.PostAsync($"{GetApiBaseUrl()}/api/User/{id}/disable", null);
+                if (response.IsSuccessStatusCode)
+                {
+                    return Json(new { success = true, message = "Đã vô hiệu hóa sinh viên thành công" });
+                }
+
+                var errorContent = await response.Content.ReadAsStringAsync();
+                return Json(new { success = false, message = $"Lỗi: {response.StatusCode}" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Có lỗi xảy ra: {ex.Message}" });
+            }
+        }
+
+        // POST: Admin/EnableUser/{id}
+        [HttpPost]
+        public async Task<IActionResult> EnableUser(string id)
+        {
+            var accessCheck = await CheckAdminAccessAsync();
+            if (accessCheck != null) return Json(new { success = false, message = "Unauthorized" });
+
+            try
+            {
+                var token = _authApiService.GetCurrentToken();
+                _httpClient.DefaultRequestHeaders.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+                var response = await _httpClient.PostAsync($"{GetApiBaseUrl()}/api/User/{id}/enable", null);
+                if (response.IsSuccessStatusCode)
+                {
+                    return Json(new { success = true, message = "Đã kích hoạt sinh viên thành công" });
+                }
+
+                var errorContent = await response.Content.ReadAsStringAsync();
+                return Json(new { success = false, message = $"Lỗi: {response.StatusCode}" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Có lỗi xảy ra: {ex.Message}" });
+            }
+        }
+
+        // GET: Admin/UserBorrows/{id}
+        public async Task<IActionResult> UserBorrows(string id)
+        {
+            var accessCheck = await CheckAdminAccessAsync();
+            if (accessCheck != null) return accessCheck;
+
+            try
+            {
+                var token = _authApiService.GetCurrentToken();
+                _httpClient.DefaultRequestHeaders.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+                // Get user info
+                var userResponse = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/User/admin/{id}");
+                AdminUserViewModel? user = null;
+                if (userResponse.IsSuccessStatusCode)
+                {
+                    var userContent = await userResponse.Content.ReadAsStringAsync();
+                    user = JsonSerializer.Deserialize<AdminUserViewModel>(userContent, _jsonOptions);
+                }
+
+                // Get user's borrow history
+                var borrowResponse = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Borrow/user/{id}");
+                List<BorrowBookViewModel> borrows = new List<BorrowBookViewModel>();
+                if (borrowResponse.IsSuccessStatusCode)
+                {
+                    var borrowContent = await borrowResponse.Content.ReadAsStringAsync();
+                    borrows = JsonSerializer.Deserialize<List<BorrowBookViewModel>>(borrowContent, _jsonOptions) ?? new List<BorrowBookViewModel>();
+                }
+
+                ViewBag.User = user;
+                return View(borrows);
+            }
+            catch (Exception)
+            {
+                ViewBag.User = null;
+                return View(new List<BorrowBookViewModel>());
+            }
+        }
+
+        // GET: Admin/EditUser/{id}
+        public async Task<IActionResult> EditUser(string id)
+        {
+            var accessCheck = await CheckAdminAccessAsync();
+            if (accessCheck != null) return accessCheck;
+
+            try
+            {
+                var token = _authApiService.GetCurrentToken();
+                _httpClient.DefaultRequestHeaders.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+                var response = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/User/admin/{id}");
+                if (response.IsSuccessStatusCode)
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+                    var user = JsonSerializer.Deserialize<AdminUserViewModel>(content, _jsonOptions);
+                    return View(user);
+                }
+                return NotFound();
+            }
+            catch (Exception)
+            {
+                return NotFound();
+            }
+        }
+
+        // GET: Admin/DebugApi - Debug page
+        public IActionResult DebugApi()
+        {
+            return View();
+        }
+
+        // GET: Admin/TestApiUsers - Test API endpoint
+        public async Task<IActionResult> TestApiUsers()
+        {
+            try
+            {
+                var token = _authApiService.GetCurrentToken();
+                _httpClient.DefaultRequestHeaders.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+                var response = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/User");
+                var content = await response.Content.ReadAsStringAsync();
+
+                return Json(new
+                {
+                    statusCode = response.StatusCode,
+                    isSuccess = response.IsSuccessStatusCode,
+                    content = content,
+                    apiUrl = $"{GetApiBaseUrl()}/api/User",
+                    hasToken = !string.IsNullOrEmpty(token)
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new
+                {
+                    error = ex.Message,
+                    apiUrl = $"{GetApiBaseUrl()}/api/User"
+                });
+            }
+        }
     }
 }

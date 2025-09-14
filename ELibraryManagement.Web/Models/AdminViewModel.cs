@@ -69,5 +69,7 @@ namespace ELibraryManagement.Web.Models
         public List<string> Roles { get; set; } = new();
         public int TotalBorrows { get; set; }
         public int ActiveBorrows { get; set; }
+        public bool IsActive { get; set; } = true;
+        public DateTime? LastLoginDate { get; set; }
     }
 }

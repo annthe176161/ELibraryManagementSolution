@@ -1,0 +1,213 @@
+@model AdminUserViewModel
+
+@if (Model != null)
+{
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="fas fa-user me-2"></i>
+                        Thông tin cá nhân
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <table class="table table-borderless">
+                        <tbody>
+                            <tr>
+                                <td class="fw-bold" style="width: 40%;">Họ tên:</td>
+                                <td>@Model.FullName</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold">Tên đăng nhập:</td>
+                                <td>@Model.UserName</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold">Email:</td>
+                                <td>@Model.Email</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold">Mã sinh viên:</td>
+                                <td>
+                                    @if (!string.IsNullOrEmpty(Model.StudentId))
+                                    {
+                                        <span class="badge bg-primary">@Model.StudentId</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Chưa cập nhật</span>
+                                    }
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold">Số điện thoại:</td>
+                                <td>
+                                    @if (!string.IsNullOrEmpty(Model.PhoneNumber))
+                                    {
+                                        @Model.PhoneNumber
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Chưa cập nhật</span>
+                                    }
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold">Địa chỉ:</td>
+                                <td>
+                                    @if (!string.IsNullOrEmpty(Model.Address))
+                                    {
+                                        @Model.Address
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Chưa cập nhật</span>
+                                    }
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="fw-bold">Ngày sinh:</td>
+                                <td>
+                                    @if (Model.DateOfBirth.HasValue)
+                                    {
+                                        @Model.DateOfBirth.Value.ToString("dd/MM/yyyy")
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">Chưa cập nhật</span>
+                                    }
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="fas fa-chart-line me-2"></i>
+                        Thống kê hoạt động
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <div class="d-flex justify-content-between align-items-center p-3 bg-light rounded">
+                                <div>
+                                    <i class="fas fa-calendar-plus text-primary me-2"></i>
+                                    <strong>Ngày tham gia:</strong>
+                                </div>
+                                <span class="badge bg-primary">@Model.CreatedAt.ToString("dd/MM/yyyy")</span>
+                            </div>
+                        </div>
+                        
+                        <div class="col-12">
+                            <div class="d-flex justify-content-between align-items-center p-3 bg-light rounded">
+                                <div>
+                                    <i class="fas fa-book-open text-info me-2"></i>
+                                    <strong>Đang mượn:</strong>
+                                </div>
+                                <span class="badge bg-info">@Model.ActiveBorrows sách</span>
+                            </div>
+                        </div>
+                        
+                        <div class="col-12">
+                            <div class="d-flex justify-content-between align-items-center p-3 bg-light rounded">
+                                <div>
+                                    <i class="fas fa-history text-secondary me-2"></i>
+                                    <strong>Tổng đã mượn:</strong>
+                                </div>
+                                <span class="badge bg-secondary">@Model.TotalBorrows lần</span>
+                            </div>
+                        </div>
+                        
+                        <div class="col-12">
+                            <div class="d-flex justify-content-between align-items-center p-3 bg-light rounded">
+                                <div>
+                                    <i class="fas fa-user-check text-success me-2"></i>
+                                    <strong>Trạng thái:</strong>
+                                </div>
+                                @if (Model.IsActive)
+                                {
+                                    <span class="badge bg-success">
+                                        <i class="fas fa-check-circle me-1"></i>Hoạt động
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger">
+                                        <i class="fas fa-ban me-1"></i>Bị vô hiệu
+                                    </span>
+                                }
+                            </div>
+                        </div>
+                        
+                        @if (Model.LastLoginDate.HasValue)
+                        {
+                            <div class="col-12">
+                                <div class="d-flex justify-content-between align-items-center p-3 bg-light rounded">
+                                    <div>
+                                        <i class="fas fa-sign-in-alt text-warning me-2"></i>
+                                        <strong>Lần cuối đăng nhập:</strong>
+                                    </div>
+                                    <span class="badge bg-warning">@Model.LastLoginDate.Value.ToString("dd/MM/yyyy HH:mm")</span>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mt-3">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="fas fa-tasks me-2"></i>
+                        Thao tác nhanh
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                        <button type="button" class="btn btn-outline-info" onclick="viewUserBorrows('@Model.Id')">
+                            <i class="fas fa-history me-1"></i>
+                            Xem lịch sử mượn sách
+                        </button>
+                        
+                        @if (Model.IsActive)
+                        {
+                            <button type="button" class="btn btn-outline-warning" onclick="disableUser('@Model.Id', '@Model.FullName')">
+                                <i class="fas fa-ban me-1"></i>
+                                Vô hiệu hóa tài khoản
+                            </button>
+                        }
+                        else
+                        {
+                            <button type="button" class="btn btn-outline-success" onclick="enableUser('@Model.Id', '@Model.FullName')">
+                                <i class="fas fa-check me-1"></i>
+                                Kích hoạt tài khoản
+                            </button>
+                        }
+                        
+                        <button type="button" class="btn btn-outline-primary" onclick="editUser()">
+                            <i class="fas fa-edit me-1"></i>
+                            Chỉnh sửa thông tin
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+else
+{
+    <div class="alert alert-danger">
+        <i class="fas fa-exclamation-triangle me-2"></i>
+        Không thể tải thông tin sinh viên. Vui lòng thử lại.
+    </div>
+}
