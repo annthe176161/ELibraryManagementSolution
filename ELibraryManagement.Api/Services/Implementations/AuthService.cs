@@ -386,5 +386,90 @@ namespace ELibraryManagement.Api.Services.Implementations
                 };
             }
         }
+
+        public async Task<AuthResponseDto> HandleGoogleLoginAsync(ExternalLoginInfo info)
+        {
+            try
+            {
+                var email = info.Principal.FindFirstValue(ClaimTypes.Email);
+                var firstName = info.Principal.FindFirstValue(ClaimTypes.GivenName);
+                var lastName = info.Principal.FindFirstValue(ClaimTypes.Surname);
+
+                if (string.IsNullOrEmpty(email))
+                {
+                    return new AuthResponseDto
+                    {
+                        Success = false,
+                        Message = "Không thể lấy email từ Google."
+                    };
+                }
+
+                // Tìm user theo email
+                var user = await _userManager.FindByEmailAsync(email);
+                if (user == null)
+                {
+                    // Tạo user mới
+                    user = new ApplicationUser
+                    {
+                        UserName = email,
+                        Email = email,
+                        FirstName = firstName ?? "",
+                        LastName = lastName ?? "",
+                        EmailConfirmed = true, // Google đã xác thực email
+                        StudentId = GenerateRandomStudentId() // Tạo student ID ngẫu nhiên
+                    };
+
+                    var result = await _userManager.CreateAsync(user);
+                    if (!result.Succeeded)
+                    {
+                        var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+                        return new AuthResponseDto
+                        {
+                            Success = false,
+                            Message = $"Tạo tài khoản thất bại: {errors}"
+                        };
+                    }
+
+                    // Thêm role User mặc định
+                    await _userManager.AddToRoleAsync(user, "User");
+                }
+
+                // Liên kết external login với user
+                var existingLogin = await _userManager.GetLoginsAsync(user);
+                if (!existingLogin.Any(x => x.LoginProvider == info.LoginProvider))
+                {
+                    await _userManager.AddLoginAsync(user, info);
+                }
+
+                // Tạo JWT token
+                var token = await GenerateJwtTokenAsync(user);
+                var userDto = await GetUserDtoAsync(user);
+
+                return new AuthResponseDto
+                {
+                    Success = true,
+                    Message = "Đăng nhập Google thành công",
+                    Token = token,
+                    User = userDto
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in HandleGoogleLoginAsync");
+                return new AuthResponseDto
+                {
+                    Success = false,
+                    Message = "Có lỗi xảy ra khi đăng nhập bằng Google."
+                };
+            }
+        }
+
+        private string GenerateRandomStudentId()
+        {
+            // Tạo student ID ngẫu nhiên với format: SV + 8 số
+            var random = new Random();
+            var studentId = "SV" + random.Next(10000000, 99999999);
+            return studentId;
+        }
     }
 }

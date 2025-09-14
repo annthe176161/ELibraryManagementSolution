@@ -2,6 +2,8 @@ using ELibraryManagement.Api.DTOs;
 using ELibraryManagement.Api.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Identity;
+using System.Text.Json;
 
 namespace ELibraryManagement.Api.Controllers
 {
@@ -11,10 +13,12 @@ namespace ELibraryManagement.Api.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IAuthService _authService;
+        private readonly SignInManager<Models.ApplicationUser> _signInManager;
 
-        public AuthController(IAuthService authService)
+        public AuthController(IAuthService authService, SignInManager<Models.ApplicationUser> signInManager)
         {
             _authService = authService;
+            _signInManager = signInManager;
         }
 
         /// <summary>
@@ -223,6 +227,42 @@ namespace ELibraryManagement.Api.Controllers
             }
 
             return Ok(result);
+        }
+
+        /// <summary>
+        /// Đăng nhập bằng Google
+        /// </summary>
+        [HttpGet("google-login")]
+        [AllowAnonymous]
+        public IActionResult GoogleLogin()
+        {
+            var redirectUrl = Url.Action("GoogleResponse", "Auth");
+            var properties = _signInManager.ConfigureExternalAuthenticationProperties("Google", redirectUrl);
+            return Challenge(properties, "Google");
+        }
+
+        /// <summary>
+        /// Xử lý callback từ Google
+        /// </summary>
+        [HttpGet("google-response")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GoogleResponse()
+        {
+            var info = await _signInManager.GetExternalLoginInfoAsync();
+            if (info == null)
+            {
+                return BadRequest(new { success = false, message = "External login error" });
+            }
+
+            var result = await _authService.HandleGoogleLoginAsync(info);
+            if (!result.Success)
+            {
+                return BadRequest(result);
+            }
+
+            // Redirect về frontend với token
+            var userData = JsonSerializer.Serialize(result.User);
+            return Redirect($"https://localhost:7208/Account/Login?token={result.Token}&user={Uri.EscapeDataString(userData)}");
         }
     }
 

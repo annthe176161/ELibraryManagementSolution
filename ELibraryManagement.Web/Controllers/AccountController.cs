@@ -1,6 +1,7 @@
 using ELibraryManagement.Web.Models;
 using ELibraryManagement.Web.Services;
 using Microsoft.AspNetCore.Mvc;
+using System.Text.Json;
 
 namespace ELibraryManagement.Web.Controllers
 {
@@ -45,8 +46,42 @@ namespace ELibraryManagement.Web.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Login()
+        public async Task<IActionResult> Login(string token, string user)
         {
+            // Xử lý callback từ Google OAuth
+            if (!string.IsNullOrEmpty(token) && !string.IsNullOrEmpty(user))
+            {
+                try
+                {
+                    // Decode user info
+                    var userInfo = JsonSerializer.Deserialize<UserViewModel>(Uri.UnescapeDataString(user));
+
+                    if (userInfo != null)
+                    {
+                        // Lưu token và user info vào session
+                        _authApiService.StoreUserSession(token, userInfo);
+
+                        TempData["SuccessMessage"] = "Đăng nhập Google thành công!";
+
+                        // Check if user is admin and redirect appropriately
+                        var isAdmin = await _authApiService.IsInRoleAsync("Admin");
+                        if (isAdmin)
+                        {
+                            return RedirectToAction("Index", "Admin");
+                        }
+                        return RedirectToAction("Index", "Home");
+                    }
+                    else
+                    {
+                        TempData["ErrorMessage"] = "Không thể xử lý thông tin user từ Google.";
+                    }
+                }
+                catch (Exception)
+                {
+                    TempData["ErrorMessage"] = "Có lỗi xảy ra trong quá trình đăng nhập Google.";
+                }
+            }
+
             if (_authApiService.IsAuthenticated())
             {
                 // Check if user is admin and redirect to admin panel

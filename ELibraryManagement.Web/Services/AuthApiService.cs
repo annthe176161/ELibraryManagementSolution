@@ -21,6 +21,8 @@ namespace ELibraryManagement.Web.Services
         Task<AuthResponseViewModel> ForgotPasswordAsync(ForgotPasswordViewModel model);
         Task<AuthResponseViewModel> ResetPasswordAsync(ResetPasswordViewModel model);
         Task<AuthResponseViewModel> UploadAvatarAsync(IFormFile file);
+        void StoreToken(string token);
+        void StoreUserSession(string token, UserViewModel user);
     }
 
     public class AuthApiService : IAuthApiService
@@ -617,6 +619,20 @@ namespace ELibraryManagement.Web.Services
                     Message = $"Có lỗi xảy ra: {ex.Message}"
                 };
             }
+        }
+
+        public void StoreToken(string token)
+        {
+            _httpContextAccessor.HttpContext?.Session.SetString("AuthToken", token);
+        }
+
+        public void StoreUserSession(string token, UserViewModel user)
+        {
+            _httpContextAccessor.HttpContext?.Session.SetString("AuthToken", token);
+            _httpContextAccessor.HttpContext?.Session.SetString("UserName", user.UserName ?? "");
+            _httpContextAccessor.HttpContext?.Session.SetString("Email", user.Email ?? "");
+            _httpContextAccessor.HttpContext?.Session.SetString("FullName",
+                $"{user.FirstName} {user.LastName}".Trim());
         }
     }
 }

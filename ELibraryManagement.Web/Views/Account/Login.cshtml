@@ -587,7 +587,7 @@
                 <span>hoặc đăng nhập bằng</span>
             </div>
 
-            <button type="button" class="google-login-button" onclick="showGoogleMessage()">
+            <button type="button" class="google-login-button" onclick="loginWithGoogle()">
                 <i class="fab fa-google google-icon"></i>
                 <span>Đăng nhập với Google</span>
             </button>
@@ -626,8 +626,9 @@
             }
         }
 
-        function showGoogleMessage() {
-            alert('Tính năng đăng nhập với Google sẽ sớm được cập nhật!');
+        function loginWithGoogle() {
+            // Chuyển hướng đến Google OAuth endpoint
+            window.location.href = 'https://localhost:7125/api/Auth/google-login';
         }
 
         // Auto-focus vào trường username
