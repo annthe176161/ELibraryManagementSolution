@@ -538,6 +538,17 @@
                 <div class="modern-alert alert-success">
                     <i class="fas fa-check-circle"></i>
                     @TempData["SuccessMessage"]
+                    @if (TempData["ShowEmailVerificationMessage"] != null)
+                    {
+                        <div class="mt-2">
+                            <small>
+                                Chưa nhận được email?
+                                <a href="@Url.Action("ResendEmailConfirmation", "Account")" class="text-primary">
+                                    Gửi lại email xác nhận
+                                </a>
+                            </small>
+                        </div>
+                    }
                 </div>
             }
 

@@ -21,6 +21,7 @@ namespace ELibraryManagement.Web.Services
         Task<AuthResponseViewModel> ForgotPasswordAsync(ForgotPasswordViewModel model);
         Task<AuthResponseViewModel> ResetPasswordAsync(ResetPasswordViewModel model);
         Task<AuthResponseViewModel> UploadAvatarAsync(IFormFile file);
+        Task<AuthResponseViewModel> ResendEmailConfirmationAsync(ResendEmailConfirmationViewModel model);
         void StoreToken(string token);
         void StoreUserSession(string token, UserViewModel user);
     }
@@ -609,6 +610,51 @@ namespace ELibraryManagement.Web.Services
                 {
                     Success = false,
                     Message = $"Upload avatar thất bại: {responseContent}"
+                };
+            }
+            catch (Exception ex)
+            {
+                return new AuthResponseViewModel
+                {
+                    Success = false,
+                    Message = $"Có lỗi xảy ra: {ex.Message}"
+                };
+            }
+        }
+
+        public async Task<AuthResponseViewModel> ResendEmailConfirmationAsync(ResendEmailConfirmationViewModel model)
+        {
+            try
+            {
+                var json = JsonSerializer.Serialize(model);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                var response = await _httpClient.PostAsync($"{GetApiBaseUrl()}/api/auth/resend-email-confirmation", content);
+                var responseContent = await response.Content.ReadAsStringAsync();
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var apiResponse = JsonSerializer.Deserialize<AuthResponseViewModel>(responseContent, new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true
+                    });
+
+                    return apiResponse ?? new AuthResponseViewModel
+                    {
+                        Success = false,
+                        Message = "Có lỗi xảy ra khi xử lý phản hồi"
+                    };
+                }
+
+                var errorResponse = JsonSerializer.Deserialize<AuthResponseViewModel>(responseContent, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+
+                return errorResponse ?? new AuthResponseViewModel
+                {
+                    Success = false,
+                    Message = "Có lỗi xảy ra khi gửi lại email xác nhận"
                 };
             }
             catch (Exception ex)

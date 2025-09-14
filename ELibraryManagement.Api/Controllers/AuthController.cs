@@ -264,11 +264,62 @@ namespace ELibraryManagement.Api.Controllers
             var userData = JsonSerializer.Serialize(result.User);
             return Redirect($"https://localhost:7208/Account/Login?token={result.Token}&user={Uri.EscapeDataString(userData)}");
         }
+
+        /// <summary>
+        /// Xác nhận email
+        /// </summary>
+        [HttpGet("confirm-email")]
+        [AllowAnonymous]
+        public async Task<IActionResult> ConfirmEmail(string userId, string token)
+        {
+            if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(token))
+            {
+                return BadRequest("Invalid email confirmation request.");
+            }
+
+            var result = await _authService.ConfirmEmailAsync(userId, token);
+
+            if (result.Success)
+            {
+                // Redirect to frontend with success message
+                return Redirect($"https://localhost:7208/Account/EmailConfirmed?success=true&message={Uri.EscapeDataString(result.Message)}");
+            }
+
+            // Redirect to frontend with error message
+            return Redirect($"https://localhost:7208/Account/EmailConfirmed?success=false&message={Uri.EscapeDataString(result.Message)}");
+        }
+
+        /// <summary>
+        /// Gửi lại email xác nhận
+        /// </summary>
+        [HttpPost("resend-email-confirmation")]
+        [AllowAnonymous]
+        public async Task<IActionResult> ResendEmailConfirmation([FromBody] ResendEmailConfirmationDto request)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var result = await _authService.ResendEmailConfirmationAsync(request.Email);
+
+            if (!result.Success)
+            {
+                return BadRequest(result);
+            }
+
+            return Ok(result);
+        }
     }
 
     public class AssignRoleRequestDto
     {
         public string UserId { get; set; } = string.Empty;
         public string RoleName { get; set; } = string.Empty;
+    }
+
+    public class ResendEmailConfirmationDto
+    {
+        public string Email { get; set; } = string.Empty;
     }
 }

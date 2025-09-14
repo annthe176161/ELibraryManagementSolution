@@ -38,6 +38,7 @@ namespace ELibraryManagement.Web.Controllers
             if (result.Success)
             {
                 TempData["SuccessMessage"] = result.Message;
+                TempData["ShowEmailVerificationMessage"] = true;
                 return RedirectToAction("Login");
             }
 
@@ -364,6 +365,49 @@ namespace ELibraryManagement.Web.Controllers
                 if (result.Success)
                 {
                     TempData["SuccessMessage"] = "Mật khẩu đã được reset thành công. Bạn có thể đăng nhập bằng mật khẩu mới.";
+                    return RedirectToAction("Login");
+                }
+
+                TempData["ErrorMessage"] = result.Message;
+                return View(model);
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Có lỗi xảy ra: {ex.Message}";
+                return View(model);
+            }
+        }
+
+        [HttpGet]
+        public IActionResult EmailConfirmed(bool success, string message)
+        {
+            ViewBag.Success = success;
+            ViewBag.Message = message;
+            return View();
+        }
+
+        [HttpGet]
+        public IActionResult ResendEmailConfirmation()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ResendEmailConfirmation(ResendEmailConfirmationViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            try
+            {
+                var result = await _authApiService.ResendEmailConfirmationAsync(model);
+
+                if (result.Success)
+                {
+                    TempData["SuccessMessage"] = result.Message;
                     return RedirectToAction("Login");
                 }
 

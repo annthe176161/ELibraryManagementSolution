@@ -4,6 +4,7 @@ using ELibraryManagement.Api.DTOs;
 using ELibraryManagement.Api.Formatters;
 using ELibraryManagement.Api.Models;
 using ELibraryManagement.Api.Seeders;
+using ELibraryManagement.Api.Services;
 using ELibraryManagement.Api.Services.Implementations;
 using ELibraryManagement.Api.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -69,6 +70,7 @@ namespace ELibraryManagement.Api
             builder.Services.AddScoped<ICategoryService, CategoryService>();
             builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
             builder.Services.AddScoped<IUserStatusService, UserStatusService>();
+            builder.Services.AddScoped<IEmailService, EmailService>();
 
             // Configure Cloudinary
             builder.Services.AddSingleton(provider =>

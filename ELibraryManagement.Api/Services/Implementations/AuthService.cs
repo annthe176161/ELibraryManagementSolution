@@ -1,5 +1,6 @@
 using ELibraryManagement.Api.DTOs;
 using ELibraryManagement.Api.Models;
+using ELibraryManagement.Api.Services;
 using ELibraryManagement.Api.Services.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
@@ -16,19 +17,22 @@ namespace ELibraryManagement.Api.Services.Implementations
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly IConfiguration _configuration;
         private readonly ILogger<AuthService> _logger;
+        private readonly IEmailService _emailService;
 
         public AuthService(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             RoleManager<IdentityRole> roleManager,
             IConfiguration configuration,
-            ILogger<AuthService> logger)
+            ILogger<AuthService> logger,
+            IEmailService emailService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _roleManager = roleManager;
             _configuration = configuration;
             _logger = logger;
+            _emailService = emailService;
         }
 
         public async Task<AuthResponseDto> RegisterAsync(RegisterRequestDto request)
@@ -65,7 +69,8 @@ namespace ELibraryManagement.Api.Services.Implementations
                 Address = request.Address,
                 PhoneNumber = request.PhoneNumber,
                 DateOfBirth = request.DateOfBirth,
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow,
+                EmailConfirmed = false // Email needs to be confirmed
             };
 
             var result = await _userManager.CreateAsync(user, request.Password);
@@ -82,15 +87,19 @@ namespace ELibraryManagement.Api.Services.Implementations
             // Assign default role
             await _userManager.AddToRoleAsync(user, "User");
 
-            // Generate JWT token
-            var token = await GenerateJwtTokenAsync(user);
+            // Generate email confirmation token
+            var emailToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+            var confirmationLink = $"{_configuration["AppSettings:BaseUrl"]}/api/auth/confirm-email?userId={user.Id}&token={Uri.EscapeDataString(emailToken)}";
+
+            // Send confirmation email
+            await _emailService.SendEmailConfirmationAsync(user.Email, confirmationLink);
 
             return new AuthResponseDto
             {
                 Success = true,
-                Message = "User registered successfully.",
-                Token = token,
-                Expiration = DateTime.UtcNow.AddHours(24),
+                Message = "User registered successfully. Please check your email to confirm your account before logging in.",
+                Token = null, // Don't provide token until email is confirmed
+                Expiration = null,
                 User = await GetUserDtoAsync(user)
             };
         }
@@ -117,6 +126,16 @@ namespace ELibraryManagement.Api.Services.Implementations
                 {
                     Success = false,
                     Message = "Invalid username/email or password."
+                };
+            }
+
+            // Check if email is confirmed
+            if (!user.EmailConfirmed)
+            {
+                return new AuthResponseDto
+                {
+                    Success = false,
+                    Message = "Please confirm your email address before logging in. Check your email for the confirmation link."
                 };
             }
 
@@ -462,6 +481,79 @@ namespace ELibraryManagement.Api.Services.Implementations
                     Message = "Có lỗi xảy ra khi đăng nhập bằng Google."
                 };
             }
+        }
+
+        public async Task<AuthResponseDto> ConfirmEmailAsync(string userId, string token)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return new AuthResponseDto
+                {
+                    Success = false,
+                    Message = "User not found."
+                };
+            }
+
+            var result = await _userManager.ConfirmEmailAsync(user, token);
+            if (result.Succeeded)
+            {
+                return new AuthResponseDto
+                {
+                    Success = true,
+                    Message = "Email confirmed successfully. You can now log in to your account."
+                };
+            }
+
+            return new AuthResponseDto
+            {
+                Success = false,
+                Message = "Email confirmation failed. The token may be invalid or expired."
+            };
+        }
+
+        public async Task<AuthResponseDto> ResendEmailConfirmationAsync(string email)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null)
+            {
+                return new AuthResponseDto
+                {
+                    Success = false,
+                    Message = "User not found."
+                };
+            }
+
+            if (user.EmailConfirmed)
+            {
+                return new AuthResponseDto
+                {
+                    Success = false,
+                    Message = "Email is already confirmed."
+                };
+            }
+
+            // Generate new email confirmation token
+            var emailToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
+            var confirmationLink = $"{_configuration["AppSettings:BaseUrl"]}/api/auth/confirm-email?userId={user.Id}&token={Uri.EscapeDataString(emailToken)}";
+
+            // Send confirmation email
+            var emailSent = await _emailService.SendEmailConfirmationAsync(user.Email, confirmationLink);
+
+            if (emailSent)
+            {
+                return new AuthResponseDto
+                {
+                    Success = true,
+                    Message = "Confirmation email sent successfully. Please check your email."
+                };
+            }
+
+            return new AuthResponseDto
+            {
+                Success = false,
+                Message = "Failed to send confirmation email. Please try again later."
+            };
         }
 
         private string GenerateRandomStudentId()
