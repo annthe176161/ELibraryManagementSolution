@@ -42,12 +42,18 @@ function initializeAdminDashboard() {
   });
 }
 
-function initializeEnhancedFeatures() {
-  // Count-up animation for stat numbers
-  function animateStatNumbers() {
+// Count-up animation for stat numbers
+function animateStatNumbers() {
+  try {
     $(".stat-number[data-count]").each(function () {
       const $this = $(this);
-      const countTo = parseInt($this.attr("data-count"));
+      const countTo = parseInt($this.attr("data-count")) || 0;
+
+      if (isNaN(countTo)) {
+        console.warn("Invalid count value for element:", this);
+        $this.text("0");
+        return;
+      }
 
       $({ countNum: 0 }).animate(
         {
@@ -65,8 +71,12 @@ function initializeEnhancedFeatures() {
         }
       );
     });
+  } catch (error) {
+    console.error("Error in animateStatNumbers:", error);
   }
+}
 
+function initializeEnhancedFeatures() {
   // Chart controls functionality
   $(".chart-controls .btn").on("click", function () {
     $(".chart-controls .btn").removeClass("active");
@@ -424,7 +434,16 @@ function exportTableToCSV(tableSelector, filename = "export.csv") {
 // Global error handler
 window.addEventListener("error", function (e) {
   console.error("Admin Dashboard Error:", e.error);
-  showNotification("Có lỗi xảy ra. Vui lòng thử lại.", "error");
+
+  // Only show toast for critical errors, not all JavaScript errors
+  if (
+    e.error &&
+    e.error.name &&
+    (e.error.name === "NetworkError" || e.error.name === "TypeError")
+  ) {
+    // Only show error notification for network or critical type errors
+    showNotification("Có lỗi xảy ra. Vui lòng thử lại.", "error");
+  }
 });
 
 // Add sidebar overlay styles

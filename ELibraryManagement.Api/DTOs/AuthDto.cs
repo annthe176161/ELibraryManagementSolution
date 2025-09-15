@@ -71,6 +71,10 @@ namespace ELibraryManagement.Api.DTOs
         public DateTime? DateOfBirth { get; set; }
         public DateTime CreatedAt { get; set; }
         public List<string> Roles { get; set; } = new List<string>();
+        public bool IsActive { get; set; } = true;
+        public DateTime? LastLoginDate { get; set; }
+        public int TotalBorrows { get; set; }
+        public int ActiveBorrows { get; set; }
     }
 
     public class UpdateProfileRequestDto

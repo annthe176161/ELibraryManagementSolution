@@ -4,6 +4,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using ELibraryManagement.Api.Models;
+using Microsoft.EntityFrameworkCore;
+using System.Linq;
+using System.Security.Claims;
 
 namespace ELibraryManagement.Api.Controllers
 {
@@ -20,6 +23,45 @@ namespace ELibraryManagement.Api.Controllers
             _userManager = userManager;
             _cloudinaryService = cloudinaryService;
         }
+
+        /// <summary>
+        /// Lấy danh sách tất cả người dùng (chỉ dành cho Admin)
+        /// </summary>
+        [HttpGet]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetAllUsers()
+        {
+            var users = await _userManager.Users.ToListAsync();
+            var userDtos = new List<UserDto>();
+
+            foreach (var user in users)
+            {
+                var roles = await _userManager.GetRolesAsync(user);
+                userDtos.Add(new UserDto
+                {
+                    Id = user.Id,
+                    UserName = user.UserName,
+                    Email = user.Email,
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    StudentId = user.StudentId,
+                    PhoneNumber = user.PhoneNumber,
+                    Address = user.Address,
+                    DateOfBirth = user.DateOfBirth,
+                    CreatedAt = user.CreatedAt,
+                    IsActive = user.IsActive,
+                    LastLoginDate = user.LastLoginDate,
+                    Roles = roles.ToList(),
+                    // Note: TotalBorrows and ActiveBorrows will require more complex queries involving other DbSets.
+                    // Leaving them as 0 for now to fix the immediate dashboard loading issue.
+                    TotalBorrows = 0,
+                    ActiveBorrows = 0
+                });
+            }
+
+            return Ok(userDtos);
+        }
+
 
         /// <summary>
         /// Tạo user mẫu để test (chỉ dành cho Admin)
@@ -80,43 +122,6 @@ namespace ELibraryManagement.Api.Controllers
                 user.Address,
                 user.DateOfBirth
             });
-        }
-
-        /// <summary>
-        /// Lấy danh sách tất cả users với thông tin đầy đủ cho admin
-        /// </summary>
-        [HttpGet]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> GetAllUsers()
-        {
-            var users = new List<object>();
-
-            foreach (var user in _userManager.Users)
-            {
-                var roles = await _userManager.GetRolesAsync(user);
-                users.Add(new
-                {
-                    user.Id,
-                    user.UserName,
-                    user.Email,
-                    user.FirstName,
-                    user.LastName,
-                    FullName = $"{user.FirstName} {user.LastName}".Trim(),
-                    user.PhoneNumber,
-                    user.Address,
-                    user.DateOfBirth,
-                    user.AvatarUrl,
-                    user.StudentId,
-                    user.CreatedAt,
-                    user.LockoutEnd,
-                    IsActive = user.LockoutEnd == null || user.LockoutEnd <= DateTimeOffset.UtcNow,
-                    Roles = roles.ToList(),
-                    TotalBorrows = 0, // TODO: Calculate from borrow records
-                    ActiveBorrows = 0 // TODO: Calculate from active borrow records
-                });
-            }
-
-            return Ok(users);
         }
 
         /// <summary>

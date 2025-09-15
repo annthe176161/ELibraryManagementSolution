@@ -6,16 +6,16 @@ namespace ELibraryManagement.Api.Models
     public class ApplicationUser : IdentityUser
     {
         [MaxLength(100)]
-        public string? FirstName { get; set; }
+        public string FirstName { get; set; } = string.Empty;
 
         [MaxLength(100)]
-        public string? LastName { get; set; }
+        public string LastName { get; set; } = string.Empty;
 
         [MaxLength(20)]
-        public string? StudentId { get; set; }
+        public string StudentId { get; set; } = string.Empty;
 
         [MaxLength(255)]
-        public string? Address { get; set; }
+        public string Address { get; set; } = string.Empty;
 
         public DateTime? DateOfBirth { get; set; }
 
@@ -25,6 +25,10 @@ namespace ELibraryManagement.Api.Models
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         public DateTime? UpdatedAt { get; set; }
+
+        public bool IsActive { get; set; } = true;
+
+        public DateTime? LastLoginDate { get; set; }
 
         // Navigation properties
         public virtual ICollection<BorrowRecord> BorrowRecords { get; set; } = new List<BorrowRecord>();

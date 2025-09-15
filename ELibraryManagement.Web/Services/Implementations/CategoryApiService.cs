@@ -44,13 +44,22 @@ namespace ELibraryManagement.Web.Services.Implementations
         {
             try
             {
+                SetAuthorizationHeader();
+
                 var baseUrl = GetApiBaseUrl();
-                var response = await _httpClient.GetAsync($"{baseUrl}/api/Category?includeInactive={includeInactive}");
+                var url = $"{baseUrl}/api/Category?includeInactive={includeInactive}";
+                Console.WriteLine($"[CategoryApiService] Calling: {url}");
+
+                var response = await _httpClient.GetAsync(url);
                 var content = await response.Content.ReadAsStringAsync();
+
+                Console.WriteLine($"[CategoryApiService] Response Status: {response.StatusCode}");
+                Console.WriteLine($"[CategoryApiService] Response Content: {content}");
 
                 if (response.IsSuccessStatusCode)
                 {
                     var result = JsonConvert.DeserializeObject<CategoriesListResponseDto>(content);
+                    Console.WriteLine($"[CategoryApiService] Deserialized: Success={result?.Success}, Count={result?.Categories?.Count}");
                     return result ?? new CategoriesListResponseDto { Success = false, Message = "Không thể deserialize dữ liệu" };
                 }
 
@@ -63,6 +72,7 @@ namespace ELibraryManagement.Web.Services.Implementations
             }
             catch (Exception ex)
             {
+                Console.WriteLine($"[CategoryApiService] Exception: {ex.Message}");
                 _logger.LogError(ex, "Error calling GetAllCategories API");
                 return new CategoriesListResponseDto
                 {

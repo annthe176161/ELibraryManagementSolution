@@ -1,3 +1,5 @@
+using ELibraryManagement.Web.Models.ViewModels;
+
 namespace ELibraryManagement.Web.Models
 {
     public class BookViewModel

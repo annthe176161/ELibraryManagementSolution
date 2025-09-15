@@ -591,7 +591,12 @@
                             categoriesSelect.empty();
                             
                             response.data.forEach(category => {
-                                categoriesSelect.append(new Option(category.name, category.id));
+                                const optionText = category.isActive ? category.name : `${category.name} (Không hoạt động)`;
+                                const option = new Option(optionText, category.id);
+                                if (!category.isActive) {
+                                    $(option).prop('disabled', true).addClass('text-muted');
+                                }
+                                categoriesSelect.append(option);
                             });
                             
                             resolve();

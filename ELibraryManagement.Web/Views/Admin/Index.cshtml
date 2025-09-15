@@ -451,59 +451,78 @@
         });
 
         function initializeEnhancedDashboard() {
-            // Add staggered animation to elements
-            $('.enhanced-stat-card').each(function (index) {
-                $(this).delay(index * 200).queue(function () {
-                    $(this).addClass('fade-in').dequeue();
+            try {
+                console.log('Initializing enhanced dashboard...');
+                
+                // Add staggered animation to elements
+                $('.enhanced-stat-card').each(function (index) {
+                    $(this).delay(index * 200).queue(function () {
+                        $(this).addClass('fade-in').dequeue();
+                    });
                 });
-            });
 
-            $('.quick-access-card').each(function (index) {
-                $(this).delay((index + 4) * 200).queue(function () {
-                    $(this).addClass('slide-in-left').dequeue();
+                $('.quick-access-card').each(function (index) {
+                    $(this).delay((index + 4) * 200).queue(function () {
+                        $(this).addClass('slide-in-left').dequeue();
+                    });
                 });
-            });
 
-            $('.analytics-card, .activity-card, .quick-actions-card').each(function (index) {
-                $(this).delay((index + 8) * 200).queue(function () {
-                    $(this).addClass('fade-in').dequeue();
+                $('.analytics-card, .activity-card, .quick-actions-card').each(function (index) {
+                    $(this).delay((index + 8) * 200).queue(function () {
+                        $(this).addClass('fade-in').dequeue();
+                    });
                 });
-            });
 
-            // Initialize count-up animations for statistics
-            setTimeout(() => {
-                animateCountUp('.stat-number[data-count]');
-            }, 500);
+                // Initialize count-up animations for statistics
+                setTimeout(() => {
+                    console.log('Starting count-up animation...');
+                    animateCountUp('.stat-number[data-count]');
+                }, 500);
 
-            // Add hover effects
-            $('.enhanced-stat-card, .quick-access-card').hover(
-                function () {
-                    $(this).css('transform', 'translateY(-8px) scale(1.02)');
-                },
-                function () {
-                    $(this).css('transform', 'translateY(0) scale(1)');
-                }
-            );
+                // Add hover effects
+                $('.enhanced-stat-card, .quick-access-card').hover(
+                    function () {
+                        $(this).css('transform', 'translateY(-8px) scale(1.02)');
+                    },
+                    function () {
+                        $(this).css('transform', 'translateY(0) scale(1)');
+                    }
+                );
+                
+                console.log('Enhanced dashboard initialization completed.');
+            } catch (error) {
+                console.error('Error initializing enhanced dashboard:', error);
+            }
         }
 
         function animateCountUp(selector) {
-            $(selector).each(function () {
-                const $this = $(this);
-                const countTo = parseInt($this.attr('data-count'));
+            try {
+                $(selector).each(function () {
+                    const $this = $(this);
+                    const countTo = parseInt($this.attr('data-count')) || 0;
 
-                $({ countNum: 0 }).animate({
-                    countNum: countTo
-                }, {
-                    duration: 2000,
-                    easing: 'swing',
-                    step: function () {
-                        $this.text(Math.floor(this.countNum).toLocaleString());
-                    },
-                    complete: function () {
-                        $this.text(countTo.toLocaleString());
+                    if (isNaN(countTo)) {
+                        console.warn('Invalid count value for element:', this);
+                        $this.text('0');
+                        return;
                     }
+
+                    $({ countNum: 0 }).animate({
+                        countNum: countTo
+                    }, {
+                        duration: 2000,
+                        easing: 'swing',
+                        step: function () {
+                            $this.text(Math.floor(this.countNum).toLocaleString());
+                        },
+                        complete: function () {
+                            $this.text(countTo.toLocaleString());
+                        }
+                    });
                 });
-            });
+            } catch (error) {
+                console.error('Error in animateCountUp:', error);
+            }
         }
 
         // Dashboard refresh functionality

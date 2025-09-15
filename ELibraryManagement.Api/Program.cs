@@ -169,6 +169,10 @@ namespace ELibraryManagement.Api
             using (var scope = app.Services.CreateScope())
             {
                 await AdminUserSeeder.SeedAdminUser(scope.ServiceProvider);
+
+                // Update existing users' IsActive status
+                var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+                await UserStatusSeeder.SeedUserStatusAsync(context);
             }
 
             // Configure the HTTP request pipeline.
