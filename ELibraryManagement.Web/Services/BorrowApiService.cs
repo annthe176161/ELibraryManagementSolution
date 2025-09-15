@@ -4,11 +4,34 @@ using System.Text;
 
 namespace ELibraryManagement.Web.Services
 {
+    // DTO to match API response
+    public class BorrowRecordDto
+    {
+        public int Id { get; set; }
+        public int BookId { get; set; }
+        public string BookTitle { get; set; } = string.Empty;
+        public string BookAuthor { get; set; } = string.Empty;
+        public string BookCoverUrl { get; set; } = string.Empty;
+        public string UserId { get; set; } = string.Empty;
+        public string UserName { get; set; } = string.Empty;
+        public string UserEmail { get; set; } = string.Empty;
+        public DateTime BorrowDate { get; set; }
+        public DateTime DueDate { get; set; }
+        public DateTime? ReturnDate { get; set; }
+        public string Status { get; set; } = string.Empty;
+        public string? Notes { get; set; }
+        public bool IsOverdue => ReturnDate == null && DateTime.UtcNow > DueDate;
+        public int OverdueDays => IsOverdue ? (DateTime.UtcNow - DueDate).Days : 0;
+        public decimal? FineAmount { get; set; }
+    }
+
     public interface IBorrowApiService
     {
         Task<ExtendBorrowResponseViewModel> ExtendBorrowAsync(int borrowId, string? reason = null);
         Task<BorrowResult> BorrowBookAsync(int bookId);
         Task<bool> IsAuthenticatedAsync();
+        Task<BorrowDetailViewModel?> GetBorrowDetailAsync(int borrowId);
+        Task<bool> UpdateBorrowStatusAsync(int borrowId, string status);
     }
 
     public class BorrowApiService : IBorrowApiService
@@ -16,13 +39,15 @@ namespace ELibraryManagement.Web.Services
         private readonly HttpClient _httpClient;
         private readonly IConfiguration _configuration;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IAuthApiService _authApiService;
         private readonly JsonSerializerOptions _jsonOptions;
 
-        public BorrowApiService(HttpClient httpClient, IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
+        public BorrowApiService(HttpClient httpClient, IConfiguration configuration, IHttpContextAccessor httpContextAccessor, IAuthApiService authApiService)
         {
             _httpClient = httpClient;
             _configuration = configuration;
             _httpContextAccessor = httpContextAccessor;
+            _authApiService = authApiService;
             _jsonOptions = new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true
@@ -36,9 +61,19 @@ namespace ELibraryManagement.Web.Services
             return httpsUrl ?? httpUrl ?? "https://localhost:7125";
         }
 
+        private void SetAuthorizationHeader()
+        {
+            var token = _authApiService.GetCurrentToken();
+            if (!string.IsNullOrEmpty(token))
+            {
+                _httpClient.DefaultRequestHeaders.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            }
+        }
+
         private string? GetCurrentToken()
         {
-            return _httpContextAccessor.HttpContext?.Session.GetString("Token");
+            return _authApiService.GetCurrentToken();
         }
 
         public async Task<bool> IsAuthenticatedAsync()
@@ -49,7 +84,7 @@ namespace ELibraryManagement.Web.Services
 
             var token = !string.IsNullOrEmpty(sessionToken) ? sessionToken : cookieToken;
 
-            return !string.IsNullOrEmpty(token);
+            return await Task.FromResult(!string.IsNullOrEmpty(token));
         }
 
         public async Task<ExtendBorrowResponseViewModel> ExtendBorrowAsync(int borrowId, string? reason = null)
@@ -155,6 +190,83 @@ namespace ELibraryManagement.Web.Services
             catch (Exception ex)
             {
                 return new BorrowResult { Success = false, Message = $"Có lỗi xảy ra: {ex.Message}" };
+            }
+        }
+
+        public async Task<BorrowDetailViewModel?> GetBorrowDetailAsync(int borrowId)
+        {
+            try
+            {
+                var token = GetCurrentToken();
+                if (string.IsNullOrEmpty(token))
+                {
+                    return null;
+                }
+
+                SetAuthorizationHeader();
+
+                var response = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Borrow/admin/{borrowId}");
+                if (response.IsSuccessStatusCode)
+                {
+                    var responseContent = await response.Content.ReadAsStringAsync();
+                    var borrowRecordDto = JsonSerializer.Deserialize<BorrowRecordDto>(responseContent, _jsonOptions);
+
+                    if (borrowRecordDto != null)
+                    {
+                        // Map BorrowRecordDto to BorrowDetailViewModel
+                        return new BorrowDetailViewModel
+                        {
+                            Id = borrowRecordDto.Id,
+                            UserId = borrowRecordDto.UserId,
+                            UserName = borrowRecordDto.UserName,
+                            UserEmail = borrowRecordDto.UserEmail,
+                            StudentId = "", // Not available in API response
+                            UserPhoneNumber = "", // Not available in API response
+                            BookId = borrowRecordDto.BookId,
+                            BookTitle = borrowRecordDto.BookTitle,
+                            BookAuthor = borrowRecordDto.BookAuthor,
+                            BookCoverUrl = borrowRecordDto.BookCoverUrl,
+                            BookIsbn = "", // Not available in API response
+                            BorrowDate = borrowRecordDto.BorrowDate,
+                            DueDate = borrowRecordDto.DueDate,
+                            ReturnDate = borrowRecordDto.ReturnDate,
+                            Status = borrowRecordDto.Status,
+                            Notes = borrowRecordDto.Notes,
+                            FineAmount = borrowRecordDto.FineAmount
+                        };
+                    }
+                }
+
+                return null;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        public async Task<bool> UpdateBorrowStatusAsync(int borrowId, string status)
+        {
+            try
+            {
+                var token = GetCurrentToken();
+                if (string.IsNullOrEmpty(token))
+                {
+                    return false;
+                }
+
+                SetAuthorizationHeader();
+
+                var requestData = new { Status = status };
+                var json = JsonSerializer.Serialize(requestData, _jsonOptions);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                var response = await _httpClient.PutAsync($"{GetApiBaseUrl()}/api/Borrow/admin/{borrowId}/status", content);
+                return response.IsSuccessStatusCode;
+            }
+            catch (Exception)
+            {
+                return false;
             }
         }
     }

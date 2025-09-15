@@ -53,6 +53,46 @@ namespace ELibraryManagement.Web.Models
         };
     }
 
+    public class BorrowDetailViewModel
+    {
+        public int Id { get; set; }
+        public string UserId { get; set; } = "";
+        public string UserName { get; set; } = "";
+        public string UserEmail { get; set; } = "";
+        public string StudentId { get; set; } = "";
+        public string UserPhoneNumber { get; set; } = "";
+        public int BookId { get; set; }
+        public string BookTitle { get; set; } = "";
+        public string BookAuthor { get; set; } = "";
+        public string BookCoverUrl { get; set; } = "";
+        public string BookIsbn { get; set; } = "";
+        public DateTime BorrowDate { get; set; }
+        public DateTime DueDate { get; set; }
+        public DateTime? ReturnDate { get; set; }
+        public string Status { get; set; } = "";
+        public string? Notes { get; set; }
+        public decimal? FineAmount { get; set; }
+        public bool IsOverdue => ReturnDate == null && DateTime.Now > DueDate;
+        public int OverdueDays => IsOverdue ? (DateTime.Now - DueDate).Days : 0;
+        public string StatusDisplay => Status switch
+        {
+            "Borrowed" => "Đang mượn",
+            "Returned" => "Đã trả",
+            "Overdue" => "Quá hạn",
+            _ => Status
+        };
+        public string StatusClass => Status switch
+        {
+            "Borrowed" => "success",
+            "Returned" => "secondary",
+            "Overdue" => "danger",
+            _ => "primary"
+        };
+        public string FormattedBorrowDate => BorrowDate.ToString("dd/MM/yyyy HH:mm");
+        public string FormattedDueDate => DueDate.ToString("dd/MM/yyyy");
+        public string FormattedReturnDate => ReturnDate?.ToString("dd/MM/yyyy HH:mm") ?? "";
+    }
+
     public class AdminUserViewModel
     {
         public string Id { get; set; } = "";

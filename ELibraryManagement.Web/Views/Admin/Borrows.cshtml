@@ -357,38 +357,72 @@
             // Show borrow details in modal
             $('#detailsModal').modal('show');
             
-            // You would fetch details from API here
+            // Show loading spinner
             $('#borrowDetails').html('<div class="text-center"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div>');
             
-            // Simulate loading details
-            setTimeout(function() {
-                $('#borrowDetails').html(`
-                    <div class="row">
-                        <div class="col-md-6">
-                            <h6>Thông tin người mượn</h6>
-                            <p><strong>Họ tên:</strong> Loading...</p>
-                            <p><strong>Email:</strong> Loading...</p>
-                            <p><strong>Số điện thoại:</strong> Loading...</p>
-                        </div>
-                        <div class="col-md-6">
-                            <h6>Thông tin sách</h6>
-                            <p><strong>Tên sách:</strong> Loading...</p>
-                            <p><strong>Tác giả:</strong> Loading...</p>
-                            <p><strong>ISBN:</strong> Loading...</p>
-                        </div>
-                    </div>
-                    <hr>
-                    <div class="row">
-                        <div class="col-12">
-                            <h6>Thông tin mượn trả</h6>
-                            <p><strong>Ngày mượn:</strong> Loading...</p>
-                            <p><strong>Ngày đến hạn:</strong> Loading...</p>
-                            <p><strong>Trạng thái:</strong> Loading...</p>
-                            <p><strong>Ghi chú:</strong> Loading...</p>
-                        </div>
-                    </div>
-                `);
-            }, 1000);
+            // Fetch details from API
+            $.ajax({
+                url: `/Admin/GetBorrowDetail/${borrowId}`,
+                type: 'GET',
+                success: function(response) {
+                    if (response.success && response.data) {
+                        const data = response.data;
+                        $('#borrowDetails').html(`
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6>Thông tin người mượn</h6>
+                                    <p><strong>Họ tên:</strong> ${data.userName || 'Không có thông tin'}</p>
+                                    <p><strong>Email:</strong> ${data.userEmail || 'Không có thông tin'}</p>
+                                    <p><strong>Mã sinh viên:</strong> ${data.studentId || 'Không có thông tin'}</p>
+                                    <p><strong>Số điện thoại:</strong> ${data.userPhoneNumber || 'Không có thông tin'}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6>Thông tin sách</h6>
+                                    <p><strong>Tên sách:</strong> ${data.bookTitle || 'Không có thông tin'}</p>
+                                    <p><strong>Tác giả:</strong> ${data.bookAuthor || 'Không có thông tin'}</p>
+                                    <p><strong>ISBN:</strong> ${data.bookIsbn || 'Không có thông tin'}</p>
+                                    ${data.bookCoverUrl ? `<img src="${data.bookCoverUrl}" alt="Book Cover" class="img-thumbnail" style="max-width: 120px;">` : ''}
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="row">
+                                <div class="col-12">
+                                    <h6>Thông tin mượn trả</h6>
+                                    <p><strong>Ngày mượn:</strong> ${data.formattedBorrowDate || 'Không có thông tin'}</p>
+                                    <p><strong>Ngày đến hạn:</strong> ${data.formattedDueDate || 'Không có thông tin'}</p>
+                                    <p><strong>Ngày trả:</strong> ${data.formattedReturnDate || 'Chưa trả'}</p>
+                                    <p><strong>Trạng thái:</strong> <span class="badge bg-${data.statusClass}">${data.statusDisplay || 'Không có thông tin'}</span></p>
+                                    ${data.isOverdue ? `<p><strong>Số ngày quá hạn:</strong> <span class="text-danger">${data.overdueDays} ngày</span></p>` : ''}
+                                    <p><strong>Ghi chú:</strong> ${data.notes || 'Không có ghi chú'}</p>
+                                    ${data.fineAmount ? `<p><strong>Tiền phạt:</strong> <span class="text-danger">${data.fineAmount.toLocaleString('vi-VN')} VND</span></p>` : ''}
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="row">
+                                <div class="col-12">
+                                    <h6>Cập nhật trạng thái</h6>
+                                    <div class="btn-group" role="group">
+                                        <button type="button" class="btn btn-success btn-sm" onclick="updateBorrowStatus(${data.id}, 'Returned')">
+                                            <i class="bi bi-check-circle"></i> Đã trả
+                                        </button>
+                                        <button type="button" class="btn btn-warning btn-sm" onclick="updateBorrowStatus(${data.id}, 'Overdue')">
+                                            <i class="bi bi-exclamation-triangle"></i> Quá hạn
+                                        </button>
+                                        <button type="button" class="btn btn-primary btn-sm" onclick="updateBorrowStatus(${data.id}, 'Borrowed')">
+                                            <i class="bi bi-book"></i> Đang mượn
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        `);
+                    } else {
+                        $('#borrowDetails').html('<div class="alert alert-danger">Không thể tải thông tin chi tiết: ' + (response.message || 'Lỗi không xác định') + '</div>');
+                    }
+                },
+                error: function(xhr, status, error) {
+                    $('#borrowDetails').html('<div class="alert alert-danger">Có lỗi xảy ra khi tải thông tin chi tiết</div>');
+                }
+            });
         }
 
         function returnBook(borrowId, userName, bookTitle) {
@@ -489,6 +523,34 @@
         function viewNotes(borrowId) {
             // Show notes in modal or tooltip
             showToast('info', 'Hiển thị ghi chú cho giao dịch #' + borrowId);
+        }
+
+        // Update borrow status function
+        function updateBorrowStatus(borrowId, status) {
+            if (confirm(`Bạn có chắc chắn muốn cập nhật trạng thái thành "${status === 'Returned' ? 'Đã trả' : status === 'Overdue' ? 'Quá hạn' : 'Đang mượn'}"?`)) {
+                $.ajax({
+                    url: '/Admin/UpdateBorrowStatus',
+                    type: 'POST',
+                    data: {
+                        id: borrowId,
+                        status: status,
+                        notes: ''
+                    },
+                    success: function(response) {
+                        if (response.success) {
+                            showToast('success', response.message || 'Cập nhật trạng thái thành công!');
+                            // Close modal and reload page
+                            $('#detailsModal').modal('hide');
+                            setTimeout(() => location.reload(), 1500);
+                        } else {
+                            showToast('error', response.message || 'Không thể cập nhật trạng thái');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        showToast('error', 'Có lỗi xảy ra khi cập nhật trạng thái');
+                    }
+                });
+            }
         }
 
         // Toast notification function

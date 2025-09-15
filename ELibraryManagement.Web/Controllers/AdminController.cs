@@ -524,6 +524,29 @@ namespace ELibraryManagement.Web.Controllers
             }
         }
 
+        // GET: Admin/GetBorrowDetail/{id} - Get Borrow Record Details
+        [HttpGet]
+        public async Task<IActionResult> GetBorrowDetail(int id)
+        {
+            var accessCheck = await CheckAdminAccessAsync();
+            if (accessCheck != null) return Json(new { success = false, message = "Unauthorized" });
+
+            try
+            {
+                var borrowDetail = await _borrowApiService.GetBorrowDetailAsync(id);
+                if (borrowDetail != null)
+                {
+                    return Json(new { success = true, data = borrowDetail });
+                }
+
+                return Json(new { success = false, message = "Không thể tải chi tiết giao dịch mượn" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Có lỗi xảy ra: {ex.Message}" });
+            }
+        }
+
         // GET: Admin/Borrows - Borrow Records Management
         public async Task<IActionResult> Borrows()
         {
@@ -717,22 +740,8 @@ namespace ELibraryManagement.Web.Controllers
 
             try
             {
-                var token = _authApiService.GetCurrentToken();
-                if (string.IsNullOrEmpty(token))
-                {
-                    return Json(new { success = false, message = "Không có token xác thực" });
-                }
-
-                _httpClient.DefaultRequestHeaders.Clear();
-                _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
-
-                var updateDto = new { Status = status, Notes = notes };
-                var json = JsonSerializer.Serialize(updateDto, _jsonOptions);
-                var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
-
-                var response = await _httpClient.PutAsync($"{GetApiBaseUrl()}/api/borrow/admin/{id}/status", content);
-
-                if (response.IsSuccessStatusCode)
+                var result = await _borrowApiService.UpdateBorrowStatusAsync(id, status);
+                if (result)
                 {
                     return Json(new { success = true, message = "Cập nhật trạng thái thành công" });
                 }
