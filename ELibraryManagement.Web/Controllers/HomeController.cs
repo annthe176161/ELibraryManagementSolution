@@ -153,6 +153,18 @@ namespace ELibraryManagement.Web.Controllers
                     ViewBag.RecentReviews = new List<object>();
                 }
 
+                // Lấy review summary
+                try
+                {
+                    var reviewSummary = await _reviewApiService.GetBookReviewSummaryAsync(id);
+                    ViewBag.ReviewSummary = reviewSummary;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "Could not load review summary for book {BookId}", id);
+                    ViewBag.ReviewSummary = null;
+                }
+
                 // Truyền thông tin authentication vào View - sử dụng cùng logic với BorrowController
                 var sessionToken = HttpContext.Session.GetString("AuthToken");
                 var cookieToken = HttpContext.Request.Cookies["AuthToken"];

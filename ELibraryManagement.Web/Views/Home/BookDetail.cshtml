@@ -347,6 +347,264 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        /* Reviews Section Styles */
+        .reviews-section {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            border: 1px solid #e2e8f0;
+        }
+
+        .review-summary {
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .rating-overview {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: 2rem;
+            align-items: start;
+        }
+
+        .average-rating {
+            text-align: center;
+            padding: 1rem;
+        }
+
+        .rating-number {
+            font-size: 3rem;
+            font-weight: 700;
+            color: #2563eb;
+            margin-bottom: 0.5rem;
+        }
+
+        .rating-stars {
+            margin-bottom: 0.5rem;
+        }
+
+        .rating-stars i {
+            font-size: 1.2rem;
+            margin: 0 0.1rem;
+        }
+
+        .text-yellow-400 {
+            color: #fbbf24;
+        }
+
+        .text-gray-300 {
+            color: #d1d5db;
+        }
+
+        .rating-count {
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+
+        .rating-breakdown {
+            padding: 0.5rem 0;
+        }
+
+        .rating-bar {
+            display: grid;
+            grid-template-columns: 60px 1fr 40px;
+            gap: 1rem;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .rating-label {
+            font-size: 0.875rem;
+            color: #6b7280;
+            font-weight: 500;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #fbbf24, #f59e0b);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .rating-count-small {
+            font-size: 0.875rem;
+            color: #6b7280;
+            text-align: right;
+        }
+
+        .reviews-subtitle {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .recent-reviews {
+            margin-bottom: 2rem;
+        }
+
+        .review-item {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .review-item:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            border-color: #d1d5db;
+        }
+
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .reviewer-info {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .reviewer-avatar {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1rem;
+        }
+
+        .reviewer-name {
+            font-weight: 600;
+            color: #1f2937;
+            font-size: 0.95rem;
+        }
+
+        .review-date {
+            color: #6b7280;
+            font-size: 0.875rem;
+        }
+
+        .review-rating i {
+            font-size: 0.9rem;
+            margin: 0 0.05rem;
+        }
+
+        .review-content {
+            color: #374151;
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+
+        .no-reviews {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: #6b7280;
+        }
+
+        .no-reviews-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .no-reviews-text h4 {
+            color: #374151;
+            margin-bottom: 0.5rem;
+        }
+
+        .review-actions {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 500;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            border: 1px solid transparent;
+            font-size: 0.9rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #2563eb, #1e40af);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+            color: white;
+            text-decoration: none;
+        }
+
+        .btn-outline-primary {
+            border-color: #3b82f6;
+            color: #3b82f6;
+            background: white;
+        }
+
+        .btn-outline-primary:hover {
+            background: #3b82f6;
+            color: white;
+            text-decoration: none;
+        }
+
+        .btn-outline-secondary {
+            border-color: #6b7280;
+            color: #6b7280;
+            background: white;
+        }
+
+        .btn-outline-secondary:hover {
+            background: #6b7280;
+            color: white;
+            text-decoration: none;
+        }
+
+        @@media (max-width: 768px) {
+            .rating-overview {
+                grid-template-columns: 1fr;
+                text-align: center;
+                gap: 1rem;
+            }
+            
+            .review-actions {
+                flex-direction: column;
+            }
+            
+            .btn {
+                justify-content: center;
+            }
+        }
     </style>
 }
 
@@ -503,6 +761,167 @@
                         <p class="description-text">@Model.Description</p>
                     </div>
                 }
+
+                <!-- Reviews Section -->
+                <div class="reviews-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-star"></i>
+                        Đánh giá từ độc giả
+                    </h3>
+                    
+                    @if (ViewBag.ReviewSummary != null)
+                    {
+                        var reviewSummary = ViewBag.ReviewSummary as ELibraryManagement.Web.Models.BookReviewSummaryViewModel;
+                        if (reviewSummary != null)
+                        {
+                            <div class="review-summary">
+                                <div class="rating-overview">
+                                    <div class="average-rating">
+                                        <div class="rating-number">@(reviewSummary.AverageRating > 0 ? reviewSummary.AverageRating.ToString("F1") : "N/A")</div>
+                                        <div class="rating-stars">
+                                            @for (int i = 1; i <= 5; i++)
+                                            {
+                                                if (i <= reviewSummary.AverageRating)
+                                                {
+                                                    <i class="fas fa-star text-yellow-400"></i>
+                                                }
+                                                else if (i - 0.5 <= reviewSummary.AverageRating)
+                                                {
+                                                    <i class="fas fa-star-half-alt text-yellow-400"></i>
+                                                }
+                                                else
+                                                {
+                                                    <i class="far fa-star text-gray-300"></i>
+                                                }
+                                            }
+                                        </div>
+                                        <div class="rating-count">(@reviewSummary.TotalReviews đánh giá)</div>
+                                    </div>
+                                    
+                                    <div class="rating-breakdown">
+                                        <div class="rating-bar">
+                                            <span class="rating-label">5 sao</span>
+                                            <div class="progress-bar">
+                                                <div class="progress-fill" style="width: @reviewSummary.FiveStarPercentage%"></div>
+                                            </div>
+                                            <span class="rating-count-small">@reviewSummary.FiveStarCount</span>
+                                        </div>
+                                        <div class="rating-bar">
+                                            <span class="rating-label">4 sao</span>
+                                            <div class="progress-bar">
+                                                <div class="progress-fill" style="width: @reviewSummary.FourStarPercentage%"></div>
+                                            </div>
+                                            <span class="rating-count-small">@reviewSummary.FourStarCount</span>
+                                        </div>
+                                        <div class="rating-bar">
+                                            <span class="rating-label">3 sao</span>
+                                            <div class="progress-bar">
+                                                <div class="progress-fill" style="width: @reviewSummary.ThreeStarPercentage%"></div>
+                                            </div>
+                                            <span class="rating-count-small">@reviewSummary.ThreeStarCount</span>
+                                        </div>
+                                        <div class="rating-bar">
+                                            <span class="rating-label">2 sao</span>
+                                            <div class="progress-bar">
+                                                <div class="progress-fill" style="width: @reviewSummary.TwoStarPercentage%"></div>
+                                            </div>
+                                            <span class="rating-count-small">@reviewSummary.TwoStarCount</span>
+                                        </div>
+                                        <div class="rating-bar">
+                                            <span class="rating-label">1 sao</span>
+                                            <div class="progress-bar">
+                                                <div class="progress-fill" style="width: @reviewSummary.OneStarPercentage%"></div>
+                                            </div>
+                                            <span class="rating-count-small">@reviewSummary.OneStarCount</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    }
+
+                    <!-- Recent Reviews -->
+                    @{
+                        var recentReviews = ViewBag.RecentReviews as System.Collections.IEnumerable;
+                        bool hasReviews = recentReviews != null && recentReviews.Cast<object>().Any();
+                    }
+                    @if (hasReviews && recentReviews != null)
+                    {
+                        <div class="recent-reviews">
+                            <h4 class="reviews-subtitle">Đánh giá gần đây</h4>
+                            @foreach (dynamic review in recentReviews)
+                            {
+                                <div class="review-item">
+                                    <div class="review-header">
+                                        <div class="reviewer-info">
+                                            <div class="reviewer-avatar">
+                                                <i class="fas fa-user"></i>
+                                            </div>
+                                            <div class="reviewer-details">
+                                                <div class="reviewer-name">@review.UserName</div>
+                                                <div class="review-date">@review.CreatedAt</div>
+                                            </div>
+                                        </div>
+                                        <div class="review-rating">
+                                            @for (int i = 1; i <= 5; i++)
+                                            {
+                                                if (i <= review.Rating)
+                                                {
+                                                    <i class="fas fa-star text-yellow-400"></i>
+                                                }
+                                                else
+                                                {
+                                                    <i class="far fa-star text-gray-300"></i>
+                                                }
+                                            }
+                                        </div>
+                                    </div>
+                                    <div class="review-content">
+                                        @review.Comment
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="no-reviews">
+                            <div class="no-reviews-icon">
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <div class="no-reviews-text">
+                                <h4>Chưa có đánh giá nào</h4>
+                                <p>Hãy là người đầu tiên đánh giá cuốn sách này!</p>
+                            </div>
+                        </div>
+                    }
+
+                    <!-- Review Actions -->
+                    <div class="review-actions">
+                        @if (ViewBag.IsAuthenticated)
+                        {
+                            <a href="@Url.Action("Create", "Review", new { bookId = Model.Id })" class="btn btn-primary">
+                                <i class="fas fa-edit"></i>
+                                Viết đánh giá
+                            </a>
+                        }
+                        else
+                        {
+                            <a href="@Url.Action("Login", "Account")" class="btn btn-outline-primary">
+                                <i class="fas fa-sign-in-alt"></i>
+                                Đăng nhập để đánh giá
+                            </a>
+                        }
+                        
+                        @if (ViewBag.ReviewSummary != null && ((ELibraryManagement.Web.Models.BookReviewSummaryViewModel)ViewBag.ReviewSummary).TotalReviews > 3)
+                        {
+                            <a href="@Url.Action("BookReviews", "Review", new { bookId = Model.Id })" class="btn btn-outline-secondary">
+                                <i class="fas fa-eye"></i>
+                                Xem tất cả đánh giá
+                            </a>
+                        }
+                    </div>
+                </div>
 
                 <!-- University Library Borrowing Rules -->
                 <div class="borrow-rules-section">

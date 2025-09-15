@@ -105,6 +105,15 @@ namespace ELibraryManagement.Web.Controllers
                 // Get current user information
                 var currentUser = await _authApiService.GetCurrentUserAsync();
 
+                // Get borrowed books count for validation
+                var allBorrowedBooks = await _bookApiService.GetBorrowedBooksAsync(currentUser?.Id ?? "", token ?? "");
+
+                // Filter only currently borrowed books (not returned yet)
+                var currentlyBorrowedBooks = allBorrowedBooks?.Where(b => b.ReturnDate == null).ToList() ?? new List<UserBorrowedBookViewModel>();
+                var currentBorrowedCount = currentlyBorrowedBooks.Count;
+                var maxBooksAllowed = 5;
+                var canBorrow = currentBorrowedCount < maxBooksAllowed;
+
                 var borrowViewModel = new BorrowBookViewModel
                 {
                     BookId = book.Id,
@@ -123,6 +132,12 @@ namespace ELibraryManagement.Web.Controllers
                         StudentStatus = "Đang học" // This might come from user status
                     }
                 };
+
+                // Add borrow limit information to ViewBag
+                ViewBag.CurrentBorrowedCount = currentBorrowedCount;
+                ViewBag.MaxBooksAllowed = maxBooksAllowed;
+                ViewBag.CanBorrow = canBorrow;
+                ViewBag.BorrowedBooks = currentlyBorrowedBooks;
 
                 return View(borrowViewModel);
             }

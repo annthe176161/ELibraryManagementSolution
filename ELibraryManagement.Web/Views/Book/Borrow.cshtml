@@ -180,6 +180,224 @@
         overflow: hidden;
     }
 
+    /* Borrow Limit Section Styles */
+    .borrow-limit-section {
+        background: linear-gradient(135deg, #f0f9ff 0%, #dbeafe 100%);
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        border: 2px solid #3b82f6;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .borrow-limit-section.warning {
+        background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+        border-color: #f59e0b;
+    }
+
+    .borrow-limit-section.danger {
+        background: linear-gradient(135deg, #fef2f2 0%, #fecaca 100%);
+        border-color: #ef4444;
+    }
+
+    .borrow-limit-title {
+        color: #1e40af;
+        font-size: 1.2rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .borrow-limit-title.warning {
+        color: #d97706;
+    }
+
+    .borrow-limit-title.danger {
+        color: #dc2626;
+    }
+
+    .borrow-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .stat-item {
+        background: white;
+        border-radius: 10px;
+        padding: 1rem;
+        text-align: center;
+        border: 1px solid #e5e7eb;
+        transition: all 0.3s ease;
+    }
+
+    .stat-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .stat-number {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+
+    .stat-number.current {
+        color: #3b82f6;
+    }
+
+    .stat-number.max {
+        color: #6b7280;
+    }
+
+    .stat-number.remaining {
+        color: #16a34a;
+    }
+
+    .stat-number.warning {
+        color: #f59e0b;
+    }
+
+    .stat-number.danger {
+        color: #ef4444;
+    }
+
+    .stat-label {
+        color: #374151;
+        font-size: 0.875rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .borrow-progress {
+        background: white;
+        border-radius: 10px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .progress-bar-container {
+        background: #e5e7eb;
+        height: 12px;
+        border-radius: 6px;
+        overflow: hidden;
+        margin-bottom: 0.5rem;
+    }
+
+    .progress-bar-fill {
+        height: 100%;
+        border-radius: 6px;
+        transition: all 0.3s ease;
+    }
+
+    .progress-bar-fill.safe {
+        background: linear-gradient(90deg, #16a34a, #22c55e);
+    }
+
+    .progress-bar-fill.warning {
+        background: linear-gradient(90deg, #f59e0b, #fbbf24);
+    }
+
+    .progress-bar-fill.danger {
+        background: linear-gradient(90deg, #ef4444, #f87171);
+    }
+
+    .progress-text {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.875rem;
+        color: #374151;
+    }
+
+    .borrowed-books-list {
+        background: #f8fafc;
+        border-radius: 8px;
+        padding: 1rem;
+        max-height: 200px;
+        overflow-y: auto;
+    }
+
+    .borrowed-book-item {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 0.5rem;
+        background: white;
+        border-radius: 6px;
+        margin-bottom: 0.5rem;
+        border: 1px solid #e5e7eb;
+    }
+
+    .borrowed-book-item:last-child {
+        margin-bottom: 0;
+    }
+
+    .book-icon {
+        width: 30px;
+        height: 30px;
+        background: #3b82f6;
+        color: white;
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.75rem;
+        flex-shrink: 0;
+    }
+
+    .book-title-borrowed {
+        flex: 1;
+        font-size: 0.875rem;
+        color: #374151;
+        font-weight: 500;
+    }
+
+    .due-date {
+        font-size: 0.75rem;
+        color: #6b7280;
+        white-space: nowrap;
+    }
+
+    .warning-message {
+        background: #fef3c7;
+        border: 1px solid #f59e0b;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-top: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .warning-message.danger {
+        background: #fef2f2;
+        border-color: #ef4444;
+    }
+
+    .warning-message i {
+        color: #f59e0b;
+        font-size: 1.1rem;
+    }
+
+    .warning-message.danger i {
+        color: #ef4444;
+    }
+
+    .warning-text {
+        color: #92400e;
+        font-weight: 500;
+        font-size: 0.9rem;
+    }
+
+    .warning-text.danger {
+        color: #991b1b;
+    }
+
     .book-info-section::before {
         content: '📚';
         position: absolute;
@@ -604,6 +822,108 @@
                                     </div>
                                 </div>
                             </div>
+                        </div>
+
+                        <!-- Borrow Limit Information -->
+                        @{
+                            var currentCount = ViewBag.CurrentBorrowedCount ?? 0;
+                            var maxAllowed = ViewBag.MaxBooksAllowed ?? 5;
+                            var remaining = maxAllowed - currentCount;
+                            var canBorrow = ViewBag.CanBorrow ?? true;
+                            var borrowedBooks = ViewBag.BorrowedBooks as List<ELibraryManagement.Web.Models.UserBorrowedBookViewModel>;
+                            
+                            string sectionClass = "";
+                            string titleClass = "";
+                            string progressClass = "";
+                            
+                            if (currentCount >= maxAllowed) {
+                                sectionClass = "danger";
+                                titleClass = "danger";
+                                progressClass = "danger";
+                            } else if (currentCount >= maxAllowed - 1) {
+                                sectionClass = "warning";
+                                titleClass = "warning";
+                                progressClass = "warning";
+                            } else {
+                                progressClass = "safe";
+                            }
+                        }
+                        
+                        <div class="borrow-limit-section @sectionClass">
+                            <h5 class="borrow-limit-title @titleClass">
+                                <i class="fas fa-books"></i>
+                                Thông tin sách đã mượn
+                            </h5>
+                            
+                            <div class="borrow-stats">
+                                <div class="stat-item">
+                                    <div class="stat-number current">@currentCount</div>
+                                    <div class="stat-label">Đã mượn</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-number max">@maxAllowed</div>
+                                    <div class="stat-label">Tối đa</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-number @(remaining <= 0 ? "danger" : remaining == 1 ? "warning" : "remaining")">@Math.Max(0, remaining)</div>
+                                    <div class="stat-label">Còn lại</div>
+                                </div>
+                            </div>
+                            
+                            <div class="borrow-progress">
+                                <div class="progress-bar-container">
+                                    <div class="progress-bar-fill @progressClass" style="width: @((currentCount * 100.0 / maxAllowed).ToString("F1", System.Globalization.CultureInfo.InvariantCulture))%"></div>
+                                </div>
+                                <div class="progress-text">
+                                    <span>Đã sử dụng: @currentCount/@maxAllowed</span>
+                                    <span>@((currentCount * 100.0 / maxAllowed).ToString("F1"))%</span>
+                                </div>
+                            </div>
+                            
+                            @if (borrowedBooks != null && borrowedBooks.Any())
+                            {
+                                <div class="borrowed-books-list">
+                                    <h6 style="margin-bottom: 0.75rem; color: #374151; font-size: 0.9rem; font-weight: 600;">Danh sách sách đã mượn:</h6>
+                                    @foreach (var book in borrowedBooks.Take(5))
+                                    {
+                                        <div class="borrowed-book-item">
+                                            <div class="book-icon">
+                                                <i class="fas fa-book"></i>
+                                            </div>
+                                            <div class="book-title-borrowed">@book.BookTitle</div>
+                                            <div class="due-date">
+                                                <text>Hạn: @book.DueDate.ToString("dd/MM/yyyy")</text>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            }
+                            
+                            @if (!canBorrow)
+                            {
+                                <div class="warning-message danger">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                    <div class="warning-text danger">
+                                        Bạn đã mượn đủ @maxAllowed quyển sách (tối đa cho phép). Vui lòng trả sách trước khi mượn thêm.
+                                    </div>
+                                </div>
+                            }
+                            else if (remaining <= 1)
+                            {
+                                <div class="warning-message @(remaining == 0 ? "danger" : "")">
+                                    <i class="fas fa-info-circle"></i>
+                                    <div class="warning-text @(remaining == 0 ? "danger" : "")">
+                                        @if (remaining == 1)
+                                        {
+                                            <text>Bạn chỉ còn có thể mượn thêm 1 quyển nữa.</text>
+                                        }
+                                        else
+                                        {
+                                            <text>Đây sẽ là quyển cuối cùng bạn có thể mượn.</text>
+                                        }
+                                    </div>
+                                </div>
+                            }
                         </div>
 
                         <!-- Book Information -->
