@@ -362,6 +362,37 @@ namespace ELibraryManagement.Web.Controllers
             }
         }
 
+        // GET: Admin/GetReviewDetail - Get Review Detail
+        [HttpGet]
+        public async Task<IActionResult> GetReviewDetail(int id)
+        {
+            var accessCheck = await CheckAdminAccessAsync();
+            if (accessCheck != null) return Json(new { success = false, message = "Unauthorized" });
+
+            try
+            {
+                var token = _authApiService.GetCurrentToken();
+                _httpClient.DefaultRequestHeaders.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+                var response = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Review/{id}");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+                    var review = JsonSerializer.Deserialize<ReviewDetailViewModel>(content, _jsonOptions);
+                    return Json(new { success = true, data = review });
+                }
+
+                var errorContent = await response.Content.ReadAsStringAsync();
+                return Json(new { success = false, message = "Không thể tải chi tiết đánh giá: " + errorContent });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Có lỗi xảy ra: {ex.Message}" });
+            }
+        }
+
         // GET: Admin/Borrows - Borrow Records Management
         public async Task<IActionResult> Borrows()
         {

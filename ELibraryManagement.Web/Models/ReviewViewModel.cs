@@ -139,4 +139,22 @@ namespace ELibraryManagement.Web.Models
         public ReviewViewModel? ExistingReview { get; set; }
         public string Message { get; set; } = string.Empty;
     }
+
+    // ViewModel cho chi tiết review (Admin)
+    public class ReviewDetailViewModel
+    {
+        public int Id { get; set; }
+        public string UserId { get; set; } = string.Empty;
+        public string UserName { get; set; } = string.Empty;
+        public string UserEmail { get; set; } = string.Empty;
+        public string UserAvatarUrl { get; set; } = string.Empty;
+        public int BookId { get; set; }
+        public string BookTitle { get; set; } = string.Empty;
+        public string BookAuthor { get; set; } = string.Empty;
+        public string BookCoverUrl { get; set; } = string.Empty;
+        public int Rating { get; set; }
+        public string? Comment { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public DateTime? UpdatedAt { get; set; }
+    }
 }

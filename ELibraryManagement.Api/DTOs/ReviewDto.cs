@@ -33,9 +33,11 @@ namespace ELibraryManagement.Api.DTOs
         public int Id { get; set; }
         public string UserId { get; set; } = string.Empty;
         public string UserName { get; set; } = string.Empty;
+        public string UserEmail { get; set; } = string.Empty;
         public string UserAvatarUrl { get; set; } = string.Empty;
         public int BookId { get; set; }
         public string BookTitle { get; set; } = string.Empty;
+        public string BookAuthor { get; set; } = string.Empty;
         public string BookCoverUrl { get; set; } = string.Empty;
         public int Rating { get; set; }
         public string? Comment { get; set; }
