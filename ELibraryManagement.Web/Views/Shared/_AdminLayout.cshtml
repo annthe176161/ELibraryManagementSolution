@@ -3,6 +3,7 @@
 
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -13,6 +14,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="~/css/admin.css" asp-append-version="true" />
 </head>
+
 <body class="admin-body">
     <!-- Top Navigation Bar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark admin-navbar fixed-top">
@@ -22,13 +24,15 @@
                 <span>E-Library Admin</span>
             </a>
 
-            <button class="navbar-toggler d-lg-none" type="button" data-bs-toggle="collapse" data-bs-target="#sidebar-collapse">
+            <button class="navbar-toggler d-lg-none" type="button" data-bs-toggle="collapse"
+                data-bs-target="#sidebar-collapse">
                 <span class="navbar-toggler-icon"></span>
             </button>
 
             <div class="navbar-nav ms-auto">
                 <div class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown">
+                    <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button"
+                        data-bs-toggle="dropdown">
                         <i class="fas fa-user-circle me-2"></i>
                         <span>@_authApiService.GetCurrentUserName()</span>
                     </a>
@@ -43,7 +47,9 @@
                                 <i class="fas fa-home me-2"></i>Về trang chính
                             </a>
                         </li>
-                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <hr class="dropdown-divider">
+                        </li>
                         <li>
                             <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
                                 <button type="submit" class="dropdown-item border-0 bg-transparent">
@@ -71,8 +77,8 @@
                 <ul class="nav nav-pills flex-column">
                     <!-- Dashboard -->
                     <li class="nav-item">
-                        <a class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Index" ? "active" : "")" 
-                           asp-controller="Admin" asp-action="Index">
+                        <a class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Index" ? "active" : "")"
+                            asp-controller="Admin" asp-action="Index">
                             <i class="fas fa-tachometer-alt me-3"></i>
                             Dashboard
                         </a>
@@ -80,8 +86,8 @@
 
                     <!-- User Management -->
                     <li class="nav-item">
-                        <a class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Users" ? "active" : "")" 
-                           asp-controller="Admin" asp-action="Users">
+                        <a class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Users" ? "active" : "")"
+                            asp-controller="Admin" asp-action="Users">
                             <i class="fas fa-users me-3"></i>
                             Quản lý người dùng
                         </a>
@@ -89,8 +95,8 @@
 
                     <!-- Book Management -->
                     <li class="nav-item">
-                        <a class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Books" ? "active" : "")" 
-                           asp-controller="Admin" asp-action="Books">
+                        <a class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Books" ? "active" : "")"
+                            asp-controller="Admin" asp-action="Books">
                             <i class="fas fa-book me-3"></i>
                             Quản lý sách
                         </a>
@@ -98,8 +104,8 @@
 
                     <!-- Borrow Management -->
                     <li class="nav-item">
-                        <a class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Borrows" ? "active" : "")" 
-                           asp-controller="Admin" asp-action="Borrows">
+                        <a class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Borrows" ? "active" : "")"
+                            asp-controller="Admin" asp-action="Borrows">
                             <i class="fas fa-clipboard-list me-3"></i>
                             Quản lý mượn sách
                         </a>
@@ -107,8 +113,8 @@
 
                     <!-- Review Management -->
                     <li class="nav-item">
-                        <a class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Reviews" ? "active" : "")" 
-                           asp-controller="Admin" asp-action="Reviews">
+                        <a class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Reviews" ? "active" : "")"
+                            asp-controller="Admin" asp-action="Reviews">
                             <i class="fas fa-star me-3"></i>
                             Quản lý đánh giá
                         </a>
@@ -118,7 +124,7 @@
 
                     <!-- Categories -->
                     <li class="nav-item">
-                        <a class="nav-link" href="#">
+                        <a class="nav-link" asp-controller="Admin" asp-action="Categories">
                             <i class="fas fa-tags me-3"></i>
                             Quản lý thể loại
                         </a>
@@ -169,4 +175,5 @@
     @await RenderSectionAsync("Scripts", required: false)
     @await RenderSectionAsync("ValidationScripts", required: false)
 </body>
+
 </html>

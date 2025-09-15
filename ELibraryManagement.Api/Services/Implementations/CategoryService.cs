@@ -35,6 +35,7 @@ namespace ELibraryManagement.Api.Services.Implementations
                         Id = c.Id,
                         Name = c.Name,
                         Description = c.Description,
+                        Color = c.Color,
                         IsActive = c.IsActive,
                         CreatedAt = c.CreatedAt,
                         UpdatedAt = c.UpdatedAt,
@@ -72,6 +73,7 @@ namespace ELibraryManagement.Api.Services.Implementations
                         Id = c.Id,
                         Name = c.Name,
                         Description = c.Description,
+                        Color = c.Color,
                         IsActive = c.IsActive,
                         CreatedAt = c.CreatedAt,
                         UpdatedAt = c.UpdatedAt,
@@ -124,6 +126,7 @@ namespace ELibraryManagement.Api.Services.Implementations
                 {
                     Name = createDto.Name.Trim(),
                     Description = createDto.Description?.Trim(),
+                    Color = createDto.Color?.Trim(),
                     IsActive = createDto.IsActive,
                     CreatedAt = DateTime.UtcNow
                 };
@@ -136,6 +139,7 @@ namespace ELibraryManagement.Api.Services.Implementations
                     Id = category.Id,
                     Name = category.Name,
                     Description = category.Description,
+                    Color = category.Color,
                     IsActive = category.IsActive,
                     CreatedAt = category.CreatedAt,
                     UpdatedAt = category.UpdatedAt,
@@ -186,6 +190,7 @@ namespace ELibraryManagement.Api.Services.Implementations
 
                 category.Name = updateDto.Name.Trim();
                 category.Description = updateDto.Description?.Trim();
+                category.Color = updateDto.Color?.Trim();
                 category.IsActive = updateDto.IsActive;
                 category.UpdatedAt = DateTime.UtcNow;
 
@@ -196,6 +201,7 @@ namespace ELibraryManagement.Api.Services.Implementations
                     Id = category.Id,
                     Name = category.Name,
                     Description = category.Description,
+                    Color = category.Color,
                     IsActive = category.IsActive,
                     CreatedAt = category.CreatedAt,
                     UpdatedAt = category.UpdatedAt,
@@ -295,6 +301,7 @@ namespace ELibraryManagement.Api.Services.Implementations
                     Id = category.Id,
                     Name = category.Name,
                     Description = category.Description,
+                    Color = category.Color,
                     IsActive = category.IsActive,
                     CreatedAt = category.CreatedAt,
                     UpdatedAt = category.UpdatedAt,

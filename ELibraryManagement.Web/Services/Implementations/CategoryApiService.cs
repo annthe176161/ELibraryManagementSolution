@@ -10,12 +10,14 @@ namespace ELibraryManagement.Web.Services.Implementations
         private readonly HttpClient _httpClient;
         private readonly IConfiguration _configuration;
         private readonly ILogger<CategoryApiService> _logger;
+        private readonly IAuthApiService _authApiService;
 
-        public CategoryApiService(HttpClient httpClient, IConfiguration configuration, ILogger<CategoryApiService> logger)
+        public CategoryApiService(HttpClient httpClient, IConfiguration configuration, ILogger<CategoryApiService> logger, IAuthApiService authApiService)
         {
             _httpClient = httpClient;
             _configuration = configuration;
             _logger = logger;
+            _authApiService = authApiService;
         }
 
         private string GetApiBaseUrl()
@@ -26,6 +28,16 @@ namespace ELibraryManagement.Web.Services.Implementations
 
             // Sử dụng BaseUrl đầu tiên (ưu tiên HTTPS), nếu không có thì dùng HTTP
             return httpsUrl ?? httpUrl ?? "http://localhost:5293";
+        }
+
+        private void SetAuthorizationHeader()
+        {
+            var token = _authApiService.GetCurrentToken();
+            if (!string.IsNullOrEmpty(token))
+            {
+                _httpClient.DefaultRequestHeaders.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            }
         }
 
         public async Task<CategoriesListResponseDto> GetAllCategoriesAsync(bool includeInactive = false)
@@ -96,6 +108,8 @@ namespace ELibraryManagement.Web.Services.Implementations
         {
             try
             {
+                SetAuthorizationHeader();
+
                 var json = JsonConvert.SerializeObject(createDto);
                 var httpContent = new StringContent(json, Encoding.UTF8, System.Net.Mime.MediaTypeNames.Application.Json);
 
@@ -146,6 +160,8 @@ namespace ELibraryManagement.Web.Services.Implementations
         {
             try
             {
+                SetAuthorizationHeader();
+
                 var json = JsonConvert.SerializeObject(updateDto);
                 var httpContent = new StringContent(json, Encoding.UTF8, System.Net.Mime.MediaTypeNames.Application.Json);
 
@@ -196,6 +212,8 @@ namespace ELibraryManagement.Web.Services.Implementations
         {
             try
             {
+                SetAuthorizationHeader();
+
                 var baseUrl = GetApiBaseUrl();
                 var response = await _httpClient.DeleteAsync($"{baseUrl}/api/Category/{id}");
                 var content = await response.Content.ReadAsStringAsync();
@@ -243,6 +261,8 @@ namespace ELibraryManagement.Web.Services.Implementations
         {
             try
             {
+                SetAuthorizationHeader();
+
                 var baseUrl = GetApiBaseUrl();
                 var response = await _httpClient.PatchAsync($"{baseUrl}/api/Category/{id}/toggle-status", null);
                 var content = await response.Content.ReadAsStringAsync();
@@ -290,6 +310,8 @@ namespace ELibraryManagement.Web.Services.Implementations
         {
             try
             {
+                SetAuthorizationHeader();
+
                 var baseUrl = GetApiBaseUrl();
                 var url = $"{baseUrl}/api/Category/check-name?name={Uri.EscapeDataString(name)}";
                 if (excludeId.HasValue)

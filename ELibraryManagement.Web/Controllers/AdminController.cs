@@ -1,7 +1,10 @@
 using ELibraryManagement.Web.Models;
+using ELibraryManagement.Web.Models.DTOs.CategoryDtos;
 using ELibraryManagement.Web.Services;
+using ELibraryManagement.Web.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using System.Text.Json;
+using ViewModels = ELibraryManagement.Web.Models.ViewModels;
 
 namespace ELibraryManagement.Web.Controllers
 {
@@ -11,6 +14,7 @@ namespace ELibraryManagement.Web.Controllers
         private readonly IBookApiService _bookApiService;
         private readonly IReviewApiService _reviewApiService;
         private readonly IBorrowApiService _borrowApiService;
+        private readonly ICategoryApiService _categoryApiService;
         private readonly HttpClient _httpClient;
         private readonly IConfiguration _configuration;
         private readonly JsonSerializerOptions _jsonOptions;
@@ -20,6 +24,7 @@ namespace ELibraryManagement.Web.Controllers
             IBookApiService bookApiService,
             IReviewApiService reviewApiService,
             IBorrowApiService borrowApiService,
+            ICategoryApiService categoryApiService,
             HttpClient httpClient,
             IConfiguration configuration)
         {
@@ -27,6 +32,7 @@ namespace ELibraryManagement.Web.Controllers
             _bookApiService = bookApiService;
             _reviewApiService = reviewApiService;
             _borrowApiService = borrowApiService;
+            _categoryApiService = categoryApiService;
             _httpClient = httpClient;
             _configuration = configuration;
             _jsonOptions = new JsonSerializerOptions
@@ -386,6 +392,131 @@ namespace ELibraryManagement.Web.Controllers
 
                 var errorContent = await response.Content.ReadAsStringAsync();
                 return Json(new { success = false, message = "Không thể tải chi tiết đánh giá: " + errorContent });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Có lỗi xảy ra: {ex.Message}" });
+            }
+        }
+
+        // GET: Admin/Categories - Category Management
+        public async Task<IActionResult> Categories()
+        {
+            var accessCheck = await CheckAdminAccessAsync();
+            if (accessCheck != null) return accessCheck;
+
+            try
+            {
+                var result = await _categoryApiService.GetAllCategoriesAsync(includeInactive: true);
+
+                if (result.Success && result.Categories != null)
+                {
+                    var categories = result.Categories.Select(c => new ViewModels.CategoryViewModel
+                    {
+                        Id = c.Id,
+                        Name = c.Name,
+                        Description = c.Description,
+                        Color = c.Color,
+                        IsActive = c.IsActive,
+                        CreatedAt = c.CreatedAt,
+                        UpdatedAt = c.UpdatedAt,
+                        BookCount = c.BookCount
+                    }).ToList();
+
+                    return View(categories);
+                }
+
+                TempData["ErrorMessage"] = result.Message ?? "Không thể tải danh sách thể loại.";
+                return View(new List<ViewModels.CategoryViewModel>());
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Có lỗi xảy ra: {ex.Message}";
+                return View(new List<ViewModels.CategoryViewModel>());
+            }
+        }
+
+        // POST: Admin/CreateCategory - Create Category
+        [HttpPost]
+        public async Task<IActionResult> CreateCategory([FromBody] ViewModels.CreateCategoryViewModel model)
+        {
+            var accessCheck = await CheckAdminAccessAsync();
+            if (accessCheck != null) return Json(new { success = false, message = "Unauthorized" });
+
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState
+                    .Where(x => x.Value?.Errors?.Count > 0)
+                    .SelectMany(x => x.Value?.Errors?.Select(e => e.ErrorMessage) ?? new List<string>());
+                return Json(new { success = false, message = "Dữ liệu không hợp lệ", errors = errors });
+            }
+
+            try
+            {
+                var result = await _categoryApiService.CreateCategoryAsync(model.ToDto());
+
+                if (result.Success)
+                {
+                    return Json(new { success = true, message = result.Message });
+                }
+
+                return Json(new { success = false, message = result.Message });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Có lỗi xảy ra: {ex.Message}" });
+            }
+        }
+
+        // POST: Admin/UpdateCategory - Update Category
+        [HttpPost]
+        public async Task<IActionResult> UpdateCategory([FromBody] ViewModels.UpdateCategoryViewModel model)
+        {
+            var accessCheck = await CheckAdminAccessAsync();
+            if (accessCheck != null) return Json(new { success = false, message = "Unauthorized" });
+
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState
+                    .Where(x => x.Value?.Errors?.Count > 0)
+                    .SelectMany(x => x.Value?.Errors?.Select(e => e.ErrorMessage) ?? new List<string>());
+                return Json(new { success = false, message = "Dữ liệu không hợp lệ", errors = errors });
+            }
+
+            try
+            {
+                var result = await _categoryApiService.UpdateCategoryAsync(model.Id, model.ToDto());
+
+                if (result.Success)
+                {
+                    return Json(new { success = true, message = result.Message });
+                }
+
+                return Json(new { success = false, message = result.Message });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Có lỗi xảy ra: {ex.Message}" });
+            }
+        }
+
+        // POST: Admin/DeleteCategory - Delete Category
+        [HttpPost]
+        public async Task<IActionResult> DeleteCategory(int categoryId)
+        {
+            var accessCheck = await CheckAdminAccessAsync();
+            if (accessCheck != null) return Json(new { success = false, message = "Unauthorized" });
+
+            try
+            {
+                var result = await _categoryApiService.DeleteCategoryAsync(categoryId);
+
+                if (result.Success)
+                {
+                    return Json(new { success = true, message = result.Message });
+                }
+
+                return Json(new { success = false, message = result.Message });
             }
             catch (Exception ex)
             {

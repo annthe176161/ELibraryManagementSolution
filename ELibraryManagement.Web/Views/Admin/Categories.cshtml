@@ -1,0 +1,493 @@
+@model List<ELibraryManagement.Web.Models.ViewModels.CategoryViewModel>
+
+@{
+    ViewData["Title"] = "Quản lý thể loại - E-Library";
+    Layout = "_AdminLayout";
+}
+
+<!-- Page Header -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="d-flex align-items-center justify-content-between">
+            <div>
+                <h2 class="h3 mb-0">
+                    <i class="fas fa-tags me-2 text-primary"></i>
+                    Quản lý thể loại
+                </h2>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a asp-action="Index">Quản trị</a>
+                        </li>
+                        <li class="breadcrumb-item active">Thể loại</li>
+                    </ol>
+                </nav>
+            </div>
+            <div>
+                <button type="button" class="btn btn-success" onclick="openCreateModal()">
+                    <i class="fas fa-plus me-1"></i>Thêm thể loại mới
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Statistics Row -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <div class="small">Tổng thể loại</div>
+                        <div class="h4 mb-0">@Model.Count</div>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-tags fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <div class="small">Đang hoạt động</div>
+                        <div class="h4 mb-0">@Model.Count(c => c.IsActive)</div>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-check-circle fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-warning text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <div class="small">Không hoạt động</div>
+                        <div class="h4 mb-0">@Model.Count(c => !c.IsActive)</div>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-pause-circle fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-info text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <div class="small">Tổng sách</div>
+                        <div class="h4 mb-0">@Model.Sum(c => c.BookCount)</div>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-book fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Categories Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-white">
+                <div class="d-flex align-items-center justify-content-between">
+                    <h5 class="mb-0">Danh sách thể loại</h5>
+                    <div class="d-flex">
+                        <div class="input-group input-group-sm me-3" style="width: 300px;">
+                            <input type="text" class="form-control" placeholder="Tìm kiếm thể loại..." id="searchInput">
+                            <button class="btn btn-outline-secondary" type="button">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                        <select class="form-select form-select-sm" id="statusFilter" style="width: 150px;">
+                            <option value="">Tất cả trạng thái</option>
+                            <option value="active">Hoạt động</option>
+                            <option value="inactive">Không hoạt động</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0" id="categoriesTable">
+                        <thead class="table-light">
+                            <tr>
+                                <th scope="col">Tên thể loại</th>
+                                <th scope="col">Mô tả</th>
+                                <th scope="col">Màu sắc</th>
+                                <th scope="col">Trạng thái</th>
+                                <th scope="col">Số sách</th>
+                                <th scope="col">Ngày tạo</th>
+                                <th scope="col">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var category in Model.OrderBy(c => c.Name))
+                            {
+                                <tr data-status="@(category.IsActive ? "active" : "inactive")">
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            @if (!string.IsNullOrEmpty(category.Color))
+                                            {
+                                                <div class="me-2" style="width: 20px; height: 20px; background-color: @category.Color; border-radius: 3px; border: 1px solid #ddd;"></div>
+                                            }
+                                            <strong>@category.Name</strong>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div style="max-width: 300px;">
+                                            @if (!string.IsNullOrEmpty(category.Description))
+                                            {
+                                                @if (category.Description.Length > 100)
+                                                {
+                                                    <div class="description-preview">
+                                                        <p class="mb-1">@category.Description.Substring(0, 100)...</p>
+                                                        <button class="btn btn-sm btn-link p-0 text-decoration-none" onclick="toggleDescription(this)">
+                                                            <small>Xem thêm</small>
+                                                        </button>
+                                                        <div class="description-full d-none">
+                                                            <p class="mb-1">@category.Description</p>
+                                                            <button class="btn btn-sm btn-link p-0 text-decoration-none" onclick="toggleDescription(this)">
+                                                                <small>Thu gọn</small>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+                                                }
+                                                else
+                                                {
+                                                    <p class="mb-0">@category.Description</p>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <em class="text-muted">Chưa có mô tả</em>
+                                            }
+                                        </div>
+                                    </td>
+                                    <td>
+                                        @if (!string.IsNullOrEmpty(category.Color))
+                                        {
+                                            <div class="d-flex align-items-center">
+                                                <div class="me-2" style="width: 30px; height: 20px; background-color: @category.Color; border-radius: 3px; border: 1px solid #ddd;"></div>
+                                                <small class="text-muted">@category.Color</small>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <em class="text-muted">Chưa đặt màu</em>
+                                        }
+                                    </td>
+                                    <td>
+                                        <span class="badge @category.StatusBadgeClass">@category.StatusText</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-info">@category.BookCount sách</span>
+                                    </td>
+                                    <td>
+                                        <small class="text-muted">
+                                            @category.CreatedAt.ToString("dd/MM/yyyy")
+                                        </small>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <button type="button" class="btn btn-sm btn-outline-warning" title="Chỉnh sửa" onclick="editCategory(@category.Id, '@category.Name', '@category.Description', '@category.Color', @category.IsActive.ToString().ToLower())">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-outline-danger" title="Xóa" onclick="deleteCategory(@category.Id, '@category.Name', @category.BookCount)" @(category.BookCount > 0 ? "disabled" : "")>
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="card-footer bg-light">
+                <div class="d-flex justify-content-between align-items-center">
+                    <small class="text-muted">
+                        Hiển thị @Model.Count thể loại
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create/Edit Category Modal -->
+<div class="modal fade" id="categoryModal" tabindex="-1" aria-labelledby="categoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="categoryModalLabel">Thêm thể loại mới</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="categoryForm">
+                <div class="modal-body">
+                    <input type="hidden" id="categoryId" name="Id" value="0">
+                    
+                    <div class="mb-3">
+                        <label for="categoryName" class="form-label">Tên thể loại <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="categoryName" name="Name" required maxlength="100">
+                        <div class="invalid-feedback">
+                            Vui lòng nhập tên thể loại (tối đa 100 ký tự).
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="categoryDescription" class="form-label">Mô tả</label>
+                        <textarea class="form-control" id="categoryDescription" name="Description" rows="3" maxlength="500"></textarea>
+                        <div class="form-text">Tối đa 500 ký tự</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="categoryColor" class="form-label">Màu sắc</label>
+                        <div class="input-group">
+                            <input type="color" class="form-control form-control-color" id="categoryColor" name="Color" title="Chọn màu">
+                            <input type="text" class="form-control" id="categoryColorText" placeholder="#ffffff" maxlength="7" pattern="^#[0-9A-Fa-f]{6}$">
+                        </div>
+                        <div class="form-text">Chọn màu đại diện cho thể loại</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="categoryIsActive" name="IsActive" checked>
+                            <label class="form-check-label" for="categoryIsActive">
+                                Kích hoạt thể loại
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn btn-primary" id="saveCategoryBtn">
+                        <i class="fas fa-save me-1"></i>Lưu
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Xác nhận xóa thể loại</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có chắc chắn muốn xóa thể loại này không?</p>
+                <div id="deleteDetails"></div>
+                <div id="deleteWarning" class="alert alert-warning d-none mt-3"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Xóa</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let currentCategoryId = null;
+
+        $(document).ready(function() {
+            // Search functionality
+            $('#searchInput').on('keyup', function() {
+                var value = $(this).val().toLowerCase();
+                $('#categoriesTable tbody tr').filter(function() {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+                });
+            });
+
+            // Status filter
+            $('#statusFilter').on('change', function() {
+                var value = $(this).val();
+                $('#categoriesTable tbody tr').filter(function() {
+                    if (value === '') {
+                        $(this).show();
+                    } else {
+                        $(this).toggle($(this).data('status') === value);
+                    }
+                });
+            });
+
+            // Color picker sync
+            $('#categoryColor').on('change', function() {
+                $('#categoryColorText').val($(this).val());
+            });
+
+            $('#categoryColorText').on('input', function() {
+                var color = $(this).val();
+                if (/^#[0-9A-Fa-f]{6}$/.test(color)) {
+                    $('#categoryColor').val(color);
+                }
+            });
+
+            // Form submission
+            $('#categoryForm').on('submit', function(e) {
+                e.preventDefault();
+                saveCategory();
+            });
+        });
+
+        function toggleDescription(button) {
+            var container = $(button).closest('.description-preview');
+            container.find('.description-preview > p, .description-preview > button').toggleClass('d-none');
+            container.find('.description-full').toggleClass('d-none');
+        }
+
+        function openCreateModal() {
+            currentCategoryId = null;
+            $('#categoryModalLabel').text('Thêm thể loại mới');
+            $('#categoryForm')[0].reset();
+            $('#categoryId').val('0');
+            $('#categoryIsActive').prop('checked', true);
+            $('#categoryColor').val('#007bff');
+            $('#categoryColorText').val('#007bff');
+            $('#categoryModal').modal('show');
+        }
+
+        function editCategory(id, name, description, color, isActive) {
+            currentCategoryId = id;
+            $('#categoryModalLabel').text('Chỉnh sửa thể loại');
+            $('#categoryId').val(id);
+            $('#categoryName').val(name);
+            $('#categoryDescription').val(description || '');
+            $('#categoryColor').val(color || '#007bff');
+            $('#categoryColorText').val(color || '#007bff');
+            $('#categoryIsActive').prop('checked', isActive);
+            $('#categoryModal').modal('show');
+        }
+
+        function saveCategory() {
+            const form = $('#categoryForm')[0];
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            const formData = {
+                Id: parseInt($('#categoryId').val()) || 0,
+                Name: $('#categoryName').val().trim(),
+                Description: $('#categoryDescription').val().trim() || null,
+                Color: $('#categoryColorText').val() || null,
+                IsActive: $('#categoryIsActive').is(':checked')
+            };
+
+            const isEdit = currentCategoryId !== null && currentCategoryId > 0;
+            const url = isEdit ? '/Admin/UpdateCategory' : '/Admin/CreateCategory';
+            
+            $('#saveCategoryBtn').prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i>Đang lưu...');
+
+            $.ajax({
+                url: url,
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(formData),
+                success: function(response) {
+                    if (response.success) {
+                        $('#categoryModal').modal('hide');
+                        showToast('success', response.message);
+                        setTimeout(() => location.reload(), 1500);
+                    } else {
+                        showToast('error', response.message);
+                    }
+                },
+                error: function(xhr) {
+                    console.error('Error:', xhr);
+                    showToast('error', 'Có lỗi xảy ra khi lưu thể loại');
+                },
+                complete: function() {
+                    $('#saveCategoryBtn').prop('disabled', false).html('<i class="fas fa-save me-1"></i>Lưu');
+                }
+            });
+        }
+
+        function deleteCategory(categoryId, categoryName, bookCount) {
+            currentCategoryId = categoryId;
+            $('#deleteDetails').html(`<strong>Thể loại:</strong> ${categoryName}`);
+            
+            if (bookCount > 0) {
+                $('#deleteWarning').removeClass('d-none').html(`
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Không thể xóa thể loại này vì có ${bookCount} sách đang sử dụng.
+                `);
+                $('#confirmDeleteBtn').prop('disabled', true);
+            } else {
+                $('#deleteWarning').addClass('d-none');
+                $('#confirmDeleteBtn').prop('disabled', false);
+            }
+            
+            $('#deleteModal').modal('show');
+        }
+
+        $('#confirmDeleteBtn').on('click', function() {
+            if (currentCategoryId) {
+                $.ajax({
+                    url: '/Admin/DeleteCategory',
+                    type: 'POST',
+                    data: { categoryId: currentCategoryId },
+                    success: function(response) {
+                        $('#deleteModal').modal('hide');
+                        if (response.success) {
+                            showToast('success', response.message);
+                            setTimeout(() => location.reload(), 1500);
+                        } else {
+                            showToast('error', response.message);
+                        }
+                    },
+                    error: function(xhr) {
+                        $('#deleteModal').modal('hide');
+                        showToast('error', 'Có lỗi xảy ra khi xóa thể loại');
+                    }
+                });
+            }
+        });
+
+        // Toast notification function
+        function showToast(type, message) {
+            const toastHtml = `
+                <div class="toast align-items-center text-white bg-${type === 'success' ? 'success' : type === 'error' ? 'danger' : 'info'} border-0" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="d-flex">
+                        <div class="toast-body">
+                            ${message}
+                        </div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                </div>
+            `;
+            
+            // Create toast container if it doesn't exist
+            if (!$('#toastContainer').length) {
+                $('body').append('<div id="toastContainer" class="toast-container position-fixed top-0 end-0 p-3"></div>');
+            }
+            
+            const $toast = $(toastHtml);
+            $('#toastContainer').append($toast);
+            
+            const toast = new bootstrap.Toast($toast[0]);
+            toast.show();
+            
+            // Remove toast element after it's hidden
+            $toast.on('hidden.bs.toast', function() {
+                $(this).remove();
+            });
+        }
+    </script>
+}

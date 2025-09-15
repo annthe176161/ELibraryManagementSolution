@@ -7,6 +7,7 @@ namespace ELibraryManagement.Web.Models.DTOs.CategoryDtos
         public int Id { get; set; }
         public string Name { get; set; } = string.Empty;
         public string? Description { get; set; }
+        public string? Color { get; set; }
         public bool IsActive { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
@@ -22,6 +23,9 @@ namespace ELibraryManagement.Web.Models.DTOs.CategoryDtos
         [StringLength(500, ErrorMessage = "Mô tả không được vượt quá 500 ký tự")]
         public string? Description { get; set; }
 
+        [StringLength(20, ErrorMessage = "Mã màu không được vượt quá 20 ký tự")]
+        public string? Color { get; set; }
+
         public bool IsActive { get; set; } = true;
     }
 
@@ -33,6 +37,9 @@ namespace ELibraryManagement.Web.Models.DTOs.CategoryDtos
 
         [StringLength(500, ErrorMessage = "Mô tả không được vượt quá 500 ký tự")]
         public string? Description { get; set; }
+
+        [StringLength(20, ErrorMessage = "Mã màu không được vượt quá 20 ký tự")]
+        public string? Color { get; set; }
 
         public bool IsActive { get; set; }
     }
