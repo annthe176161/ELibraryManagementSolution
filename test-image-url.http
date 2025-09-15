@@ -1,0 +1,27 @@
+### Test Create Book with Image URL
+POST http://localhost:5293/api/book/admin/create
+Content-Type: application/json
+Authorization: Bearer YOUR_TOKEN_HERE
+
+{
+  "title": "Test Book with Image",
+  "author": "Test Author",
+  "isbn": "1234567890123",
+  "publisher": "Test Publisher",
+  "publicationYear": 2023,
+  "description": "This is a test book to verify image URL persistence",
+  "coverImageUrl": "https://res.cloudinary.com/your-cloud/image/upload/v1234567890/test-book-cover.jpg",
+  "quantity": 5,
+  "language": "Vietnamese",
+  "pageCount": 300,
+  "categoryIds": [1]
+}
+
+### Get Admin Token First
+POST http://localhost:5293/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "admin@example.com",
+  "password": "Admin@123"
+}

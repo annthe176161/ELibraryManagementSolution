@@ -56,7 +56,7 @@
                     <div class="d-flex justify-content-between">
                         <div>
                             <div class="small">Có sẵn</div>
-                            <div class="h4 mb-0">@Model.Count(b => b.AvailableCopies > 0)</div>
+                            <div class="h4 mb-0">@Model.Sum(b => b.AvailableCopies)</div>
                         </div>
                         <div class="align-self-center">
                             <i class="fas fa-check-circle fa-2x opacity-75"></i>
@@ -71,7 +71,7 @@
                     <div class="d-flex justify-content-between">
                         <div>
                             <div class="small">Đang được mượn</div>
-                            <div class="h4 mb-0">@Model.Sum(b => b.TotalCopies - b.AvailableCopies)</div>
+                            <div class="h4 mb-0">@Model.Sum(b => Math.Max(0, b.TotalCopies - b.AvailableCopies))</div>
                         </div>
                         <div class="align-self-center">
                             <i class="fas fa-hand-holding fa-2x opacity-75"></i>
@@ -86,7 +86,7 @@
                     <div class="d-flex justify-content-between">
                         <div>
                             <div class="small">Hết sách</div>
-                            <div class="h4 mb-0">@Model.Count(b => b.AvailableCopies == 0)</div>
+                            <div class="h4 mb-0">@Model.Count(b => b.TotalCopies == 0)</div>
                         </div>
                         <div class="align-self-center">
                             <i class="fas fa-exclamation-triangle fa-2x opacity-75"></i>
@@ -141,9 +141,24 @@
                                     <tr>
                                         <td>
                                             <div class="d-flex align-items-center">
-                                                <img src="@book.ImageUrl" alt="@book.Title" 
-                                                     class="me-3 rounded" 
-                                                     style="width: 60px; height: 80px; object-fit: cover;">
+                                                <div class="book-cover me-3" style="width: 60px; height: 80px;">
+                                                    @if (!string.IsNullOrEmpty(book.ImageUrl))
+                                                    {
+                                                        <img src="@book.ImageUrl" alt="@book.Title" 
+                                                             class="rounded w-100 h-100" 
+                                                             style="object-fit: cover;"
+                                                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                                        <div class="bg-secondary rounded d-none align-items-center justify-content-center text-white w-100 h-100" style="font-size: 12px;">
+                                                            <i class="fas fa-book"></i>
+                                                        </div>
+                                                    }
+                                                    else
+                                                    {
+                                                        <div class="bg-secondary rounded d-flex align-items-center justify-content-center text-white w-100 h-100" style="font-size: 12px;">
+                                                            <i class="fas fa-book"></i>
+                                                        </div>
+                                                    }
+                                                </div>
                                                 <div>
                                                     <h6 class="mb-1">@book.Title</h6>
                                                     <small class="text-muted">@(string.IsNullOrEmpty(book.Description) ? "" : (book.Description.Length > 50 ? book.Description.Substring(0, 50) + "..." : book.Description))</small>
@@ -152,7 +167,25 @@
                                         </td>
                                         <td>@book.Author</td>
                                         <td>
-                                            <span class="badge bg-primary">@book.CategoryName</span>
+                                            @if (book.Categories != null && book.Categories.Any())
+                                            {
+                                                @foreach (var category in book.Categories.Take(2))
+                                                {
+                                                    <span class="badge bg-primary me-1">@category.Name</span>
+                                                }
+                                                @if (book.Categories.Count > 2)
+                                                {
+                                                    <small class="text-muted">+@(book.Categories.Count - 2)</small>
+                                                }
+                                            }
+                                            else if (!string.IsNullOrEmpty(book.CategoryName))
+                                            {
+                                                <span class="badge bg-primary">@book.CategoryName</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-muted">Chưa phân loại</span>
+                                            }
                                         </td>
                                         <td>
                                             @if (!string.IsNullOrEmpty(book.ISBN))
@@ -165,17 +198,17 @@
                                             }
                                         </td>
                                         <td>
-                                            @if (book.AvailableCopies > 0)
+                                            @if (book.TotalCopies == 0)
+                                            {
+                                                <span class="badge bg-danger">Hết sách</span>
+                                            }
+                                            else if (book.AvailableCopies > 0)
                                             {
                                                 <span class="badge bg-success">Có sẵn</span>
                                             }
-                                            else if (book.TotalCopies > 0)
-                                            {
-                                                <span class="badge bg-warning">Đang mượn</span>
-                                            }
                                             else
                                             {
-                                                <span class="badge bg-danger">Hết sách</span>
+                                                <span class="badge bg-warning">Đang mượn</span>
                                             }
                                         </td>
                                         <td>
@@ -207,7 +240,7 @@
                                                 <button type="button" class="btn btn-sm btn-outline-primary" title="Xem chi tiết" onclick="viewBook(@book.Id)">
                                                     <i class="fas fa-eye"></i>
                                                 </button>
-                                                <button type="button" class="btn btn-sm btn-outline-warning" title="Chỉnh sửa" onclick="editBook(@book.Id)" data-bs-toggle="modal" data-bs-target="#bookModal">
+                                                <button type="button" class="btn btn-sm btn-outline-warning" title="Chỉnh sửa" data-bs-toggle="modal" data-bs-target="#bookModal" onclick="editBook(@book.Id)">
                                                     <i class="fas fa-edit"></i>
                                                 </button>
                                                 <button type="button" class="btn btn-sm btn-outline-danger" title="Xóa" onclick="deleteBook(@book.Id, '@book.Title')">
@@ -276,7 +309,9 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="isbn" class="form-label">ISBN</label>
-                                <input type="text" class="form-control" id="isbn" name="isbn">
+                                <input type="text" class="form-control" id="isbn" name="isbn" maxlength="13" 
+                                       placeholder="Tối đa 13 ký tự">
+                                <small class="form-text text-muted">Ví dụ: 9786047770560</small>
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -329,9 +364,31 @@
                     </div>
 
                     <div class="mb-3">
-                        <label for="coverImageUrl" class="form-label">URL hình bìa</label>
-                        <input type="url" class="form-control" id="coverImageUrl" name="coverImageUrl" 
-                               placeholder="https://example.com/image.jpg">
+                        <label for="coverImageUrl" class="form-label">Hình bìa sách</label>
+                        <div class="row">
+                            <div class="col-md-8">
+                                <input type="url" class="form-control" id="coverImageUrl" name="coverImageUrl" 
+                                       placeholder="https://res.cloudinary.com/demo/image/upload/sample.jpg">
+                            </div>
+                            <div class="col-md-4">
+                                <div class="input-group">
+                                    <input type="file" class="form-control" id="imageFile" accept="image/*" onchange="handleBookImageUpload(this)">
+                                    <button class="btn btn-outline-secondary" type="button" onclick="triggerImageUpload()" disabled id="uploadBtn">
+                                        <i class="fas fa-upload"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <small class="form-text text-muted">Bạn có thể nhập URL hoặc upload file ảnh (tự động upload khi chọn file)</small>
+                        <div class="mt-2">
+                            <img id="imagePreview" src="" alt="Preview" style="max-width: 150px; max-height: 200px; display: none;" class="img-thumbnail">
+                        </div>
+                        <div id="uploadProgress" class="mt-2" style="display: none;">
+                            <div class="progress">
+                                <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%"></div>
+                            </div>
+                            <small class="text-muted">Đang tải lên...</small>
+                        </div>
                     </div>
 
                     <div class="mb-3">
@@ -371,14 +428,126 @@
     </div>
 </div>
 
+<!-- View Book Detail Modal -->
+<div class="modal fade" id="viewBookModal" tabindex="-1" aria-labelledby="viewBookModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="viewBookModalLabel">Chi tiết sách</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-4">
+                        <div class="text-center">
+                            <div id="viewBookImage" class="mb-3" style="width: 200px; height: 280px; margin: 0 auto;">
+                                <img id="viewBookImg" src="" alt="Book Cover" class="img-fluid rounded shadow" style="width: 100%; height: 100%; object-fit: cover;">
+                                <div id="viewBookImgPlaceholder" class="bg-secondary rounded d-none align-items-center justify-content-center text-white h-100" style="font-size: 24px;">
+                                    <i class="fas fa-book"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <h4 id="viewBookTitle" class="mb-3"></h4>
+                        <table class="table table-borderless">
+                            <tr>
+                                <td width="30%"><strong>Tác giả:</strong></td>
+                                <td id="viewBookAuthor"></td>
+                            </tr>
+                            <tr>
+                                <td><strong>ISBN:</strong></td>
+                                <td id="viewBookISBN"></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Nhà xuất bản:</strong></td>
+                                <td id="viewBookPublisher"></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Năm xuất bản:</strong></td>
+                                <td id="viewBookYear"></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Ngôn ngữ:</strong></td>
+                                <td id="viewBookLanguage"></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Số trang:</strong></td>
+                                <td id="viewBookPages"></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Danh mục:</strong></td>
+                                <td id="viewBookCategories"></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Số lượng:</strong></td>
+                                <td>
+                                    <span id="viewBookAvailable" class="badge bg-success me-2"></span>
+                                    <span id="viewBookTotal" class="badge bg-secondary"></span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td><strong>Đánh giá:</strong></td>
+                                <td id="viewBookRating"></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <h6><strong>Mô tả:</strong></h6>
+                        <p id="viewBookDescription" class="text-muted"></p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                <button type="button" class="btn btn-warning" onclick="editBookFromView()">
+                    <i class="fas fa-edit me-1"></i>
+                    Chỉnh sửa
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
     <script>
         let currentBookId = null;
         let categories = [];
 
+        // Error handling
+        window.onerror = function(msg, url, lineNo, columnNo, error) {
+            console.error('JavaScript Error:', msg, 'at', url, ':', lineNo, ':', columnNo, error);
+            return false;
+        };
+
         $(document).ready(function() {
+            console.log('Document ready, loading categories...');
+            
+            // Test modal functionality
+            window.testModal = function() {
+                $('#bookModalLabel').text('Test Modal');
+                $('#bookModal').modal('show');
+            };
+            
             // Load categories for the form
-            loadCategories();
+            loadCategories().catch(err => {
+                console.error('Error loading categories on ready:', err);
+            });
+
+            // Preview image when URL is entered
+            $('#coverImageUrl').on('input', function() {
+                const url = $(this).val();
+                if (url && url.match(/\.(jpeg|jpg|gif|png|webp)$/i)) {
+                    $('#imagePreview').attr('src', url).show();
+                } else if (url) {
+                    // Try to load the image anyway
+                    $('#imagePreview').attr('src', url).show();
+                } else {
+                    $('#imagePreview').hide();
+                }
+            });
 
             // Search functionality
             $('#searchInput').on('keyup', function() {
@@ -410,70 +579,280 @@
 
         // Load categories for dropdown
         function loadCategories() {
-            $.get('/Admin/GetCategories')
-                .done(function(response) {
-                    if (response.success) {
-                        categories = response.data;
-                        updateCategoriesDropdown();
+            return new Promise((resolve, reject) => {
+                $.ajax({
+                    url: '/Admin/GetCategories',
+                    type: 'GET',
+                    success: function(response) {
+                        console.log('Categories response:', response);
+                        if (response.success && response.data) {
+                            categories = response.data;
+                            const categoriesSelect = $('#categories');
+                            categoriesSelect.empty();
+                            
+                            response.data.forEach(category => {
+                                categoriesSelect.append(new Option(category.name, category.id));
+                            });
+                            
+                            resolve();
+                        } else {
+                            console.error('Failed to load categories - invalid response:', response);
+                            resolve(); // Still resolve to not break the chain
+                        }
+                    },
+                    error: function(xhr) {
+                        console.error('Error loading categories:', xhr);
+                        console.error('Status:', xhr.status, 'Response:', xhr.responseText);
+                        resolve(); // Still resolve to not break the chain
                     }
-                })
-                .fail(function() {
-                    console.error('Failed to load categories');
                 });
-        }
-
-        function updateCategoriesDropdown() {
-            const select = $('#categories');
-            select.empty();
-            categories.forEach(category => {
-                select.append(`<option value="${category.id}">${category.name}</option>`);
             });
         }
 
         // Open modal for creating new book
         function openCreateBookModal() {
-            currentBookId = null;
-            $('#bookModalLabel').text('Thêm sách mới');
-            $('#bookForm')[0].reset();
-            $('#bookId').val('');
-            $('#publicationYear').val(new Date().getFullYear());
-            $('#language').val('Tiếng Việt');
-            $('#categories').val([]);
+            try {
+                console.log('openCreateBookModal called');
+                currentBookId = null;
+                $('#bookModalLabel').text('Thêm sách mới');
+                $('#bookForm')[0].reset();
+                $('#bookId').val('');
+                $('#publicationYear').val(new Date().getFullYear());
+                $('#language').val('Tiếng Việt');
+                $('#categories').val([]);
+                $('#imagePreview').hide();
+                $('#coverImageUrl').val('');
+                
+                // Load categories async without blocking
+                setTimeout(() => {
+                    loadCategories().catch(err => {
+                        console.error('Error loading categories:', err);
+                    });
+                }, 100);
+            } catch (error) {
+                console.error('Error in openCreateBookModal:', error);
+                alert('Có lỗi xảy ra khi mở form thêm sách: ' + error.message);
+            }
         }
 
         // View book details
         function viewBook(bookId) {
-            // Implement view book functionality
-            console.log('View book:', bookId);
-            // You could redirect to a detail page or show a modal with book details
+            // Load book details from API
+            $.ajax({
+                url: '/Admin/GetBookDetail',
+                type: 'GET',
+                data: { id: bookId },
+                success: function(response) {
+                    if (response.success && response.data) {
+                        const book = response.data;
+                        
+                        // Populate view modal
+                        $('#viewBookTitle').text(book.title || '');
+                        $('#viewBookAuthor').text(book.author || 'N/A');
+                        $('#viewBookISBN').text(book.isbn || 'N/A');
+                        $('#viewBookPublisher').text(book.publisher || 'N/A');
+                        $('#viewBookYear').text(book.publicationYear || 'N/A');
+                        $('#viewBookLanguage').text(book.language || 'N/A');
+                        $('#viewBookPages').text(book.pageCount || 'N/A');
+                        $('#viewBookDescription').text(book.description || 'Chưa có mô tả');
+                        
+                        // Handle image
+                        if (book.imageUrl && book.imageUrl !== 'https://example.com/image.jpg') {
+                            $('#viewBookImg').attr('src', book.imageUrl).show();
+                            $('#viewBookImgPlaceholder').hide();
+                        } else {
+                            $('#viewBookImg').hide();
+                            $('#viewBookImgPlaceholder').removeClass('d-none').addClass('d-flex');
+                        }
+                        
+                        // Handle categories
+                        if (book.categories && book.categories.length > 0) {
+                            const categoryNames = book.categories.map(c => `<span class="badge bg-primary me-1">${c.name}</span>`).join('');
+                            $('#viewBookCategories').html(categoryNames);
+                        } else {
+                            $('#viewBookCategories').text('Chưa có danh mục');
+                        }
+                        
+                        // Handle quantities
+                        $('#viewBookAvailable').text(`Có sẵn: ${book.availableCopies || 0}`);
+                        $('#viewBookTotal').text(`Tổng: ${book.totalCopies || 0}`);
+                        
+                        // Handle rating
+                        if (book.averageRating && book.ratingCount) {
+                            let stars = '';
+                            for (let i = 1; i <= 5; i++) {
+                                if (i <= Math.floor(book.averageRating)) {
+                                    stars += '<i class="fas fa-star text-warning"></i>';
+                                } else {
+                                    stars += '<i class="far fa-star text-muted"></i>';
+                                }
+                            }
+                            $('#viewBookRating').html(`${stars} <small class="text-muted">(${book.ratingCount} đánh giá)</small>`);
+                        } else {
+                            $('#viewBookRating').text('Chưa có đánh giá');
+                        }
+                        
+                        // Store current book ID for edit button
+                        currentViewBookId = bookId;
+                        
+                        // Show modal
+                        $('#viewBookModal').modal('show');
+                    } else {
+                        alert('Không thể tải thông tin sách: ' + (response.message || 'Lỗi không xác định'));
+                    }
+                },
+                error: function(xhr) {
+                    console.error('Error loading book details:', xhr);
+                    alert('Có lỗi xảy ra khi tải thông tin sách');
+                }
+            });
+        }
+
+        // Edit book from view modal
+        let currentViewBookId = null;
+        function editBookFromView() {
+            $('#viewBookModal').modal('hide');
+            setTimeout(() => {
+                editBook(currentViewBookId);
+                $('#bookModal').modal('show');
+            }, 300);
+        }
+
+        // Handle image upload
+        function handleImageUpload(input) {
+            const file = input.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    $('#imagePreview').attr('src', e.target.result).show();
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Upload image to Cloudinary (placeholder function)
+        function uploadImage() {
+            const fileInput = document.getElementById('imageFile');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                alert('Vui lòng chọn file ảnh trước');
+                return;
+            }
+
+            // For demo purposes, set some sample book cover URLs
+            const sampleUrls = [
+                'https://salt.tikicdn.com/cache/750x750/ts/product/5e/18/24/2a6154ba08df6ce6161c13f4303fa19e.jpg',
+                'https://images-na.ssl-images-amazon.com/images/I/51-8VbtFFPL._SX330_BO1,204,203,200_.jpg',
+                'https://m.media-amazon.com/images/I/71UypkUjStL._AC_UF1000,1000_QL80_.jpg',
+                'https://product.hstatic.net/1000363117/product/image_195509_1_36793_34a84c4c9a9c442ebf1b56430aa4a1e5_master.jpg'
+            ];
+            
+            const randomUrl = sampleUrls[Math.floor(Math.random() * sampleUrls.length)];
+            $('#coverImageUrl').val(randomUrl);
+            $('#imagePreview').attr('src', randomUrl).show();
+            
+            alert('Đã chọn ảnh mẫu! Trong thực tế, chức năng này sẽ upload lên Cloudinary.');
+            
+            // You could implement Cloudinary upload here:
+            /*
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('upload_preset', 'your_upload_preset');
+            
+            fetch('https://api.cloudinary.com/v1_1/your_cloud_name/image/upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                $('#coverImageUrl').val(data.secure_url);
+                $('#imagePreview').attr('src', data.secure_url).show();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Có lỗi xảy ra khi upload ảnh');
+            });
+            */
         }
 
         // Edit book
         function editBook(bookId) {
-            currentBookId = bookId;
-            $('#bookModalLabel').text('Chỉnh sửa sách');
-            
-            // Find book data from the table
-            const row = $(`button[onclick="editBook(${bookId})"]`).closest('tr');
-            const title = row.find('td:eq(0) h6').text().trim();
-            const author = row.find('td:eq(1)').text().trim();
-            
-            // Load book details and populate form
-            loadBookForEdit(bookId);
+            try {
+                console.log('editBook called with ID:', bookId);
+                currentBookId = bookId;
+                $('#bookModalLabel').text('Chỉnh sửa sách');
+                
+                // Reset form first
+                $('#bookForm')[0].reset();
+                $('#imagePreview').hide();
+                
+                // Load book details from API async
+                setTimeout(() => {
+                    loadBookForEdit(bookId);
+                }, 100);
+            } catch (error) {
+                console.error('Error in editBook:', error);
+                alert('Có lỗi xảy ra khi mở form chỉnh sửa: ' + error.message);
+            }
         }
 
         // Load book details for editing
         function loadBookForEdit(bookId) {
-            // You might want to make an API call to get full book details
-            // For now, we'll populate basic fields from the table
-            const row = $(`button[onclick="editBook(${bookId})"]`).closest('tr');
+            // Show loading
+            $('#saveBookBtn').prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i>Đang tải...');
             
-            $('#bookId').val(bookId);
-            $('#title').val(row.find('td:eq(0) h6').text().trim());
-            $('#author').val(row.find('td:eq(1)').text().trim());
-            
-            // You would need to make an API call to get full book details
-            // including ISBN, description, etc.
+            $.ajax({
+                url: '/Admin/GetBookDetail',
+                type: 'GET',
+                data: { id: bookId },
+                success: function(response) {
+                    if (response.success && response.data) {
+                        const book = response.data;
+                        
+                        // Populate form fields
+                        $('#bookId').val(book.id || bookId);
+                        $('#title').val(book.title || '');
+                        $('#author').val(book.author || '');
+                        $('#isbn').val(book.isbn || '');
+                        $('#publisher').val(book.publisher || '');
+                        $('#publicationYear').val(book.publicationYear || new Date().getFullYear());
+                        $('#description').val(book.description || '');
+                        
+                        // Handle image URL and preview
+                        const imageUrl = book.imageUrl || book.coverImageUrl || '';
+                        $('#coverImageUrl').val(imageUrl);
+                        if (imageUrl && imageUrl.trim() !== '') {
+                            $('#imagePreview').attr('src', imageUrl).show();
+                        } else {
+                            $('#imagePreview').hide();
+                        }
+                        
+                        $('#quantity').val(book.totalCopies || 0);
+                        $('#language').val(book.language || 'Tiếng Việt');
+                        $('#pageCount').val(book.pageCount || 0);
+                        
+                        // Load categories and select the book's categories
+                        loadCategories().then(() => {
+                            if (book.categories && book.categories.length > 0) {
+                                const categoryIds = book.categories.map(c => c.id.toString());
+                                $('#categories').val(categoryIds);
+                            } else {
+                                $('#categories').val([]);
+                            }
+                        });
+                    } else {
+                        alert('Không thể tải thông tin sách: ' + (response.message || 'Lỗi không xác định'));
+                    }
+                },
+                error: function(xhr) {
+                    console.error('Error loading book details:', xhr);
+                    alert('Có lỗi xảy ra khi tải thông tin sách');
+                },
+                complete: function() {
+                    $('#saveBookBtn').prop('disabled', false).html('<i class="fas fa-save me-1"></i>Lưu');
+                }
+            });
         }
 
         // Save book (create or update)
@@ -484,20 +863,53 @@
                 return;
             }
 
+            // Validate required fields
+            const title = $('#title').val().trim();
+            const author = $('#author').val().trim();
+            const isbn = $('#isbn').val().trim();
+            const quantity = parseInt($('#quantity').val()) || 0;
+
+            if (!title) {
+                alert('Vui lòng nhập tiêu đề sách');
+                $('#title').focus();
+                return;
+            }
+
+            if (!author) {
+                alert('Vui lòng nhập tác giả');
+                $('#author').focus();
+                return;
+            }
+
+            if (isbn && isbn.length > 13) {
+                alert('ISBN không được vượt quá 13 ký tự');
+                $('#isbn').focus();
+                return;
+            }
+
+            if (quantity < 0) {
+                alert('Số lượng phải là số không âm');
+                $('#quantity').focus();
+                return;
+            }
+
             const formData = {
-                id: parseInt($('#bookId').val()) || 0,
-                title: $('#title').val(),
-                author: $('#author').val(),
-                isbn: $('#isbn').val(),
-                publisher: $('#publisher').val(),
-                publicationYear: parseInt($('#publicationYear').val()),
-                description: $('#description').val(),
-                coverImageUrl: $('#coverImageUrl').val(),
-                quantity: parseInt($('#quantity').val()),
-                language: $('#language').val(),
-                pageCount: parseInt($('#pageCount').val()) || 0,
-                categoryIds: $('#categories').val() ? $('#categories').val().map(id => parseInt(id)) : []
+                Id: parseInt($('#bookId').val()) || 0,
+                Title: title,
+                Author: author,
+                ISBN: $('#isbn').val() || null,
+                Publisher: $('#publisher').val() || null,
+                PublicationYear: parseInt($('#publicationYear').val()) || new Date().getFullYear(),
+                Description: $('#description').val() || null,
+                CoverImageUrl: $('#coverImageUrl').val() || null,
+                Quantity: quantity,
+                Language: $('#language').val() || 'Tiếng Việt',
+                PageCount: parseInt($('#pageCount').val()) || 0,
+                CategoryIds: $('#categories').val() ? $('#categories').val().map(id => parseInt(id)) : []
             };
+
+            console.log('Sending data:', formData); // Debug log
+            console.log('CoverImageUrl value:', $('#coverImageUrl').val()); // Debug specific field
 
             const isEdit = currentBookId !== null && currentBookId > 0;
             const url = isEdit ? '/Admin/UpdateBook' : '/Admin/CreateBook';
@@ -510,22 +922,106 @@
                 contentType: 'application/json',
                 data: JSON.stringify(formData),
                 success: function(response) {
+                    console.log('Response:', response); // Debug log
                     if (response.success) {
                         $('#bookModal').modal('hide');
                         alert(response.message);
                         location.reload(); // Reload page to show updated data
                     } else {
                         alert('Lỗi: ' + response.message);
+                        if (response.errors) {
+                            console.error('Validation errors:', response.errors);
+                        }
                     }
                 },
                 error: function(xhr) {
                     console.error('Error:', xhr);
-                    alert('Có lỗi xảy ra khi lưu sách');
+                    try {
+                        const errorResponse = JSON.parse(xhr.responseText);
+                        alert('Có lỗi xảy ra: ' + (errorResponse.message || 'Lỗi không xác định'));
+                    } catch (e) {
+                        alert('Có lỗi xảy ra khi lưu sách');
+                    }
                 },
                 complete: function() {
                     $('#saveBookBtn').prop('disabled', false).html('<i class="fas fa-save me-1"></i>Lưu');
                 }
             });
+        }
+
+        // Handle book image upload
+        async function handleBookImageUpload(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            // Validate file type
+            const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+            if (!allowedTypes.includes(file.type)) {
+                alert('Vui lòng chọn file ảnh hợp lệ (JPG, PNG, GIF, WebP)');
+                input.value = '';
+                return;
+            }
+
+            // Validate file size (5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                alert('Kích thước file quá lớn. Vui lòng chọn file nhỏ hơn 5MB');
+                input.value = '';
+                return;
+            }
+
+            // Show preview
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                $('#imagePreview').attr('src', e.target.result).show();
+            };
+            reader.readAsDataURL(file);
+
+            // Auto upload to server
+            await uploadBookImage(file);
+        }
+
+        async function uploadBookImage(file) {
+            try {
+                $('#uploadProgress').show();
+                $('.progress-bar').css('width', '50%');
+
+                const formData = new FormData();
+                formData.append('file', file);
+
+                const response = await $.ajax({
+                    url: '/Admin/UploadBookImage',
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    timeout: 30000
+                });
+
+                $('.progress-bar').css('width', '100%');
+                
+                if (response.success && response.imageUrl) {
+                    $('#coverImageUrl').val(response.imageUrl);
+                    $('#imagePreview').attr('src', response.imageUrl).show();
+                    
+                    // Show success message briefly
+                    setTimeout(() => {
+                        $('#uploadProgress').hide();
+                        $('.progress-bar').css('width', '0%');
+                    }, 1000);
+                } else {
+                    alert('Upload thất bại: ' + (response.message || 'Lỗi không xác định'));
+                    $('#uploadProgress').hide();
+                }
+            } catch (error) {
+                console.error('Upload error:', error);
+                alert('Có lỗi xảy ra khi upload ảnh: ' + (error.responseJSON?.message || error.message || 'Lỗi không xác định'));
+                $('#uploadProgress').hide();
+            }
+        }
+
+        function triggerImageUpload() {
+            $('#imageFile').click();
+        }
         }
 
         // Delete book

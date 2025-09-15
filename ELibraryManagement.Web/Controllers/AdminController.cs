@@ -218,12 +218,87 @@ namespace ELibraryManagement.Web.Controllers
                 }
 
                 var books = await _bookApiService.GetAllBooksAsync(token);
+
+                // Debug logging - temporary
+                Console.WriteLine($"Loaded {books.Count} books from API");
+                foreach (var book in books.Take(3))
+                {
+                    Console.WriteLine($"Book: {book.Title}, Total: {book.TotalCopies}, Available: {book.AvailableCopies}");
+                }
+
                 return View(books ?? new List<BookViewModel>());
             }
             catch (Exception ex)
             {
+                Console.WriteLine($"Error loading books: {ex.Message}");
                 TempData["ErrorMessage"] = $"Có lỗi xảy ra: {ex.Message}";
                 return View(new List<BookViewModel>());
+            }
+        }
+
+        // Debug API - temporary action to check raw API response
+        [HttpGet]
+        public async Task<IActionResult> DebugApiBooks()
+        {
+            try
+            {
+                var token = _authApiService.GetCurrentToken();
+                var apiBaseUrl = GetApiBaseUrl();
+                var url = $"{apiBaseUrl}/api/book/admin/all";
+
+                _httpClient.DefaultRequestHeaders.Clear();
+                _httpClient.DefaultRequestHeaders.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+                var response = await _httpClient.GetAsync(url);
+                var content = await response.Content.ReadAsStringAsync();
+
+                ViewBag.ApiUrl = url;
+                ViewBag.ResponseStatus = response.StatusCode;
+                ViewBag.RawResponse = content;
+
+                return View();
+            }
+            catch (Exception ex)
+            {
+                ViewBag.Error = ex.Message;
+                return View();
+            }
+        }
+
+        // Debug: Test create book with sample data
+        [HttpGet]
+        public async Task<IActionResult> TestCreateBook()
+        {
+            try
+            {
+                var sampleBook = new CreateBookViewModel
+                {
+                    Title = "Test Book " + DateTime.Now.ToString("HHmmss"),
+                    Author = "Test Author",
+                    ISBN = "9999999999999",
+                    Publisher = "Test Publisher",
+                    PublicationYear = 2024,
+                    Description = "This is a test book created for debugging",
+                    CoverImageUrl = "https://via.placeholder.com/300x400",
+                    Quantity = 5,
+                    Language = "Tiếng Việt",
+                    PageCount = 200,
+                    CategoryIds = new List<int> { 1 } // Assuming category ID 1 exists
+                };
+
+                var token = _authApiService.GetCurrentToken();
+                if (string.IsNullOrEmpty(token))
+                {
+                    return Json(new { success = false, message = "No authentication token" });
+                }
+
+                var result = await _bookApiService.CreateBookAsync(sampleBook, token);
+                return Json(new { success = true, message = "Test book created successfully", data = result });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message, stackTrace = ex.StackTrace });
             }
         }
 
@@ -342,6 +417,34 @@ namespace ELibraryManagement.Web.Controllers
             }
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetBookDetail(int id)
+        {
+            var accessCheck = await CheckAdminAccessAsync();
+            if (accessCheck != null) return Json(new { success = false, message = "Unauthorized" });
+
+            try
+            {
+                var token = _authApiService.GetCurrentToken();
+                if (string.IsNullOrEmpty(token))
+                {
+                    return Json(new { success = false, message = "Không có token xác thực" });
+                }
+
+                var book = await _bookApiService.GetBookDetailAsync(id, token);
+                if (book == null)
+                {
+                    return Json(new { success = false, message = "Không tìm thấy sách" });
+                }
+
+                return Json(new { success = true, data = book });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Có lỗi xảy ra: {ex.Message}" });
+            }
+        }
+
         [HttpPost]
         public async Task<IActionResult> CreateBook([FromBody] CreateBookViewModel model)
         {
@@ -350,7 +453,22 @@ namespace ELibraryManagement.Web.Controllers
 
             if (!ModelState.IsValid)
             {
-                return Json(new { success = false, message = "Dữ liệu không hợp lệ", errors = ModelState });
+                var errors = ModelState
+                    .Where(x => x.Value?.Errors?.Count > 0)
+                    .Select(x => new
+                    {
+                        Field = x.Key,
+                        Errors = x.Value?.Errors?.Select(e => e.ErrorMessage) ?? new List<string>()
+                    });
+
+                var errorMessage = string.Join("; ", errors.SelectMany(e => e.Errors));
+
+                return Json(new
+                {
+                    success = false,
+                    message = $"Dữ liệu không hợp lệ: {errorMessage}",
+                    errors = errors
+                });
             }
 
             try
@@ -788,6 +906,42 @@ namespace ELibraryManagement.Web.Controllers
                     error = ex.Message,
                     apiUrl = $"{GetApiBaseUrl()}/api/User"
                 });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UploadBookImage(IFormFile file)
+        {
+            try
+            {
+                if (!await IsAdminAsync())
+                {
+                    return Json(new { success = false, message = "Bạn không có quyền thực hiện chức năng này!" });
+                }
+
+                if (file == null || file.Length == 0)
+                {
+                    return Json(new { success = false, message = "Vui lòng chọn file ảnh!" });
+                }
+
+                var token = _authApiService.GetCurrentToken();
+                if (string.IsNullOrEmpty(token))
+                {
+                    return Json(new { success = false, message = "Bạn cần đăng nhập để thực hiện chức năng này!" });
+                }
+
+                var result = await _bookApiService.UploadBookImageAsync(file, token);
+
+                return Json(new
+                {
+                    success = result.Success,
+                    message = result.Message,
+                    imageUrl = result.ImageUrl
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Có lỗi xảy ra: {ex.Message}" });
             }
         }
     }

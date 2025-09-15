@@ -272,6 +272,15 @@ namespace ELibraryManagement.Api.Services.Implementations
         // Admin functions
         public async Task<BookDto> CreateBookAsync(CreateBookDto createBookDto)
         {
+            // Debug logging
+            Console.WriteLine($"[BookService] CreateBookAsync - Input CoverImageUrl: '{createBookDto.CoverImageUrl}'");
+
+            // Validate ISBN length
+            if (!string.IsNullOrEmpty(createBookDto.ISBN) && createBookDto.ISBN.Length > 13)
+            {
+                throw new ArgumentException("ISBN không được vượt quá 13 ký tự");
+            }
+
             var book = new Book
             {
                 Title = createBookDto.Title,
@@ -292,8 +301,22 @@ namespace ELibraryManagement.Api.Services.Implementations
                 UpdatedAt = DateTime.UtcNow
             };
 
-            _context.Books.Add(book);
-            await _context.SaveChangesAsync();
+            Console.WriteLine($"[BookService] CreateBookAsync - Book object CoverImageUrl before save: '{book.CoverImageUrl}'");
+
+            try
+            {
+                _context.Books.Add(book);
+                await _context.SaveChangesAsync();
+
+                Console.WriteLine($"[BookService] CreateBookAsync - Book ID after save: {book.Id}, CoverImageUrl: '{book.CoverImageUrl}'");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[BookService] CreateBookAsync - SaveChanges Exception: {ex.Message}");
+                Console.WriteLine($"[BookService] CreateBookAsync - Inner Exception: {ex.InnerException?.Message}");
+                Console.WriteLine($"[BookService] CreateBookAsync - Stack Trace: {ex.StackTrace}");
+                throw new Exception($"Database save failed: {ex.InnerException?.Message ?? ex.Message}", ex);
+            }
 
             // Add categories if provided
             if (createBookDto.CategoryIds?.Any() == true)

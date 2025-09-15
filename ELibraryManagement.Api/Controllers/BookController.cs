@@ -13,10 +13,12 @@ namespace ELibraryManagement.Api.Controllers
     public class BookController : ControllerBase
     {
         private readonly IBookService _bookService;
+        private readonly ICloudinaryService _cloudinaryService;
 
-        public BookController(IBookService bookService)
+        public BookController(IBookService bookService, ICloudinaryService cloudinaryService)
         {
             _bookService = bookService;
+            _cloudinaryService = cloudinaryService;
         }
 
         /// <summary>
@@ -124,25 +126,52 @@ namespace ELibraryManagement.Api.Controllers
         }
 
         /// <summary>
+        /// Lấy chi tiết sách theo ID - Chỉ dành cho Admin
+        /// </summary>
+        [HttpGet("admin/{id}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetBookDetailForAdmin(int id)
+        {
+            var book = await _bookService.GetBookByIdAsync(id);
+            if (book == null)
+            {
+                return NotFound(new { message = $"Không tìm thấy sách với ID {id}" });
+            }
+            return Ok(book);
+        }
+
+        /// <summary>
         /// Tạo sách mới - Chỉ dành cho Admin
         /// </summary>
         [HttpPost("admin/create")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> CreateBook([FromBody] CreateBookDto createBookDto)
         {
+            // Debug logging
+            Console.WriteLine($"[BookController] CreateBook - Received CoverImageUrl: '{createBookDto.CoverImageUrl}'");
+            Console.WriteLine($"[BookController] CreateBook - Full DTO: {System.Text.Json.JsonSerializer.Serialize(createBookDto)}");
+
             if (!ModelState.IsValid)
             {
+                Console.WriteLine($"[BookController] CreateBook - ModelState invalid: {string.Join(", ", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage))}");
                 return BadRequest(ModelState);
             }
 
             try
             {
                 var book = await _bookService.CreateBookAsync(createBookDto);
+                Console.WriteLine($"[BookController] CreateBook - Created book with ID: {book.Id}, CoverImageUrl: '{book.CoverImageUrl}'");
                 return CreatedAtAction(nameof(GetBookById), new { id = book.Id }, book);
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                Console.WriteLine($"[BookController] CreateBook - Exception: {ex.Message}");
+                Console.WriteLine($"[BookController] CreateBook - Inner Exception: {ex.InnerException?.Message}");
+                Console.WriteLine($"[BookController] CreateBook - Stack Trace: {ex.StackTrace}");
+
+                // Return more detailed error message
+                var errorMessage = ex.InnerException?.Message ?? ex.Message;
+                return BadRequest(new { message = $"An error occurred while saving the entity changes. Details: {errorMessage}" });
             }
         }
 
@@ -207,8 +236,62 @@ namespace ELibraryManagement.Api.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAllCategories()
         {
-            var categories = await _bookService.GetAllCategoriesAsync();
-            return Ok(categories);
+            try
+            {
+                var categories = await _bookService.GetAllCategoriesAsync();
+                return Ok(new { success = true, data = categories });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { success = false, message = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Upload hình ảnh sách - Chỉ dành cho Admin
+        /// </summary>
+        [HttpPost("admin/upload-image")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> UploadBookImage(IFormFile file)
+        {
+            try
+            {
+                if (file == null || file.Length == 0)
+                {
+                    return BadRequest(new { message = "Vui lòng chọn file ảnh!" });
+                }
+
+                // Validate file type
+                var allowedTypes = new[] { "image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp" };
+                if (!allowedTypes.Contains(file.ContentType.ToLower()))
+                {
+                    return BadRequest(new { message = "Chỉ chấp nhận file ảnh (JPG, PNG, GIF, WebP)" });
+                }
+
+                // Validate file size (5MB)
+                if (file.Length > 5 * 1024 * 1024)
+                {
+                    return BadRequest(new { message = "Kích thước file không được vượt quá 5MB" });
+                }
+
+                // Upload ảnh lên Cloudinary
+                var imageUrl = await _cloudinaryService.UploadImageAsync(file, "books");
+                if (imageUrl == null)
+                {
+                    return BadRequest(new { message = "Không thể tải lên hình ảnh" });
+                }
+
+                return Ok(new
+                {
+                    message = "Tải lên hình ảnh thành công",
+                    imageUrl = imageUrl
+                });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"[BookController] UploadBookImage - Exception: {ex.Message}");
+                return StatusCode(500, new { message = $"Có lỗi xảy ra: {ex.Message}" });
+            }
         }
     }
 }

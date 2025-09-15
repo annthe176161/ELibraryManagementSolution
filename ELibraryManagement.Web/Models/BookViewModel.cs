@@ -13,6 +13,7 @@ namespace ELibraryManagement.Web.Models
         public int TotalCopies { get; set; }
         public int AvailableCopies { get; set; }
         public string CategoryName { get; set; } = string.Empty;
+        public List<CategoryViewModel> Categories { get; set; } = new List<CategoryViewModel>();
         public string Language { get; set; } = string.Empty;
         public int PageCount { get; set; }
         public decimal AverageRating { get; set; }
