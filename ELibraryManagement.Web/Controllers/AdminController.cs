@@ -469,9 +469,7 @@ namespace ELibraryManagement.Web.Controllers
 
             try
             {
-                Console.WriteLine("[AdminController] GetCategories called");
                 var result = await _categoryApiService.GetAllCategoriesAsync(true); // includeInactive = true để lấy tất cả
-                Console.WriteLine($"[AdminController] CategoryApiService result: Success={result.Success}, Categories count={result.Categories?.Count ?? 0}");
 
                 if (result.Success && result.Categories != null)
                 {
@@ -482,16 +480,13 @@ namespace ELibraryManagement.Web.Controllers
                         isActive = c.IsActive
                     }).ToList();
 
-                    Console.WriteLine($"[AdminController] Returning {categories.Count} categories");
                     return Json(new { success = true, data = categories });
                 }
 
-                Console.WriteLine($"[AdminController] CategoryApiService failed: {result.Message}");
                 return Json(new { success = false, message = result.Message ?? "Could not load categories" });
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"[AdminController] Exception in GetCategories: {ex.Message}");
                 return Json(new { success = false, message = ex.Message });
             }
         }
@@ -834,9 +829,6 @@ namespace ELibraryManagement.Web.Controllers
                 {
                     var content = await response.Content.ReadAsStringAsync();
 
-                    // Debug logging
-                    TempData["DebugMessage"] = $"API Success: Content length: {content?.Length ?? 0}, First 200 chars: {content?.Substring(0, Math.Min(200, content?.Length ?? 0))}";
-
                     List<BookDto> bookDtos = new();
 
                     try
@@ -883,7 +875,6 @@ namespace ELibraryManagement.Web.Controllers
                     if (categoriesResponse.IsSuccessStatusCode)
                     {
                         var categoriesContent = await categoriesResponse.Content.ReadAsStringAsync();
-                        TempData["CategoriesDebug"] = $"Categories Response: {categoriesContent?.Substring(0, Math.Min(500, categoriesContent?.Length ?? 0))}";
                         try
                         {
                             if (!string.IsNullOrEmpty(categoriesContent))
@@ -905,23 +896,18 @@ namespace ELibraryManagement.Web.Controllers
                     ViewBag.TotalBooks = books?.Count ?? 0;
                     ViewBag.AvailableBooks = books?.Count(b => b.AvailableQuantity > 0) ?? 0;
                     ViewBag.OutOfStockBooks = books?.Count(b => b.AvailableQuantity == 0) ?? 0;
-                    ViewBag.DebugInfo = $"Books: {books?.Count ?? 0}, Categories: {categories?.Count ?? 0}";
 
                     return View(books ?? new List<AdminBookViewModel>());
                 }
                 else
                 {
                     TempData["ErrorMessage"] = "Không thể tải danh sách sách. Vui lòng thử lại.";
-                    // Debug: Log response details
-                    var errorContent = await response.Content.ReadAsStringAsync();
-                    TempData["DebugMessage"] = $"API Response: {response.StatusCode} - {errorContent}";
                     return View(new List<AdminBookViewModel>());
                 }
             }
             catch (Exception ex)
             {
                 TempData["ErrorMessage"] = $"Có lỗi xảy ra: {ex.Message}";
-                TempData["DebugMessage"] = $"Exception: {ex.ToString()}";
                 return View(new List<AdminBookViewModel>());
             }
         }

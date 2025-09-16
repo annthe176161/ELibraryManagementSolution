@@ -36,28 +36,6 @@
 
 <!-- Statistics Row -->
 <div class="row mb-4">
-    @if (TempData["DebugMessage"] != null || ViewBag.DebugInfo != null || TempData["CategoriesDebug"] != null ||
-        TempData["CategoriesError"] != null || TempData["BooksError"] != null)
-    {
-        <div class="col-12 mb-3">
-            <div class="alert alert-info">
-                <strong>Debug Info:</strong><br />
-                @TempData["DebugMessage"]<br />
-                @ViewBag.DebugInfo<br />
-                @TempData["CategoriesDebug"]<br />
-                @if (TempData["CategoriesError"] != null)
-                {
-                    <span class="text-danger">@TempData["CategoriesError"]</span>
-            
-                    <br />
-                }
-                @if (TempData["BooksError"] != null)
-                {
-                    <span class="text-danger">@TempData["BooksError"]</span>
-                }
-            </div>
-        </div>
-    }
     <div class="col-md-3">
         <div class="card bg-success text-white">
             <div class="card-body">

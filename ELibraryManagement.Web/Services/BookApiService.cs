@@ -643,30 +643,6 @@ namespace ELibraryManagement.Web.Services
         {
             try
             {
-                Console.WriteLine("=== Starting GetCategoryName parsing ===");
-
-                // Debug: Log all properties in the book element
-                Console.WriteLine("Available properties in book element:");
-                foreach (var property in book.EnumerateObject())
-                {
-                    Console.WriteLine($"  {property.Name}: {property.Value.ValueKind}");
-                    if (property.Value.ValueKind == JsonValueKind.Object)
-                    {
-                        Console.WriteLine($"    Object properties:");
-                        foreach (var subProp in property.Value.EnumerateObject())
-                        {
-                            Console.WriteLine($"      {subProp.Name}: {subProp.Value}");
-                        }
-                    }
-                    else if (property.Value.ValueKind == JsonValueKind.Array)
-                    {
-                        Console.WriteLine($"    Array with {property.Value.GetArrayLength()} items");
-                        for (int i = 0; i < Math.Min(property.Value.GetArrayLength(), 3); i++)
-                        {
-                            Console.WriteLine($"      [{i}]: {property.Value[i]}");
-                        }
-                    }
-                }
 
                 // Try different possible structures for category
 
@@ -676,7 +652,7 @@ namespace ELibraryManagement.Web.Services
                     var name = categoryName.GetString();
                     if (!string.IsNullOrEmpty(name))
                     {
-                        Console.WriteLine($"✓ Found categoryName: {name}");
+
                         return name;
                     }
                 }
@@ -687,7 +663,7 @@ namespace ELibraryManagement.Web.Services
                     var name = category.GetString();
                     if (!string.IsNullOrEmpty(name))
                     {
-                        Console.WriteLine($"✓ Found category: {name}");
+
                         return name;
                     }
                 }
@@ -705,7 +681,7 @@ namespace ELibraryManagement.Web.Services
                             var catNameFromArray = nameElement.GetString();
                             if (!string.IsNullOrEmpty(catNameFromArray))
                             {
-                                Console.WriteLine($"✓ Found categories[0].name: {catNameFromArray}");
+
                                 return catNameFromArray;
                             }
                         }
@@ -716,7 +692,7 @@ namespace ELibraryManagement.Web.Services
                             var catName = firstCategory.GetString();
                             if (!string.IsNullOrEmpty(catName))
                             {
-                                Console.WriteLine($"✓ Found categories[0] as string: {catName}");
+
                                 return catName;
                             }
                         }
@@ -734,7 +710,7 @@ namespace ELibraryManagement.Web.Services
                             var catName = name.GetString();
                             if (!string.IsNullOrEmpty(catName))
                             {
-                                Console.WriteLine($"✓ Found bookCategory.name: {catName}");
+
                                 return catName;
                             }
                         }
@@ -745,7 +721,7 @@ namespace ELibraryManagement.Web.Services
                             var categoryNameFromBookCat = catNameElement.GetString();
                             if (!string.IsNullOrEmpty(categoryNameFromBookCat))
                             {
-                                Console.WriteLine($"✓ Found bookCategory.categoryName: {categoryNameFromBookCat}");
+
                                 return categoryNameFromBookCat;
                             }
                         }
@@ -756,7 +732,7 @@ namespace ELibraryManagement.Web.Services
                             var categoryTitle = titleElement.GetString();
                             if (!string.IsNullOrEmpty(categoryTitle))
                             {
-                                Console.WriteLine($"✓ Found bookCategory.title: {categoryTitle}");
+
                                 return categoryTitle;
                             }
                         }
@@ -767,7 +743,7 @@ namespace ELibraryManagement.Web.Services
                 if (book.TryGetProperty("categoryId", out JsonElement categoryId))
                 {
                     var id = categoryId.GetInt32();
-                    Console.WriteLine($"Found categoryId: {id}");
+
 
                     // Simple mapping for common categories
                     var categoryMap = new Dictionary<int, string>
@@ -786,7 +762,7 @@ namespace ELibraryManagement.Web.Services
 
                     if (categoryMap.TryGetValue(id, out var mappedName))
                     {
-                        Console.WriteLine($"✓ Mapped categoryId {id} to: {mappedName}");
+
                         return mappedName;
                     }
                 }
@@ -800,19 +776,19 @@ namespace ELibraryManagement.Web.Services
                         var name = propValue.GetString();
                         if (!string.IsNullOrEmpty(name))
                         {
-                            Console.WriteLine($"✓ Found {propName}: {name}");
+
                             return name;
                         }
                     }
                 }
 
-                Console.WriteLine("❌ No category found in any expected location, returning default");
+
                 return "Chưa phân loại";
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"❌ Error parsing category: {ex.Message}");
-                Console.WriteLine($"Stack trace: {ex.StackTrace}");
+
+
                 return "Chưa phân loại";
             }
         }
@@ -827,28 +803,28 @@ namespace ELibraryManagement.Web.Services
                 if (response.IsSuccessStatusCode)
                 {
                     var content = await response.Content.ReadAsStringAsync();
-                    Console.WriteLine($"API Response for Book {id}: {content}");
+
 
                     // Parse JSON manually for now
                     var jsonDoc = JsonDocument.Parse(content);
                     var root = jsonDoc.RootElement;
 
                     // Debug: Log all properties in the response
-                    Console.WriteLine($"Available properties in JSON response:");
+
                     foreach (var property in root.EnumerateObject())
                     {
-                        Console.WriteLine($"  {property.Name}: {property.Value.ValueKind}");
+
                         if (property.Value.ValueKind == JsonValueKind.Object)
                         {
-                            Console.WriteLine($"    Object properties:");
+
                             foreach (var subProp in property.Value.EnumerateObject())
                             {
-                                Console.WriteLine($"      {subProp.Name}: {subProp.Value}");
+
                             }
                         }
                         else if (property.Value.ValueKind == JsonValueKind.Array)
                         {
-                            Console.WriteLine($"    Array with {property.Value.GetArrayLength()} items");
+
                         }
                     }
 
@@ -879,7 +855,7 @@ namespace ELibraryManagement.Web.Services
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error in GetBookByIdAsync: {ex.Message}");
+
 
                 // Return a mock book for testing if API fails
                 var categories = new[] { "Văn học", "Khoa học", "Lịch sử", "Công nghệ", "Kinh tế" };
