@@ -6,6 +6,18 @@
     min-height: 100vh;
 }
 
+/* Remove ALL transitions and animations globally in admin */
+.admin-body *,
+.admin-body *::before,
+.admin-body *::after {
+    transition: none !important;
+    animation: none !important;
+    animation-duration: 0s !important;
+    animation-delay: 0s !important;
+    transition-duration: 0s !important;
+    transition-delay: 0s !important;
+}
+
 .admin-body::before {
     content: '';
     position: fixed;
@@ -30,10 +42,49 @@
     font-size: 1.25rem;
 }
 
+/* Remove all navbar animations and transitions */
+.admin-navbar .navbar-brand,
+.admin-navbar .nav-link,
+.admin-navbar .dropdown-toggle,
+.admin-navbar .dropdown-item,
+.admin-navbar .navbar-toggler {
+    transition: none !important;
+    animation: none !important;
+}
+
+.admin-navbar .navbar-brand:hover,
+.admin-navbar .nav-link:hover,
+.admin-navbar .dropdown-toggle:hover,
+.admin-navbar .dropdown-item:hover,
+.admin-navbar .navbar-toggler:hover {
+    transform: none !important;
+    transition: none !important;
+}
+
+/* Remove Bootstrap dropdown animations */
+.dropdown-menu {
+    transition: none !important;
+    animation: none !important;
+}
+
+.dropdown-menu.show {
+    animation: none !important;
+}
+
 /* Admin Wrapper */
 .admin-wrapper {
-    margin-top: 60px; /* Account for fixed navbar */
-    display: flex;
+    margin-top: 60px; /* Account for fixed na.sidebar-toggle {
+    position: fixed;
+    top: 70px;
+    left: 250px;
+    background: #3498db;
+    color: white;
+    border: none;
+    border-radius: 0 5px 5px 0;
+    padding: 10px 8px;
+    font-size: 14px;
+    z-index: 1025;
+}display: flex;
     min-height: calc(100vh - 60px);
 }
 
@@ -47,7 +98,6 @@
     left: 0;
     height: calc(100vh - 60px);
     overflow-y: auto;
-    transition: all 0.3s ease;
     z-index: 1020;
     display: flex;
     flex-direction: column;
@@ -72,7 +122,6 @@
     color: #bdc3c7;
     padding: 12px 20px;
     border-radius: 0;
-    transition: all 0.3s ease;
     border: none;
     font-weight: 500;
 }
@@ -80,7 +129,6 @@
 .sidebar .nav-link:hover {
     background-color: rgba(52, 73, 94, 0.8);
     color: #ecf0f1;
-    transform: translateX(5px);
 }
 
 .sidebar .nav-link.active {
@@ -110,7 +158,6 @@
 .main-content {
     margin-left: 250px;
     width: calc(100% - 250px);
-    transition: all 0.3s ease;
 }
 
 .content-wrapper {
@@ -123,11 +170,9 @@
     border: none;
     border-radius: 10px;
     box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    transition: all 0.3s ease;
 }
 
 .admin-card:hover {
-    transform: translateY(-2px);
     box-shadow: 0 4px 20px rgba(0,0,0,0.15);
 }
 
@@ -212,13 +257,8 @@
     padding: 1rem 0.75rem;
 }
 
-.admin-table .table tbody tr {
-    transition: all 0.3s ease;
-}
-
 .admin-table .table tbody tr:hover {
     background-color: #f8f9fa;
-    transform: scale(1.01);
 }
 
 /* Buttons */
@@ -226,11 +266,9 @@
     border-radius: 6px;
     font-weight: 500;
     padding: 0.5rem 1rem;
-    transition: all 0.3s ease;
 }
 
 .btn-admin:hover {
-    transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
@@ -307,15 +345,7 @@
     font-weight: 400;
 }
 
-.system-status .pulse-animation {
-    animation: pulse 2s infinite;
-}
 
-@keyframes pulse {
-    0% { opacity: 1; }
-    50% { opacity: 0.5; }
-    100% { opacity: 1; }
-}
 
 .admin-badge {
     background: linear-gradient(45deg, #667eea, #764ba2);
@@ -339,7 +369,6 @@
     border-radius: 20px;
     padding: 1.5rem;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
 }
@@ -356,7 +385,6 @@
 }
 
 .enhanced-stat-card:hover {
-    transform: translateY(-5px);
     box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
 }
 
@@ -467,12 +495,10 @@
     border: none;
     border-radius: 20px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
     overflow: hidden;
 }
 
 .quick-access-card:hover {
-    transform: translateY(-5px);
     box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
 }
 
@@ -546,7 +572,6 @@
 .btn-access {
     border-radius: 10px;
     font-weight: 600;
-    transition: all 0.3s ease;
 }
 
 /* Activity & Quick Actions */
@@ -623,11 +648,9 @@
     border-radius: 10px;
     font-weight: 500;
     padding: 0.75rem 1rem;
-    transition: all 0.3s ease;
 }
 
 .btn-quick-action:hover {
-    transform: translateY(-2px);
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
@@ -717,52 +740,6 @@
     }
 }
 
-/* Animation Utilities */
-.fade-in {
-    animation: fadeIn 0.6s ease-in-out;
-}
-
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.slide-in-left {
-    animation: slideInLeft 0.6s ease-in-out;
-}
-
-@keyframes slideInLeft {
-    from {
-        opacity: 0;
-        transform: translateX(-30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
-
-.slide-in-right {
-    animation: slideInRight 0.6s ease-in-out;
-}
-
-@keyframes slideInRight {
-    from {
-        opacity: 0;
-        transform: translateX(30px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
-
 /* Loading Animation */
 .loading-spinner {
     display: inline-block;
@@ -771,19 +748,13 @@
     border: 3px solid #f3f3f3;
     border-top: 3px solid #3498db;
     border-radius: 50%;
-    animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
 }
 
 /* Sidebar Toggle Animation */
 .sidebar-toggle {
     position: fixed;
     top: 70px;
-    left: 260px;
+    left: 250px;
     background: #3498db;
     color: white;
     border: none;
@@ -791,7 +762,6 @@
     padding: 10px 8px;
     font-size: 14px;
     z-index: 1025;
-    transition: all 0.3s ease;
 }
 
 .sidebar-toggle:hover {

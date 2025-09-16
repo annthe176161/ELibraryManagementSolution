@@ -13,6 +13,22 @@
     <link rel="stylesheet" href="~/ELibraryManagement.Web.styles.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="~/css/admin.css" asp-append-version="true" />
+    
+    <!-- Disable Bootstrap transitions globally for admin -->
+    <style>
+        .admin-body .collapse,
+        .admin-body .collapsing,
+        .admin-body .fade,
+        .admin-body .show {
+            transition: none !important;
+            animation: none !important;
+        }
+        
+        .admin-body .dropdown-menu {
+            transition: none !important;
+            animation: none !important;
+        }
+    </style>
 </head>
 
 <body class="admin-body">

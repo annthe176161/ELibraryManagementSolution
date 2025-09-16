@@ -18,32 +18,22 @@ $(document).ready(function () {
 });
 
 function initializeAdminDashboard() {
-  // Add enhanced loading animation to cards on page load
+  // Remove animations - just show cards immediately
   $(
     ".enhanced-stat-card, .quick-access-card, .analytics-card, .activity-card, .quick-actions-card"
-  )
-    .hide()
-    .each(function (index) {
-      $(this)
-        .delay(index * 150)
-        .fadeIn(500)
-        .addClass("fade-in");
-    });
+  ).show();
 
-  // Animate statistics cards with count-up effect
-  animateStatNumbers();
+  // Remove count-up animation - just display final numbers
+  displayStatNumbers();
 
-  // Smooth scrolling for sidebar links
+  // Remove loading effects from sidebar links
   $(".sidebar .nav-link").on("click", function (e) {
-    // Add loading effect
-    if (!$(this).hasClass("active")) {
-      $(this).append('<span class="loading-spinner ms-2"></span>');
-    }
+    // No loading animation
   });
 }
 
-// Count-up animation for stat numbers
-function animateStatNumbers() {
+// Display stat numbers without animation
+function displayStatNumbers() {
   try {
     $(".stat-number[data-count]").each(function () {
       const $this = $(this);
@@ -55,24 +45,11 @@ function animateStatNumbers() {
         return;
       }
 
-      $({ countNum: 0 }).animate(
-        {
-          countNum: countTo,
-        },
-        {
-          duration: 2000,
-          easing: "swing",
-          step: function () {
-            $this.text(Math.floor(this.countNum));
-          },
-          complete: function () {
-            $this.text(countTo);
-          },
-        }
-      );
+      // Just display the final number immediately
+      $this.text(countTo);
     });
   } catch (error) {
-    console.error("Error in animateStatNumbers:", error);
+    console.error("Error in displayStatNumbers:", error);
   }
 }
 
@@ -111,7 +88,7 @@ function initializeEnhancedFeatures() {
     // Simulate refresh
     setTimeout(() => {
       $btn.html(originalHtml).prop("disabled", false);
-      animateStatNumbers();
+      displayStatNumbers();
       showNotification("Dashboard đã được cập nhật", "success");
     }, 2000);
   };
@@ -459,12 +436,7 @@ $("<style>")
             height: calc(100vh - 60px);
             background: rgba(0,0,0,0.5);
             z-index: 1019;
-            opacity: 0;
-            animation: fadeIn 0.3s forwards;
-        }
-        
-        @keyframes fadeIn {
-            to { opacity: 1; }
+            opacity: 1;
         }
         
         @media (min-width: 992px) {
