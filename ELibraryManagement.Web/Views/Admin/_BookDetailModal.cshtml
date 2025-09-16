@@ -1,0 +1,212 @@
+@model ELibraryManagement.Web.Models.AdminBookViewModel
+
+@if (Model != null)
+{
+    <div class="modal-header">
+        <h5 class="modal-title">
+            <i class="fas fa-book text-primary me-2"></i>
+            Chi tiết sách
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+    
+    <div class="modal-body">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="text-center mb-4">
+                    <img src="@(string.IsNullOrEmpty(Model.ImageUrl) ? "/images/no-book-cover.jpg" : Model.ImageUrl)" 
+                         alt="@Model.Title" 
+                         class="img-fluid rounded shadow" 
+                         style="max-height: 300px; width: auto;" 
+                         onerror="this.src='/images/no-book-cover.jpg';">
+                </div>
+            </div>
+            
+            <div class="col-md-8">
+                <div class="book-info">
+                    <h4 class="text-primary mb-3">@Model.Title</h4>
+                    
+                    <div class="row mb-3">
+                        <div class="col-sm-4">
+                            <strong>Tác giả:</strong>
+                        </div>
+                        <div class="col-sm-8">
+                            @Model.Author
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-sm-4">
+                            <strong>ISBN:</strong>
+                        </div>
+                        <div class="col-sm-8">
+                            @Model.ISBN
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-sm-4">
+                            <strong>Nhà xuất bản:</strong>
+                        </div>
+                        <div class="col-sm-8">
+                            @Model.Publisher
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-sm-4">
+                            <strong>Năm xuất bản:</strong>
+                        </div>
+                        <div class="col-sm-8">
+                            @Model.PublicationYear
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-sm-4">
+                            <strong>Ngôn ngữ:</strong>
+                        </div>
+                        <div class="col-sm-8">
+                            @Model.Language
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-sm-4">
+                            <strong>Số trang:</strong>
+                        </div>
+                        <div class="col-sm-8">
+                            @Model.PageCount trang
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-sm-4">
+                            <strong>Thể loại:</strong>
+                        </div>
+                        <div class="col-sm-8">
+                            @if (Model.Categories != null && Model.Categories.Any())
+                            {
+                                @foreach (var category in Model.Categories)
+                                {
+                                    <span class="badge me-1" style="background-color: @category.Color; color: white;">
+                                        @category.Name
+                                    </span>
+                                }
+                            }
+                            else
+                            {
+                                <span class="text-muted">Chưa phân loại</span>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-4">
+            <div class="col-12">
+                <h6><strong>Mô tả:</strong></h6>
+                <div class="description-text">
+                    @if (!string.IsNullOrEmpty(Model.Description))
+                    {
+                        <p class="text-muted">@Model.Description</p>
+                    }
+                    else
+                    {
+                        <p class="text-muted fst-italic">Chưa có mô tả</p>
+                    }
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-4">
+            <div class="col-md-3">
+                <div class="card bg-primary text-white text-center">
+                    <div class="card-body">
+                        <h5 class="card-title mb-0">@Model.TotalQuantity</h5>
+                        <small>Tổng số lượng</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-success text-white text-center">
+                    <div class="card-body">
+                        <h5 class="card-title mb-0">@Model.AvailableQuantity</h5>
+                        <small>Có sẵn</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-warning text-white text-center">
+                    <div class="card-body">
+                        <h5 class="card-title mb-0">@Model.BorrowedQuantity</h5>
+                        <small>Đang mượn</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card bg-info text-white text-center">
+                    <div class="card-body">
+                        <h5 class="card-title mb-0">@Model.AverageRating.ToString("F1")</h5>
+                        <small>Đánh giá (@Model.RatingCount)</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mt-3">
+            <div class="col-12 text-center">
+                <div class="rating-stars">
+                    @for (int i = 1; i <= 5; i++)
+                    {
+                        if (i <= Math.Floor(Model.AverageRating))
+                        {
+                            <i class="fas fa-star text-warning"></i>
+                        }
+                        else if (i == Math.Ceiling(Model.AverageRating) && Model.AverageRating % 1 != 0)
+                        {
+                            <i class="fas fa-star-half-alt text-warning"></i>
+                        }
+                        else
+                        {
+                            <i class="far fa-star text-warning"></i>
+                        }
+                    }
+                    <span class="ms-2 text-muted">(@Model.RatingCount đánh giá)</span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal-footer">
+        <button type="button" class="btn btn-outline-primary">
+            <i class="fas fa-edit me-2"></i>Chỉnh sửa
+        </button>
+        <button type="button" class="btn btn-outline-danger">
+            <i class="fas fa-trash me-2"></i>Xóa sách
+        </button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            <i class="fas fa-times me-2"></i>Đóng
+        </button>
+    </div>
+}
+else
+{
+    <div class="modal-header">
+        <h5 class="modal-title">Chi tiết sách</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+    
+    <div class="modal-body">
+        <div class="text-center py-4">
+            <i class="fas fa-exclamation-triangle text-warning fa-3x mb-3"></i>
+            <h5>Không thể tải thông tin sách</h5>
+            <p class="text-muted">Vui lòng thử lại sau.</p>
+        </div>
+    </div>
+    
+    <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+    </div>
+}

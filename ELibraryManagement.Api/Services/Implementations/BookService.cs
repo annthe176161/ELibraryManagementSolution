@@ -439,7 +439,11 @@ namespace ELibraryManagement.Api.Services.Implementations
                         Id = bc.Category.Id,
                         Name = bc.Category.Name,
                         Description = bc.Category.Description,
-                        Color = bc.Category.Color
+                        Color = bc.Category.Color,
+                        IsActive = bc.Category.IsActive,
+                        CreatedAt = bc.Category.CreatedAt,
+                        UpdatedAt = bc.Category.UpdatedAt,
+                        BookCount = 0 // Set to 0 for performance, not needed in book context
                     }).ToList()
                 }).ToListAsync();
         }

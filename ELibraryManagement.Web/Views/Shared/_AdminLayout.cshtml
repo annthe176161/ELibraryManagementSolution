@@ -109,6 +109,15 @@
                         </a>
                     </li>
 
+                    <!-- Book Management -->
+                    <li class="nav-item">
+                        <a class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Books" ? "active" : "")"
+                            asp-controller="Admin" asp-action="Books">
+                            <i class="fas fa-book me-3"></i>
+                            Quản lý sách
+                        </a>
+                    </li>
+
                     <!-- Borrow Management -->
                     <li class="nav-item">
                         <a class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Borrows" ? "active" : "")"

@@ -1,4 +1,5 @@
 using ELibraryManagement.Web.Models;
+using ELibraryManagement.Web.Models.DTOs;
 using ELibraryManagement.Web.Models.DTOs.CategoryDtos;
 using ELibraryManagement.Web.Services;
 using ELibraryManagement.Web.Services.Interfaces;
@@ -813,6 +814,150 @@ namespace ELibraryManagement.Web.Controllers
             return View();
         }
 
+        // GET: Admin/Books - Quản lý sách
+        public async Task<IActionResult> Books()
+        {
+            var accessCheck = await CheckAdminAccessAsync();
+            if (accessCheck != null) return accessCheck;
+
+            try
+            {
+                var token = _authApiService.GetCurrentToken();
+                _httpClient.DefaultRequestHeaders.Clear();
+                _httpClient.DefaultRequestHeaders.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+                // Get all books from API
+                var response = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Book/admin/all");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+
+                    // Debug logging
+                    TempData["DebugMessage"] = $"API Success: Content length: {content?.Length ?? 0}, First 200 chars: {content?.Substring(0, Math.Min(200, content?.Length ?? 0))}";
+
+                    List<BookDto> bookDtos = new();
+
+                    try
+                    {
+                        if (!string.IsNullOrEmpty(content))
+                        {
+                            bookDtos = JsonSerializer.Deserialize<List<BookDto>>(content, _jsonOptions) ?? new();
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        TempData["BooksError"] = $"Books Deserialization Error: {ex.Message}";
+                    }
+
+                    // Map BookDto to AdminBookViewModel
+                    var books = bookDtos?.Select(dto => new AdminBookViewModel
+                    {
+                        Id = dto.Id,
+                        Title = dto.Title ?? string.Empty,
+                        Author = dto.Author ?? string.Empty,
+                        ISBN = dto.ISBN ?? string.Empty,
+                        Publisher = dto.Publisher ?? string.Empty,
+                        PublicationYear = dto.PublicationYear,
+                        Description = dto.Description ?? string.Empty,
+                        ImageUrl = dto.CoverImageUrl ?? string.Empty,
+                        TotalQuantity = dto.Quantity,
+                        AvailableQuantity = dto.AvailableQuantity,
+                        Language = dto.Language ?? string.Empty,
+                        PageCount = dto.PageCount,
+                        AverageRating = (decimal)dto.AverageRating,
+                        RatingCount = dto.RatingCount,
+                        Categories = dto.Categories?.Select(c => new CategoryInfo
+                        {
+                            Id = c.Id,
+                            Name = c.Name ?? string.Empty,
+                            Color = c.Color ?? string.Empty
+                        }).ToList() ?? new List<CategoryInfo>()
+                    }).ToList() ?? new List<AdminBookViewModel>();
+
+                    // Get categories for filtering
+                    var categoriesResponse = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Category");
+                    List<ELibraryManagement.Web.Models.DTOs.CategoryDto> categories = new();
+
+                    if (categoriesResponse.IsSuccessStatusCode)
+                    {
+                        var categoriesContent = await categoriesResponse.Content.ReadAsStringAsync();
+                        TempData["CategoriesDebug"] = $"Categories Response: {categoriesContent?.Substring(0, Math.Min(500, categoriesContent?.Length ?? 0))}";
+                        try
+                        {
+                            if (!string.IsNullOrEmpty(categoriesContent))
+                            {
+                                var categoriesResponseDto = JsonSerializer.Deserialize<ELibraryManagement.Web.Models.DTOs.CategoriesListResponseDto>(categoriesContent, _jsonOptions);
+                                if (categoriesResponseDto?.Success == true)
+                                {
+                                    categories = categoriesResponseDto.Categories ?? new();
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            TempData["CategoriesError"] = $"Categories Deserialization Error: {ex.Message}";
+                        }
+                    }
+
+                    ViewBag.Categories = categories;
+                    ViewBag.TotalBooks = books?.Count ?? 0;
+                    ViewBag.AvailableBooks = books?.Count(b => b.AvailableQuantity > 0) ?? 0;
+                    ViewBag.OutOfStockBooks = books?.Count(b => b.AvailableQuantity == 0) ?? 0;
+                    ViewBag.DebugInfo = $"Books: {books?.Count ?? 0}, Categories: {categories?.Count ?? 0}";
+
+                    return View(books ?? new List<AdminBookViewModel>());
+                }
+                else
+                {
+                    TempData["ErrorMessage"] = "Không thể tải danh sách sách. Vui lòng thử lại.";
+                    // Debug: Log response details
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    TempData["DebugMessage"] = $"API Response: {response.StatusCode} - {errorContent}";
+                    return View(new List<AdminBookViewModel>());
+                }
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Có lỗi xảy ra: {ex.Message}";
+                TempData["DebugMessage"] = $"Exception: {ex.ToString()}";
+                return View(new List<AdminBookViewModel>());
+            }
+        }
+
+        // GET: Admin/TestBooks - Test Books API endpoint  
+        public async Task<IActionResult> TestBooks()
+        {
+            try
+            {
+                var token = _authApiService.GetCurrentToken();
+                _httpClient.DefaultRequestHeaders.Clear();
+                _httpClient.DefaultRequestHeaders.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+                var response = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Book/admin/all");
+                var content = await response.Content.ReadAsStringAsync();
+
+                return Json(new
+                {
+                    statusCode = response.StatusCode,
+                    isSuccess = response.IsSuccessStatusCode,
+                    content = content,
+                    apiUrl = $"{GetApiBaseUrl()}/api/Book/admin/all",
+                    hasToken = !string.IsNullOrEmpty(token)
+                });
+            }
+            catch (Exception ex)
+            {
+                return Json(new
+                {
+                    error = ex.Message,
+                    apiUrl = $"{GetApiBaseUrl()}/api/Book/admin/all"
+                });
+            }
+        }
+
         // GET: Admin/TestApiUsers - Test API endpoint
         public async Task<IActionResult> TestApiUsers()
         {
@@ -841,6 +986,69 @@ namespace ELibraryManagement.Web.Controllers
                     error = ex.Message,
                     apiUrl = $"{GetApiBaseUrl()}/api/User"
                 });
+            }
+        }
+
+        // GET: Admin/BookDetail/{id} - Xem chi tiết sách
+        [HttpGet]
+        public async Task<IActionResult> BookDetail(int id)
+        {
+            var accessCheck = await CheckAdminAccessAsync();
+            if (accessCheck != null) return Json(new { success = false, message = "Unauthorized" });
+
+            try
+            {
+                var token = _authApiService.GetCurrentToken();
+                _httpClient.DefaultRequestHeaders.Clear();
+                _httpClient.DefaultRequestHeaders.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+                var response = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Book/admin/{id}");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+
+                    if (!string.IsNullOrEmpty(content))
+                    {
+                        var bookDto = JsonSerializer.Deserialize<BookDto>(content, _jsonOptions);
+
+                        if (bookDto != null)
+                        {
+                            var bookDetail = new AdminBookViewModel
+                            {
+                                Id = bookDto.Id,
+                                Title = bookDto.Title ?? string.Empty,
+                                Author = bookDto.Author ?? string.Empty,
+                                ISBN = bookDto.ISBN ?? string.Empty,
+                                Publisher = bookDto.Publisher ?? string.Empty,
+                                PublicationYear = bookDto.PublicationYear,
+                                Description = bookDto.Description ?? string.Empty,
+                                ImageUrl = bookDto.CoverImageUrl ?? string.Empty,
+                                TotalQuantity = bookDto.Quantity,
+                                AvailableQuantity = bookDto.AvailableQuantity,
+                                Language = bookDto.Language ?? string.Empty,
+                                PageCount = bookDto.PageCount,
+                                AverageRating = (decimal)bookDto.AverageRating,
+                                RatingCount = bookDto.RatingCount,
+                                Categories = bookDto.Categories?.Select(c => new CategoryInfo
+                                {
+                                    Id = c.Id,
+                                    Name = c.Name ?? string.Empty,
+                                    Color = c.Color ?? string.Empty
+                                }).ToList() ?? new List<CategoryInfo>()
+                            };
+
+                            return PartialView("_BookDetailModal", bookDetail);
+                        }
+                    }
+                }
+
+                return PartialView("_BookDetailModal", null);
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Có lỗi xảy ra: {ex.Message}" });
             }
         }
     }

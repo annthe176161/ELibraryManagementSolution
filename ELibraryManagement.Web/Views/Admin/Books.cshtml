@@ -1,4 +1,4 @@
-@model List<BookViewModel>
+@model List<AdminBookViewModel>
 
 @{
     ViewData["Title"] = "Quản lý sách - E-Library";
@@ -35,6 +35,25 @@
 
     <!-- Statistics Row -->
     <div class="row mb-4">
+        @if (TempData["DebugMessage"] != null || ViewBag.DebugInfo != null || TempData["CategoriesDebug"] != null || TempData["CategoriesError"] != null || TempData["BooksError"] != null)
+        {
+            <div class="col-12 mb-3">
+                <div class="alert alert-info">
+                    <strong>Debug Info:</strong><br/>
+                    @TempData["DebugMessage"]<br/>
+                    @ViewBag.DebugInfo<br/>
+                    @TempData["CategoriesDebug"]<br/>
+                    @if(TempData["CategoriesError"] != null)
+                    {
+                        <span class="text-danger">@TempData["CategoriesError"]</span><br/>
+                    }
+                    @if(TempData["BooksError"] != null)
+                    {
+                        <span class="text-danger">@TempData["BooksError"]</span>
+                    }
+                </div>
+            </div>
+        }
         <div class="col-md-3">
             <div class="card bg-success text-white">
                 <div class="card-body">
@@ -56,7 +75,7 @@
                     <div class="d-flex justify-content-between">
                         <div>
                             <div class="small">Có sẵn</div>
-                            <div class="h4 mb-0">@Model.Sum(b => b.AvailableCopies)</div>
+                            <div class="h4 mb-0">@Model.Sum(b => b.AvailableQuantity)</div>
                         </div>
                         <div class="align-self-center">
                             <i class="fas fa-check-circle fa-2x opacity-75"></i>
@@ -71,7 +90,7 @@
                     <div class="d-flex justify-content-between">
                         <div>
                             <div class="small">Đang được mượn</div>
-                            <div class="h4 mb-0">@Model.Sum(b => Math.Max(0, b.TotalCopies - b.AvailableCopies))</div>
+                            <div class="h4 mb-0">@Model.Sum(b => b.BorrowedQuantity)</div>
                         </div>
                         <div class="align-self-center">
                             <i class="fas fa-hand-holding fa-2x opacity-75"></i>
@@ -86,7 +105,7 @@
                     <div class="d-flex justify-content-between">
                         <div>
                             <div class="small">Hết sách</div>
-                            <div class="h4 mb-0">@Model.Count(b => b.TotalCopies == 0)</div>
+                            <div class="h4 mb-0">@Model.Count(b => b.AvailableQuantity == 0)</div>
                         </div>
                         <div class="align-self-center">
                             <i class="fas fa-exclamation-triangle fa-2x opacity-75"></i>
@@ -178,9 +197,9 @@
                                                     <small class="text-muted">+@(book.Categories.Count - 2)</small>
                                                 }
                                             }
-                                            else if (!string.IsNullOrEmpty(book.CategoryName))
+                                            else if (!string.IsNullOrEmpty(book.CategoryNames))
                                             {
-                                                <span class="badge bg-primary">@book.CategoryName</span>
+                                                <span class="badge bg-primary">@book.CategoryNames</span>
                                             }
                                             else
                                             {
@@ -198,11 +217,11 @@
                                             }
                                         </td>
                                         <td>
-                                            @if (book.TotalCopies == 0)
+                                            @if (book.TotalQuantity == 0)
                                             {
                                                 <span class="badge bg-danger">Hết sách</span>
                                             }
-                                            else if (book.AvailableCopies > 0)
+                                            else if (book.AvailableQuantity > 0)
                                             {
                                                 <span class="badge bg-success">Có sẵn</span>
                                             }
@@ -213,8 +232,8 @@
                                         </td>
                                         <td>
                                             <div class="d-flex flex-column">
-                                                <small><strong>Có sẵn:</strong> @book.AvailableCopies</small>
-                                                <small><strong>Tổng:</strong> @book.TotalCopies</small>
+                                                <small><strong>Có sẵn:</strong> @book.AvailableQuantity</small>
+                                                <small><strong>Tổng:</strong> @book.TotalQuantity</small>
                                             </div>
                                         </td>
                                         <td>
@@ -237,7 +256,8 @@
                                         </td>
                                         <td>
                                             <div class="btn-group" role="group">
-                                                <button type="button" class="btn btn-sm btn-outline-primary" title="Xem chi tiết" onclick="viewBook(@book.Id)">
+                                                <button type="button" class="btn btn-sm btn-outline-primary view-book-btn" 
+                                                        title="Xem chi tiết" data-book-id="@book.Id">
                                                     <i class="fas fa-eye"></i>
                                                 </button>
                                                 <button type="button" class="btn btn-sm btn-outline-warning" title="Chỉnh sửa" data-bs-toggle="modal" data-bs-target="#bookModal" onclick="editBook(@book.Id)">
@@ -428,85 +448,11 @@
     </div>
 </div>
 
-<!-- View Book Detail Modal -->
-<div class="modal fade" id="viewBookModal" tabindex="-1" aria-labelledby="viewBookModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
+<!-- Book Detail Modal -->
+<div class="modal fade" id="bookDetailModal" tabindex="-1" aria-labelledby="bookDetailModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="viewBookModalLabel">Chi tiết sách</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div class="row">
-                    <div class="col-md-4">
-                        <div class="text-center">
-                            <div id="viewBookImage" class="mb-3" style="width: 200px; height: 280px; margin: 0 auto;">
-                                <img id="viewBookImg" src="" alt="Book Cover" class="img-fluid rounded shadow" style="width: 100%; height: 100%; object-fit: cover;">
-                                <div id="viewBookImgPlaceholder" class="bg-secondary rounded d-none align-items-center justify-content-center text-white h-100" style="font-size: 24px;">
-                                    <i class="fas fa-book"></i>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-8">
-                        <h4 id="viewBookTitle" class="mb-3"></h4>
-                        <table class="table table-borderless">
-                            <tr>
-                                <td width="30%"><strong>Tác giả:</strong></td>
-                                <td id="viewBookAuthor"></td>
-                            </tr>
-                            <tr>
-                                <td><strong>ISBN:</strong></td>
-                                <td id="viewBookISBN"></td>
-                            </tr>
-                            <tr>
-                                <td><strong>Nhà xuất bản:</strong></td>
-                                <td id="viewBookPublisher"></td>
-                            </tr>
-                            <tr>
-                                <td><strong>Năm xuất bản:</strong></td>
-                                <td id="viewBookYear"></td>
-                            </tr>
-                            <tr>
-                                <td><strong>Ngôn ngữ:</strong></td>
-                                <td id="viewBookLanguage"></td>
-                            </tr>
-                            <tr>
-                                <td><strong>Số trang:</strong></td>
-                                <td id="viewBookPages"></td>
-                            </tr>
-                            <tr>
-                                <td><strong>Danh mục:</strong></td>
-                                <td id="viewBookCategories"></td>
-                            </tr>
-                            <tr>
-                                <td><strong>Số lượng:</strong></td>
-                                <td>
-                                    <span id="viewBookAvailable" class="badge bg-success me-2"></span>
-                                    <span id="viewBookTotal" class="badge bg-secondary"></span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><strong>Đánh giá:</strong></td>
-                                <td id="viewBookRating"></td>
-                            </tr>
-                        </table>
-                    </div>
-                </div>
-                <div class="row mt-3">
-                    <div class="col-12">
-                        <h6><strong>Mô tả:</strong></h6>
-                        <p id="viewBookDescription" class="text-muted"></p>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                <button type="button" class="btn btn-warning" onclick="editBookFromView()">
-                    <i class="fas fa-edit me-1"></i>
-                    Chỉnh sửa
-                </button>
-            </div>
+            <!-- Content will be loaded dynamically -->
         </div>
     </div>
 </div>
@@ -524,6 +470,13 @@
 
         $(document).ready(function() {
             console.log('Document ready, loading categories...');
+            
+            // View book detail button event listener
+            $(document).on('click', '.view-book-btn', function() {
+                const bookId = $(this).data('book-id');
+                console.log('View book clicked for ID:', bookId);
+                viewBook(bookId);
+            });
             
             // Test modal functionality
             window.testModal = function() {
@@ -640,78 +593,7 @@
             }
         }
 
-        // View book details
-        function viewBook(bookId) {
-            // Load book details from API
-            $.ajax({
-                url: '/Admin/GetBookDetail',
-                type: 'GET',
-                data: { id: bookId },
-                success: function(response) {
-                    if (response.success && response.data) {
-                        const book = response.data;
-                        
-                        // Populate view modal
-                        $('#viewBookTitle').text(book.title || '');
-                        $('#viewBookAuthor').text(book.author || 'N/A');
-                        $('#viewBookISBN').text(book.isbn || 'N/A');
-                        $('#viewBookPublisher').text(book.publisher || 'N/A');
-                        $('#viewBookYear').text(book.publicationYear || 'N/A');
-                        $('#viewBookLanguage').text(book.language || 'N/A');
-                        $('#viewBookPages').text(book.pageCount || 'N/A');
-                        $('#viewBookDescription').text(book.description || 'Chưa có mô tả');
-                        
-                        // Handle image
-                        if (book.imageUrl && book.imageUrl !== 'https://example.com/image.jpg') {
-                            $('#viewBookImg').attr('src', book.imageUrl).show();
-                            $('#viewBookImgPlaceholder').hide();
-                        } else {
-                            $('#viewBookImg').hide();
-                            $('#viewBookImgPlaceholder').removeClass('d-none').addClass('d-flex');
-                        }
-                        
-                        // Handle categories
-                        if (book.categories && book.categories.length > 0) {
-                            const categoryNames = book.categories.map(c => `<span class="badge bg-primary me-1">${c.name}</span>`).join('');
-                            $('#viewBookCategories').html(categoryNames);
-                        } else {
-                            $('#viewBookCategories').text('Chưa có danh mục');
-                        }
-                        
-                        // Handle quantities
-                        $('#viewBookAvailable').text(`Có sẵn: ${book.availableCopies || 0}`);
-                        $('#viewBookTotal').text(`Tổng: ${book.totalCopies || 0}`);
-                        
-                        // Handle rating
-                        if (book.averageRating && book.ratingCount) {
-                            let stars = '';
-                            for (let i = 1; i <= 5; i++) {
-                                if (i <= Math.floor(book.averageRating)) {
-                                    stars += '<i class="fas fa-star text-warning"></i>';
-                                } else {
-                                    stars += '<i class="far fa-star text-muted"></i>';
-                                }
-                            }
-                            $('#viewBookRating').html(`${stars} <small class="text-muted">(${book.ratingCount} đánh giá)</small>`);
-                        } else {
-                            $('#viewBookRating').text('Chưa có đánh giá');
-                        }
-                        
-                        // Store current book ID for edit button
-                        currentViewBookId = bookId;
-                        
-                        // Show modal
-                        $('#viewBookModal').modal('show');
-                    } else {
-                        alert('Không thể tải thông tin sách: ' + (response.message || 'Lỗi không xác định'));
-                    }
-                },
-                error: function(xhr) {
-                    console.error('Error loading book details:', xhr);
-                    alert('Có lỗi xảy ra khi tải thông tin sách');
-                }
-            });
-        }
+
 
         // Edit book from view modal
         let currentViewBookId = null;
@@ -1027,7 +909,6 @@
         function triggerImageUpload() {
             $('#imageFile').click();
         }
-        }
 
         // Delete book
         function deleteBook(bookId, bookTitle) {
@@ -1056,6 +937,53 @@
             });
             
             $('#deleteModal').modal('show');
+        }
+
+        // View book detail
+        function viewBook(bookId) {
+            console.log('viewBook function called with ID:', bookId);
+            
+            if (!bookId) {
+                console.error('No book ID provided');
+                alert('Lỗi: Không có ID sách');
+                return;
+            }
+            
+            console.log('Loading book detail modal...');
+            $('#bookDetailModal .modal-content').html('<div class="modal-body text-center"><div class="spinner-border" role="status"><span class="visually-hidden">Đang tải...</span></div></div>');
+            $('#bookDetailModal').modal('show');
+            
+            console.log('Making AJAX request to:', '/Admin/BookDetail/' + bookId);
+            $.ajax({
+                url: '/Admin/BookDetail/' + bookId,
+                type: 'GET',
+                success: function(response) {
+                    console.log('AJAX success, response received');
+                    $('#bookDetailModal .modal-content').html(response);
+                },
+                error: function(xhr) {
+                    console.error('AJAX Error:', xhr);
+                    console.error('Status:', xhr.status);
+                    console.error('Response Text:', xhr.responseText);
+                    $('#bookDetailModal .modal-content').html(`
+                        <div class="modal-header">
+                            <h5 class="modal-title">Chi tiết sách</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="text-center py-4">
+                                <i class="fas fa-exclamation-triangle text-danger fa-3x mb-3"></i>
+                                <h5>Lỗi tải dữ liệu</h5>
+                                <p class="text-muted">Có lỗi xảy ra khi tải thông tin sách. Status: ${xhr.status}</p>
+                                <p class="text-muted">Chi tiết: ${xhr.responseText}</p>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                        </div>
+                    `);
+                }
+            });
         }
     </script>
 }
