@@ -59,12 +59,21 @@ namespace ELibraryManagement.Web.Controllers
                     return RedirectToAction("MyBooks");
                 }
 
+                // Tính toán thống kê cá nhân
+                var currentlyActiveBorrows = borrowedBooks?.Where(b =>
+                    b.Status == "Requested" || b.Status == "Borrowed").Count() ?? 0;
+                var totalBorrowed = borrowedBooks?.Count() ?? 0;
+
                 // Tạo ViewModel cho borrowed book details
                 var viewModel = new BorrowedBookDetailViewModel
                 {
                     BorrowRecord = borrowedBook,
                     BookDetails = bookDetails
                 };
+
+                // Truyền thông tin thống kê qua ViewBag
+                ViewBag.CurrentActiveBorrows = currentlyActiveBorrows;
+                ViewBag.TotalBorrowed = totalBorrowed;
 
                 return View(viewModel);
             }
@@ -108,8 +117,9 @@ namespace ELibraryManagement.Web.Controllers
                 // Get borrowed books count for validation
                 var allBorrowedBooks = await _bookApiService.GetBorrowedBooksAsync(currentUser?.Id ?? "", token ?? "");
 
-                // Filter only currently borrowed books (not returned yet)
-                var currentlyBorrowedBooks = allBorrowedBooks?.Where(b => b.ReturnDate == null).ToList() ?? new List<UserBorrowedBookViewModel>();
+                // Filter only currently active borrow requests and borrowed books (exclude cancelled and returned)
+                var currentlyBorrowedBooks = allBorrowedBooks?.Where(b =>
+                    b.Status == "Requested" || b.Status == "Borrowed").ToList() ?? new List<UserBorrowedBookViewModel>();
                 var currentBorrowedCount = currentlyBorrowedBooks.Count;
                 var maxBooksAllowed = 5;
                 var canBorrow = currentBorrowedCount < maxBooksAllowed;
@@ -219,12 +229,78 @@ namespace ELibraryManagement.Web.Controllers
                 }
                 else
                 {
+                    // When there's an error, we need to reload all ViewBag data
+                    // Get borrowed books count for validation
+                    var allBorrowedBooks = await _bookApiService.GetBorrowedBooksAsync(currentUser.Id, token);
+                    var currentlyBorrowedBooks = allBorrowedBooks?.Where(b =>
+                        b.Status == "Requested" || b.Status == "Borrowed").ToList() ?? new List<UserBorrowedBookViewModel>();
+                    var currentBorrowedCount = currentlyBorrowedBooks.Count;
+                    var maxBooksAllowed = 5;
+                    var canBorrow = currentBorrowedCount < maxBooksAllowed;
+
+                    // Reload student info
+                    model.StudentInfo = new StudentInfoViewModel
+                    {
+                        StudentId = currentUser?.StudentId ?? "SV001234567",
+                        FullName = $"{currentUser?.FirstName} {currentUser?.LastName}".Trim() ?? _authApiService.GetCurrentUserName() ?? "Nguyễn Văn An",
+                        Email = currentUser?.Email ?? "anNV@fpt.edu.vn",
+                        PhoneNumber = currentUser?.PhoneNumber ?? "0123 456 789",
+                        Major = "Công nghệ thông tin",
+                        AcademicYear = "2021 - 2025",
+                        StudentStatus = "Đang học"
+                    };
+
+                    // Reload ViewBag data
+                    ViewBag.CurrentBorrowedCount = currentBorrowedCount;
+                    ViewBag.MaxBooksAllowed = maxBooksAllowed;
+                    ViewBag.CanBorrow = canBorrow;
+                    ViewBag.BorrowedBooks = currentlyBorrowedBooks;
+
                     ModelState.AddModelError("", result.Message);
                     return View(model);
                 }
             }
             catch (Exception ex)
             {
+                // When there's an exception, we need to reload all ViewBag data
+                try
+                {
+                    var currentUser = await _authApiService.GetCurrentUserAsync();
+                    var token = _authApiService.GetCurrentToken();
+
+                    if (currentUser != null && !string.IsNullOrEmpty(token))
+                    {
+                        var allBorrowedBooks = await _bookApiService.GetBorrowedBooksAsync(currentUser.Id, token);
+                        var currentlyBorrowedBooks = allBorrowedBooks?.Where(b =>
+                            b.Status == "Requested" || b.Status == "Borrowed").ToList() ?? new List<UserBorrowedBookViewModel>();
+                        var currentBorrowedCount = currentlyBorrowedBooks.Count;
+                        var maxBooksAllowed = 5;
+                        var canBorrow = currentBorrowedCount < maxBooksAllowed;
+
+                        // Reload student info
+                        model.StudentInfo = new StudentInfoViewModel
+                        {
+                            StudentId = currentUser?.StudentId ?? "SV001234567",
+                            FullName = $"{currentUser?.FirstName} {currentUser?.LastName}".Trim() ?? _authApiService.GetCurrentUserName() ?? "Nguyễn Văn An",
+                            Email = currentUser?.Email ?? "anNV@fpt.edu.vn",
+                            PhoneNumber = currentUser?.PhoneNumber ?? "0123 456 789",
+                            Major = "Công nghệ thông tin",
+                            AcademicYear = "2021 - 2025",
+                            StudentStatus = "Đang học"
+                        };
+
+                        // Reload ViewBag data
+                        ViewBag.CurrentBorrowedCount = currentBorrowedCount;
+                        ViewBag.MaxBooksAllowed = maxBooksAllowed;
+                        ViewBag.CanBorrow = canBorrow;
+                        ViewBag.BorrowedBooks = currentlyBorrowedBooks;
+                    }
+                }
+                catch
+                {
+                    // If we can't reload the data, just continue with the error
+                }
+
                 ModelState.AddModelError("", $"Có lỗi xảy ra: {ex.Message}");
                 return View(model);
             }
@@ -272,14 +348,14 @@ namespace ELibraryManagement.Web.Controllers
             }
         }
 
-        // POST: Book/Return/5
+        // POST: Book/Cancel/5 - Hủy yêu cầu mượn sách
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Return(int id)
+        public async Task<IActionResult> Cancel(int id)
         {
             if (!_authApiService.IsAuthenticated())
             {
-                TempData["ErrorMessage"] = "Bạn cần đăng nhập để trả sách.";
+                TempData["ErrorMessage"] = "Bạn cần đăng nhập để hủy yêu cầu mượn sách.";
                 return RedirectToAction("Login", "Account");
             }
 
@@ -292,28 +368,11 @@ namespace ELibraryManagement.Web.Controllers
                     return RedirectToAction("Login", "Account");
                 }
 
-                var result = await _bookApiService.ReturnBookAsync(id, token);
+                var result = await _bookApiService.CancelBorrowRequestAsync(id, token);
 
                 if (result.Success)
                 {
                     TempData["SuccessMessage"] = result.Message;
-
-                    // Lấy thông tin borrowed book để biết BookId
-                    var currentUser = await _authApiService.GetCurrentUserAsync();
-                    if (currentUser != null)
-                    {
-                        var borrowedBooks = await _bookApiService.GetBorrowedBooksAsync(currentUser.Id, token);
-                        var returnedBook = borrowedBooks.FirstOrDefault(b => b.BorrowRecordId == id);
-
-                        if (returnedBook != null)
-                        {
-                            // Thêm thông tin để hiển thị option review
-                            TempData["ReturnedBookId"] = returnedBook.BookId;
-                            TempData["ReturnedBookTitle"] = returnedBook.BookTitle;
-                            TempData["BorrowRecordId"] = id;
-                            TempData["ShowReviewOption"] = true;
-                        }
-                    }
                 }
                 else
                 {

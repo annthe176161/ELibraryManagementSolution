@@ -45,8 +45,7 @@ namespace ELibraryManagement.Web.Services
         Task<BorrowBookResponseViewModel> BorrowBookAsync(BorrowBookRequestViewModel request, string token);
         Task<List<UserBorrowedBookViewModel>> GetBorrowedBooksAsync(string userId, string token);
         Task<BorrowBookResponseViewModel> ReturnBookAsync(int borrowRecordId, string token);
-
-
+        Task<BorrowBookResponseViewModel> CancelBorrowRequestAsync(int borrowRecordId, string token);
     }
 
     public class BookApiService : IBookApiService
@@ -1035,10 +1034,55 @@ namespace ELibraryManagement.Web.Services
                 else
                 {
                     System.Diagnostics.Debug.WriteLine($"API Error: {response.StatusCode} - {responseContent}");
+
+                    // Try to parse error response for detailed message
+                    string errorMessage = $"Lỗi API: {response.StatusCode}";
+                    try
+                    {
+                        var errorResponse = JsonSerializer.Deserialize<JsonElement>(responseContent, _jsonOptions);
+                        if (errorResponse.TryGetProperty("message", out var messageProperty))
+                        {
+                            errorMessage = messageProperty.GetString() ?? errorMessage;
+                        }
+                        else if (errorResponse.TryGetProperty("title", out var titleProperty))
+                        {
+                            errorMessage = titleProperty.GetString() ?? errorMessage;
+                        }
+                        else if (errorResponse.TryGetProperty("errors", out var errorsProperty))
+                        {
+                            var errors = new List<string>();
+                            if (errorsProperty.ValueKind == JsonValueKind.Object)
+                            {
+                                foreach (var error in errorsProperty.EnumerateObject())
+                                {
+                                    if (error.Value.ValueKind == JsonValueKind.Array)
+                                    {
+                                        foreach (var errorMsg in error.Value.EnumerateArray())
+                                        {
+                                            errors.Add(errorMsg.GetString() ?? "");
+                                        }
+                                    }
+                                }
+                                if (errors.Any())
+                                {
+                                    errorMessage = string.Join("; ", errors);
+                                }
+                            }
+                        }
+                    }
+                    catch (JsonException)
+                    {
+                        // If parsing fails, use the raw response if it's a simple string
+                        if (!string.IsNullOrWhiteSpace(responseContent))
+                        {
+                            errorMessage = responseContent;
+                        }
+                    }
+
                     return new BorrowBookResponseViewModel
                     {
                         Success = false,
-                        Message = $"Lỗi API: {response.StatusCode}"
+                        Message = errorMessage
                     };
                 }
             }
@@ -1118,6 +1162,45 @@ namespace ELibraryManagement.Web.Services
                     {
                         Success = false,
                         Message = "Không thể trả sách. Vui lòng thử lại sau."
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                return new BorrowBookResponseViewModel
+                {
+                    Success = false,
+                    Message = $"Có lỗi xảy ra: {ex.Message}"
+                };
+            }
+        }
+
+        public async Task<BorrowBookResponseViewModel> CancelBorrowRequestAsync(int borrowRecordId, string token)
+        {
+            try
+            {
+                var apiBaseUrl = GetApiBaseUrl();
+
+                _httpClient.DefaultRequestHeaders.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+                var response = await _httpClient.PostAsync($"{apiBaseUrl}/api/Book/cancel/{borrowRecordId}", null);
+                var responseContent = await response.Content.ReadAsStringAsync();
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return new BorrowBookResponseViewModel
+                    {
+                        Success = true,
+                        Message = "Hủy yêu cầu mượn sách thành công!"
+                    };
+                }
+                else
+                {
+                    return new BorrowBookResponseViewModel
+                    {
+                        Success = false,
+                        Message = "Không thể hủy yêu cầu. Vui lòng thử lại sau."
                     };
                 }
             }

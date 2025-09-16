@@ -170,11 +170,25 @@
 
                     <!-- Status Badge -->
                     <div class="status-overlay">
-                        @if (Model.BorrowRecord.ReturnDate.HasValue)
+                        @if (Model.BorrowRecord.Status == "Returned" && Model.BorrowRecord.ReturnDate.HasValue)
                         {
                             <span class="status-badge returned">
                                 <i class="fas fa-check-circle me-1"></i>
                                 Đã trả
+                            </span>
+                        }
+                        else if (Model.BorrowRecord.Status == "Cancelled")
+                        {
+                            <span class="status-badge returned" style="background-color: #6b7280;">
+                                <i class="fas fa-times-circle me-1"></i>
+                                Đã hủy
+                            </span>
+                        }
+                        else if (Model.BorrowRecord.Status == "Requested")
+                        {
+                            <span class="status-badge borrowed" style="background-color: #f59e0b;">
+                                <i class="fas fa-clock me-1"></i>
+                                Chờ xác nhận
                             </span>
                         }
                         else if (Model.BorrowRecord.IsOverdue)
@@ -381,21 +395,14 @@
                 <div class="user-stats-grid">
                     <div class="stat-card">
                         <div class="stat-value">
-                            @{
-                                // Tính số sách đang mượn (giả sử có API để lấy thông tin này)
-                                var currentBorrowed = 1; // Placeholder - cần API để lấy số liệu thực
-                            }
-                            @currentBorrowed
+                            @ViewBag.CurrentActiveBorrows
                         </div>
                         <div class="stat-label">Sách đang mượn</div>
                     </div>
 
                     <div class="stat-card">
                         <div class="stat-value">
-                            @{
-                                var totalBorrowed = 5; // Placeholder - cần API để lấy số liệu thực
-                            }
-                            @totalBorrowed
+                            @ViewBag.TotalBorrowed
                         </div>
                         <div class="stat-label">Tổng đã mượn</div>
                     </div>
@@ -578,23 +585,35 @@
                         Quay lại danh sách
                     </a>
 
-                    @if (!Model.BorrowRecord.ReturnDate.HasValue)
+                    @if (!Model.BorrowRecord.ReturnDate.HasValue && Model.BorrowRecord.Status != "Cancelled")
                     {
-                        <form asp-controller="Book" asp-action="Return" asp-route-id="@Model.BorrowRecord.BorrowRecordId"
-                              method="post" class="d-inline">
-                            <button type="submit" class="btn btn-success"
-                                    onclick="return confirm('Bạn có chắc chắn muốn trả sách này?')">
-                                <i class="fas fa-undo me-2"></i>
-                                Trả sách
-                            </button>
-                        </form>
-
-                        @if (!Model.BorrowRecord.IsOverdue)
+                        @if (Model.BorrowRecord.Status == "Requested")
                         {
-                            <button class="btn btn-warning" onclick="extendBook(@Model.BorrowRecord.BorrowRecordId)">
-                                <i class="fas fa-clock me-2"></i>
-                                Gia hạn sách
-                            </button>
+                            <!-- Cancel Request button for pending requests -->
+                            <form asp-controller="Book" asp-action="Cancel" asp-route-id="@Model.BorrowRecord.BorrowRecordId"
+                                  method="post" class="d-inline">
+                                <button type="submit" class="btn btn-outline-danger"
+                                        onclick="return confirm('Bạn có chắc chắn muốn hủy yêu cầu mượn sách này?')">
+                                    <i class="fas fa-times me-2"></i>
+                                    Hủy yêu cầu
+                                </button>
+                            </form>
+                        }
+                        else if (Model.BorrowRecord.Status == "Borrowed")
+                        {
+                            <!-- Info message for borrowed books -->
+                            <div class="alert alert-info d-inline-block">
+                                <i class="fas fa-info-circle me-2"></i>
+                                Liên hệ thủ thư để trả sách
+                            </div>
+
+                            @if (!Model.BorrowRecord.IsOverdue)
+                            {
+                                <button class="btn btn-warning" onclick="extendBook(@Model.BorrowRecord.BorrowRecordId)">
+                                    <i class="fas fa-clock me-2"></i>
+                                    Gia hạn sách
+                                </button>
+                            }
                         }
                     }
 

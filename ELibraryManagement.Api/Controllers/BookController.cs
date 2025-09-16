@@ -63,11 +63,7 @@ namespace ELibraryManagement.Api.Controllers
 
                 var result = await _bookService.BorrowBookAsync(request);
 
-                if (string.IsNullOrEmpty(result.Message) || !result.Message.Contains("thành công"))
-                {
-                    return BadRequest(result);
-                }
-
+                // Always return success for completed operations
                 return Ok(result);
             }
             catch (Exception ex)
@@ -104,6 +100,23 @@ namespace ELibraryManagement.Api.Controllers
         public async Task<IActionResult> ReturnBook(int borrowRecordId)
         {
             var result = await _bookService.ReturnBookAsync(borrowRecordId);
+
+            if (!result.Success)
+            {
+                return BadRequest(result);
+            }
+
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Hủy yêu cầu mượn sách - Yêu cầu đăng nhập
+        /// </summary>
+        [HttpPost("cancel/{borrowRecordId}")]
+        [Authorize]
+        public async Task<IActionResult> CancelBorrowRequest(int borrowRecordId)
+        {
+            var result = await _bookService.CancelBorrowRequestAsync(borrowRecordId);
 
             if (!result.Success)
             {

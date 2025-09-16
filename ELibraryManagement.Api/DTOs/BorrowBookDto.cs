@@ -90,4 +90,15 @@ namespace ELibraryManagement.Api.DTOs
         public int RemainingExtensions => Math.Max(0, 2 - ExtensionCount);
         public string Message { get; set; } = string.Empty;
     }
+
+    public class CancelBorrowRequestResponseDto
+    {
+        public bool Success { get; set; }
+        public int BorrowRecordId { get; set; }
+        public int BookId { get; set; }
+        public string BookTitle { get; set; } = string.Empty;
+        public string UserId { get; set; } = string.Empty;
+        public DateTime CancelDate { get; set; }
+        public string Message { get; set; } = string.Empty;
+    }
 }

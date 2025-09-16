@@ -118,26 +118,27 @@ namespace ELibraryManagement.Api.Services.Implementations
                 throw new InvalidOperationException("Sách không có sẵn để mượn.");
             }
 
-            // Check if user already has this book borrowed
+            // Check if user already has this book borrowed or requested
             var existingBorrow = await _context.BorrowRecords
-                .AnyAsync(br => br.UserId == request.UserId && br.BookId == request.BookId && br.Status == BorrowStatus.Borrowed);
+                .AnyAsync(br => br.UserId == request.UserId && br.BookId == request.BookId &&
+                         (br.Status == BorrowStatus.Borrowed || br.Status == BorrowStatus.Requested));
 
             if (existingBorrow)
             {
-                throw new InvalidOperationException("Bạn đã mượn cuốn sách này rồi.");
+                throw new InvalidOperationException("Bạn đã có yêu cầu mượn hoặc đang mượn cuốn sách này rồi.");
             }
 
             // Calculate due date (default 14 days if not provided)
             var dueDate = request.DueDate ?? DateTime.UtcNow.AddDays(14);
 
-            // Create borrow record
+            // Create borrow record with Requested status (pending admin approval)
             var borrowRecord = new BorrowRecord
             {
                 UserId = request.UserId,
                 BookId = request.BookId,
                 BorrowDate = DateTime.UtcNow,
                 DueDate = dueDate,
-                Status = BorrowStatus.Borrowed,
+                Status = BorrowStatus.Requested,
                 Notes = request.Notes,
                 CreatedAt = DateTime.UtcNow
             };
@@ -161,7 +162,7 @@ namespace ELibraryManagement.Api.Services.Implementations
                 BorrowDate = borrowRecord.BorrowDate,
                 DueDate = borrowRecord.DueDate,
                 Status = borrowRecord.Status.ToString(),
-                Message = "Mượn sách thành công."
+                Message = "Yêu cầu mượn sách đã được gửi và đang chờ xác nhận từ thủ thư."
             };
         }
 
@@ -266,6 +267,48 @@ namespace ELibraryManagement.Api.Services.Implementations
                 ReturnDate = returnDate,
                 FineAmount = fineAmount,
                 Message = isOverdue ? $"Trả sách thành công. Phạt: {fineAmount:N0} VND" : "Trả sách thành công."
+            };
+        }
+
+        public async Task<CancelBorrowRequestResponseDto> CancelBorrowRequestAsync(int borrowRecordId)
+        {
+            var borrowRecord = await _context.BorrowRecords
+                .Include(br => br.Book)
+                .Include(br => br.User)
+                .FirstOrDefaultAsync(br => br.Id == borrowRecordId);
+
+            if (borrowRecord == null)
+            {
+                throw new ArgumentException("Không tìm thấy bản ghi mượn sách.");
+            }
+
+            // Only allow cancellation if status is Requested
+            if (borrowRecord.Status != Models.BorrowStatus.Requested)
+            {
+                throw new InvalidOperationException("Chỉ có thể hủy yêu cầu mượn sách khi trạng thái là 'Chờ xác nhận'.");
+            }
+
+            // Update status to Cancelled
+            borrowRecord.Status = Models.BorrowStatus.Cancelled;
+            // Note: Don't set ReturnDate for cancelled requests as they were never actually borrowed
+
+            // Increase book available quantity since the request is cancelled
+            borrowRecord.Book.AvailableQuantity++;
+
+            // Decrease user's current borrow count (since the request was counted when created)
+            await _userStatusService.DecrementBorrowCountAsync(borrowRecord.UserId);
+
+            await _context.SaveChangesAsync();
+
+            return new CancelBorrowRequestResponseDto
+            {
+                Success = true,
+                BorrowRecordId = borrowRecord.Id,
+                BookId = borrowRecord.BookId,
+                BookTitle = borrowRecord.Book.Title,
+                UserId = borrowRecord.UserId,
+                CancelDate = DateTime.UtcNow,
+                Message = "Hủy yêu cầu mượn sách thành công."
             };
         }
 

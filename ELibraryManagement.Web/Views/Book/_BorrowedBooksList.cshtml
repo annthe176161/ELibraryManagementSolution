@@ -70,11 +70,25 @@
                     <div class="col-md-3">
                         <div class="book-status-actions">
                             <!-- Status Badge -->
-                            @if (book.ReturnDate.HasValue)
+                            @if (book.Status == "Returned" && book.ReturnDate.HasValue)
                             {
                                 <span class="badge bg-success mb-2">
                                     <i class="fas fa-check-circle me-1"></i>
                                     Đã trả
+                                </span>
+                            }
+                            else if (book.Status == "Cancelled")
+                            {
+                                <span class="badge bg-secondary mb-2">
+                                    <i class="fas fa-times-circle me-1"></i>
+                                    Đã hủy
+                                </span>
+                            }
+                            else if (book.Status == "Requested")
+                            {
+                                <span class="badge bg-warning mb-2">
+                                    <i class="fas fa-clock me-1"></i>
+                                    Chờ xác nhận
                                 </span>
                             }
                             else if (book.IsOverdue)
@@ -100,28 +114,40 @@
                                     Xem chi tiết
                                 </a>
 
-                                @if (!book.ReturnDate.HasValue)
+                                @if (!book.ReturnDate.HasValue && book.Status != "Cancelled")
                                 {
-                                    <!-- Extend button - only if book can be extended -->
-                                    @if (!book.IsOverdue)
+                                    @if (book.Status == "Requested")
                                     {
-                                        <button type="button" class="btn btn-warning btn-sm w-100 mb-1" 
-                                                onclick="extendBorrow(@book.BorrowRecordId, '@book.BookTitle')">
-                                            <i class="fas fa-calendar-plus me-1"></i>
-                                            Gia hạn sách
-                                        </button>
+                                        <!-- Cancel Request button for Requested status -->
+                                        <form id="cancelForm_@book.BorrowRecordId" asp-controller="Book" asp-action="Cancel"
+                                            asp-route-id="@book.BorrowRecordId" method="post" class="d-inline w-100">
+                                            <button type="button" class="btn btn-outline-danger btn-sm w-100"
+                                                onclick="confirmCancel(@book.BorrowRecordId, '@book.BookTitle')">
+                                                <i class="fas fa-times me-1"></i>
+                                                Hủy yêu cầu
+                                            </button>
+                                        </form>
                                     }
+                                    else if (book.Status == "Borrowed")
+                                    {
+                                        <!-- Extend button - only if book can be extended and not overdue -->
+                                        @if (!book.IsOverdue)
+                                        {
+                                            <button type="button" class="btn btn-warning btn-sm w-100 mb-1" 
+                                                    onclick="extendBorrow(@book.BorrowRecordId, '@book.BookTitle')">
+                                                <i class="fas fa-calendar-plus me-1"></i>
+                                                Gia hạn sách
+                                            </button>
+                                        }
 
-                                    <form id="returnForm_@book.BorrowRecordId" asp-controller="Book" asp-action="Return"
-                                        asp-route-id="@book.BorrowRecordId" method="post" class="d-inline w-100">
-                                        <button type="button" class="btn btn-success btn-sm w-100"
-                                            onclick="confirmReturn(@book.BorrowRecordId, '@book.BookTitle')">
-                                            <i class="fas fa-undo me-1"></i>
-                                            Trả sách
-                                        </button>
-                                    </form>
+                                        <!-- Note: Students cannot return books directly -->
+                                        <div class="alert alert-info p-2 mt-1" style="font-size: 0.8rem;">
+                                            <i class="fas fa-info-circle me-1"></i>
+                                            Liên hệ thủ thư để trả sách
+                                        </div>
+                                    }
                                 }
-                                else
+                                else if (book.Status == "Returned")
                                 {
                                     <!-- Review button for returned books -->
                                     <a asp-controller="Review" 
