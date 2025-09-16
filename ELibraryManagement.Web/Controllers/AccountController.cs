@@ -199,6 +199,9 @@ namespace ELibraryManagement.Web.Controllers
                     return RedirectToAction("Login");
                 }
 
+                // Clear irrelevant success messages (like Google login success) on this page
+                TempData.Remove("SuccessMessage");
+
                 var model = new EditProfileViewModel
                 {
                     FirstName = user.FirstName,

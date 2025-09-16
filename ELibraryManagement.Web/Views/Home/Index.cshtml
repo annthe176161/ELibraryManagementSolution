@@ -6,7 +6,9 @@
     <link rel="stylesheet" href="~/css/home.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 }
 
@@ -20,16 +22,16 @@
             </div>
             <h1>Khám Phá Tri Thức<br><span class="highlight">Không Giới Hạn</span></h1>
             <p class="hero-description">
-                Truy cập hàng nghìn tài liệu học thuật, sách tham khảo và nghiên cứu. 
+                Truy cập hàng nghìn tài liệu học thuật, sách tham khảo và nghiên cứu.
                 Hỗ trợ học tập và nghiên cứu miễn phí cho mọi sinh viên.
             </p>
-            
+
             <!-- Quick Search Bar -->
             <div class="hero-search">
                 <div class="search-container">
                     <i class="fas fa-search"></i>
-                    <input type="text" placeholder="Tìm kiếm sách, tác giả, hoặc chủ đề...">
-                    <button class="search-btn">Tìm kiếm</button>
+                    <input type="text" placeholder="Tìm kiếm sách, tác giả, hoặc chủ đề..." disabled>
+                    <button class="search-btn" disabled onclick="return false">Tìm kiếm</button>
                 </div>
             </div>
 
@@ -49,7 +51,7 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="hero-visual">
             <div class="floating-books">
                 <div class="book-float book-1">
@@ -82,9 +84,9 @@
                 Khám phá những công cụ thiết yếu giúp bạn tối ưu hóa trải nghiệm học tập tại thư viện
             </p>
         </div>
-        
+
         <div class="quick-actions-grid">
-            <a href="/Book" class="action-card">
+            <a href="#" class="action-card">
                 <div class="action-icon">
                     <i class="fas fa-search"></i>
                 </div>
@@ -94,8 +96,8 @@
                     <i class="fas fa-arrow-right"></i>
                 </div>
             </a>
-            
-            <a href="/Book/MyBooks" class="action-card">
+
+            <a href="#" class="action-card">
                 <div class="action-icon">
                     <i class="fas fa-bookmark"></i>
                 </div>
@@ -105,8 +107,8 @@
                     <i class="fas fa-arrow-right"></i>
                 </div>
             </a>
-            
-            <a href="/Account/Profile" class="action-card">
+
+            <a href="#" class="action-card">
                 <div class="action-icon">
                     <i class="fas fa-user-graduate"></i>
                 </div>
@@ -116,7 +118,7 @@
                     <i class="fas fa-arrow-right"></i>
                 </div>
             </a>
-            
+
             <div class="action-card">
                 <div class="action-icon">
                     <i class="fas fa-headset"></i>
@@ -138,11 +140,11 @@
             <span class="section-badge">Về Chúng Tôi</span>
             <h2>Thư Viện Số Hiện Đại<br>Phục Vụ Cộng Đồng Học Thuật</h2>
             <p class="section-description">
-                Chúng tôi cam kết tạo ra một môi trường học tập số hóa, hỗ trợ sinh viên trong hành trình 
+                Chúng tôi cam kết tạo ra một môi trường học tập số hóa, hỗ trợ sinh viên trong hành trình
                 chinh phục tri thức và phát triển năng lực nghiên cứu.
             </p>
         </div>
-        
+
         <div class="about-layout">
             <!-- Left Column: Core Values -->
             <div class="about-left">
@@ -156,7 +158,7 @@
                         </div>
                         <p>Xây dựng thư viện số hiện đại, cung cấp dịch vụ thông tin chất lượng cao</p>
                     </div>
-                    
+
                     <div class="value-card vision">
                         <div class="value-header">
                             <div class="value-icon">
@@ -166,7 +168,7 @@
                         </div>
                         <p>Trở thành thư viện số hàng đầu với công nghệ tiên tiến</p>
                     </div>
-                    
+
                     <div class="value-card core">
                         <div class="value-header">
                             <div class="value-icon">
@@ -178,7 +180,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <!-- Right Column: Statistics & Features -->
             <div class="about-right">
                 <div class="about-stats">
@@ -204,7 +206,7 @@
                         <div class="stat-label">Lượt Mượn</div>
                     </div>
                 </div>
-                
+
                 <div class="key-features">
                     <h4>Tính Năng Nổi Bật</h4>
                     <div class="features-list">
@@ -246,47 +248,50 @@
             <span class="section-badge">Dịch Vụ</span>
             <h2>Tận Hưởng Trải Nghiệm<br>Thư Viện Hiện Đại</h2>
         </div>
-        
+
         <div class="features-grid">
             <div class="feature-card">
                 <div class="feature-icon">
                     <i class="fas fa-book-open"></i>
                 </div>
                 <h3>Mượn Sách Miễn Phí</h3>
-                <p>Mượn sách hoàn toàn miễn phí với thời gian linh hoạt. Chỉ cần tài khoản sinh viên để truy cập toàn bộ thư viện.</p>
+                <p>Mượn sách hoàn toàn miễn phí với thời gian linh hoạt. Chỉ cần tài khoản sinh viên để truy cập toàn bộ
+                    thư viện.</p>
                 <ul class="feature-list">
                     <li>Không phí mượn sách</li>
                     <li>Gia hạn dễ dàng online</li>
                     <li>Đặt trước sách yêu thích</li>
                 </ul>
             </div>
-            
+
             <div class="feature-card">
                 <div class="feature-icon">
                     <i class="fas fa-laptop"></i>
                 </div>
                 <h3>Truy Cập Số Hóa</h3>
-                <p>Đọc sách và tài liệu trực tuyến mọi lúc mọi nơi. Hỗ trợ đầy đủ trên máy tính, tablet và điện thoại.</p>
+                <p>Đọc sách và tài liệu trực tuyến mọi lúc mọi nơi. Hỗ trợ đầy đủ trên máy tính, tablet và điện thoại.
+                </p>
                 <ul class="feature-list">
                     <li>Đọc online 24/7</li>
                     <li>Tải về để đọc offline</li>
                     <li>Đồng bộ đa thiết bị</li>
                 </ul>
             </div>
-            
+
             <div class="feature-card">
                 <div class="feature-icon">
                     <i class="fas fa-search"></i>
                 </div>
                 <h3>Tìm Kiếm Thông Minh</h3>
-                <p>Công cụ tìm kiếm mạnh mẽ giúp bạn tìm thấy chính xác tài liệu cần thiết trong hàng nghìn đầu sách.</p>
+                <p>Công cụ tìm kiếm mạnh mẽ giúp bạn tìm thấy chính xác tài liệu cần thiết trong hàng nghìn đầu sách.
+                </p>
                 <ul class="feature-list">
                     <li>Tìm kiếm theo chủ đề</li>
                     <li>Lọc theo khoa, ngành</li>
                     <li>Gợi ý tài liệu liên quan</li>
                 </ul>
             </div>
-            
+
             <div class="feature-card">
                 <div class="feature-icon">
                     <i class="fas fa-user-friends"></i>
@@ -318,7 +323,7 @@
                     Với công nghệ hiện đại và giao diện thân thiện, chúng tôi mong muốn tạo ra một
                     <strong>"ngôi nhà chung"</strong> cho những người yêu sách trên khắp đất nước.
                 </p>
-                
+
                 <div class="mission-features">
                     <div class="mission-feature">
                         <i class="fas fa-dragon"></i>
@@ -342,7 +347,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="mission-stats">
                 <div class="stats-grid-balanced">
                     <div class="stat-card">
@@ -387,7 +392,7 @@
         </div>
 
         <div class="categories-grid">
-            <a href="/Book?category=technology" class="category-card">
+            <a href="#" class="category-card">
                 <div class="category-icon">
                     <i class="fas fa-laptop-code"></i>
                 </div>
@@ -395,8 +400,8 @@
                 <p>Lập trình, AI, Khoa học dữ liệu</p>
                 <span class="book-count">1,200+ sách</span>
             </a>
-            
-            <a href="/Book?category=business" class="category-card">
+
+            <a href="#" class="category-card">
                 <div class="category-icon">
                     <i class="fas fa-chart-line"></i>
                 </div>
@@ -404,8 +409,8 @@
                 <p>Quản trị, Marketing, Tài chính</p>
                 <span class="book-count">800+ sách</span>
             </a>
-            
-            <a href="/Book?category=science" class="category-card">
+
+            <a href="#" class="category-card">
                 <div class="category-icon">
                     <i class="fas fa-atom"></i>
                 </div>
@@ -413,8 +418,8 @@
                 <p>Vật lý, Hóa học, Sinh học</p>
                 <span class="book-count">950+ sách</span>
             </a>
-            
-            <a href="/Book?category=social" class="category-card">
+
+            <a href="#" class="category-card">
                 <div class="category-icon">
                     <i class="fas fa-users"></i>
                 </div>
@@ -422,8 +427,8 @@
                 <p>Tâm lý học, Xã hội học, Luật</p>
                 <span class="book-count">650+ sách</span>
             </a>
-            
-            <a href="/Book?category=language" class="category-card">
+
+            <a href="#" class="category-card">
                 <div class="category-icon">
                     <i class="fas fa-language"></i>
                 </div>
@@ -431,8 +436,8 @@
                 <p>Tiếng Anh, Tiếng Việt, Ngôn ngữ khác</p>
                 <span class="book-count">400+ sách</span>
             </a>
-            
-            <a href="/Book?category=arts" class="category-card">
+
+            <a href="#" class="category-card">
                 <div class="category-icon">
                     <i class="fas fa-palette"></i>
                 </div>
@@ -443,7 +448,7 @@
         </div>
 
         <div class="text-center mt-5">
-            <a href="/Book" class="btn-primary-large">
+            <a href="#" class="btn-primary-large">
                 <i class="fas fa-book-open"></i>
                 Khám Phá Tất Cả Sách
                 <i class="fas fa-arrow-right"></i>
@@ -465,7 +470,7 @@
                     <span class="stat-label">Đầu sách</span>
                 </div>
             </div>
-            
+
             <div class="stat-card">
                 <div class="stat-icon">
                     <i class="fas fa-user-graduate"></i>
@@ -475,7 +480,7 @@
                     <span class="stat-label">Sinh viên tham gia</span>
                 </div>
             </div>
-            
+
             <div class="stat-card">
                 <div class="stat-icon">
                     <i class="fas fa-download"></i>
@@ -485,7 +490,7 @@
                     <span class="stat-label">Lượt mượn/tháng</span>
                 </div>
             </div>
-            
+
             <div class="stat-card">
                 <div class="stat-icon">
                     <i class="fas fa-clock"></i>
@@ -502,7 +507,7 @@
 @section Scripts {
     <script>
         // Enhanced search functionality
-        document.querySelector('.search-btn').addEventListener('click', function(e) {
+        document.querySelector('.search-btn').addEventListener('click', function (e) {
             e.preventDefault();
             const searchTerm = document.querySelector('.search-container input').value;
             if (searchTerm.trim()) {
@@ -510,7 +515,7 @@
             }
         });
 
-        document.querySelector('.search-container input').addEventListener('keypress', function(e) {
+        document.querySelector('.search-container input').addEventListener('keypress', function (e) {
             if (e.key === 'Enter') {
                 e.preventDefault();
                 const searchTerm = this.value;
@@ -540,7 +545,7 @@
             rootMargin: '0px 0px -100px 0px'
         };
 
-        const observer = new IntersectionObserver(function(entries) {
+        const observer = new IntersectionObserver(function (entries) {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     entry.target.style.opacity = '1';

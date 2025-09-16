@@ -257,6 +257,9 @@ namespace ELibraryManagement.Web.Controllers
                     return RedirectToAction("Login", "Account");
                 }
 
+                // Clear irrelevant success messages (like Google login success) on this page
+                TempData.Remove("SuccessMessage");
+
                 var borrowedBooks = await _bookApiService.GetBorrowedBooksAsync(currentUser.Id, token);
 
                 return View(borrowedBooks);
