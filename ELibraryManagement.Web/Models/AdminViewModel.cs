@@ -39,15 +39,23 @@ namespace ELibraryManagement.Web.Models
         public int OverdueDays => IsOverdue ? (DateTime.Now - DueDate).Days : 0;
         public string StatusDisplay => Status switch
         {
+            "Requested" => "Chờ duyệt",
             "Borrowed" => "Đang mượn",
             "Returned" => "Đã trả",
+            "Cancelled" => "Đã hủy",
+            "Lost" => "Mất sách",
+            "Damaged" => "Hư hỏng",
             "Overdue" => "Quá hạn",
             _ => Status
         };
         public string StatusClass => Status switch
         {
+            "Requested" => "warning",
             "Borrowed" => "success",
             "Returned" => "secondary",
+            "Cancelled" => "danger",
+            "Lost" => "dark",
+            "Damaged" => "dark",
             "Overdue" => "danger",
             _ => "primary"
         };
@@ -76,15 +84,23 @@ namespace ELibraryManagement.Web.Models
         public int OverdueDays => IsOverdue ? (DateTime.Now - DueDate).Days : 0;
         public string StatusDisplay => Status switch
         {
+            "Requested" => "Chờ duyệt",
             "Borrowed" => "Đang mượn",
             "Returned" => "Đã trả",
+            "Cancelled" => "Đã hủy",
+            "Lost" => "Mất sách",
+            "Damaged" => "Hư hỏng",
             "Overdue" => "Quá hạn",
             _ => Status
         };
         public string StatusClass => Status switch
         {
+            "Requested" => "warning",
             "Borrowed" => "success",
             "Returned" => "secondary",
+            "Cancelled" => "danger",
+            "Lost" => "dark",
+            "Damaged" => "dark",
             "Overdue" => "danger",
             _ => "primary"
         };

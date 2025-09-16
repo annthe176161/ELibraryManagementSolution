@@ -501,6 +501,13 @@ namespace ELibraryManagement.Web.Controllers
             try
             {
                 var result = await _borrowApiService.UpdateBorrowStatusAsync(id, status);
+
+                // If notes are provided, update them too
+                if (!string.IsNullOrEmpty(notes))
+                {
+                    await UpdateBorrowNotesInternal(id, notes);
+                }
+
                 if (result)
                 {
                     return Json(new { success = true, message = "Cập nhật trạng thái thành công" });
@@ -512,7 +519,71 @@ namespace ELibraryManagement.Web.Controllers
             }
             catch (Exception ex)
             {
+                // Xử lý lỗi validation trạng thái
+                if (ex.Message.Contains("không thể chuyển"))
+                {
+                    return Json(new { success = false, message = ex.Message });
+                }
+
                 return Json(new { success = false, message = $"Có lỗi xảy ra: {ex.Message}" });
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAllowedTransitions(int id)
+        {
+            var accessCheck = await CheckAdminAccessAsync();
+            if (accessCheck != null) return Json(new { success = false, message = "Unauthorized" });
+
+            try
+            {
+                var token = _authApiService.GetCurrentToken();
+                if (string.IsNullOrEmpty(token))
+                {
+                    return Json(new { success = false, message = "Không có token xác thực" });
+                }
+
+                _httpClient.DefaultRequestHeaders.Clear();
+                _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+
+                var response = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/borrow/admin/{id}/allowed-transitions");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+                    return Json(new { success = true, data = JsonSerializer.Deserialize<object>(content, _jsonOptions) });
+                }
+                else
+                {
+                    return Json(new { success = false, message = "Không thể lấy danh sách trạng thái hợp lệ" });
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Có lỗi xảy ra: {ex.Message}" });
+            }
+        }
+
+        private async Task UpdateBorrowNotesInternal(int id, string? notes)
+        {
+            var token = _authApiService.GetCurrentToken();
+            if (string.IsNullOrEmpty(token))
+            {
+                throw new Exception("Không có token xác thực");
+            }
+
+            _httpClient.DefaultRequestHeaders.Clear();
+            _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+
+            var notesDto = new { Notes = notes };
+            var json = JsonSerializer.Serialize(notesDto, _jsonOptions);
+            var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
+
+            var response = await _httpClient.PutAsync($"{GetApiBaseUrl()}/api/borrow/admin/{id}/notes", content);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                throw new Exception("Không thể cập nhật ghi chú");
             }
         }
 

@@ -55,6 +55,12 @@ namespace ELibraryManagement.Api.DTOs
         public string? Notes { get; set; }
     }
 
+    public class UpdateBorrowNotesDto
+    {
+        [MaxLength(1000)]
+        public string? Notes { get; set; }
+    }
+
     public class ExtendDueDateDto
     {
         [Required]

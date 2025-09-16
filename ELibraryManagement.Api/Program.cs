@@ -67,6 +67,7 @@ namespace ELibraryManagement.Api
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<IReviewService, ReviewService>();
             builder.Services.AddScoped<IBorrowService, BorrowService>();
+            builder.Services.AddScoped<IBorrowStatusValidationService, BorrowStatusValidationService>();
             builder.Services.AddScoped<ICategoryService, CategoryService>();
             builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
             builder.Services.AddScoped<IUserStatusService, UserStatusService>();

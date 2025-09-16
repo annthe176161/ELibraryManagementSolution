@@ -1,5 +1,7 @@
+using ELibraryManagement.Api.Data;
 using ELibraryManagement.Api.DTOs;
 using ELibraryManagement.Api.Services.Interfaces;
+using ELibraryManagement.Api.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -11,10 +13,17 @@ namespace ELibraryManagement.Api.Controllers
     public class BorrowController : ControllerBase
     {
         private readonly IBorrowService _borrowService;
+        private readonly IBorrowStatusValidationService _validationService;
+        private readonly ApplicationDbContext _context;
 
-        public BorrowController(IBorrowService borrowService)
+        public BorrowController(
+            IBorrowService borrowService,
+            IBorrowStatusValidationService validationService,
+            ApplicationDbContext context)
         {
             _borrowService = borrowService;
+            _validationService = validationService;
+            _context = context;
         }
 
         /// <summary>
@@ -181,6 +190,61 @@ namespace ELibraryManagement.Api.Controllers
             {
                 var result = await _borrowService.ConfirmReturnAsync(id);
                 return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Lấy danh sách trạng thái có thể chuyển từ trạng thái hiện tại - Chỉ dành cho Admin
+        /// </summary>
+        [HttpGet("admin/{id}/allowed-transitions")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetAllowedTransitions(int id)
+        {
+            try
+            {
+                var borrowRecord = await _context.BorrowRecords.FindAsync(id);
+                if (borrowRecord == null)
+                {
+                    return NotFound(new { message = "Borrow record not found" });
+                }
+
+                var allowedStatuses = _validationService.GetAllowedTransitions(borrowRecord.Status);
+                var statusList = allowedStatuses.Select(status => new
+                {
+                    Value = status.ToString(),
+                    DisplayName = status switch
+                    {
+                        BorrowStatus.Requested => "Chờ duyệt",
+                        BorrowStatus.Borrowed => "Đang mượn",
+                        BorrowStatus.Returned => "Đã trả",
+                        BorrowStatus.Lost => "Mất sách",
+                        BorrowStatus.Damaged => "Hư hỏng",
+                        BorrowStatus.Cancelled => "Đã hủy",
+                        _ => status.ToString()
+                    },
+                    IsFinal = _validationService.IsFinalStatus(status)
+                });
+
+                return Ok(new
+                {
+                    currentStatus = borrowRecord.Status.ToString(),
+                    currentStatusDisplay = borrowRecord.Status switch
+                    {
+                        BorrowStatus.Requested => "Chờ duyệt",
+                        BorrowStatus.Borrowed => "Đang mượn",
+                        BorrowStatus.Returned => "Đã trả",
+                        BorrowStatus.Lost => "Mất sách",
+                        BorrowStatus.Damaged => "Hư hỏng",
+                        BorrowStatus.Cancelled => "Đã hủy",
+                        _ => borrowRecord.Status.ToString()
+                    },
+                    isFinalStatus = _validationService.IsFinalStatus(borrowRecord.Status),
+                    allowedTransitions = statusList
+                });
             }
             catch (Exception ex)
             {

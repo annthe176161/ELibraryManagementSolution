@@ -9,10 +9,12 @@ namespace ELibraryManagement.Api.Services.Implementations
     public class BorrowService : IBorrowService
     {
         private readonly ApplicationDbContext _context;
+        private readonly IBorrowStatusValidationService _validationService;
 
-        public BorrowService(ApplicationDbContext context)
+        public BorrowService(ApplicationDbContext context, IBorrowStatusValidationService validationService)
         {
             _context = context;
+            _validationService = validationService;
         }
 
         public async Task<IEnumerable<BorrowRecordDto>> GetAllBorrowRecordsAsync()
@@ -78,17 +80,67 @@ namespace ELibraryManagement.Api.Services.Implementations
             if (borrowRecord == null)
                 return false;
 
-            if (Enum.TryParse<BorrowStatus>(updateDto.Status, out var status))
+            if (Enum.TryParse<BorrowStatus>(updateDto.Status, out var newStatus))
             {
-                borrowRecord.Status = status;
+                // Validate trạng thái chuyển đổi
+                if (!_validationService.CanTransition(borrowRecord.Status, newStatus))
+                {
+                    throw new InvalidOperationException(
+                        _validationService.GetTransitionErrorMessage(borrowRecord.Status, newStatus));
+                }
+
+                borrowRecord.Status = newStatus;
                 borrowRecord.Notes = updateDto.Notes;
                 borrowRecord.UpdatedAt = DateTime.UtcNow;
+
+                // Cập nhật các trường liên quan dựa trên trạng thái mới
+                UpdateRelatedFields(borrowRecord, newStatus);
 
                 await _context.SaveChangesAsync();
                 return true;
             }
 
             return false;
+        }
+
+        private void UpdateRelatedFields(BorrowRecord borrowRecord, BorrowStatus newStatus)
+        {
+            switch (newStatus)
+            {
+                case BorrowStatus.Borrowed:
+                    // Khi chuyển sang Borrowed, cập nhật ngày xác nhận
+                    borrowRecord.ConfirmedDate = DateTime.UtcNow;
+                    break;
+
+                case BorrowStatus.Returned:
+                    // Khi trả sách, cập nhật ngày trả
+                    borrowRecord.ReturnDate = DateTime.UtcNow;
+                    break;
+
+                case BorrowStatus.Cancelled:
+                    // Khi hủy, có thể xóa ngày trả nếu có
+                    borrowRecord.ReturnDate = null;
+                    break;
+
+                case BorrowStatus.Lost:
+                case BorrowStatus.Damaged:
+                    // Có thể tạo fine record tự động
+                    // Logic này có thể được mở rộng sau
+                    break;
+            }
+        }
+
+        public async Task<bool> UpdateBorrowNotesAsync(int id, string? notes)
+        {
+            var borrowRecord = await _context.BorrowRecords.FindAsync(id);
+            if (borrowRecord == null)
+                return false;
+
+            borrowRecord.Notes = notes;
+            borrowRecord.UpdatedAt = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+            return true;
         }
 
         public async Task<bool> ExtendDueDateAsync(int id, DateTime newDueDate)

@@ -7,6 +7,7 @@ namespace ELibraryManagement.Api.Services.Interfaces
         Task<IEnumerable<BorrowRecordDto>> GetAllBorrowRecordsAsync();
         Task<BorrowRecordDto?> GetBorrowRecordByIdAsync(int id);
         Task<bool> UpdateBorrowStatusAsync(int id, UpdateBorrowStatusDto updateDto);
+        Task<bool> UpdateBorrowNotesAsync(int id, string? notes);
         Task<bool> ExtendDueDateAsync(int id, DateTime newDueDate);
         Task<ExtendBorrowResponseDto> ExtendBorrowAsync(int id, string? reason = null);
         Task<bool> SendReminderAsync(int id);
