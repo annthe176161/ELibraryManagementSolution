@@ -47,8 +47,16 @@ namespace ELibraryManagement.Web.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Login(string token, string user)
+        public async Task<IActionResult> Login(string? token = null, string? user = null)
         {
+            // Prevent browser caching to ensure fresh content
+            Response.Headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
+            Response.Headers["Pragma"] = "no-cache";
+            Response.Headers["Expires"] = "0";
+
+            // Clear any lingering success messages when accessing login page directly
+            TempData.Remove("SuccessMessage");
+
             // Xử lý callback từ Google OAuth
             if (!string.IsNullOrEmpty(token) && !string.IsNullOrEmpty(user))
             {
@@ -129,8 +137,13 @@ namespace ELibraryManagement.Web.Controllers
         public IActionResult Logout()
         {
             _authApiService.Logout();
-            TempData["SuccessMessage"] = "Đăng xuất thành công!";
-            return RedirectToAction("Index", "Home");
+
+            // Clear any existing success messages to prevent confusion
+            TempData.Remove("SuccessMessage");
+            TempData.Remove("ErrorMessage");
+
+            // Don't set success message for logout - it's confusing on login page
+            return RedirectToAction("Login");
         }
 
         [HttpGet]
