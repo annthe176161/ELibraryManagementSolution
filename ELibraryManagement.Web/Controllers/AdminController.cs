@@ -1051,5 +1051,225 @@ namespace ELibraryManagement.Web.Controllers
                 return Json(new { success = false, message = $"Có lỗi xảy ra: {ex.Message}" });
             }
         }
+
+        // POST: Admin/UploadImage - Upload ảnh sách
+        [HttpPost]
+        public async Task<IActionResult> UploadImage(IFormFile file)
+        {
+            var accessCheck = await CheckAdminAccessAsync();
+            if (accessCheck != null) return Json(new { success = false, message = "Unauthorized" });
+
+            try
+            {
+                if (file == null || file.Length == 0)
+                {
+                    return Json(new { success = false, message = "Không có file được chọn" });
+                }
+
+                // Validate file type
+                var allowedTypes = new[] { "image/jpeg", "image/jpg", "image/png", "image/gif", "image/webp" };
+                if (!allowedTypes.Contains(file.ContentType.ToLower()))
+                {
+                    return Json(new { success = false, message = "Chỉ chấp nhận file ảnh (JPG, PNG, GIF, WEBP)" });
+                }
+
+                // Validate file size (max 5MB)
+                if (file.Length > 5 * 1024 * 1024)
+                {
+                    return Json(new { success = false, message = "File ảnh không được vượt quá 5MB" });
+                }
+
+                var token = _authApiService.GetCurrentToken();
+                _httpClient.DefaultRequestHeaders.Clear();
+                _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+
+                // Create multipart form data
+                using var formData = new MultipartFormDataContent();
+                using var fileContent = new StreamContent(file.OpenReadStream());
+                fileContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(file.ContentType);
+                formData.Add(fileContent, "file", file.FileName);
+
+                var response = await _httpClient.PostAsync($"{GetApiBaseUrl()}/api/Book/admin/upload-image", formData);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+                    var result = JsonSerializer.Deserialize<JsonElement>(content, _jsonOptions);
+
+                    if (result.TryGetProperty("imageUrl", out var imageUrlProperty))
+                    {
+                        var imageUrl = imageUrlProperty.GetString();
+                        return Json(new { success = true, imageUrl = imageUrl, message = "Upload ảnh thành công" });
+                    }
+
+                    return Json(new { success = true, message = "Upload thành công nhưng không nhận được URL" });
+                }
+                else
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    try
+                    {
+                        var errorResult = JsonSerializer.Deserialize<JsonElement>(errorContent, _jsonOptions);
+                        if (errorResult.TryGetProperty("message", out var messageProperty))
+                        {
+                            return Json(new { success = false, message = messageProperty.GetString() });
+                        }
+                    }
+                    catch
+                    {
+                        // Ignore JSON parse error, use status message instead
+                    }
+                    return Json(new { success = false, message = $"Lỗi upload: {response.StatusCode} - {errorContent}" });
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Lỗi không xác định: {ex.Message}" });
+            }
+        }
+
+        // POST: Admin/SaveBook - Lưu sách (tạo mới hoặc cập nhật)
+        [HttpPost]
+        public async Task<IActionResult> SaveBook([FromBody] JsonElement bookData)
+        {
+            var accessCheck = await CheckAdminAccessAsync();
+            if (accessCheck != null) return Json(new { success = false, message = "Unauthorized" });
+
+            try
+            {
+                if (bookData.ValueKind == JsonValueKind.Null || bookData.ValueKind == JsonValueKind.Undefined)
+                {
+                    return Json(new { success = false, message = "Dữ liệu sách không hợp lệ" });
+                }
+
+                // Parse basic required fields
+                if (!bookData.TryGetProperty("Title", out var titleProperty) ||
+                    string.IsNullOrWhiteSpace(titleProperty.GetString()))
+                {
+                    return Json(new { success = false, message = "Tiêu đề sách là bắt buộc" });
+                }
+
+                if (!bookData.TryGetProperty("Author", out var authorProperty) ||
+                    string.IsNullOrWhiteSpace(authorProperty.GetString()))
+                {
+                    return Json(new { success = false, message = "Tác giả là bắt buộc" });
+                }
+
+                if (!bookData.TryGetProperty("Quantity", out var quantityProperty) ||
+                    quantityProperty.GetInt32() <= 0)
+                {
+                    return Json(new { success = false, message = "Số lượng phải lớn hơn 0" });
+                }
+
+                var token = _authApiService.GetCurrentToken();
+                _httpClient.DefaultRequestHeaders.Clear();
+                _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+
+                string apiUrl;
+                HttpResponseMessage response;
+
+                // Check if it's an update (has ID > 0) or create new
+                var isUpdate = bookData.TryGetProperty("Id", out var idProperty) && idProperty.GetInt32() > 0;
+
+                if (isUpdate)
+                {
+                    // Update existing book
+                    var bookId = idProperty.GetInt32();
+                    apiUrl = $"{GetApiBaseUrl()}/api/Book/admin/update";
+                    var json = bookData.GetRawText();
+                    var content = new StringContent(json, System.Text.Encoding.UTF8, new System.Net.Http.Headers.MediaTypeHeaderValue("application/json"));
+                    response = await _httpClient.PutAsync(apiUrl, content);
+                }
+                else
+                {
+                    // Create new book
+                    apiUrl = $"{GetApiBaseUrl()}/api/Book/admin/create";
+                    var json = bookData.GetRawText();
+                    var content = new StringContent(json, System.Text.Encoding.UTF8, new System.Net.Http.Headers.MediaTypeHeaderValue("application/json"));
+                    response = await _httpClient.PostAsync(apiUrl, content);
+                }
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return Json(new { success = true, message = isUpdate ? "Cập nhật sách thành công" : "Thêm sách mới thành công" });
+                }
+                else
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    return Json(new { success = false, message = $"Lỗi từ API: {response.StatusCode} - {errorContent}" });
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Có lỗi xảy ra: {ex.Message}" });
+            }
+        }
+
+        // GET: Admin/GetBookDetail/{id} - Lấy thông tin sách để chỉnh sửa
+        [HttpGet]
+        public async Task<IActionResult> GetBookDetail(int id)
+        {
+            var accessCheck = await CheckAdminAccessAsync();
+            if (accessCheck != null) return Json(new { success = false, message = "Unauthorized" });
+
+            try
+            {
+                var token = _authApiService.GetCurrentToken();
+                _httpClient.DefaultRequestHeaders.Clear();
+                _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+
+                var response = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Book/admin/{id}");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+                    if (!string.IsNullOrEmpty(content))
+                    {
+                        var bookDto = JsonSerializer.Deserialize<BookDto>(content, _jsonOptions);
+                        if (bookDto != null)
+                        {
+                            return Json(new { success = true, data = bookDto });
+                        }
+                    }
+                }
+
+                return Json(new { success = false, message = "Không tìm thấy sách" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Có lỗi xảy ra: {ex.Message}" });
+            }
+        }
+
+        // POST: Admin/DeleteBook - Xóa sách
+        [HttpPost]
+        public async Task<IActionResult> DeleteBook(int id)
+        {
+            var accessCheck = await CheckAdminAccessAsync();
+            if (accessCheck != null) return Json(new { success = false, message = "Unauthorized" });
+
+            try
+            {
+                var token = _authApiService.GetCurrentToken();
+                _httpClient.DefaultRequestHeaders.Clear();
+                _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
+
+                var response = await _httpClient.DeleteAsync($"{GetApiBaseUrl()}/api/Book/{id}");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    return Json(new { success = true, message = "Xóa sách thành công" });
+                }
+                else
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    return Json(new { success = false, message = $"Lỗi từ API: {response.StatusCode} - {errorContent}" });
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Có lỗi xảy ra: {ex.Message}" });
+            }
+        }
     }
 }

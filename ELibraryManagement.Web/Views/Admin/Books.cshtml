@@ -8,295 +8,305 @@
 <!-- Page Header -->
 <div class="row mb-4">
     <div class="col-12">
-            <div class="d-flex align-items-center justify-content-between">
-                <div>
-                    <h2 class="h3 mb-0">
-                        <i class="fas fa-book me-2 text-success"></i>
-                        Quản lý sách
-                    </h2>
-                    <nav aria-label="breadcrumb">
-                        <ol class="breadcrumb">
-                            <li class="breadcrumb-item">
-                                <a asp-action="Index">Quản trị</a>
-                            </li>
-                            <li class="breadcrumb-item active">Sách</li>
-                        </ol>
-                    </nav>
-                </div>
-                <div>
-                    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#bookModal" onclick="openCreateBookModal()">
-                        <i class="fas fa-plus me-1"></i>
-                        Thêm sách mới
-                    </button>
-                </div>
+        <div class="d-flex align-items-center justify-content-between">
+            <div>
+                <h2 class="h3 mb-0">
+                    <i class="fas fa-book me-2 text-success"></i>
+                    Quản lý sách
+                </h2>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a asp-action="Index">Quản trị</a>
+                        </li>
+                        <li class="breadcrumb-item active">Sách</li>
+                    </ol>
+                </nav>
+            </div>
+            <div>
+                <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#bookModal"
+                    onclick="openCreateBookModal()">
+                    <i class="fas fa-plus me-1"></i>
+                    Thêm sách mới
+                </button>
             </div>
         </div>
     </div>
+</div>
 
-    <!-- Statistics Row -->
-    <div class="row mb-4">
-        @if (TempData["DebugMessage"] != null || ViewBag.DebugInfo != null || TempData["CategoriesDebug"] != null || TempData["CategoriesError"] != null || TempData["BooksError"] != null)
-        {
-            <div class="col-12 mb-3">
-                <div class="alert alert-info">
-                    <strong>Debug Info:</strong><br/>
-                    @TempData["DebugMessage"]<br/>
-                    @ViewBag.DebugInfo<br/>
-                    @TempData["CategoriesDebug"]<br/>
-                    @if(TempData["CategoriesError"] != null)
-                    {
-                        <span class="text-danger">@TempData["CategoriesError"]</span><br/>
-                    }
-                    @if(TempData["BooksError"] != null)
-                    {
-                        <span class="text-danger">@TempData["BooksError"]</span>
-                    }
-                </div>
-            </div>
-        }
-        <div class="col-md-3">
-            <div class="card bg-success text-white">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <div class="small">Tổng số sách</div>
-                            <div class="h4 mb-0">@Model.Count</div>
-                        </div>
-                        <div class="align-self-center">
-                            <i class="fas fa-book fa-2x opacity-75"></i>
-                        </div>
-                    </div>
-                </div>
+<!-- Statistics Row -->
+<div class="row mb-4">
+    @if (TempData["DebugMessage"] != null || ViewBag.DebugInfo != null || TempData["CategoriesDebug"] != null ||
+        TempData["CategoriesError"] != null || TempData["BooksError"] != null)
+    {
+        <div class="col-12 mb-3">
+            <div class="alert alert-info">
+                <strong>Debug Info:</strong><br />
+                @TempData["DebugMessage"]<br />
+                @ViewBag.DebugInfo<br />
+                @TempData["CategoriesDebug"]<br />
+                @if (TempData["CategoriesError"] != null)
+                {
+                    <span class="text-danger">@TempData["CategoriesError"]</span>
+            
+                    <br />
+                }
+                @if (TempData["BooksError"] != null)
+                {
+                    <span class="text-danger">@TempData["BooksError"]</span>
+                }
             </div>
         </div>
-        <div class="col-md-3">
-            <div class="card bg-info text-white">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <div class="small">Có sẵn</div>
-                            <div class="h4 mb-0">@Model.Sum(b => b.AvailableQuantity)</div>
-                        </div>
-                        <div class="align-self-center">
-                            <i class="fas fa-check-circle fa-2x opacity-75"></i>
-                        </div>
+    }
+    <div class="col-md-3">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <div class="small">Tổng số sách</div>
+                        <div class="h4 mb-0">@Model.Count</div>
                     </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card bg-warning text-white">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <div class="small">Đang được mượn</div>
-                            <div class="h4 mb-0">@Model.Sum(b => b.BorrowedQuantity)</div>
-                        </div>
-                        <div class="align-self-center">
-                            <i class="fas fa-hand-holding fa-2x opacity-75"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card bg-danger text-white">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <div class="small">Hết sách</div>
-                            <div class="h4 mb-0">@Model.Count(b => b.AvailableQuantity == 0)</div>
-                        </div>
-                        <div class="align-self-center">
-                            <i class="fas fa-exclamation-triangle fa-2x opacity-75"></i>
-                        </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-book fa-2x opacity-75"></i>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
-    <!-- Books Table -->
-    <div class="row">
-        <div class="col-12">
-            <div class="card shadow">
-                <div class="card-header bg-light">
-                    <div class="d-flex align-items-center justify-content-between">
-                        <h5 class="mb-0">Danh sách sách</h5>
-                        <div class="d-flex">
-                            <div class="input-group input-group-sm me-3" style="width: 300px;">
-                                <input type="text" class="form-control" placeholder="Tìm kiếm sách..." id="searchInput">
-                                <button class="btn btn-outline-secondary" type="button">
-                                    <i class="fas fa-search"></i>
-                                </button>
-                            </div>
-                            <select class="form-select form-select-sm" id="statusFilter" style="width: 150px;">
-                                <option value="">Tất cả trạng thái</option>
-                                <option value="available">Có sẵn</option>
-                                <option value="borrowed">Đang mượn</option>
-                                <option value="outofstock">Hết sách</option>
-                            </select>
-                        </div>
+    <div class="col-md-3">
+        <div class="card bg-info text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <div class="small">Có sẵn</div>
+                        <div class="h4 mb-0">@Model.Sum(b => b.AvailableQuantity)</div>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-check-circle fa-2x opacity-75"></i>
                     </div>
                 </div>
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-hover mb-0" id="booksTable">
-                            <thead class="table-light">
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-warning text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <div class="small">Đang được mượn</div>
+                        <div class="h4 mb-0">@Model.Sum(b => b.BorrowedQuantity)</div>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-hand-holding fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-danger text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <div class="small">Hết sách</div>
+                        <div class="h4 mb-0">@Model.Count(b => b.AvailableQuantity == 0)</div>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-exclamation-triangle fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Books Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow">
+            <div class="card-header bg-light">
+                <div class="d-flex align-items-center justify-content-between">
+                    <h5 class="mb-0">Danh sách sách</h5>
+                    <div class="d-flex">
+                        <div class="input-group input-group-sm me-3" style="width: 300px;">
+                            <input type="text" class="form-control" placeholder="Tìm kiếm sách..." id="searchInput">
+                            <button class="btn btn-outline-secondary" type="button">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                        <select class="form-select form-select-sm" id="statusFilter" style="width: 150px;">
+                            <option value="">Tất cả trạng thái</option>
+                            <option value="available">Có sẵn</option>
+                            <option value="borrowed">Đang mượn</option>
+                            <option value="outofstock">Hết sách</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0" id="booksTable">
+                        <thead class="table-light">
+                            <tr>
+                                <th scope="col">Sách</th>
+                                <th scope="col">Tác giả</th>
+                                <th scope="col">Thể loại</th>
+                                <th scope="col">ISBN</th>
+                                <th scope="col">Tình trạng</th>
+                                <th scope="col">Số lượng</th>
+                                <th scope="col">Đánh giá</th>
+                                <th scope="col">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var book in Model)
+                            {
                                 <tr>
-                                    <th scope="col">Sách</th>
-                                    <th scope="col">Tác giả</th>
-                                    <th scope="col">Thể loại</th>
-                                    <th scope="col">ISBN</th>
-                                    <th scope="col">Tình trạng</th>
-                                    <th scope="col">Số lượng</th>
-                                    <th scope="col">Đánh giá</th>
-                                    <th scope="col">Thao tác</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var book in Model)
-                                {
-                                    <tr>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                <div class="book-cover me-3" style="width: 60px; height: 80px;">
-                                                    @if (!string.IsNullOrEmpty(book.ImageUrl))
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="book-cover me-3" style="width: 60px; height: 80px;">
+                                                @if (!string.IsNullOrEmpty(book.ImageUrl))
+                                                {
+                                                    <img src="@book.ImageUrl" alt="@book.Title" class="rounded w-100 h-100"
+                                                        style="object-fit: cover;"
+                                                        onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                                    <div class="bg-secondary rounded d-none align-items-center justify-content-center text-white w-100 h-100"
+                                                        style="font-size: 12px;">
+                                                        <i class="fas fa-book"></i>
+                                                    </div>
+                                                }
+                                                else
+                                                {
+                                                    <div class="bg-secondary rounded d-flex align-items-center justify-content-center text-white w-100 h-100"
+                                                        style="font-size: 12px;">
+                                                        <i class="fas fa-book"></i>
+                                                    </div>
+                                                }
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-1">@book.Title</h6>
+                                                <small class="text-muted">@(string.IsNullOrEmpty(book.Description) ? "" :
+                                                                                                    (book.Description.Length > 50 ? book.Description.Substring(0, 50) +
+                                                                                                    "..." : book.Description))</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>@book.Author</td>
+                                    <td>
+                                        @if (book.Categories != null && book.Categories.Any())
+                                        {
+                                            @foreach (var category in book.Categories.Take(2))
+                                            {
+                                                <span class="badge bg-primary me-1">@category.Name</span>
+                                            }
+                                            @if (book.Categories.Count > 2)
+                                            {
+                                                <small class="text-muted">+@(book.Categories.Count - 2)</small>
+                                            }
+                                        }
+                                        else if (!string.IsNullOrEmpty(book.CategoryNames))
+                                        {
+                                            <span class="badge bg-primary">@book.CategoryNames</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">Chưa phân loại</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (!string.IsNullOrEmpty(book.ISBN))
+                                        {
+                                            <code>@book.ISBN</code>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">N/A</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (book.TotalQuantity == 0)
+                                        {
+                                            <span class="badge bg-danger">Hết sách</span>
+                                        }
+                                        else if (book.AvailableQuantity > 0)
+                                        {
+                                            <span class="badge bg-success">Có sẵn</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="badge bg-warning">Đang mượn</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <div class="d-flex flex-column">
+                                            <small><strong>Có sẵn:</strong> @book.AvailableQuantity</small>
+                                            <small><strong>Tổng:</strong> @book.TotalQuantity</small>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="me-2">
+                                                @for (int i = 1; i <= 5; i++)
+                                                {
+                                                    @if (i <= Math.Floor(book.AverageRating))
                                                     {
-                                                        <img src="@book.ImageUrl" alt="@book.Title" 
-                                                             class="rounded w-100 h-100" 
-                                                             style="object-fit: cover;"
-                                                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                                                        <div class="bg-secondary rounded d-none align-items-center justify-content-center text-white w-100 h-100" style="font-size: 12px;">
-                                                            <i class="fas fa-book"></i>
-                                                        </div>
+                                                        <i class="fas fa-star text-warning"></i>
                                                     }
                                                     else
                                                     {
-                                                        <div class="bg-secondary rounded d-flex align-items-center justify-content-center text-white w-100 h-100" style="font-size: 12px;">
-                                                            <i class="fas fa-book"></i>
-                                                        </div>
+                                                        <i class="far fa-star text-muted"></i>
                                                     }
-                                                </div>
-                                                <div>
-                                                    <h6 class="mb-1">@book.Title</h6>
-                                                    <small class="text-muted">@(string.IsNullOrEmpty(book.Description) ? "" : (book.Description.Length > 50 ? book.Description.Substring(0, 50) + "..." : book.Description))</small>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td>@book.Author</td>
-                                        <td>
-                                            @if (book.Categories != null && book.Categories.Any())
-                                            {
-                                                @foreach (var category in book.Categories.Take(2))
-                                                {
-                                                    <span class="badge bg-primary me-1">@category.Name</span>
                                                 }
-                                                @if (book.Categories.Count > 2)
-                                                {
-                                                    <small class="text-muted">+@(book.Categories.Count - 2)</small>
-                                                }
-                                            }
-                                            else if (!string.IsNullOrEmpty(book.CategoryNames))
-                                            {
-                                                <span class="badge bg-primary">@book.CategoryNames</span>
-                                            }
-                                            else
-                                            {
-                                                <span class="text-muted">Chưa phân loại</span>
-                                            }
-                                        </td>
-                                        <td>
-                                            @if (!string.IsNullOrEmpty(book.ISBN))
-                                            {
-                                                <code>@book.ISBN</code>
-                                            }
-                                            else
-                                            {
-                                                <span class="text-muted">N/A</span>
-                                            }
-                                        </td>
-                                        <td>
-                                            @if (book.TotalQuantity == 0)
-                                            {
-                                                <span class="badge bg-danger">Hết sách</span>
-                                            }
-                                            else if (book.AvailableQuantity > 0)
-                                            {
-                                                <span class="badge bg-success">Có sẵn</span>
-                                            }
-                                            else
-                                            {
-                                                <span class="badge bg-warning">Đang mượn</span>
-                                            }
-                                        </td>
-                                        <td>
-                                            <div class="d-flex flex-column">
-                                                <small><strong>Có sẵn:</strong> @book.AvailableQuantity</small>
-                                                <small><strong>Tổng:</strong> @book.TotalQuantity</small>
                                             </div>
-                                        </td>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                <div class="me-2">
-                                                    @for (int i = 1; i <= 5; i++)
-                                                    {
-                                                        @if (i <= Math.Floor(book.AverageRating))
-                                                        {
-                                                            <i class="fas fa-star text-warning"></i>
-                                                        }
-                                                        else
-                                                        {
-                                                            <i class="far fa-star text-muted"></i>
-                                                        }
-                                                    }
-                                                </div>
-                                                <small class="text-muted">(@book.RatingCount)</small>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <div class="btn-group" role="group">
-                                                <button type="button" class="btn btn-sm btn-outline-primary view-book-btn" 
-                                                        title="Xem chi tiết" data-book-id="@book.Id">
-                                                    <i class="fas fa-eye"></i>
-                                                </button>
-                                                <button type="button" class="btn btn-sm btn-outline-warning" title="Chỉnh sửa" data-bs-toggle="modal" data-bs-target="#bookModal" onclick="editBook(@book.Id)">
-                                                    <i class="fas fa-edit"></i>
-                                                </button>
-                                                <button type="button" class="btn btn-sm btn-outline-danger" title="Xóa" onclick="deleteBook(@book.Id, '@book.Title')">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
+                                            <small class="text-muted">(@book.RatingCount)</small>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <button type="button" class="btn btn-sm btn-outline-primary view-book-btn"
+                                                title="Xem chi tiết" data-book-id="@book.Id">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-outline-warning" title="Chỉnh sửa"
+                                                data-bs-toggle="modal" data-bs-target="#bookModal"
+                                                onclick="editBook(@book.Id)">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button type="button" class="btn btn-sm btn-outline-danger" title="Xóa"
+                                                onclick="deleteBook(@book.Id, '@book.Title')">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
                 </div>
-                <div class="card-footer bg-light">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <small class="text-muted">
-                            Hiển thị @Model.Count sách
-                        </small>
-                        <nav>
-                            <ul class="pagination pagination-sm mb-0">
-                                <li class="page-item disabled">
-                                    <span class="page-link">Trước</span>
-                                </li>
-                                <li class="page-item active">
-                                    <span class="page-link">1</span>
-                                </li>
-                                <li class="page-item disabled">
-                                    <span class="page-link">Sau</span>
-                                </li>
-                            </ul>
-                        </nav>
-                    </div>
+            </div>
+            <div class="card-footer bg-light">
+                <div class="d-flex justify-content-between align-items-center">
+                    <small class="text-muted">
+                        Hiển thị @Model.Count sách
+                    </small>
+                    <nav>
+                        <ul class="pagination pagination-sm mb-0">
+                            <li class="page-item disabled">
+                                <span class="page-link">Trước</span>
+                            </li>
+                            <li class="page-item active">
+                                <span class="page-link">1</span>
+                            </li>
+                            <li class="page-item disabled">
+                                <span class="page-link">Sau</span>
+                            </li>
+                        </ul>
+                    </nav>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
 <!-- Book Modal (Create/Edit) -->
 <div class="modal fade" id="bookModal" tabindex="-1" aria-labelledby="bookModalLabel" aria-hidden="true">
@@ -309,7 +319,7 @@
             <div class="modal-body">
                 <form id="bookForm">
                     <input type="hidden" id="bookId" name="id" />
-                    
+
                     <div class="row">
                         <div class="col-md-6">
                             <div class="mb-3">
@@ -319,7 +329,8 @@
                         </div>
                         <div class="col-md-6">
                             <div class="mb-3">
-                                <label for="author" class="form-label">Tác giả <span class="text-danger">*</span></label>
+                                <label for="author" class="form-label">Tác giả <span
+                                        class="text-danger">*</span></label>
                                 <input type="text" class="form-control" id="author" name="author" required>
                             </div>
                         </div>
@@ -329,8 +340,8 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="isbn" class="form-label">ISBN</label>
-                                <input type="text" class="form-control" id="isbn" name="isbn" maxlength="13" 
-                                       placeholder="Tối đa 13 ký tự">
+                                <input type="text" class="form-control" id="isbn" name="isbn" maxlength="13"
+                                    placeholder="Tối đa 13 ký tự">
                                 <small class="form-text text-muted">Ví dụ: 9786047770560</small>
                             </div>
                         </div>
@@ -346,15 +357,16 @@
                         <div class="col-md-4">
                             <div class="mb-3">
                                 <label for="publicationYear" class="form-label">Năm xuất bản</label>
-                                <input type="number" class="form-control" id="publicationYear" name="publicationYear" 
-                                       min="1000" max="2100" value="2025">
+                                <input type="number" class="form-control" id="publicationYear" name="publicationYear"
+                                    min="1000" max="2100" value="2025">
                             </div>
                         </div>
                         <div class="col-md-4">
                             <div class="mb-3">
-                                <label for="quantity" class="form-label">Số lượng <span class="text-danger">*</span></label>
-                                <input type="number" class="form-control" id="quantity" name="quantity" 
-                                       min="0" required>
+                                <label for="quantity" class="form-label">Số lượng <span
+                                        class="text-danger">*</span></label>
+                                <input type="number" class="form-control" id="quantity" name="quantity" min="0"
+                                    required>
                             </div>
                         </div>
                         <div class="col-md-4">
@@ -369,7 +381,8 @@
                         <div class="col-md-6">
                             <div class="mb-3">
                                 <label for="language" class="form-label">Ngôn ngữ</label>
-                                <input type="text" class="form-control" id="language" name="language" value="Tiếng Việt">
+                                <input type="text" class="form-control" id="language" name="language"
+                                    value="Tiếng Việt">
                             </div>
                         </div>
                         <div class="col-md-6">
@@ -387,25 +400,30 @@
                         <label for="coverImageUrl" class="form-label">Hình bìa sách</label>
                         <div class="row">
                             <div class="col-md-8">
-                                <input type="url" class="form-control" id="coverImageUrl" name="coverImageUrl" 
-                                       placeholder="https://res.cloudinary.com/demo/image/upload/sample.jpg">
+                                <input type="url" class="form-control" id="coverImageUrl" name="coverImageUrl"
+                                    placeholder="https://res.cloudinary.com/demo/image/upload/sample.jpg">
                             </div>
                             <div class="col-md-4">
                                 <div class="input-group">
-                                    <input type="file" class="form-control" id="imageFile" accept="image/*" onchange="handleBookImageUpload(this)">
-                                    <button class="btn btn-outline-secondary" type="button" onclick="triggerImageUpload()" disabled id="uploadBtn">
+                                    <input type="file" class="form-control" id="imageFile" accept="image/*"
+                                        onchange="handleBookImageUpload(this)">
+                                    <button class="btn btn-outline-secondary" type="button"
+                                        onclick="triggerImageUpload()" disabled id="uploadBtn">
                                         <i class="fas fa-upload"></i>
                                     </button>
                                 </div>
                             </div>
                         </div>
-                        <small class="form-text text-muted">Bạn có thể nhập URL hoặc upload file ảnh (tự động upload khi chọn file)</small>
+                        <small class="form-text text-muted">Bạn có thể nhập URL hoặc upload file ảnh (tự động upload khi
+                            chọn file)</small>
                         <div class="mt-2">
-                            <img id="imagePreview" src="" alt="Preview" style="max-width: 150px; max-height: 200px; display: none;" class="img-thumbnail">
+                            <img id="imagePreview" src="" alt="Preview"
+                                style="max-width: 150px; max-height: 200px; display: none;" class="img-thumbnail">
                         </div>
                         <div id="uploadProgress" class="mt-2" style="display: none;">
                             <div class="progress">
-                                <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 0%"></div>
+                                <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar"
+                                    style="width: 0%"></div>
                             </div>
                             <small class="text-muted">Đang tải lên...</small>
                         </div>
@@ -463,34 +481,34 @@
         let categories = [];
 
         // Error handling
-        window.onerror = function(msg, url, lineNo, columnNo, error) {
+        window.onerror = function (msg, url, lineNo, columnNo, error) {
             console.error('JavaScript Error:', msg, 'at', url, ':', lineNo, ':', columnNo, error);
             return false;
         };
 
-        $(document).ready(function() {
+        $(document).ready(function () {
             console.log('Document ready, loading categories...');
-            
+
             // View book detail button event listener
-            $(document).on('click', '.view-book-btn', function() {
+            $(document).on('click', '.view-book-btn', function () {
                 const bookId = $(this).data('book-id');
                 console.log('View book clicked for ID:', bookId);
                 viewBook(bookId);
             });
-            
+
             // Test modal functionality
-            window.testModal = function() {
+            window.testModal = function () {
                 $('#bookModalLabel').text('Test Modal');
                 $('#bookModal').modal('show');
             };
-            
+
             // Load categories for the form
             loadCategories().catch(err => {
                 console.error('Error loading categories on ready:', err);
             });
 
             // Preview image when URL is entered
-            $('#coverImageUrl').on('input', function() {
+            $('#coverImageUrl').on('input', function () {
                 const url = $(this).val();
                 if (url && url.match(/\.(jpeg|jpg|gif|png|webp)$/i)) {
                     $('#imagePreview').attr('src', url).show();
@@ -503,17 +521,17 @@
             });
 
             // Search functionality
-            $('#searchInput').on('keyup', function() {
+            $('#searchInput').on('keyup', function () {
                 var value = $(this).val().toLowerCase();
-                $('#booksTable tbody tr').filter(function() {
+                $('#booksTable tbody tr').filter(function () {
                     $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
                 });
             });
 
             // Status filter
-            $('#statusFilter').on('change', function() {
+            $('#statusFilter').on('change', function () {
                 var value = $(this).val();
-                $('#booksTable tbody tr').filter(function() {
+                $('#booksTable tbody tr').filter(function () {
                     if (value === '') {
                         $(this).show();
                     } else {
@@ -536,13 +554,13 @@
                 $.ajax({
                     url: '/Admin/GetCategories',
                     type: 'GET',
-                    success: function(response) {
+                    success: function (response) {
                         console.log('Categories response:', response);
                         if (response.success && response.data) {
                             categories = response.data;
                             const categoriesSelect = $('#categories');
                             categoriesSelect.empty();
-                            
+
                             response.data.forEach(category => {
                                 const optionText = category.isActive ? category.name : `${category.name} (Không hoạt động)`;
                                 const option = new Option(optionText, category.id);
@@ -551,14 +569,14 @@
                                 }
                                 categoriesSelect.append(option);
                             });
-                            
+
                             resolve();
                         } else {
                             console.error('Failed to load categories - invalid response:', response);
                             resolve(); // Still resolve to not break the chain
                         }
                     },
-                    error: function(xhr) {
+                    error: function (xhr) {
                         console.error('Error loading categories:', xhr);
                         console.error('Status:', xhr.status, 'Response:', xhr.responseText);
                         resolve(); // Still resolve to not break the chain
@@ -580,7 +598,7 @@
                 $('#categories').val([]);
                 $('#imagePreview').hide();
                 $('#coverImageUrl').val('');
-                
+
                 // Load categories async without blocking
                 setTimeout(() => {
                     loadCategories().catch(err => {
@@ -610,7 +628,7 @@
             const file = input.files[0];
             if (file) {
                 const reader = new FileReader();
-                reader.onload = function(e) {
+                reader.onload = function (e) {
                     $('#imagePreview').attr('src', e.target.result).show();
                 };
                 reader.readAsDataURL(file);
@@ -621,7 +639,7 @@
         function uploadImage() {
             const fileInput = document.getElementById('imageFile');
             const file = fileInput.files[0];
-            
+
             if (!file) {
                 alert('Vui lòng chọn file ảnh trước');
                 return;
@@ -634,19 +652,19 @@
                 'https://m.media-amazon.com/images/I/71UypkUjStL._AC_UF1000,1000_QL80_.jpg',
                 'https://product.hstatic.net/1000363117/product/image_195509_1_36793_34a84c4c9a9c442ebf1b56430aa4a1e5_master.jpg'
             ];
-            
+
             const randomUrl = sampleUrls[Math.floor(Math.random() * sampleUrls.length)];
             $('#coverImageUrl').val(randomUrl);
             $('#imagePreview').attr('src', randomUrl).show();
-            
+
             alert('Đã chọn ảnh mẫu! Trong thực tế, chức năng này sẽ upload lên Cloudinary.');
-            
+
             // You could implement Cloudinary upload here:
             /*
             const formData = new FormData();
             formData.append('file', file);
             formData.append('upload_preset', 'your_upload_preset');
-            
+        
             fetch('https://api.cloudinary.com/v1_1/your_cloud_name/image/upload', {
                 method: 'POST',
                 body: formData
@@ -669,11 +687,11 @@
                 console.log('editBook called with ID:', bookId);
                 currentBookId = bookId;
                 $('#bookModalLabel').text('Chỉnh sửa sách');
-                
+
                 // Reset form first
                 $('#bookForm')[0].reset();
                 $('#imagePreview').hide();
-                
+
                 // Load book details from API async
                 setTimeout(() => {
                     loadBookForEdit(bookId);
@@ -688,15 +706,15 @@
         function loadBookForEdit(bookId) {
             // Show loading
             $('#saveBookBtn').prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i>Đang tải...');
-            
+
             $.ajax({
                 url: '/Admin/GetBookDetail',
                 type: 'GET',
                 data: { id: bookId },
-                success: function(response) {
+                success: function (response) {
                     if (response.success && response.data) {
                         const book = response.data;
-                        
+
                         // Populate form fields
                         $('#bookId').val(book.id || bookId);
                         $('#title').val(book.title || '');
@@ -705,7 +723,7 @@
                         $('#publisher').val(book.publisher || '');
                         $('#publicationYear').val(book.publicationYear || new Date().getFullYear());
                         $('#description').val(book.description || '');
-                        
+
                         // Handle image URL and preview
                         const imageUrl = book.imageUrl || book.coverImageUrl || '';
                         $('#coverImageUrl').val(imageUrl);
@@ -714,11 +732,11 @@
                         } else {
                             $('#imagePreview').hide();
                         }
-                        
+
                         $('#quantity').val(book.totalCopies || 0);
                         $('#language').val(book.language || 'Tiếng Việt');
                         $('#pageCount').val(book.pageCount || 0);
-                        
+
                         // Load categories and select the book's categories
                         loadCategories().then(() => {
                             if (book.categories && book.categories.length > 0) {
@@ -732,11 +750,11 @@
                         alert('Không thể tải thông tin sách: ' + (response.message || 'Lỗi không xác định'));
                     }
                 },
-                error: function(xhr) {
+                error: function (xhr) {
                     console.error('Error loading book details:', xhr);
                     alert('Có lỗi xảy ra khi tải thông tin sách');
                 },
-                complete: function() {
+                complete: function () {
                     $('#saveBookBtn').prop('disabled', false).html('<i class="fas fa-save me-1"></i>Lưu');
                 }
             });
@@ -799,8 +817,8 @@
             console.log('CoverImageUrl value:', $('#coverImageUrl').val()); // Debug specific field
 
             const isEdit = currentBookId !== null && currentBookId > 0;
-            const url = isEdit ? '/Admin/UpdateBook' : '/Admin/CreateBook';
-            
+            const url = isEdit ? '/Admin/SaveBook' : '/Admin/SaveBook';
+
             $('#saveBookBtn').prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i>Đang lưu...');
 
             $.ajax({
@@ -808,7 +826,7 @@
                 type: 'POST',
                 contentType: 'application/json',
                 data: JSON.stringify(formData),
-                success: function(response) {
+                success: function (response) {
                     console.log('Response:', response); // Debug log
                     if (response.success) {
                         $('#bookModal').modal('hide');
@@ -821,7 +839,7 @@
                         }
                     }
                 },
-                error: function(xhr) {
+                error: function (xhr) {
                     console.error('Error:', xhr);
                     try {
                         const errorResponse = JSON.parse(xhr.responseText);
@@ -830,7 +848,7 @@
                         alert('Có lỗi xảy ra khi lưu sách');
                     }
                 },
-                complete: function() {
+                complete: function () {
                     $('#saveBookBtn').prop('disabled', false).html('<i class="fas fa-save me-1"></i>Lưu');
                 }
             });
@@ -858,7 +876,7 @@
 
             // Show preview
             const reader = new FileReader();
-            reader.onload = function(e) {
+            reader.onload = function (e) {
                 $('#imagePreview').attr('src', e.target.result).show();
             };
             reader.readAsDataURL(file);
@@ -876,7 +894,7 @@
                 formData.append('file', file);
 
                 const response = await $.ajax({
-                    url: '/Admin/UploadBookImage',
+                    url: '/Admin/UploadImage',
                     type: 'POST',
                     data: formData,
                     processData: false,
@@ -885,11 +903,11 @@
                 });
 
                 $('.progress-bar').css('width', '100%');
-                
+
                 if (response.success && response.imageUrl) {
                     $('#coverImageUrl').val(response.imageUrl);
                     $('#imagePreview').attr('src', response.imageUrl).show();
-                    
+
                     // Show success message briefly
                     setTimeout(() => {
                         $('#uploadProgress').hide();
@@ -913,13 +931,13 @@
         // Delete book
         function deleteBook(bookId, bookTitle) {
             $('#deleteDetails').html(`<strong>Sách:</strong> ${bookTitle}`);
-            
-            $('#confirmDeleteBtn').off('click').on('click', function() {
+
+            $('#confirmDeleteBtn').off('click').on('click', function () {
                 $.ajax({
                     url: '/Admin/DeleteBook',
                     type: 'POST',
                     data: { id: bookId },
-                    success: function(response) {
+                    success: function (response) {
                         $('#deleteModal').modal('hide');
                         if (response.success) {
                             alert(response.message);
@@ -928,60 +946,60 @@
                             alert('Lỗi: ' + response.message);
                         }
                     },
-                    error: function(xhr) {
+                    error: function (xhr) {
                         $('#deleteModal').modal('hide');
                         console.error('Error:', xhr);
                         alert('Có lỗi xảy ra khi xóa sách');
                     }
                 });
             });
-            
+
             $('#deleteModal').modal('show');
         }
 
         // View book detail
         function viewBook(bookId) {
             console.log('viewBook function called with ID:', bookId);
-            
+
             if (!bookId) {
                 console.error('No book ID provided');
                 alert('Lỗi: Không có ID sách');
                 return;
             }
-            
+
             console.log('Loading book detail modal...');
             $('#bookDetailModal .modal-content').html('<div class="modal-body text-center"><div class="spinner-border" role="status"><span class="visually-hidden">Đang tải...</span></div></div>');
             $('#bookDetailModal').modal('show');
-            
+
             console.log('Making AJAX request to:', '/Admin/BookDetail/' + bookId);
             $.ajax({
                 url: '/Admin/BookDetail/' + bookId,
                 type: 'GET',
-                success: function(response) {
+                success: function (response) {
                     console.log('AJAX success, response received');
                     $('#bookDetailModal .modal-content').html(response);
                 },
-                error: function(xhr) {
+                error: function (xhr) {
                     console.error('AJAX Error:', xhr);
                     console.error('Status:', xhr.status);
                     console.error('Response Text:', xhr.responseText);
                     $('#bookDetailModal .modal-content').html(`
-                        <div class="modal-header">
-                            <h5 class="modal-title">Chi tiết sách</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                            <div class="text-center py-4">
-                                <i class="fas fa-exclamation-triangle text-danger fa-3x mb-3"></i>
-                                <h5>Lỗi tải dữ liệu</h5>
-                                <p class="text-muted">Có lỗi xảy ra khi tải thông tin sách. Status: ${xhr.status}</p>
-                                <p class="text-muted">Chi tiết: ${xhr.responseText}</p>
+                            <div class="modal-header">
+                                <h5 class="modal-title">Chi tiết sách</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                        </div>
-                    `);
+                            <div class="modal-body">
+                                <div class="text-center py-4">
+                                    <i class="fas fa-exclamation-triangle text-danger fa-3x mb-3"></i>
+                                    <h5>Lỗi tải dữ liệu</h5>
+                                    <p class="text-muted">Có lỗi xảy ra khi tải thông tin sách. Status: ${xhr.status}</p>
+                                    <p class="text-muted">Chi tiết: ${xhr.responseText}</p>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                            </div>
+                        `);
                 }
             });
         }
