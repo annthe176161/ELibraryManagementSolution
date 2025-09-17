@@ -274,6 +274,9 @@ namespace ELibraryManagement.Web.Controllers
 
             try
             {
+                bool avatarUploaded = false;
+                string successMessage = "";
+
                 // Debug: Check if avatar file exists
                 if (model.AvatarFile != null && model.AvatarFile.Length > 0)
                 {
@@ -283,15 +286,15 @@ namespace ELibraryManagement.Web.Controllers
                     if (uploadResult.Success)
                     {
                         TempData["DebugMessage"] += $" | ✅ Upload thành công! Avatar URL từ API: {uploadResult.User?.AvatarUrl ?? "N/A"}";
+                        avatarUploaded = true;
+                        successMessage = "Cập nhật avatar thành công!";
+
+                        // Update model with new avatar URL to prevent overwrite during profile update
+                        model.AvatarUrl = uploadResult.User?.AvatarUrl;
+                        TempData["DebugMessage"] += $" | 🔗 Model AvatarUrl updated: {model.AvatarUrl}";
 
                         // Small delay to ensure database is updated
                         await Task.Delay(500);
-
-                        TempData["SuccessMessage"] = "Cập nhật avatar thành công!";
-
-                        // Add cache-busting parameter to force avatar refresh
-                        var timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-                        return RedirectToAction("Profile", new { t = timestamp });
                     }
                     else
                     {
@@ -300,25 +303,64 @@ namespace ELibraryManagement.Web.Controllers
                         return View(model);
                     }
                 }
-                else
+
+                // Check if there are profile data changes to update
+                bool hasProfileChanges = !string.IsNullOrEmpty(model.FirstName) ||
+                                        !string.IsNullOrEmpty(model.LastName) ||
+                                        !string.IsNullOrEmpty(model.StudentId) ||
+                                        !string.IsNullOrEmpty(model.PhoneNumber) ||
+                                        model.DateOfBirth.HasValue ||
+                                        !string.IsNullOrEmpty(model.Address);
+
+                if (hasProfileChanges)
                 {
-                    TempData["DebugMessage"] = "🔍 DEBUG: Không có avatar file được upload (chỉ update profile)";
+                    TempData["DebugMessage"] += " | 🔄 Updating profile info...";
+
+                    // Update profile information (avatar already handled separately)
+                    var profileResult = await _authApiService.UpdateProfileAsync(model);
+
+                    if (profileResult.Success)
+                    {
+                        TempData["DebugMessage"] += " | ✅ Profile update thành công!";
+
+                        if (avatarUploaded)
+                        {
+                            successMessage = "Cập nhật avatar và thông tin cá nhân thành công!";
+                        }
+                        else
+                        {
+                            successMessage = "Cập nhật thông tin cá nhân thành công!";
+                        }
+                    }
+                    else
+                    {
+                        TempData["DebugMessage"] += $" | ❌ Profile update lỗi: {profileResult.Message}";
+
+                        if (avatarUploaded)
+                        {
+                            // Avatar uploaded but profile update failed
+                            TempData["SuccessMessage"] = "Cập nhật avatar thành công!";
+                            TempData["ErrorMessage"] = $"Nhưng không thể cập nhật thông tin cá nhân: {profileResult.Message}";
+                        }
+                        else
+                        {
+                            TempData["ErrorMessage"] = profileResult.Message;
+                            return View(model);
+                        }
+                    }
+                }
+                else if (!avatarUploaded)
+                {
+                    TempData["DebugMessage"] = "🔍 DEBUG: Không có thay đổi nào để cập nhật";
+                    TempData["ErrorMessage"] = "Không có thông tin nào được thay đổi.";
+                    return View(model);
                 }
 
-                // Chỉ cập nhật thông tin profile (không có avatar)
-                var profileResult = await _authApiService.UpdateProfileAsync(model);
+                TempData["SuccessMessage"] = successMessage;
 
-                if (profileResult.Success)
-                {
-                    TempData["SuccessMessage"] = "Cập nhật thông tin cá nhân thành công!";
-                    TempData["DebugMessage"] += " | ✅ Profile-only update thành công!";
-                    var timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-                    return RedirectToAction("Profile", new { t = timestamp });
-                }
-
-                TempData["ErrorMessage"] = profileResult.Message;
-                TempData["DebugMessage"] += $" | ❌ Profile-only update lỗi: {profileResult.Message}";
-                return View(model);
+                // Add cache-busting parameter to force avatar refresh
+                var timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+                return RedirectToAction("Profile", new { t = timestamp });
             }
             catch (Exception ex)
             {
