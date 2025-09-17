@@ -444,7 +444,7 @@ namespace ELibraryManagement.Api.Services.Implementations
                         FirstName = firstName ?? "",
                         LastName = lastName ?? "",
                         EmailConfirmed = true, // Google đã xác thực email
-                        StudentId = GenerateRandomStudentId() // Tạo student ID ngẫu nhiên
+                        StudentId = "" // Để trống, cho phép user tự nhập sau
                     };
 
                     var result = await _userManager.CreateAsync(user);
