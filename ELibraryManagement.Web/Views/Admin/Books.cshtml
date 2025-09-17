@@ -42,7 +42,7 @@
                 <div class="d-flex justify-content-between">
                     <div>
                         <div class="small">Tổng số sách</div>
-                        <div class="h4 mb-0">@Model.Count</div>
+                        <div class="h4 mb-0">@Model.Sum(b => b.TotalQuantity)</div>
                     </div>
                     <div class="align-self-center">
                         <i class="fas fa-book fa-2x opacity-75"></i>

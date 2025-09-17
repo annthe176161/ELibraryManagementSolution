@@ -984,9 +984,12 @@ namespace ELibraryManagement.Web.Controllers
                     }
 
                     ViewBag.Categories = categories;
-                    ViewBag.TotalBooks = books?.Count ?? 0;
-                    ViewBag.AvailableBooks = books?.Count(b => b.AvailableQuantity > 0) ?? 0;
-                    ViewBag.OutOfStockBooks = books?.Count(b => b.AvailableQuantity == 0) ?? 0;
+
+                    // Calculate correct statistics
+                    ViewBag.TotalBooks = books?.Sum(b => b.TotalQuantity) ?? 0;  // Tổng số cuốn sách
+                    ViewBag.AvailableBooks = books?.Sum(b => b.AvailableQuantity) ?? 0;  // Tổng số cuốn sách có sẵn
+                    ViewBag.BorrowedBooks = books?.Sum(b => b.TotalQuantity - b.AvailableQuantity) ?? 0;  // Tổng số cuốn sách đang được mượn
+                    ViewBag.OutOfStockBooks = books?.Count(b => b.AvailableQuantity == 0) ?? 0;  // Số loại sách hết hàng
 
                     return View(books ?? new List<AdminBookViewModel>());
                 }
