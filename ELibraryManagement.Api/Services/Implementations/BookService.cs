@@ -216,16 +216,9 @@ namespace ELibraryManagement.Api.Services.Implementations
             {
                 var overdueDays = (returnDate - borrowRecord.DueDate).Days;
 
-                // Progressive fine rates as per business rules
-                decimal dailyRate = 0;
-                if (overdueDays <= 7)
-                    dailyRate = 2000; // 2,000 VND per day for first week
-                else if (overdueDays <= 14)
-                    dailyRate = 5000; // 5,000 VND per day for second week
-                else
-                    dailyRate = 10000; // 10,000 VND per day after 2 weeks
-
-                fineAmount = overdueDays * dailyRate;
+                // Fixed fine rate: 5000 VND per day
+                var finePerDay = 5000m; // 5000 VND per day
+                fineAmount = overdueDays * finePerDay;
 
                 // Create a fine record
                 var fine = new Fine

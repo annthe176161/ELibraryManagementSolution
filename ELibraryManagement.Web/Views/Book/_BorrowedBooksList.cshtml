@@ -55,7 +55,18 @@
                                             {
                                                 <text>Hạn trả: @book.DueDate.ToString("dd/MM/yyyy")</text>
                                             }
-                                            // Nếu đã trả thì không hiển thị hạn trả
+                                            else if (book.Status == "Returned" && book.ReturnDate.HasValue)
+                                            {
+                                                <text>Đã trả: @book.ReturnDate.Value.ToString("dd/MM/yyyy")</text>
+                                            }
+                                            else if (book.Status == "Cancelled")
+                                            {
+                                                <text>Đã hủy</text>
+                                            }
+                                            else if (book.IsOverdue)
+                                            {
+                                                <text>Quá hạn @book.DaysOverdue ngày</text>
+                                            }
                                         </small>
                                     </div>
                                 </div>
@@ -123,7 +134,8 @@
 
                             @if (book.Status == "Requested")
                             {
-                                <div class="alert alert-light border-success p-2 mt-2 mb-2" style="font-size: 0.8rem; background-color: #e8f5e8; border-color: #4caf50;">
+                                <div class="alert alert-light border-success p-2 mt-2 mb-2"
+                                    style="font-size: 0.8rem; background-color: #e8f5e8; border-color: #4caf50;">
                                     <i class="fas fa-check-circle text-success me-1"></i>
                                     <strong>Đến thư viện</strong> để nhận sách
                                 </div>
