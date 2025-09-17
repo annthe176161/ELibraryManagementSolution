@@ -171,7 +171,7 @@
                                             @if (!string.IsNullOrEmpty(user.PhoneNumber))
                                             {
                                                 <br>
-                                        
+
                                                 <small class="text-muted"><i
                                                         class="fas fa-phone fa-sm me-1"></i>@user.PhoneNumber</small>
                                             }
@@ -228,7 +228,7 @@
                                                 </button>
                                             }
                                             <button type="button" class="btn btn-sm btn-outline-info"
-                                                onclick="viewUserBorrows('@user.Id')" title="Xem lịch sử mượn">
+                                                onclick="viewUserDetail('@user.Id')" title="Xem lịch sử mượn">
                                                 <i class="fas fa-history"></i>
                                             </button>
                                         </div>
@@ -386,11 +386,11 @@
                 })
                 .fail(function () {
                     $('#userDetailContent').html(`
-                            <div class="alert alert-danger">
-                                <i class="fas fa-exclamation-triangle me-2"></i>
-                                Không thể tải thông tin sinh viên. Vui lòng thử lại.
-                            </div>
-                        `);
+                                <div class="alert alert-danger">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                    Không thể tải thông tin sinh viên. Vui lòng thử lại.
+                                </div>
+                            `);
                 });
         }
 
@@ -454,15 +454,15 @@
             const icon = type === 'success' ? 'fas fa-check-circle' : 'fas fa-exclamation-circle';
 
             const toastHtml = `
-                    <div id="${toastId}" class="toast align-items-center text-white ${bgClass} border-0" role="alert" aria-live="assertive" aria-atomic="true">
-                        <div class="d-flex">
-                            <div class="toast-body">
-                                <i class="${icon} me-2"></i>${message}
+                        <div id="${toastId}" class="toast align-items-center text-white ${bgClass} border-0" role="alert" aria-live="assertive" aria-atomic="true">
+                            <div class="d-flex">
+                                <div class="toast-body">
+                                    <i class="${icon} me-2"></i>${message}
+                                </div>
+                                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
                             </div>
-                            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
                         </div>
-                    </div>
-                `;
+                    `;
 
             // Add to toast container (create if doesn't exist)
             let toastContainer = document.getElementById('toast-container');
