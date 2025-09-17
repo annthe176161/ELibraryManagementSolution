@@ -303,7 +303,7 @@ namespace ELibraryManagement.Api.Controllers
                     user.StudentId,
                     user.CreatedAt,
                     user.LockoutEnd,
-                    IsActive = user.IsActive && (user.LockoutEnd == null || user.LockoutEnd <= DateTimeOffset.UtcNow),
+                    IsActive = user.IsActive,
                     Roles = roles.ToList(),
                     TotalBorrows = 0, // TODO: Calculate from borrow records
                     ActiveBorrows = 0 // TODO: Calculate from active borrow records
