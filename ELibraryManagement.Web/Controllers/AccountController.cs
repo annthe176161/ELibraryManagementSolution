@@ -47,7 +47,7 @@ namespace ELibraryManagement.Web.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Login(string? token = null, string? user = null)
+        public async Task<IActionResult> Login(string? token = null, string? user = null, string? error = null)
         {
             // Prevent browser caching to ensure fresh content
             Response.Headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
@@ -56,6 +56,13 @@ namespace ELibraryManagement.Web.Controllers
 
             // Clear any lingering success messages when accessing login page directly
             TempData.Remove("SuccessMessage");
+
+            // Xử lý lỗi từ Google OAuth
+            if (!string.IsNullOrEmpty(error))
+            {
+                TempData["ErrorMessage"] = Uri.UnescapeDataString(error);
+                return View();
+            }
 
             // Xử lý callback từ Google OAuth
             if (!string.IsNullOrEmpty(token) && !string.IsNullOrEmpty(user))

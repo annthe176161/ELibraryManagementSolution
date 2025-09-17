@@ -552,6 +552,14 @@
                 </div>
             }
 
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="modern-alert alert-danger">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    @TempData["ErrorMessage"]
+                </div>
+            }
+
             <form asp-action="Login" method="post">
                 <div asp-validation-summary="ModelOnly" class="modern-alert alert-danger"></div>
 

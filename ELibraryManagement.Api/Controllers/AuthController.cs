@@ -251,13 +251,15 @@ namespace ELibraryManagement.Api.Controllers
             var info = await _signInManager.GetExternalLoginInfoAsync();
             if (info == null)
             {
-                return BadRequest(new { success = false, message = "Lỗi đăng nhập bên ngoài" });
+                // Redirect về login page với error message
+                return Redirect($"https://localhost:7208/Account/Login?error={Uri.EscapeDataString("Lỗi đăng nhập bên ngoài")}");
             }
 
             var result = await _authService.HandleGoogleLoginAsync(info);
             if (!result.Success)
             {
-                return BadRequest(result);
+                // Redirect về login page với error message
+                return Redirect($"https://localhost:7208/Account/Login?error={Uri.EscapeDataString(result.Message)}");
             }
 
             // Redirect về frontend với token

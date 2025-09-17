@@ -259,7 +259,7 @@ namespace ELibraryManagement.Api.Controllers
                     user.StudentId,
                     user.CreatedAt,
                     user.LockoutEnd,
-                    IsActive = user.LockoutEnd == null || user.LockoutEnd <= DateTimeOffset.UtcNow,
+                    IsActive = user.IsActive && (user.LockoutEnd == null || user.LockoutEnd <= DateTimeOffset.UtcNow),
                     Roles = roles.ToList(),
                     TotalBorrows = 0, // TODO: Calculate from borrow records
                     ActiveBorrows = 0 // TODO: Calculate from active borrow records
@@ -288,10 +288,20 @@ namespace ELibraryManagement.Api.Controllers
                     return NotFound("Không tìm thấy người dùng");
                 }
 
-                // Set lockout end to a far future date to disable user
-                var result = await _userManager.SetLockoutEndDateAsync(user, DateTimeOffset.UtcNow.AddYears(100));
+                // Set both IsActive and LockoutEnd for consistency
+                user.IsActive = false;
+                user.UpdatedAt = DateTime.UtcNow;
 
-                if (result.Succeeded)
+                var updateResult = await _userManager.UpdateAsync(user);
+                if (!updateResult.Succeeded)
+                {
+                    return BadRequest("Không thể cập nhật thông tin người dùng");
+                }
+
+                // Also set lockout for additional security
+                var lockoutResult = await _userManager.SetLockoutEndDateAsync(user, DateTimeOffset.UtcNow.AddYears(100));
+
+                if (lockoutResult.Succeeded)
                 {
                     return Ok(new { message = "Đã vô hiệu hóa người dùng thành công" });
                 }
@@ -319,10 +329,20 @@ namespace ELibraryManagement.Api.Controllers
                     return NotFound("Không tìm thấy người dùng");
                 }
 
-                // Remove lockout to enable user
-                var result = await _userManager.SetLockoutEndDateAsync(user, null);
+                // Set both IsActive and remove lockout for consistency
+                user.IsActive = true;
+                user.UpdatedAt = DateTime.UtcNow;
 
-                if (result.Succeeded)
+                var updateResult = await _userManager.UpdateAsync(user);
+                if (!updateResult.Succeeded)
+                {
+                    return BadRequest("Không thể cập nhật thông tin người dùng");
+                }
+
+                // Remove lockout to enable user
+                var lockoutResult = await _userManager.SetLockoutEndDateAsync(user, null);
+
+                if (lockoutResult.Succeeded)
                 {
                     return Ok(new { message = "Đã kích hoạt người dùng thành công" });
                 }

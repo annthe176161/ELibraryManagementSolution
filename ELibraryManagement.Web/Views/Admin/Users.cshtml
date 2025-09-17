@@ -285,9 +285,6 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                <button type="button" class="btn btn-primary" onclick="editUser()">
-                    <i class="fas fa-edit me-1"></i>Chỉnh sửa
-                </button>
             </div>
         </div>
     </div>
@@ -447,17 +444,6 @@
                 .fail(function () {
                     showToast('error', 'Không thể kích hoạt sinh viên. Vui lòng thử lại.');
                 });
-        }
-
-        // View user borrow history
-        function viewUserBorrows(userId) {
-            window.location.href = `/Admin/UserBorrows/${userId}`;
-        }
-
-        // Edit user
-        function editUser() {
-            if (!currentUserId) return;
-            window.location.href = `/Admin/EditUser/${currentUserId}`;
         }
 
         // Show toast notification

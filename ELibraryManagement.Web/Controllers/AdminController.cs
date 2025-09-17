@@ -736,14 +736,32 @@ namespace ELibraryManagement.Web.Controllers
                 _httpClient.DefaultRequestHeaders.Authorization =
                     new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
-                var response = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/User/admin/{id}");
-                if (response.IsSuccessStatusCode)
+                // Get user info
+                var userResponse = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/User/admin/{id}");
+                AdminUserViewModel? user = null;
+                if (userResponse.IsSuccessStatusCode)
                 {
-                    var content = await response.Content.ReadAsStringAsync();
-                    var user = JsonSerializer.Deserialize<AdminUserViewModel>(content, _jsonOptions);
-                    return PartialView("_UserDetailPartial", user);
+                    var userContent = await userResponse.Content.ReadAsStringAsync();
+                    user = JsonSerializer.Deserialize<AdminUserViewModel>(userContent, _jsonOptions);
                 }
-                return PartialView("_UserDetailPartial", null);
+
+                // Get user's borrow history
+                var borrowResponse = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Borrow/user/{id}");
+                List<UserBorrowedBookViewModel> borrows = new List<UserBorrowedBookViewModel>();
+                if (borrowResponse.IsSuccessStatusCode)
+                {
+                    var borrowContent = await borrowResponse.Content.ReadAsStringAsync();
+                    borrows = JsonSerializer.Deserialize<List<UserBorrowedBookViewModel>>(borrowContent, _jsonOptions) ?? new List<UserBorrowedBookViewModel>();
+                }
+
+                // Create a combined view model
+                var viewModel = new UserDetailWithBorrowsViewModel
+                {
+                    User = user,
+                    BorrowedBooks = borrows
+                };
+
+                return PartialView("_UserDetailPartial", viewModel);
             }
             catch (Exception)
             {
@@ -807,7 +825,8 @@ namespace ELibraryManagement.Web.Controllers
             }
         }
 
-        // GET: Admin/UserBorrows/{id}
+        // GET: Admin/UserBorrows/{id} - DEPRECATED: Functionality moved to inline user details modal
+        /*
         public async Task<IActionResult> UserBorrows(string id)
         {
             var accessCheck = await CheckAdminAccessAsync();
@@ -830,11 +849,11 @@ namespace ELibraryManagement.Web.Controllers
 
                 // Get user's borrow history
                 var borrowResponse = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Borrow/user/{id}");
-                List<BorrowBookViewModel> borrows = new List<BorrowBookViewModel>();
+                List<UserBorrowedBookViewModel> borrows = new List<UserBorrowedBookViewModel>();
                 if (borrowResponse.IsSuccessStatusCode)
                 {
                     var borrowContent = await borrowResponse.Content.ReadAsStringAsync();
-                    borrows = JsonSerializer.Deserialize<List<BorrowBookViewModel>>(borrowContent, _jsonOptions) ?? new List<BorrowBookViewModel>();
+                    borrows = JsonSerializer.Deserialize<List<UserBorrowedBookViewModel>>(borrowContent, _jsonOptions) ?? new List<UserBorrowedBookViewModel>();
                 }
 
                 ViewBag.User = user;
@@ -843,9 +862,10 @@ namespace ELibraryManagement.Web.Controllers
             catch (Exception)
             {
                 ViewBag.User = null;
-                return View(new List<BorrowBookViewModel>());
+                return View(new List<UserBorrowedBookViewModel>());
             }
         }
+        */
 
         // GET: Admin/EditUser/{id}
         public async Task<IActionResult> EditUser(string id)

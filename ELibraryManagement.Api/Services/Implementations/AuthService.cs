@@ -139,6 +139,16 @@ namespace ELibraryManagement.Api.Services.Implementations
                 };
             }
 
+            // Check if user is active
+            if (!user.IsActive)
+            {
+                return new AuthResponseDto
+                {
+                    Success = false,
+                    Message = "Tài khoản của bạn đã bị vô hiệu hóa. Vui lòng liên hệ quản trị viên để được hỗ trợ."
+                };
+            }
+
             // Generate JWT token
             var token = await GenerateJwtTokenAsync(user);
 
@@ -460,6 +470,18 @@ namespace ELibraryManagement.Api.Services.Implementations
 
                     // Thêm role User mặc định
                     await _userManager.AddToRoleAsync(user, "User");
+                }
+                else
+                {
+                    // Check if existing user is active
+                    if (!user.IsActive)
+                    {
+                        return new AuthResponseDto
+                        {
+                            Success = false,
+                            Message = "Tài khoản của bạn đã bị vô hiệu hóa. Vui lòng liên hệ quản trị viên để được hỗ trợ."
+                        };
+                    }
                 }
 
                 // Liên kết external login với user
