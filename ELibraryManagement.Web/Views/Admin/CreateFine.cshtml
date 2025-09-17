@@ -1,0 +1,331 @@
+@model ELibraryManagement.Web.Services.CreateFineRequest
+@using ELibraryManagement.Web.Models
+@{
+    ViewData["Title"] = "Tạo phạt mới";
+    Layout = "_AdminLayout";
+    var users = ViewBag.Users as List<ELibraryManagement.Web.Models.AdminUserViewModel> ?? new List<ELibraryManagement.Web.Models.AdminUserViewModel>();
+    var selectedUserId = ViewBag.SelectedUserId as string;
+}
+
+<div class="container-fluid">
+    <!-- Page Header -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+            <i class="fas fa-plus-circle"></i>
+            Tạo phạt mới
+        </h1>
+        <a href="@Url.Action("Fines")" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i>
+            Quay lại danh sách
+        </a>
+    </div>
+
+    <div class="row">
+        <div class="col-xl-8 col-lg-7">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-edit"></i>
+                        Thông tin phạt
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <form asp-action="CreateFine" method="post" id="createFineForm">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="UserId" class="form-label">
+                                        Sinh viên <span class="text-danger">*</span>
+                                    </label>
+                                    <select asp-for="UserId" class="form-control select2" required>
+                                        <option value="">-- Chọn sinh viên --</option>
+                                        @foreach (var user in users)
+                                        {
+                                            <option value="@user.Id" 
+                                                    data-email="@user.Email"
+                                                    selected="@(selectedUserId == user.Id)">
+                                                @user.FullName (@user.Email)
+                                            </option>
+                                        }
+                                    </select>
+                                    <span asp-validation-for="UserId" class="text-danger"></span>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="BorrowRecordId" class="form-label">
+                                        Bản ghi mượn sách (tuỳ chọn)
+                                    </label>
+                                    <select asp-for="BorrowRecordId" class="form-control" id="borrowRecordSelect">
+                                        <option value="">-- Không liên quan đến mượn sách --</option>
+                                    </select>
+                                    <span asp-validation-for="BorrowRecordId" class="text-danger"></span>
+                                    <small class="form-text text-muted">
+                                        Chọn sinh viên trước để xem các bản ghi mượn sách
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="Amount" class="form-label">
+                                        Số tiền phạt (VND) <span class="text-danger">*</span>
+                                    </label>
+                                    <input asp-for="Amount" type="number" class="form-control" 
+                                           min="1000" max="10000000" step="1000" 
+                                           placeholder="Nhập số tiền phạt..." required>
+                                    <span asp-validation-for="Amount" class="text-danger"></span>
+                                    <small class="form-text text-muted">
+                                        Từ 1,000 đến 10,000,000 VND
+                                    </small>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label asp-for="DueDate" class="form-label">
+                                        Hạn thanh toán
+                                    </label>
+                                    <input asp-for="DueDate" type="date" class="form-control" 
+                                           min="@DateTime.Now.ToString("yyyy-MM-dd")"
+                                           value="@DateTime.Now.AddDays(30).ToString("yyyy-MM-dd")">
+                                    <span asp-validation-for="DueDate" class="text-danger"></span>
+                                    <small class="form-text text-muted">
+                                        Mặc định 30 ngày từ hôm nay
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="Reason" class="form-label">
+                                Lý do phạt <span class="text-danger">*</span>
+                            </label>
+                            <input asp-for="Reason" type="text" class="form-control" 
+                                   placeholder="Nhập lý do phạt..." maxlength="100" required>
+                            <span asp-validation-for="Reason" class="text-danger"></span>
+                            <small class="form-text text-muted">
+                                Tối đa 100 ký tự
+                            </small>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="Description" class="form-label">
+                                Mô tả chi tiết
+                            </label>
+                            <textarea asp-for="Description" class="form-control" rows="4" 
+                                      placeholder="Nhập mô tả chi tiết về lý do phạt..." maxlength="500"></textarea>
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                            <small class="form-text text-muted">
+                                Tối đa 500 ký tự
+                            </small>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="d-flex justify-content-between">
+                                <a href="@Url.Action("Fines")" class="btn btn-secondary">
+                                    <i class="fas fa-times"></i>
+                                    Hủy
+                                </a>
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save"></i>
+                                    Tạo phạt
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-4 col-lg-5">
+            <!-- Quick Actions -->
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-lightbulb"></i>
+                        Gợi ý số tiền phạt
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        <button type="button" class="list-group-item list-group-item-action" 
+                                onclick="setAmount(5000)">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">Trả muộn sách</h6>
+                                <small class="text-success">5,000 VND/ngày</small>
+                            </div>
+                            <p class="mb-1">Phạt tiêu chuẩn cho việc trả sách muộn.</p>
+                        </button>
+                        
+                        <button type="button" class="list-group-item list-group-item-action" 
+                                onclick="setAmount(50000)">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">Làm hỏng sách</h6>
+                                <small class="text-warning">50,000 VND</small>
+                            </div>
+                            <p class="mb-1">Phạt cho việc làm hỏng sách nhẹ.</p>
+                        </button>
+                        
+                        <button type="button" class="list-group-item list-group-item-action" 
+                                onclick="setAmount(200000)">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">Mất sách</h6>
+                                <small class="text-danger">200,000 VND</small>
+                            </div>
+                            <p class="mb-1">Phạt cho việc làm mất sách hoàn toàn.</p>
+                        </button>
+                        
+                        <button type="button" class="list-group-item list-group-item-action" 
+                                onclick="setAmount(20000)">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">Vi phạm quy định</h6>
+                                <small class="text-info">20,000 VND</small>
+                            </div>
+                            <p class="mb-1">Phạt cho các vi phạm quy định khác.</p>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- User Info -->
+            <div class="card shadow mb-4" id="userInfoCard" style="display: none;">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">
+                        <i class="fas fa-user"></i>
+                        Thông tin sinh viên
+                    </h6>
+                </div>
+                <div class="card-body" id="userInfoContent">
+                    <!-- User info will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Initialize select2 for better UX
+            $('.select2').select2({
+                placeholder: '-- Chọn sinh viên --',
+                allowClear: true
+            });
+
+            // Load user info and borrow records when user is selected
+            $('#UserId').change(function() {
+                const userId = $(this).val();
+                if (userId) {
+                    loadUserInfo(userId);
+                    loadUserBorrowRecords(userId);
+                } else {
+                    $('#userInfoCard').hide();
+                    $('#borrowRecordSelect').html('<option value="">-- Không liên quan đến mượn sách --</option>');
+                }
+            });
+
+            // If a user is pre-selected, load their info
+            const preSelectedUserId = '@selectedUserId';
+            if (preSelectedUserId) {
+                loadUserInfo(preSelectedUserId);
+                loadUserBorrowRecords(preSelectedUserId);
+            }
+        });
+
+        function setAmount(amount) {
+            $('#Amount').val(amount);
+            
+            // Set appropriate reason based on amount
+            if (amount === 5000) {
+                $('#Reason').val('Trả sách muộn');
+                $('#Description').val('Phạt tiêu chuẩn cho việc trả sách quá hạn theo quy định thư viện.');
+            } else if (amount === 50000) {
+                $('#Reason').val('Làm hỏng sách');
+                $('#Description').val('Sách bị hỏng nhẹ, cần sửa chữa hoặc thay thế.');
+            } else if (amount === 200000) {
+                $('#Reason').val('Mất sách');
+                $('#Description').val('Sách bị mất hoàn toàn, cần bồi thường theo giá trị sách.');
+            } else if (amount === 20000) {
+                $('#Reason').val('Vi phạm quy định thư viện');
+                $('#Description').val('Vi phạm các quy định khác của thư viện.');
+            }
+        }
+
+        function loadUserInfo(userId) {
+            // Show loading
+            $('#userInfoContent').html('<div class="text-center"><i class="fas fa-spinner fa-spin"></i> Đang tải...</div>');
+            $('#userInfoCard').show();
+
+            // Load user basic info (from the selected option)
+            const selectedOption = $(`#UserId option[value="${userId}"]`);
+            const userName = selectedOption.text().split('(')[0].trim();
+            const userEmail = selectedOption.data('email');
+
+            $('#userInfoContent').html(`
+                <div class="row">
+                    <div class="col-12">
+                        <h6>${userName}</h6>
+                        <p class="text-muted mb-2">${userEmail}</p>
+                    </div>
+                </div>
+            `);
+
+            // Load additional user info via AJAX (fines, etc.)
+            $.get('@Url.Action("GetUserFines")/' + userId, function(response) {
+                if (response.success && response.data.length > 0) {
+                    let finesHtml = '<hr><h6>Phạt hiện tại:</h6><ul class="list-unstyled">';
+                    let totalPending = 0;
+                    
+                    response.data.forEach(function(fine) {
+                        if (fine.status === 'Pending') {
+                            totalPending += fine.amount;
+                            finesHtml += `<li><small class="text-warning">• ${fine.reason}: ${fine.amount.toLocaleString()} VND</small></li>`;
+                        }
+                    });
+                    
+                    finesHtml += '</ul>';
+                    
+                    if (totalPending > 0) {
+                        finesHtml += `<div class="alert alert-warning alert-sm p-2"><small><strong>Tổng nợ:</strong> ${totalPending.toLocaleString()} VND</small></div>`;
+                    }
+                    
+                    $('#userInfoContent').append(finesHtml);
+                }
+            });
+        }
+
+        function loadUserBorrowRecords(userId) {
+            $('#borrowRecordSelect').html('<option value="">Đang tải...</option>');
+            
+            // This would require an API endpoint to get user's borrow records
+            // For now, we'll just reset to default
+            setTimeout(() => {
+                $('#borrowRecordSelect').html('<option value="">-- Không liên quan đến mượn sách --</option>');
+            }, 500);
+        }
+
+        // Form validation
+        $('#createFineForm').submit(function(e) {
+            const amount = parseInt($('#Amount').val());
+            const reason = $('#Reason').val().trim();
+            
+            if (!reason) {
+                e.preventDefault();
+                alert('Vui lòng nhập lý do phạt');
+                return false;
+            }
+            
+            if (amount < 1000 || amount > 10000000) {
+                e.preventDefault();
+                alert('Số tiền phạt phải từ 1,000 đến 10,000,000 VND');
+                return false;
+            }
+            
+            return true;
+        });
+    </script>
+
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

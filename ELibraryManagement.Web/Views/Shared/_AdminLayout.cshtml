@@ -136,6 +136,15 @@
                         </a>
                     </li>
 
+                    <!-- Fine Management -->
+                    <li class="nav-item">
+                        <a class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Fines" || ViewContext.RouteData.Values["action"]?.ToString() == "CreateFine" ? "active" : "")"
+                            asp-controller="Admin" asp-action="Fines">
+                            <i class="fas fa-money-bill-wave me-3"></i>
+                            Quản lý phạt
+                        </a>
+                    </li>
+
                     <li class="nav-divider"></li>
 
                     <!-- Categories -->

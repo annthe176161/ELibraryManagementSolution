@@ -45,6 +45,10 @@ namespace ELibraryManagement.Web
             builder.Services.AddHttpClient<ICategoryApiService, CategoryApiService>();
             builder.Services.AddScoped<ICategoryApiService, CategoryApiService>();
 
+            // Add Fine services
+            builder.Services.AddHttpClient<IFineApiService, FineApiService>();
+            builder.Services.AddScoped<IFineApiService, FineApiService>();
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.

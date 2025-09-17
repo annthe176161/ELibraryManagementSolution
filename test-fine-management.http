@@ -1,0 +1,129 @@
+### Fine Management API Tests
+@baseUrl = https://localhost:7263
+@contentType = application/json
+
+### Get API Info
+GET {{baseUrl}}/api
+
+### 1. Get All Fines with Pagination
+GET {{baseUrl}}/api/fine?page=1&pageSize=10&sortBy=FineDate&sortDescending=true
+
+### 2. Get Fines with Status Filter (Pending = 0)
+GET {{baseUrl}}/api/fine?status=0&page=1&pageSize=5
+
+### 3. Get Fines with Date Range Filter
+GET {{baseUrl}}/api/fine?fromDate=2024-01-01&toDate=2024-12-31
+
+### 4. Search Fines by Reason
+GET {{baseUrl}}/api/fine?search=muộn
+
+### 5. Get Fine Statistics
+GET {{baseUrl}}/api/fine/statistics
+
+### 6. Get Fine by ID
+GET {{baseUrl}}/api/fine/1
+
+### 7. Create New Fine
+POST {{baseUrl}}/api/fine
+Content-Type: {{contentType}}
+
+{
+  "userId": "user-id-here",
+  "borrowRecordId": null,
+  "amount": 20000.00,
+  "reason": "Sử dụng điện thoại trong thư viện",
+  "description": "Vi phạm quy định sử dụng thiết bị điện tử trong khu vực yên tĩnh",
+  "dueDate": "2024-12-31T23:59:59"
+}
+
+### 8. Update Fine
+PUT {{baseUrl}}/api/fine/1
+Content-Type: {{contentType}}
+
+{
+  "id": 1,
+  "userId": "user-id-here",
+  "borrowRecordId": null,
+  "amount": 25000.00,
+  "reason": "Sử dụng điện thoại trong thư viện",
+  "description": "Vi phạm quy định sử dụng thiết bị điện tử trong khu vực yên tĩnh - Cập nhật mức phạt",
+  "status": 0,
+  "dueDate": "2024-12-31T23:59:59"
+}
+
+### 9. Mark Fine as Paid
+POST {{baseUrl}}/api/fine/1/mark-paid
+Content-Type: {{contentType}}
+
+{
+  "notes": "Sinh viên đã thanh toán bằng tiền mặt tại quầy thủ thư lúc 10:30 AM"
+}
+
+### 10. Waive Fine
+POST {{baseUrl}}/api/fine/2/waive
+Content-Type: {{contentType}}
+
+{
+  "reason": "Miễn phạt do hoàn cảnh đặc biệt của sinh viên",
+  "notes": "Sinh viên có hoàn cảnh gia đình khó khăn, lần đầu vi phạm"
+}
+
+### 11. Send Reminder
+POST {{baseUrl}}/api/fine/1/send-reminder
+Content-Type: {{contentType}}
+
+{
+  "reminderType": "Email",
+  "message": "Nhắc nhở thanh toán phạt sớm để tránh phụ phí"
+}
+
+### 12. Get Overdue Fines
+GET {{baseUrl}}/api/fine?status=0&isOverdue=true
+
+### 13. Get Fines by User ID
+GET {{baseUrl}}/api/fine?userId=user-id-here
+
+### 14. Get Fines by Amount Range
+GET {{baseUrl}}/api/fine?minAmount=10000&maxAmount=50000
+
+### 15. Get Recent Fines (Last 7 days)
+GET {{baseUrl}}/api/fine?fromDate={{$datetime iso8601 -7 d}}&toDate={{$datetime iso8601}}
+
+### 16. Complex Filter - Pending Fines with High Amount
+GET {{baseUrl}}/api/fine?status=0&minAmount=30000&sortBy=Amount&sortDescending=true
+
+### Test Error Cases
+
+### 17. Get Non-existent Fine
+GET {{baseUrl}}/api/fine/999999
+
+### 18. Create Fine with Invalid Data
+POST {{baseUrl}}/api/fine
+Content-Type: {{contentType}}
+
+{
+  "userId": "",
+  "amount": -1000,
+  "reason": "",
+  "description": ""
+}
+
+### 19. Update Non-existent Fine
+PUT {{baseUrl}}/api/fine/999999
+Content-Type: {{contentType}}
+
+{
+  "id": 999999,
+  "userId": "test-user",
+  "amount": 1000,
+  "reason": "Test",
+  "description": "Test"
+}
+
+### 20. Mark Paid - Non-existent Fine
+POST {{baseUrl}}/api/fine/999999/mark-paid
+Content-Type: {{contentType}}
+
+{
+  "notes": "Test payment"
+}

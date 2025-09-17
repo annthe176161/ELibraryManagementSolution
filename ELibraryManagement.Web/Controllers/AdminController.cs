@@ -15,6 +15,7 @@ namespace ELibraryManagement.Web.Controllers
         private readonly IReviewApiService _reviewApiService;
         private readonly IBorrowApiService _borrowApiService;
         private readonly ICategoryApiService _categoryApiService;
+        private readonly IFineApiService _fineApiService;
         private readonly HttpClient _httpClient;
         private readonly IConfiguration _configuration;
         private readonly JsonSerializerOptions _jsonOptions;
@@ -25,6 +26,7 @@ namespace ELibraryManagement.Web.Controllers
             IReviewApiService reviewApiService,
             IBorrowApiService borrowApiService,
             ICategoryApiService categoryApiService,
+            IFineApiService fineApiService,
             HttpClient httpClient,
             IConfiguration configuration,
             ILogger<AdminController> logger)
@@ -33,6 +35,7 @@ namespace ELibraryManagement.Web.Controllers
             _reviewApiService = reviewApiService;
             _borrowApiService = borrowApiService;
             _categoryApiService = categoryApiService;
+            _fineApiService = fineApiService;
             _httpClient = httpClient;
             _configuration = configuration;
             _logger = logger;
@@ -1351,5 +1354,280 @@ namespace ELibraryManagement.Web.Controllers
                 return Json(new { success = false, message = $"Có lỗi xảy ra: {ex.Message}" });
             }
         }
+
+        #region Fine Management Actions
+
+        // GET: Admin/Fines - Quản lý phạt
+        public async Task<IActionResult> Fines(int page = 1, string? status = null, string? search = null)
+        {
+            var accessCheck = await CheckAdminAccessAsync();
+            if (accessCheck != null) return accessCheck;
+
+            try
+            {
+                var token = _authApiService.GetCurrentToken();
+                _httpClient.DefaultRequestHeaders.Clear();
+                _httpClient.DefaultRequestHeaders.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+                var (fines, totalCount, totalPages) = await _fineApiService.GetAllFinesAsync(page, 20, status, search);
+                var statistics = await _fineApiService.GetFineStatisticsAsync();
+
+                ViewBag.Statistics = statistics;
+                ViewBag.CurrentPage = page;
+                ViewBag.TotalPages = totalPages;
+                ViewBag.TotalCount = totalCount;
+                ViewBag.CurrentStatus = status;
+                ViewBag.CurrentSearch = search;
+
+                return View(fines);
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Có lỗi xảy ra: {ex.Message}";
+                return View(new List<FineViewModel>());
+            }
+        }
+
+        // GET: Admin/FineDetails/{id} - Chi tiết phạt
+        [HttpGet]
+        public async Task<IActionResult> FineDetails(int id)
+        {
+            var accessCheck = await CheckAdminAccessAsync();
+            if (accessCheck != null) return Json(new { success = false, message = "Unauthorized" });
+
+            try
+            {
+                var token = _authApiService.GetCurrentToken();
+                _httpClient.DefaultRequestHeaders.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+                var fineDetail = await _fineApiService.GetFineDetailsAsync(id);
+                if (fineDetail != null)
+                {
+                    return PartialView("_FineDetailModal", fineDetail);
+                }
+
+                return Json(new { success = false, message = "Không tìm thấy thông tin phạt" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Có lỗi xảy ra: {ex.Message}" });
+            }
+        }
+
+        // GET: Admin/CreateFine - Tạo phạt mới
+        [HttpGet]
+        public async Task<IActionResult> CreateFine(string? userId = null)
+        {
+            var accessCheck = await CheckAdminAccessAsync();
+            if (accessCheck != null) return accessCheck;
+
+            try
+            {
+                // Get all users for dropdown
+                var token = _authApiService.GetCurrentToken();
+                _httpClient.DefaultRequestHeaders.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+                var usersResponse = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/User");
+                List<AdminUserViewModel> users = new List<AdminUserViewModel>();
+
+                if (usersResponse.IsSuccessStatusCode)
+                {
+                    var usersContent = await usersResponse.Content.ReadAsStringAsync();
+                    users = JsonSerializer.Deserialize<List<AdminUserViewModel>>(usersContent, _jsonOptions) ?? new List<AdminUserViewModel>();
+                }
+
+                ViewBag.Users = users.Where(u => u.Roles.Any(r => r.Equals("User", StringComparison.OrdinalIgnoreCase))).ToList();
+                ViewBag.SelectedUserId = userId;
+
+                return View(new CreateFineRequest());
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Có lỗi xảy ra: {ex.Message}";
+                return RedirectToAction("Fines");
+            }
+        }
+
+        // POST: Admin/CreateFine - Tạo phạt mới
+        [HttpPost]
+        public async Task<IActionResult> CreateFine(CreateFineRequest model)
+        {
+            var accessCheck = await CheckAdminAccessAsync();
+            if (accessCheck != null) return RedirectToAction("Login", "Account");
+
+            if (!ModelState.IsValid)
+            {
+                // Reload users for dropdown
+                var token = _authApiService.GetCurrentToken();
+                _httpClient.DefaultRequestHeaders.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+                var usersResponse = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/User");
+                List<AdminUserViewModel> users = new List<AdminUserViewModel>();
+
+                if (usersResponse.IsSuccessStatusCode)
+                {
+                    var usersContent = await usersResponse.Content.ReadAsStringAsync();
+                    users = JsonSerializer.Deserialize<List<AdminUserViewModel>>(usersContent, _jsonOptions) ?? new List<AdminUserViewModel>();
+                }
+
+                ViewBag.Users = users.Where(u => u.Roles.Any(r => r.Equals("User", StringComparison.OrdinalIgnoreCase))).ToList();
+                return View(model);
+            }
+
+            try
+            {
+                var token = _authApiService.GetCurrentToken();
+                _httpClient.DefaultRequestHeaders.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+                var success = await _fineApiService.CreateFineAsync(model);
+
+                if (success)
+                {
+                    TempData["SuccessMessage"] = "Tạo phạt thành công";
+                    return RedirectToAction("Fines");
+                }
+                else
+                {
+                    TempData["ErrorMessage"] = "Không thể tạo phạt. Vui lòng thử lại.";
+
+                    // Reload users for dropdown
+                    var usersResponse = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/User");
+                    List<AdminUserViewModel> users = new List<AdminUserViewModel>();
+
+                    if (usersResponse.IsSuccessStatusCode)
+                    {
+                        var usersContent = await usersResponse.Content.ReadAsStringAsync();
+                        users = JsonSerializer.Deserialize<List<AdminUserViewModel>>(usersContent, _jsonOptions) ?? new List<AdminUserViewModel>();
+                    }
+
+                    ViewBag.Users = users.Where(u => u.Roles.Any(r => r.Equals("User", StringComparison.OrdinalIgnoreCase))).ToList();
+                    return View(model);
+                }
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Có lỗi xảy ra: {ex.Message}";
+                return RedirectToAction("Fines");
+            }
+        }
+
+        // POST: Admin/MarkFineAsPaid - Đánh dấu phạt đã thanh toán
+        [HttpPost]
+        public async Task<IActionResult> MarkFineAsPaid(int id, string? notes = null)
+        {
+            var accessCheck = await CheckAdminAccessAsync();
+            if (accessCheck != null) return Json(new { success = false, message = "Unauthorized" });
+
+            try
+            {
+                var token = _authApiService.GetCurrentToken();
+                _httpClient.DefaultRequestHeaders.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+                var success = await _fineApiService.MarkFineAsPaidAsync(id, notes);
+
+                if (success)
+                {
+                    return Json(new { success = true, message = "Đã đánh dấu phạt là đã thanh toán" });
+                }
+                else
+                {
+                    return Json(new { success = false, message = "Không thể cập nhật trạng thái phạt" });
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Có lỗi xảy ra: {ex.Message}" });
+            }
+        }
+
+        // POST: Admin/WaiveFine - Miễn phạt
+        [HttpPost]
+        public async Task<IActionResult> WaiveFine(int id, string reason, string? notes = null)
+        {
+            var accessCheck = await CheckAdminAccessAsync();
+            if (accessCheck != null) return Json(new { success = false, message = "Unauthorized" });
+
+            try
+            {
+                var token = _authApiService.GetCurrentToken();
+                _httpClient.DefaultRequestHeaders.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+                var success = await _fineApiService.WaiveFineAsync(id, reason, notes);
+
+                if (success)
+                {
+                    return Json(new { success = true, message = "Đã miễn phạt thành công" });
+                }
+                else
+                {
+                    return Json(new { success = false, message = "Không thể miễn phạt" });
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Có lỗi xảy ra: {ex.Message}" });
+            }
+        }
+
+        // POST: Admin/UpdateFine - Cập nhật phạt
+        [HttpPost]
+        public async Task<IActionResult> UpdateFine(int id, [FromBody] UpdateFineRequest model)
+        {
+            var accessCheck = await CheckAdminAccessAsync();
+            if (accessCheck != null) return Json(new { success = false, message = "Unauthorized" });
+
+            try
+            {
+                var token = _authApiService.GetCurrentToken();
+                _httpClient.DefaultRequestHeaders.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+                var success = await _fineApiService.UpdateFineAsync(id, model);
+
+                if (success)
+                {
+                    return Json(new { success = true, message = "Cập nhật phạt thành công" });
+                }
+                else
+                {
+                    return Json(new { success = false, message = "Không thể cập nhật phạt" });
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Có lỗi xảy ra: {ex.Message}" });
+            }
+        }
+
+        // GET: Admin/GetUserFines/{userId} - Lấy danh sách phạt của user
+        [HttpGet]
+        public async Task<IActionResult> GetUserFines(string userId)
+        {
+            var accessCheck = await CheckAdminAccessAsync();
+            if (accessCheck != null) return Json(new { success = false, message = "Unauthorized" });
+
+            try
+            {
+                var token = _authApiService.GetCurrentToken();
+                _httpClient.DefaultRequestHeaders.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+                var fines = await _fineApiService.GetUserFinesAsync(userId);
+                return Json(new { success = true, data = fines });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Có lỗi xảy ra: {ex.Message}" });
+            }
+        }
+
+        #endregion
     }
 }

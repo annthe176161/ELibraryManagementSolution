@@ -30,6 +30,9 @@ namespace ELibraryManagement.Api.Models
 
         public DateTime? LastLoginDate { get; set; }
 
+        // Computed property
+        public string FullName => $"{FirstName} {LastName}".Trim();
+
         // Navigation properties
         public virtual ICollection<BorrowRecord> BorrowRecords { get; set; } = new List<BorrowRecord>();
         public virtual ICollection<Review> Reviews { get; set; } = new List<Review>();
