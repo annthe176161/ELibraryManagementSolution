@@ -100,6 +100,53 @@
             </div>
         }
 
+        <!-- Borrowing Process Guidance -->
+        @if (Model.Any(b => b.Status == "Requested"))
+        {
+            <div class="alert alert-success border-0 shadow-sm mb-4" style="background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%);">
+                <div class="d-flex align-items-start">
+                    <div class="me-3">
+                        <i class="fas fa-check-circle fa-2x text-success"></i>
+                    </div>
+                    <div class="flex-grow-1">
+                        <h6 class="fw-bold mb-2" style="color: #2e7d32;">
+                            <i class="fas fa-bookmark me-2"></i>
+                            Sách đã được đăng ký thành công
+                        </h6>
+                        <p class="mb-2" style="color: #424242;">
+                            Bạn có sách đã được đăng ký mượn. Hãy đến thư viện để nhận sách trong thời gian sớm nhất:
+                        </p>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <ul class="mb-0" style="color: #424242; font-size: 0.9rem;">
+                                    <li class="mb-1">
+                                        <i class="fas fa-map-marker-alt text-primary me-2"></i>
+                                        <strong>Đến thư viện:</strong> FPT University Library
+                                    </li>
+                                    <li class="mb-1">
+                                        <i class="fas fa-clock text-info me-2"></i>
+                                        <strong>Giờ mở cửa:</strong> 7:00 - 18:00
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <ul class="mb-0" style="color: #424242; font-size: 0.9rem;">
+                                    <li class="mb-1">
+                                        <i class="fas fa-id-card text-warning me-2"></i>
+                                        <strong>Mang theo:</strong> Thẻ sinh viên
+                                    </li>
+                                    <li class="mb-1">
+                                        <i class="fas fa-user-check text-success me-2"></i>
+                                        <strong>Thông báo:</strong> Cho thủ thư biết bạn đã đăng ký
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
         @if (Model.Any())
         {
             <!-- Enhanced Filter Tabs -->
@@ -118,8 +165,8 @@
                             <li class="nav-item" role="presentation">
                                 <button class="nav-link" id="pending-tab" data-bs-toggle="pill" data-bs-target="#pending"
                                     type="button" role="tab">
-                                    <i class="fas fa-clock me-2"></i>
-                                    Chờ xác nhận
+                                    <i class="fas fa-check-circle me-2"></i>
+                                    Đã đăng ký
                                     <span class="badge bg-light text-dark ms-2">@Model.Count(b => b.Status ==
                                                                             "Requested")</span>
                             </button>

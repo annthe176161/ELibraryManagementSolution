@@ -49,7 +49,7 @@
                 <div class="card-body">
                     <div class="d-flex justify-content-between">
                         <div>
-                            <div class="small">Chờ duyệt</div>
+                            <div class="small">Đã đăng ký</div>
                             <div class="h4 mb-0">@Model.Count(b => b.Status == "Requested")</div>
                         </div>
                         <div class="align-self-center">
@@ -137,7 +137,7 @@
                             </div>
                             <select class="form-select form-select-sm" id="statusFilter" style="width: 150px;">
                                 <option value="">Tất cả trạng thái</option>
-                                <option value="requested">Chờ duyệt</option>
+                                <option value="requested">Đã đăng ký</option>
                                 <option value="borrowed">Đang mượn</option>
                                 <option value="overdue">Quá hạn</option>
                                 <option value="returned">Đã trả</option>
@@ -371,7 +371,7 @@
                     } else {
                         var statusText = $(this).find('.badge').text().toLowerCase();
                         if (value === 'requested') {
-                            $(this).toggle(statusText.indexOf('chờ duyệt') > -1);
+                            $(this).toggle(statusText.indexOf('đã đăng ký') > -1);
                         } else if (value === 'borrowed') {
                             $(this).toggle(statusText.indexOf('đang mượn') > -1);
                         } else if (value === 'overdue') {
@@ -602,7 +602,7 @@
                     console.log('Update response:', response);
                     if (response.success) {
                         const statusDisplayMap = {
-                            'Requested': 'Chờ duyệt',
+                            'Requested': 'Đã đăng ký',
                             'Borrowed': 'Đang mượn', 
                             'Returned': 'Đã trả',
                             'Cancelled': 'Đã hủy',

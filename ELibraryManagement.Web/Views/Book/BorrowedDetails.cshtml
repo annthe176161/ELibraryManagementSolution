@@ -7,7 +7,8 @@
     <link rel="stylesheet" href="~/css/borrowed-book-detail.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         /* FPT University Theme Styles */
@@ -186,9 +187,9 @@
                         }
                         else if (Model.BorrowRecord.Status == "Requested")
                         {
-                            <span class="status-badge borrowed" style="background-color: #f59e0b;">
-                                <i class="fas fa-clock me-1"></i>
-                                Chờ xác nhận
+                            <span class="status-badge borrowed" style="background-color: #4caf50;">
+                                <i class="fas fa-check-circle me-1"></i>
+                                Đã đăng ký
                             </span>
                         }
                         else if (Model.BorrowRecord.IsOverdue)
@@ -265,7 +266,8 @@
                             <svg width="80" height="80">
                                 <circle class="progress-ring-bg" cx="40" cy="40" r="35"></circle>
                                 <circle class="progress-ring-fill" cx="40" cy="40" r="35"
-                                        style="stroke-dashoffset: @(220 - (Model.BookDetails.AvailableCopies * 220 / Model.BookDetails.TotalCopies))"></circle>
+                                    style="stroke-dashoffset: @(220 - (Model.BookDetails.AvailableCopies * 220 / Model.BookDetails.TotalCopies))">
+                                </circle>
                             </svg>
                         </div>
                         <div class="stat-value">@Model.BookDetails.AvailableCopies/@Model.BookDetails.TotalCopies</div>
@@ -278,7 +280,8 @@
                     </div>
 
                     <div class="stat-card">
-                        <div class="stat-value">@(Model.BookDetails.TotalCopies - Model.BookDetails.AvailableCopies)</div>
+                        <div class="stat-value">@(Model.BookDetails.TotalCopies - Model.BookDetails.AvailableCopies)
+                        </div>
                         <div class="stat-label">Đang được mượn</div>
                     </div>
 
@@ -303,18 +306,43 @@
                     <div class="detail-item">
                         <div class="detail-label">
                             <i class="fas fa-calendar-plus text-primary"></i>
-                            Ngày mượn
+                            @if (Model.BorrowRecord.Status == "Requested")
+                            {
+                                <text>Ngày yêu cầu</text>
+                            }
+                            else
+                            {
+                                <text>Ngày mượn</text>
+                            }
                         </div>
                         <div class="detail-value">@Model.BorrowRecord.BorrowDate.ToString("dd/MM/yyyy HH:mm")</div>
                     </div>
 
-                    <div class="detail-item">
-                        <div class="detail-label">
-                            <i class="fas fa-calendar-check text-warning"></i>
-                            Hạn trả
+                    @if (Model.BorrowRecord.Status != "Requested")
+                    {
+                        <div class="detail-item">
+                            <div class="detail-label">
+                                <i class="fas fa-calendar-check text-warning"></i>
+                                Hạn trả
+                            </div>
+                            <div class="detail-value">@Model.BorrowRecord.DueDate.ToString("dd/MM/yyyy")</div>
                         </div>
-                        <div class="detail-value">@Model.BorrowRecord.DueDate.ToString("dd/MM/yyyy")</div>
-                    </div>
+                    }
+                    else
+                    {
+                        <div class="detail-item">
+                            <div class="detail-label">
+                                <i class="fas fa-check-circle text-success"></i>
+                                Trạng thái
+                            </div>
+                            <div class="detail-value">
+                                <span class="badge bg-success">
+                                    <i class="fas fa-check-circle me-1"></i>
+                                    Đã đăng ký
+                                </span>
+                            </div>
+                        </div>
+                    }
 
                     @if (Model.BorrowRecord.ReturnDate.HasValue)
                     {
@@ -323,46 +351,50 @@
                                 <i class="fas fa-calendar-check text-success"></i>
                                 Ngày trả thực tế
                             </div>
-                            <div class="detail-value">@Model.BorrowRecord.ReturnDate.Value.ToString("dd/MM/yyyy HH:mm")</div>
+                            <div class="detail-value">@Model.BorrowRecord.ReturnDate.Value.ToString("dd/MM/yyyy HH:mm")
+                            </div>
                         </div>
                     }
 
-                    <div class="detail-item">
-                        <div class="detail-label">
-                            <i class="fas fa-clock text-info"></i>
-                            Thời gian mượn
-                        </div>
-                        <div class="detail-value">
-                            @{
-                                var borrowDuration = Model.BorrowRecord.ReturnDate.HasValue
+                    @if (Model.BorrowRecord.Status != "Requested")
+                    {
+                        <div class="detail-item">
+                            <div class="detail-label">
+                                <i class="fas fa-clock text-info"></i>
+                                Thời gian mượn
+                            </div>
+                            <div class="detail-value">
+                                @{
+                                    var borrowDuration = Model.BorrowRecord.ReturnDate.HasValue
                                     ? (Model.BorrowRecord.ReturnDate.Value - Model.BorrowRecord.BorrowDate).Days
                                     : (DateTime.Now - Model.BorrowRecord.BorrowDate).Days;
-                            }
-                            @borrowDuration ngày
+                                }
+                                @borrowDuration ngày
+                            </div>
                         </div>
-                    </div>
 
-                    <div class="detail-item">
-                        <div class="detail-label">
-                            <i class="fas fa-hourglass-half text-secondary"></i>
-                            Còn lại
+                        <div class="detail-item">
+                            <div class="detail-label">
+                                <i class="fas fa-hourglass-half text-secondary"></i>
+                                Còn lại
+                            </div>
+                            <div class="detail-value">
+                                @if (Model.BorrowRecord.ReturnDate.HasValue)
+                                {
+                                    <span class="text-muted">Đã trả</span>
+                                }
+                                else if (Model.BorrowRecord.IsOverdue)
+                                {
+                                    <span class="text-danger">Quá hạn @Model.BorrowRecord.DaysOverdue ngày</span>
+                                }
+                                else
+                                {
+                                    var daysLeft = (Model.BorrowRecord.DueDate - DateTime.Now).Days;
+                                    <span class="text-success">@daysLeft ngày</span>
+                                }
+                            </div>
                         </div>
-                        <div class="detail-value">
-                            @if (Model.BorrowRecord.ReturnDate.HasValue)
-                            {
-                                <span class="text-muted">Đã trả</span>
-                            }
-                            else if (Model.BorrowRecord.IsOverdue)
-                            {
-                                <span class="text-danger">Quá hạn @Model.BorrowRecord.DaysOverdue ngày</span>
-                            }
-                            else
-                            {
-                                var daysLeft = (Model.BorrowRecord.DueDate - DateTime.Now).Days;
-                                <span class="text-success">@daysLeft ngày</span>
-                            }
-                        </div>
-                    </div>
+                    }
 
                     <div class="detail-item">
                         <div class="detail-label">
@@ -433,7 +465,14 @@
                         <div class="timeline-content">
                             <h6>
                                 <i class="fas fa-book-open me-2"></i>
-                                Mượn sách thành công
+                                @if (Model.BorrowRecord.Status == "Requested")
+                                {
+                                    <text>Yêu cầu mượn sách</text>
+                                }
+                                else
+                                {
+                                    <text>Mượn sách thành công</text>
+                                }
                             </h6>
                             <small class="text-muted">
                                 <i class="fas fa-calendar me-1"></i>
@@ -441,10 +480,38 @@
                             </small>
                             <p class="timeline-desc">
                                 <i class="fas fa-info-circle me-1"></i>
-                                Sách đã được mượn từ thư viện FPT University
+                                @if (Model.BorrowRecord.Status == "Requested")
+                                {
+                                    <text>Yêu cầu mượn sách đã được xác nhận. Bạn có thể đến thư viện để nhận sách.</text>
+                                }
+                                else
+                                {
+                                    <text>Sách đã được mượn từ thư viện FPT University</text>
+                                }
                             </p>
                         </div>
                     </div>
+
+                    @if (Model.BorrowRecord.Status == "Borrowed")
+                    {
+                        <div class="timeline-item completed">
+                            <div class="timeline-dot"></div>
+                            <div class="timeline-content">
+                                <h6>
+                                    <i class="fas fa-check-circle me-2"></i>
+                                    Đã được phê duyệt
+                                </h6>
+                                <small class="text-muted">
+                                    <i class="fas fa-calendar me-1"></i>
+                                    Yêu cầu đã được thủ thư phê duyệt
+                                </small>
+                                <p class="timeline-desc">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    Sách đã sẵn sàng để mượn tại thư viện
+                                </p>
+                            </div>
+                        </div>
+                    }
 
                     @if (Model.BorrowRecord.ReturnDate.HasValue)
                     {
@@ -471,7 +538,8 @@
                                     {
                                         <span class="text-danger">
                                             <i class="fas fa-exclamation-triangle me-1"></i>
-                                            Trả trễ @((Model.BorrowRecord.ReturnDate.Value - Model.BorrowRecord.DueDate).Days) ngày
+                                            Trả trễ @((Model.BorrowRecord.ReturnDate.Value - Model.BorrowRecord.DueDate).Days)
+                                            ngày
                                         </span>
                                     }
                                 </p>
@@ -480,39 +548,112 @@
                     }
                     else
                     {
-                        <div class="timeline-item @(Model.BorrowRecord.IsOverdue ? "overdue" : "pending")">
-                            <div class="timeline-dot"></div>
-                            <div class="timeline-content">
-                                <h6>
-                                    <i class="fas fa-clock me-2"></i>
-                                    Hạn trả sách
-                                </h6>
-                                <small class="text-muted">
-                                    <i class="fas fa-calendar me-1"></i>
-                                    @Model.BorrowRecord.DueDate.ToString("dd/MM/yyyy")
-                                </small>
-                                <p class="timeline-desc">
-                                    @if (Model.BorrowRecord.IsOverdue)
-                                    {
-                                        <span class="text-danger">
-                                            <i class="fas fa-exclamation-triangle me-1"></i>
-                                            Đã quá hạn @Model.BorrowRecord.DaysOverdue ngày
-                                        </span>
-                                    }
-                                    else
-                                    {
-                                        var daysLeft = (Model.BorrowRecord.DueDate - DateTime.Now).Days;
-                                        <span class="text-info">
-                                            <i class="fas fa-hourglass-half me-1"></i>
-                                            Còn @daysLeft ngày
-                                        </span>
-                                    }
-                                </p>
+                        @* Nếu là Requested thì không hiển thị hạn trả, thay vào đó show hướng dẫn nhận sách *@
+                        @if (Model.BorrowRecord.Status == "Requested")
+                        {
+                            <div class="timeline-item pending">
+                                <div class="timeline-dot"></div>
+                                <div class="timeline-content">
+                                    <h6>
+                                        <i class="fas fa-check-circle me-2 text-success"></i>
+                                        Sẵn sàng nhận
+                                    </h6>
+                                    <small class="text-muted">
+                                        <i class="fas fa-map-marker-alt me-1"></i>
+                                        Đến thư viện để nhận sách
+                                    </small>
+                                    <p class="timeline-desc text-muted mt-2">
+                                        <i class="fas fa-id-card me-1"></i>
+                                        Mang theo thẻ sinh viên và thông báo với thủ thư
+                                    </p>
+                                </div>
                             </div>
-                        </div>
+                        }
+                        else
+                        {
+                            <div class="timeline-item @(Model.BorrowRecord.IsOverdue ? "overdue" : "pending")">
+                                <div class="timeline-dot"></div>
+                                <div class="timeline-content">
+                                    <h6>
+                                        <i class="fas fa-clock me-2"></i>
+                                        Hạn trả sách
+                                    </h6>
+                                    <small class="text-muted">
+                                        <i class="fas fa-calendar me-1"></i>
+                                        @Model.BorrowRecord.DueDate.ToString("dd/MM/yyyy")
+                                    </small>
+                                    <p class="timeline-desc">
+                                        @if (Model.BorrowRecord.IsOverdue)
+                                        {
+                                            <span class="text-danger">
+                                                <i class="fas fa-exclamation-triangle me-1"></i>
+                                                Đã quá hạn @Model.BorrowRecord.DaysOverdue ngày
+                                            </span>
+                                        }
+                                        else
+                                        {
+                                            var daysLeft = (Model.BorrowRecord.DueDate - DateTime.Now).Days;
+                                            <span class="text-info">
+                                                <i class="fas fa-hourglass-half me-1"></i>
+                                                Còn @daysLeft ngày
+                                            </span>
+                                        }
+                                    </p>
+                                </div>
+                            </div>
+                        }
                     }
                 </div>
             </div>
+
+            @if (Model.BorrowRecord.Status == "Requested")
+            {
+                <!-- Request Status Guidance -->
+                <div class="request-guidance-section mb-4">
+                    <div class="alert alert-success border-0 shadow-sm"
+                        style="background: linear-gradient(135deg, #e8f5e8 0%, #c8e6c9 100%); border-left: 4px solid #4caf50;">
+                        <div class="d-flex align-items-start">
+                            <div class="me-3">
+                                <i class="fas fa-check-circle fa-2x text-success"></i>
+                            </div>
+                            <div class="flex-grow-1">
+                                <h5 class="alert-heading mb-2" style="color: #2e7d32;">
+                                    <i class="fas fa-bookmark me-2"></i>
+                                    Sách đã được đăng ký thành công
+                                </h5>
+                                <p class="mb-3" style="color: #424242; font-size: 0.95rem;">
+                                    Yêu cầu mượn sách của bạn đã được xác nhận. Bạn có thể đến thư viện để nhận sách ngay
+                                    bây giờ.
+                                </p>
+                                <div class="guidance-steps">
+                                    <h6 class="mb-2" style="color: #2e7d32;">
+                                        <i class="fas fa-list-check me-2"></i>
+                                        Để nhận sách, vui lòng:
+                                    </h6>
+                                    <ul class="mb-0" style="color: #424242;">
+                                        <li class="mb-1">
+                                            <i class="fas fa-map-marker-alt text-primary me-2"></i>
+                                            Đến thư viện FPT University trong giờ mở cửa
+                                        </li>
+                                        <li class="mb-1">
+                                            <i class="fas fa-id-card text-warning me-2"></i>
+                                            Mang theo thẻ sinh viên để xác nhận danh tính
+                                        </li>
+                                        <li class="mb-1">
+                                            <i class="fas fa-clock text-info me-2"></i>
+                                            Giờ mở cửa: 7:00 - 18:00 các ngày trong tuần
+                                        </li>
+                                        <li class="mb-0">
+                                            <i class="fas fa-user-check text-success me-2"></i>
+                                            Thông báo cho thủ thư rằng bạn đã đăng ký mượn sách này
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
 
             <!-- Book Description -->
             @if (!string.IsNullOrEmpty(Model.BookDetails.Description))
@@ -572,9 +713,9 @@
                         {
                             <!-- Cancel Request button for pending requests -->
                             <form asp-controller="Book" asp-action="Cancel" asp-route-id="@Model.BorrowRecord.BorrowRecordId"
-                                  method="post" class="d-inline">
+                                method="post" class="d-inline">
                                 <button type="submit" class="btn btn-outline-danger"
-                                        onclick="return confirm('Bạn có chắc chắn muốn hủy yêu cầu mượn sách này?')">
+                                    onclick="return confirm('Bạn có chắc chắn muốn hủy yêu cầu mượn sách này?')">
                                     <i class="fas fa-times me-2"></i>
                                     Hủy yêu cầu
                                 </button>
@@ -590,7 +731,8 @@
                         }
                     }
 
-                    <a href="@Url.Action("BookDetail", "Home", new { id = Model.BookDetails.Id })" class="btn btn-outline-primary">
+                    <a href="@Url.Action("BookDetail", "Home", new { id = Model.BookDetails.Id })"
+                        class="btn btn-outline-primary">
                         <i class="fas fa-book me-2"></i>
                         Xem thông tin sách
                     </a>
@@ -608,7 +750,7 @@
 @section Scripts {
     <script>
         // Auto-refresh overdue information
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             // Add any interactive features here
             console.log('Borrowed book details page loaded');
 

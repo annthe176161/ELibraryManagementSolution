@@ -59,10 +59,14 @@ namespace ELibraryManagement.Web.Controllers
                     return RedirectToAction("MyBooks");
                 }
 
+                // Lấy lịch sử mượn trả đầy đủ để tính thống kê
+                var borrowHistory = await _bookApiService.GetBorrowHistoryAsync(currentUser.Id, token);
+
                 // Tính toán thống kê cá nhân
                 var currentlyActiveBorrows = borrowedBooks?.Where(b =>
-                    b.Status == "Requested" || b.Status == "Borrowed").Count() ?? 0;
-                var totalBorrowed = borrowedBooks?.Count() ?? 0;
+                    b.Status == "Borrowed").Count() ?? 0; // Chỉ đếm sách đang mượn thực sự
+                var totalBorrowed = borrowHistory?.Where(b =>
+                    b.Status == "Borrowed" || b.Status == "Returned").Count() ?? 0; // Chỉ đếm sách đã mượn và đã trả (loại bỏ Requested, Cancelled)
 
                 // Tạo ViewModel cho borrowed book details
                 var viewModel = new BorrowedBookDetailViewModel

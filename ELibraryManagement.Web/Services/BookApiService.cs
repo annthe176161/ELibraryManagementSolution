@@ -44,6 +44,7 @@ namespace ELibraryManagement.Web.Services
         Task<List<string>> GetAuthorsAsync();
         Task<BorrowBookResponseViewModel> BorrowBookAsync(BorrowBookRequestViewModel request, string token);
         Task<List<UserBorrowedBookViewModel>> GetBorrowedBooksAsync(string userId, string token);
+        Task<List<UserBorrowedBookViewModel>> GetBorrowHistoryAsync(string userId, string token);
         Task<bool> HasUserBorrowedBookAsync(string userId, int bookId, string token);
         Task<BorrowBookResponseViewModel> ReturnBookAsync(int borrowRecordId, string token);
         Task<BorrowBookResponseViewModel> CancelBorrowRequestAsync(int borrowRecordId, string token);
@@ -1126,6 +1127,45 @@ namespace ELibraryManagement.Web.Services
                         ReturnDate = GetPropertyValue<DateTime?>(book, "returnDate"),
                         Status = GetPropertyValue<string>(book, "status") ?? "",
                         Notes = GetPropertyValue<string>(book, "notes")
+                    }).ToList() ?? new List<UserBorrowedBookViewModel>();
+                }
+
+                return new List<UserBorrowedBookViewModel>();
+            }
+            catch (Exception)
+            {
+                return new List<UserBorrowedBookViewModel>();
+            }
+        }
+
+        public async Task<List<UserBorrowedBookViewModel>> GetBorrowHistoryAsync(string userId, string token)
+        {
+            try
+            {
+                var apiBaseUrl = GetApiBaseUrl();
+
+                _httpClient.DefaultRequestHeaders.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+                var response = await _httpClient.GetAsync($"{apiBaseUrl}/api/Borrow/user/{userId}");
+                var responseContent = await response.Content.ReadAsStringAsync();
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var borrowHistory = JsonSerializer.Deserialize<List<dynamic>>(responseContent, _jsonOptions);
+
+                    return borrowHistory?.Select(borrow => new UserBorrowedBookViewModel
+                    {
+                        BorrowRecordId = GetPropertyValue<int>(borrow, "id"),
+                        BookId = GetPropertyValue<int>(borrow, "bookId"),
+                        BookTitle = GetPropertyValue<string>(borrow, "bookTitle") ?? "",
+                        BookAuthor = GetPropertyValue<string>(borrow, "bookAuthor") ?? "",
+                        BookCoverUrl = GetPropertyValue<string>(borrow, "bookCoverUrl") ?? "",
+                        BorrowDate = GetPropertyValue<DateTime>(borrow, "borrowDate"),
+                        DueDate = GetPropertyValue<DateTime>(borrow, "dueDate"),
+                        ReturnDate = GetPropertyValue<DateTime?>(borrow, "returnDate"),
+                        Status = GetPropertyValue<string>(borrow, "status") ?? "",
+                        Notes = GetPropertyValue<string>(borrow, "notes")
                     }).ToList() ?? new List<UserBorrowedBookViewModel>();
                 }
 
