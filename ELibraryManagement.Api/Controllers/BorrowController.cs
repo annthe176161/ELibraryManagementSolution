@@ -422,5 +422,43 @@ namespace ELibraryManagement.Api.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+
+        /// <summary>
+        /// Lấy lịch sử mượn sách của một user - Chỉ dành cho Admin
+        /// </summary>
+        [HttpGet("user/{userId}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetUserBorrowHistory(string userId)
+        {
+            try
+            {
+                var borrowRecords = await _context.BorrowRecords
+                    .Include(br => br.Book)
+                    .Include(br => br.User)
+                    .Where(br => br.UserId == userId)
+                    .OrderByDescending(br => br.CreatedAt)
+                    .ToListAsync();
+
+                var result = borrowRecords.Select(br => new
+                {
+                    id = br.Id,
+                    bookId = br.BookId,
+                    bookTitle = br.Book.Title,
+                    bookAuthor = br.Book.Author,
+                    bookCoverUrl = br.Book.CoverImageUrl,
+                    borrowDate = br.BorrowDate,
+                    dueDate = br.DueDate,
+                    returnDate = br.ReturnDate,
+                    status = br.Status.ToString(),
+                    notes = br.Notes
+                });
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
     }
 }
