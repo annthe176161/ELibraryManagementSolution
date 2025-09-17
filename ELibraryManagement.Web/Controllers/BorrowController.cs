@@ -117,33 +117,9 @@ namespace ELibraryManagement.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> ExtendBorrow(int id, string? reason = null)
+        public IActionResult ExtendBorrow(int id, string? reason = null)
         {
-            if (!await _borrowApiService.IsAuthenticatedAsync())
-            {
-                return Json(new { success = false, message = "Vui lòng đăng nhập để thực hiện chức năng này." });
-            }
-
-            try
-            {
-                var result = await _borrowApiService.ExtendBorrowAsync(id, reason);
-
-                return Json(new
-                {
-                    success = result.Success,
-                    message = result.Message,
-                    borrowRecordId = result.BorrowRecordId,
-                    bookTitle = result.BookTitle,
-                    oldDueDate = result.OldDueDate.ToString("dd/MM/yyyy"),
-                    newDueDate = result.NewDueDate.ToString("dd/MM/yyyy"),
-                    extensionCount = result.ExtensionCount,
-                    remainingExtensions = result.RemainingExtensions
-                });
-            }
-            catch (Exception ex)
-            {
-                return Json(new { success = false, message = $"Có lỗi xảy ra: {ex.Message}" });
-            }
+            return Json(new { success = false, message = "Chức năng gia hạn sách đã bị vô hiệu hóa." });
         }
     }
 }

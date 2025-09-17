@@ -130,8 +130,8 @@
                                     }
                                     else if (book.Status == "Borrowed")
                                     {
-                                        <!-- Extend button - only if book can be extended and not overdue -->
-                                        @if (!book.IsOverdue)
+                                        <!-- Extend functionality has been disabled -->
+                                        @if (false)
                                         {
                                             <button type="button" class="btn btn-warning btn-sm w-100 mb-1" 
                                                     onclick="extendBorrow(@book.BorrowRecordId, '@book.BookTitle')">

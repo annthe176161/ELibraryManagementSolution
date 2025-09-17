@@ -571,7 +571,7 @@
                         </div>
                         <div class="info-content">
                             <h6>Gia hạn sách</h6>
-                            <p>Có thể gia hạn tối đa 2 lần, mỗi lần 15 ngày</p>
+                            <p>Chức năng gia hạn hiện không khả dụng</p>
                         </div>
                     </div>
                 </div>
@@ -607,7 +607,7 @@
                                 Liên hệ thủ thư để trả sách
                             </div>
 
-                            @if (!Model.BorrowRecord.IsOverdue)
+                            @if (false)
                             {
                                 <button class="btn btn-warning" onclick="extendBook(@Model.BorrowRecord.BorrowRecordId)">
                                     <i class="fas fa-clock me-2"></i>
@@ -651,40 +651,7 @@
         });
 
         function extendBook(borrowRecordId) {
-            const reason = prompt('Nhập lý do gia hạn sách (không bắt buộc):');
-            if (reason === null) return;
-
-            // Show loading
-            const btn = event.target.closest('button');
-            const originalContent = btn.innerHTML;
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Đang xử lý...';
-            btn.disabled = true;
-
-            // Call API to extend book
-            fetch('/Borrow/ExtendBorrow', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: `id=${borrowRecordId}&reason=${encodeURIComponent(reason || '')}`
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert(`Gia hạn thành công!\n\nSách: ${data.bookTitle}\nNgày trả mới: ${data.newDueDate}`);
-                    location.reload();
-                } else {
-                    alert(`Gia hạn thất bại: ${data.message}`);
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Có lỗi xảy ra khi gia hạn sách.');
-            })
-            .finally(() => {
-                btn.innerHTML = originalContent;
-                btn.disabled = false;
-            });
+            alert("Chức năng gia hạn sách đã bị vô hiệu hóa.");
         }
 
         function printBorrowDetails() {

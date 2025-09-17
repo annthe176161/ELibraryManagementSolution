@@ -72,40 +72,13 @@ namespace ELibraryManagement.Api.Controllers
         }
 
         /// <summary>
-        /// Gia hạn sách (User tự gia hạn)
+        /// Gia hạn sách (Đã vô hiệu hóa)
         /// </summary>
         [HttpPost("{id}/extend")]
         [Authorize]
-        public async Task<IActionResult> ExtendBorrow(int id, [FromBody] ExtendBorrowRequestDto? request = null)
+        public IActionResult ExtendBorrow(int id, [FromBody] ExtendBorrowRequestDto? request = null)
         {
-            try
-            {
-                // Kiểm tra người dùng có quyền gia hạn sách này không
-                var borrowRecord = await _borrowService.GetBorrowRecordByIdAsync(id);
-                if (borrowRecord == null)
-                {
-                    return NotFound(new { message = "Không tìm thấy bản ghi mượn sách" });
-                }
-
-                var currentUserId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-                if (borrowRecord.UserId != currentUserId && !User.IsInRole("Admin"))
-                {
-                    return Forbid("Bạn không có quyền gia hạn sách này");
-                }
-
-                var result = await _borrowService.ExtendBorrowAsync(id, request?.Reason);
-
-                if (result.Success)
-                {
-                    return Ok(result);
-                }
-
-                return BadRequest(result);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
+            return BadRequest(new { message = "Chức năng gia hạn sách đã bị vô hiệu hóa." });
         }
 
         /// <summary>
@@ -136,30 +109,13 @@ namespace ELibraryManagement.Api.Controllers
         }
 
         /// <summary>
-        /// Gia hạn ngày trả sách - Chỉ dành cho Admin
+        /// Gia hạn ngày trả sách - Đã vô hiệu hóa
         /// </summary>
         [HttpPut("admin/{id}/extend")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> ExtendDueDate(int id, [FromBody] ExtendDueDateDto extendDto)
+        public IActionResult ExtendDueDate(int id, [FromBody] ExtendDueDateDto extendDto)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            try
-            {
-                var result = await _borrowService.ExtendDueDateAsync(id, extendDto.NewDueDate);
-                if (result)
-                {
-                    return Ok(new { message = "Gia hạn thành công" });
-                }
-                return NotFound(new { message = "Không tìm thấy borrow record" });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
+            return BadRequest(new { message = "Chức năng gia hạn sách đã bị vô hiệu hóa." });
         }
 
         /// <summary>

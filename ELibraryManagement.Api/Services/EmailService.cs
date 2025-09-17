@@ -100,23 +100,10 @@ namespace ELibraryManagement.Api.Services
         {
             var subject = $"Nhắc nhở trả sách - {bookTitle}";
 
-            var extensionSection = canExtend
-                ? $@"
-                    <div style='background-color: #d4edda; border: 1px solid #c3e6cb; border-radius: 8px; padding: 20px; margin: 20px 0;'>
-                        <h4 style='color: #155724; margin-top: 0;'>💡 Bạn có thể gia hạn sách!</h4>
-                        <p style='color: #155724; margin: 10px 0;'>Nếu cần thêm thời gian, bạn có thể gia hạn sách này (tối đa 2 lần).</p>
-                        <div style='text-align: center; margin: 15px 0;'>
-                            <a href='https://localhost:7208/Borrow/MyBorrows' 
-                               style='background-color: #28a745; color: white; padding: 10px 25px; text-decoration: none; border-radius: 20px; font-weight: bold; display: inline-block;'>
-                                🔄 Gia hạn sách ngay
-                            </a>
-                        </div>
-                    </div>
-                "
-                : $@"
+            var extensionSection = $@"
                     <div style='background-color: #f8d7da; border: 1px solid #f5c6cb; border-radius: 8px; padding: 20px; margin: 20px 0;'>
-                        <h4 style='color: #721c24; margin-top: 0;'>⚠️ Không thể gia hạn</h4>
-                        <p style='color: #721c24; margin: 10px 0;'>Sách này đã đạt giới hạn gia hạn (2 lần) hoặc đã quá hạn. Vui lòng trả sách đúng hạn.</p>
+                        <h4 style='color: #721c24; margin-top: 0;'>⚠️ Chức năng gia hạn đã bị vô hiệu hóa</h4>
+                        <p style='color: #721c24; margin: 10px 0;'>Vui lòng trả sách đúng hạn để tránh phí phạt.</p>
                     </div>
                 ";
 
@@ -147,7 +134,7 @@ namespace ELibraryManagement.Api.Services
                                 <li>Vui lòng trả sách đúng hạn để tránh phí phạt</li>
                                 <li>Phí phạt: 5,000 VND/ngày cho mỗi ngày trễ hạn</li>
                                 <li>Sách quá hạn sẽ ảnh hướng đến khả năng mượn sách trong tương lai</li>
-                                <li>Mỗi sinh viên chỉ được gia hạn tối đa 2 lần cho mỗi cuốn sách</li>
+                                <li>Chức năng gia hạn sách hiện không khả dụng</li>
                             </ul>
                         </div>
 

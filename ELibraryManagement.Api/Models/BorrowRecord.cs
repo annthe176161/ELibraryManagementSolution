@@ -33,10 +33,7 @@ namespace ELibraryManagement.Api.Models
 
         public int OverdueDays => IsOverdue ? (DateTime.UtcNow - DueDate).Days : 0;
 
-        public bool CanExtend => Status == BorrowStatus.Borrowed &&
-                                ReturnDate == null &&
-                                ExtensionCount < 2 && // Tối đa 2 lần gia hạn
-                                !IsOverdue; // Không được quá hạn
+        public bool CanExtend => false; // Chức năng gia hạn đã bị vô hiệu hóa
 
         // Timestamp
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

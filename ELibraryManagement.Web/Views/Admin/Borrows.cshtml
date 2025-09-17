@@ -262,8 +262,10 @@
                                                     <ul class="dropdown-menu">
                                                         @if (borrow.Status == "Borrowed")
                                                         {
+                                                            @* Extension functionality disabled
                                                             <li><a class="dropdown-item" href="#" onclick="extendDue(@borrow.Id)"><i class="fas fa-calendar-plus me-2"></i>Gia hạn</a></li>
                                                             <li><hr class="dropdown-divider"></li>
+                                                            *@
                                                             <li><a class="dropdown-item text-warning" href="#" onclick="markAsLost(@borrow.Id)"><i class="fas fa-question-circle me-2"></i>Báo mất sách</a></li>
                                                             <li><a class="dropdown-item text-warning" href="#" onclick="markAsDamaged(@borrow.Id)"><i class="fas fa-exclamation-circle me-2"></i>Báo hư hỏng</a></li>
                                                         }
@@ -551,8 +553,7 @@
         }
 
         function extendDue(borrowId) {
-            currentBorrowId = borrowId;
-            $('#extendModal').modal('show');
+            showToast('error', 'Chức năng gia hạn sách đã bị vô hiệu hóa.');
         }
 
         $('#confirmExtend').on('click', function() {
