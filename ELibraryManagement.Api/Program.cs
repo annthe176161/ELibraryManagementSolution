@@ -73,6 +73,9 @@ namespace ELibraryManagement.Api
             builder.Services.AddScoped<IUserStatusService, UserStatusService>();
             builder.Services.AddScoped<IEmailService, EmailService>();
 
+            // Add Background Services
+            builder.Services.AddHostedService<ELibraryManagement.Api.BackgroundServices.BookDueReminderService>();
+
             // Configure Cloudinary
             builder.Services.AddSingleton(provider =>
             {

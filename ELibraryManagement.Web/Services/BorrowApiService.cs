@@ -31,7 +31,7 @@ namespace ELibraryManagement.Web.Services
         Task<BorrowResult> BorrowBookAsync(int bookId);
         Task<bool> IsAuthenticatedAsync();
         Task<BorrowDetailViewModel?> GetBorrowDetailAsync(int borrowId);
-        Task<bool> UpdateBorrowStatusAsync(int borrowId, string status);
+        Task<bool> UpdateBorrowStatusAsync(int borrowId, string status, string? notes = null);
     }
 
     public class BorrowApiService : IBorrowApiService
@@ -245,27 +245,41 @@ namespace ELibraryManagement.Web.Services
             }
         }
 
-        public async Task<bool> UpdateBorrowStatusAsync(int borrowId, string status)
+        public async Task<bool> UpdateBorrowStatusAsync(int borrowId, string status, string? notes = null)
         {
             try
             {
                 var token = GetCurrentToken();
                 if (string.IsNullOrEmpty(token))
                 {
+                    Console.WriteLine("No token available for UpdateBorrowStatusAsync");
                     return false;
                 }
 
                 SetAuthorizationHeader();
 
-                var requestData = new { Status = status };
+                var requestData = new { Status = status, Notes = notes };
                 var json = JsonSerializer.Serialize(requestData, _jsonOptions);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
+                Console.WriteLine($"Sending PUT request to: {GetApiBaseUrl()}/api/Borrow/admin/{borrowId}/status");
+                Console.WriteLine($"Request payload: {json}");
+
                 var response = await _httpClient.PutAsync($"{GetApiBaseUrl()}/api/Borrow/admin/{borrowId}/status", content);
+
+                Console.WriteLine($"Response status: {response.StatusCode}");
+
+                if (!response.IsSuccessStatusCode)
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    Console.WriteLine($"Error response: {errorContent}");
+                }
+
                 return response.IsSuccessStatusCode;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                Console.WriteLine($"Exception in UpdateBorrowStatusAsync: {ex.Message}");
                 return false;
             }
         }

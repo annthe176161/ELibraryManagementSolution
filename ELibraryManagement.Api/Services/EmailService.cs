@@ -95,5 +95,85 @@ namespace ELibraryManagement.Api.Services
 
             return await SendEmailAsync(email, subject, body);
         }
+
+        public async Task<bool> SendBookDueReminderAsync(string email, string userName, string bookTitle, DateTime dueDate, int daysLeft, bool canExtend)
+        {
+            var subject = $"Nhắc nhở trả sách - {bookTitle}";
+
+            var extensionSection = canExtend
+                ? $@"
+                    <div style='background-color: #d4edda; border: 1px solid #c3e6cb; border-radius: 8px; padding: 20px; margin: 20px 0;'>
+                        <h4 style='color: #155724; margin-top: 0;'>💡 Bạn có thể gia hạn sách!</h4>
+                        <p style='color: #155724; margin: 10px 0;'>Nếu cần thêm thời gian, bạn có thể gia hạn sách này (tối đa 2 lần).</p>
+                        <div style='text-align: center; margin: 15px 0;'>
+                            <a href='https://localhost:7208/Borrow/MyBorrows' 
+                               style='background-color: #28a745; color: white; padding: 10px 25px; text-decoration: none; border-radius: 20px; font-weight: bold; display: inline-block;'>
+                                🔄 Gia hạn sách ngay
+                            </a>
+                        </div>
+                    </div>
+                "
+                : $@"
+                    <div style='background-color: #f8d7da; border: 1px solid #f5c6cb; border-radius: 8px; padding: 20px; margin: 20px 0;'>
+                        <h4 style='color: #721c24; margin-top: 0;'>⚠️ Không thể gia hạn</h4>
+                        <p style='color: #721c24; margin: 10px 0;'>Sách này đã đạt giới hạn gia hạn (2 lần) hoặc đã quá hạn. Vui lòng trả sách đúng hạn.</p>
+                    </div>
+                ";
+
+            var urgencyColor = daysLeft <= 1 ? "#dc3545" : "#ffc107";
+            var urgencyText = daysLeft <= 1 ? "KHẨN CẤP" : "THÔNG BÁO";
+
+            var body = $@"
+                <div style='font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; background-color: #f8f9fa; padding: 20px;'>
+                    <div style='background-color: {urgencyColor}; color: white; text-align: center; padding: 15px; border-radius: 10px 10px 0 0;'>
+                        <h2 style='margin: 0; font-size: 24px;'>📚 {urgencyText} TRẢ SÁCH</h2>
+                    </div>
+                    
+                    <div style='background-color: white; padding: 30px; border-radius: 0 0 10px 10px; border: 1px solid #ddd;'>
+                        <h3 style='color: #333; margin-top: 0;'>Xin chào {userName}!</h3>
+                        
+                        <div style='background-color: #f1f3f4; padding: 20px; border-radius: 8px; margin: 20px 0;'>
+                            <h4 style='color: #333; margin-top: 0;'>📖 Thông tin sách:</h4>
+                            <p style='margin: 5px 0;'><strong>Tên sách:</strong> {bookTitle}</p>
+                            <p style='margin: 5px 0;'><strong>Hạn trả:</strong> <span style='color: {urgencyColor}; font-weight: bold;'>{dueDate:dd/MM/yyyy}</span></p>
+                            <p style='margin: 5px 0;'><strong>Thời gian còn lại:</strong> <span style='color: {urgencyColor}; font-weight: bold;'>{daysLeft} ngày</span></p>
+                        </div>
+
+                        {extensionSection}
+
+                        <div style='background-color: #e3f2fd; padding: 15px; border-radius: 8px; margin: 20px 0;'>
+                            <h4 style='color: #1976d2; margin-top: 0;'>🔔 Lưu ý quan trọng:</h4>
+                            <ul style='margin: 10px 0; padding-left: 20px;'>
+                                <li>Vui lòng trả sách đúng hạn để tránh phí phạt</li>
+                                <li>Phí phạt: 5,000 VND/ngày cho mỗi ngày trễ hạn</li>
+                                <li>Sách quá hạn sẽ ảnh hướng đến khả năng mượn sách trong tương lai</li>
+                                <li>Mỗi sinh viên chỉ được gia hạn tối đa 2 lần cho mỗi cuốn sách</li>
+                            </ul>
+                        </div>
+
+                        <div style='text-align: center; margin: 30px 0;'>
+                            <a href='https://localhost:7208/Borrow/MyBorrows' 
+                               style='background-color: #007bff; color: white; padding: 12px 30px; text-decoration: none; border-radius: 25px; font-weight: bold; display: inline-block; margin: 5px;'>
+                                🔍 Xem danh sách sách đang mượn
+                            </a>
+                        </div>
+
+                        <hr style='border: none; border-top: 1px solid #eee; margin: 30px 0;'>
+                        
+                        <p style='color: #666; font-size: 14px; text-align: center; margin: 20px 0;'>
+                            Email này được gửi tự động từ hệ thống Thư viện ELibrary.<br>
+                            Nếu có thắc mắc, vui lòng liên hệ thủ thư hoặc trả lời email này.
+                        </p>
+                        
+                        <div style='text-align: center; margin-top: 30px;'>
+                            <p style='margin: 0; font-weight: bold; color: #333;'>Trân trọng,</p>
+                            <p style='margin: 5px 0; color: #007bff; font-weight: bold;'>Đội ngũ Thư viện ELibrary</p>
+                        </div>
+                    </div>
+                </div>
+            ";
+
+            return await SendEmailAsync(email, subject, body);
+        }
     }
 }

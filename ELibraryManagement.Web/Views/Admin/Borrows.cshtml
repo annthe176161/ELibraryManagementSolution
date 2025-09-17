@@ -515,7 +515,7 @@
                         'Authorization': 'Bearer ' + token
                     },
                     data: {
-                        borrowId: currentBorrowId
+                        id: currentBorrowId
                     },
                     success: function(response) {
                         $('#returnModal').modal('hide');
@@ -649,6 +649,8 @@
 
         // Enhanced status update function with better error handling
         function updateBorrowStatus(borrowId, status, notes = '') {
+            console.log('Updating borrow status:', { borrowId, status, notes });
+            
             $.ajax({
                 url: '/Admin/UpdateBorrowStatus',
                 type: 'POST',
@@ -657,7 +659,11 @@
                     status: status,
                     notes: notes
                 },
+                beforeSend: function() {
+                    console.log('Sending request to update borrow status...');
+                },
                 success: function(response) {
+                    console.log('Update response:', response);
                     if (response.success) {
                         const statusDisplayMap = {
                             'Requested': 'Chờ duyệt',
@@ -671,10 +677,14 @@
                         setTimeout(() => location.reload(), 1500);
                     } else {
                         // Hiển thị thông báo lỗi validation chi tiết
+                        console.error('Update failed:', response.message);
                         showToast('error', response.message || 'Không thể cập nhật trạng thái');
                     }
                 },
                 error: function(xhr, status, error) {
+                    console.error('AJAX Error:', { xhr, status, error });
+                    console.error('Response Text:', xhr.responseText);
+                    
                     let errorMessage = 'Có lỗi xảy ra khi cập nhật trạng thái';
                     
                     try {
@@ -706,7 +716,7 @@
             
             // Create toast container if it doesn't exist
             if (!$('#toastContainer').length) {
-                $('body').append('<div id="toastContainer" class="toast-container position-fixed top-0 end-0 p-3"></div>');
+                $('body').append('<div id="toastContainer" class="toast-container position-fixed end-0 p-3" style="top: 80px; z-index: 1055;"></div>');
             }
             
             const $toast = $(toastHtml);

@@ -18,6 +18,7 @@ namespace ELibraryManagement.Web.Controllers
         private readonly HttpClient _httpClient;
         private readonly IConfiguration _configuration;
         private readonly JsonSerializerOptions _jsonOptions;
+        private readonly ILogger<AdminController> _logger;
 
         public AdminController(
             IAuthApiService authApiService,
@@ -25,7 +26,8 @@ namespace ELibraryManagement.Web.Controllers
             IBorrowApiService borrowApiService,
             ICategoryApiService categoryApiService,
             HttpClient httpClient,
-            IConfiguration configuration)
+            IConfiguration configuration,
+            ILogger<AdminController> logger)
         {
             _authApiService = authApiService;
             _reviewApiService = reviewApiService;
@@ -33,6 +35,7 @@ namespace ELibraryManagement.Web.Controllers
             _categoryApiService = categoryApiService;
             _httpClient = httpClient;
             _configuration = configuration;
+            _logger = logger;
             _jsonOptions = new JsonSerializerOptions
             {
                 PropertyNameCaseInsensitive = true
@@ -500,25 +503,27 @@ namespace ELibraryManagement.Web.Controllers
 
             try
             {
-                var result = await _borrowApiService.UpdateBorrowStatusAsync(id, status);
+                _logger.LogInformation("Updating borrow status: ID={id}, Status={status}, Notes={notes}", id, status, notes);
 
-                // If notes are provided, update them too
-                if (!string.IsNullOrEmpty(notes))
-                {
-                    await UpdateBorrowNotesInternal(id, notes);
-                }
+                var result = await _borrowApiService.UpdateBorrowStatusAsync(id, status, notes);
+
+                _logger.LogInformation("Update result: {result}", result);
 
                 if (result)
                 {
+                    _logger.LogInformation("Borrow status updated successfully for ID: {id}", id);
                     return Json(new { success = true, message = "Cập nhật trạng thái thành công" });
                 }
                 else
                 {
+                    _logger.LogWarning("Failed to update borrow status for ID: {id}", id);
                     return Json(new { success = false, message = "Không thể cập nhật trạng thái" });
                 }
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error updating borrow status for ID: {id}", id);
+
                 // Xử lý lỗi validation trạng thái
                 if (ex.Message.Contains("không thể chuyển"))
                 {
