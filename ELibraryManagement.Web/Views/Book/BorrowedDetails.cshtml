@@ -417,15 +417,6 @@
                         <div class="stat-label">Lần quá hạn</div>
                     </div>
 
-                    <div class="stat-card">
-                        <div class="stat-value">
-                            @{
-                                var extensionCount = 0; // Placeholder - cần API để lấy số liệu thực
-                            }
-                            @extensionCount
-                        </div>
-                        <div class="stat-label">Lần gia hạn</div>
-                    </div>
                 </div>
             </div>
 
@@ -564,16 +555,6 @@
                             <p>Phí phạt 5.000đ/ngày cho mỗi quyển sách quá hạn</p>
                         </div>
                     </div>
-
-                    <div class="info-card">
-                        <div class="info-icon">
-                            <i class="fas fa-sync-alt"></i>
-                        </div>
-                        <div class="info-content">
-                            <h6>Gia hạn sách</h6>
-                            <p>Chức năng gia hạn hiện không khả dụng</p>
-                        </div>
-                    </div>
                 </div>
             </div>
 
@@ -606,14 +587,6 @@
                                 <i class="fas fa-info-circle me-2"></i>
                                 Liên hệ thủ thư để trả sách
                             </div>
-
-                            @if (false)
-                            {
-                                <button class="btn btn-warning" onclick="extendBook(@Model.BorrowRecord.BorrowRecordId)">
-                                    <i class="fas fa-clock me-2"></i>
-                                    Gia hạn sách
-                                </button>
-                            }
                         }
                     }
 
@@ -649,10 +622,6 @@
                 }, 500);
             });
         });
-
-        function extendBook(borrowRecordId) {
-            alert("Chức năng gia hạn sách đã bị vô hiệu hóa.");
-        }
 
         function printBorrowDetails() {
             window.print();

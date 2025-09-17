@@ -44,6 +44,7 @@ namespace ELibraryManagement.Web.Services
         Task<List<string>> GetAuthorsAsync();
         Task<BorrowBookResponseViewModel> BorrowBookAsync(BorrowBookRequestViewModel request, string token);
         Task<List<UserBorrowedBookViewModel>> GetBorrowedBooksAsync(string userId, string token);
+        Task<bool> HasUserBorrowedBookAsync(string userId, int bookId, string token);
         Task<BorrowBookResponseViewModel> ReturnBookAsync(int borrowRecordId, string token);
         Task<BorrowBookResponseViewModel> CancelBorrowRequestAsync(int borrowRecordId, string token);
     }
@@ -1211,6 +1212,19 @@ namespace ELibraryManagement.Web.Services
                     Success = false,
                     Message = $"Có lỗi xảy ra: {ex.Message}"
                 };
+            }
+        }
+
+        public async Task<bool> HasUserBorrowedBookAsync(string userId, int bookId, string token)
+        {
+            try
+            {
+                var borrowedBooks = await GetBorrowedBooksAsync(userId, token);
+                return borrowedBooks.Any(b => b.BookId == bookId);
+            }
+            catch
+            {
+                return false;
             }
         }
     }

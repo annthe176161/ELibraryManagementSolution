@@ -173,6 +173,30 @@ namespace ELibraryManagement.Web.Controllers
                 ViewBag.IsAuthenticated = isAuthenticated;
                 ViewBag.AuthToken = !string.IsNullOrEmpty(sessionToken) ? sessionToken : cookieToken;
 
+                // Kiểm tra xem user đã từng mượn sách này chưa
+                bool hasBorrowedBook = false;
+                if (isAuthenticated)
+                {
+                    try
+                    {
+                        var currentUser = await _authApiService.GetCurrentUserAsync();
+                        if (currentUser != null)
+                        {
+                            var authToken = !string.IsNullOrEmpty(sessionToken) ? sessionToken : cookieToken;
+                            if (!string.IsNullOrEmpty(authToken))
+                            {
+                                hasBorrowedBook = await _bookApiService.HasUserBorrowedBookAsync(currentUser.Id, id, authToken);
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogWarning(ex, "Could not check if user has borrowed book {BookId}", id);
+                        hasBorrowedBook = false;
+                    }
+                }
+                ViewBag.HasBorrowedBook = hasBorrowedBook;
+
                 return View(book);
             }
             catch (Exception ex)

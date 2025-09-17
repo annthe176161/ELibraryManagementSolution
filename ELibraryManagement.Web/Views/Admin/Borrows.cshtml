@@ -262,10 +262,6 @@
                                                     <ul class="dropdown-menu">
                                                         @if (borrow.Status == "Borrowed")
                                                         {
-                                                            @* Extension functionality disabled
-                                                            <li><a class="dropdown-item" href="#" onclick="extendDue(@borrow.Id)"><i class="fas fa-calendar-plus me-2"></i>Gia hạn</a></li>
-                                                            <li><hr class="dropdown-divider"></li>
-                                                            *@
                                                             <li><a class="dropdown-item text-warning" href="#" onclick="markAsLost(@borrow.Id)"><i class="fas fa-question-circle me-2"></i>Báo mất sách</a></li>
                                                             <li><a class="dropdown-item text-warning" href="#" onclick="markAsDamaged(@borrow.Id)"><i class="fas fa-exclamation-circle me-2"></i>Báo hư hỏng</a></li>
                                                         }
@@ -316,34 +312,6 @@
 </div>
 
 <!-- Extend Due Date Modal -->
-<div class="modal fade" id="extendModal" tabindex="-1" aria-labelledby="extendModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="extendModalLabel">Gia hạn ngày trả</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <form id="extendForm">
-                    <div class="alert alert-info">
-                        <i class="fas fa-info-circle me-2"></i>
-                        Sách sẽ được gia hạn thêm <strong>14 ngày</strong> từ ngày hiện tại.
-                        Mỗi sách có thể gia hạn tối đa <strong>2 lần</strong>.
-                    </div>
-                    <div class="mb-3">
-                        <label for="extendReason" class="form-label">Lý do gia hạn (tùy chọn)</label>
-                        <textarea class="form-control" id="extendReason" rows="3" placeholder="Nhập lý do gia hạn..."></textarea>
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                <button type="button" class="btn btn-warning" id="confirmExtend">Gia hạn</button>
-            </div>
-        </div>
-    </div>
-</div>
-
 <!-- View Details Modal -->
 <div class="modal fade" id="detailsModal" tabindex="-1" aria-labelledby="detailsModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg">
@@ -551,39 +519,6 @@
                 }
             });
         }
-
-        function extendDue(borrowId) {
-            showToast('error', 'Chức năng gia hạn sách đã bị vô hiệu hóa.');
-        }
-
-        $('#confirmExtend').on('click', function() {
-            if (currentBorrowId) {
-                const reason = $('#extendReason').val();
-                
-                const token = localStorage.getItem('token');
-                
-                $.ajax({
-                    url: `/Admin/ExtendBorrow`,
-                    type: 'POST',
-                    data: {
-                        id: currentBorrowId,
-                        reason: reason
-                    },
-                    success: function(response) {
-                        $('#extendModal').modal('hide');
-                        if (response.success) {
-                            showToast('success', response.message);
-                            setTimeout(() => location.reload(), 1500);
-                        } else {
-                            showToast('error', response.message);
-                        }
-                    },
-                    error: function(xhr) {
-                        showToast('error', 'Có lỗi xảy ra khi gia hạn: ' + xhr.responseText);
-                    }
-                });
-            }
-        });
 
         function viewHistory(userId) {
             // Redirect to user history page or show in modal

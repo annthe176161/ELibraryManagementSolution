@@ -900,10 +900,20 @@
                     <div class="review-actions">
                         @if (ViewBag.IsAuthenticated)
                         {
-                            <a href="@Url.Action("Create", "Review", new { bookId = Model.Id })" class="btn btn-primary">
-                                <i class="fas fa-edit"></i>
-                                Viết đánh giá
-                            </a>
+                            @if (ViewBag.HasBorrowedBook)
+                            {
+                                <a href="@Url.Action("Create", "Review", new { bookId = Model.Id })" class="btn btn-primary">
+                                    <i class="fas fa-edit"></i>
+                                    Viết đánh giá
+                                </a>
+                            }
+                            else
+                            {
+                                <div class="alert alert-info mb-0">
+                                    <i class="fas fa-info-circle me-2"></i>
+                                    Bạn cần mượn sách này trước khi có thể viết đánh giá
+                                </div>
+                            }
                         }
                         else
                         {
@@ -938,7 +948,6 @@
                             </div>
                             <ul class="rule-list">
                                 <li><i class="fas fa-check"></i> Thời gian mượn tối đa: <strong>30 ngày</strong></li>
-                                <li><i class="fas fa-check"></i> Gia hạn: Tối đa 2 lần, mỗi lần 15 ngày</li>
                                 <li><i class="fas fa-check"></i> Sinh viên được mượn tối đa 5 cuốn</li>
                             </ul>
                         </div>

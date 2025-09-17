@@ -120,67 +120,72 @@
                                     type="button" role="tab">
                                     <i class="fas fa-clock me-2"></i>
                                     Chờ xác nhận
-                                    <span class="badge bg-light text-dark ms-2">@Model.Count(b => b.Status == "Requested")</span>
-                                </button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="borrowed-tab" data-bs-toggle="pill" data-bs-target="#borrowed"
-                                    type="button" role="tab">
-                                    <i class="fas fa-book-open me-2"></i>
-                                    Đang mượn
-                                    <span class="badge bg-light text-dark ms-2">@Model.Count(b => b.Status == "Borrowed" && b.ReturnDate == null)</span>
-                                </button>
-                            </li>
+                                    <span class="badge bg-light text-dark ms-2">@Model.Count(b => b.Status ==
+                                                                            "Requested")</span>
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="borrowed-tab" data-bs-toggle="pill" data-bs-target="#borrowed"
+                                type="button" role="tab">
+                                <i class="fas fa-book-open me-2"></i>
+                                Đang mượn
+                                <span class="badge bg-light text-dark ms-2">@Model.Count(b => b.Status == "Borrowed" &&
+                                                                        b.ReturnDate == null)</span>
+                            </button>
+                        </li>
                         <li class="nav-item" role="presentation">
                             <button class="nav-link" id="returned-tab" data-bs-toggle="pill" data-bs-target="#returned"
                                 type="button" role="tab">
                                 <i class="fas fa-check-circle me-2"></i>
                                 Đã trả
-                                <span class="badge bg-light text-dark ms-2">@Model.Count(b => b.Status == "Returned")</span>
+                                <span class="badge bg-light text-dark ms-2">@Model.Count(b => b.Status ==
+                                                                        "Returned")</span>
                             </button>
                         </li>
                         <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="cancelled-tab" data-bs-toggle="pill" data-bs-target="#cancelled"
-                                type="button" role="tab">
+                            <button class="nav-link" id="cancelled-tab" data-bs-toggle="pill"
+                                data-bs-target="#cancelled" type="button" role="tab">
                                 <i class="fas fa-times-circle me-2"></i>
                                 Đã hủy
-                                <span class="badge bg-light text-dark ms-2">@Model.Count(b => b.Status == "Cancelled")</span>
-                            </button>
-                        </li>
-                        <li class="nav-item" role="presentation">
-                            <button class="nav-link" id="overdue-tab" data-bs-toggle="pill" data-bs-target="#overdue"
-                                type="button" role="tab">
-                                <i class="fas fa-exclamation-triangle me-2"></i>
-                                Quá hạn
-                                <span class="badge bg-light text-dark ms-2">@Model.Count(b => b.IsOverdue)</span>
-                            </button>
-                        </li>
-                    </ul>
-                </div>
+                                <span class="badge bg-light text-dark ms-2">@Model.Count(b => b.Status ==
+                                                                        "Cancelled")</span>
+                                            </button>
+                                        </li>
+                                        <li class="nav-item" role="presentation">
+                                            <button class="nav-link" id="overdue-tab" data-bs-toggle="pill" data-bs-target="#overdue"
+                                                type="button" role="tab">
+                                                <i class="fas fa-exclamation-triangle me-2"></i>
+                                                Quá hạn
+                                                <span class="badge bg-light text-dark ms-2">@Model.Count(b => b.IsOverdue)</span>
+                                            </button>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Books List -->
+                        <div class="tab-content" id="statusFilterContent">
+                            <div class="tab-pane fade show active" id="all" role="tabpanel">
+                                @await Html.PartialAsync("_BorrowedBooksList", Model)
+                            </div>
+                            <div class="tab-pane fade" id="pending" role="tabpanel">
+                                @await Html.PartialAsync("_BorrowedBooksList", Model.Where(b => b.Status == "Requested").ToList())
+                            </div>
+                            <div class="tab-pane fade" id="borrowed" role="tabpanel">
+                                @await Html.PartialAsync("_BorrowedBooksList", Model.Where(b => b.Status == "Borrowed" && b.ReturnDate
+                                == null).ToList())
+            </div>
+            <div class="tab-pane fade" id="returned" role="tabpanel">
+                @await Html.PartialAsync("_BorrowedBooksList", Model.Where(b => b.Status == "Returned").ToList())
+            </div>
+            <div class="tab-pane fade" id="cancelled" role="tabpanel">
+                @await Html.PartialAsync("_BorrowedBooksList", Model.Where(b => b.Status == "Cancelled").ToList())
+            </div>
+            <div class="tab-pane fade" id="overdue" role="tabpanel">
+                @await Html.PartialAsync("_BorrowedBooksList", Model.Where(b => b.IsOverdue).ToList())
             </div>
         </div>
-
-            <!-- Books List -->
-            <div class="tab-content" id="statusFilterContent">
-                <div class="tab-pane fade show active" id="all" role="tabpanel">
-                    @await Html.PartialAsync("_BorrowedBooksList", Model)
-                </div>
-                <div class="tab-pane fade" id="pending" role="tabpanel">
-                    @await Html.PartialAsync("_BorrowedBooksList", Model.Where(b => b.Status == "Requested").ToList())
-                </div>
-                <div class="tab-pane fade" id="borrowed" role="tabpanel">
-                    @await Html.PartialAsync("_BorrowedBooksList", Model.Where(b => b.Status == "Borrowed" && b.ReturnDate == null).ToList())
-                </div>
-                <div class="tab-pane fade" id="returned" role="tabpanel">
-                    @await Html.PartialAsync("_BorrowedBooksList", Model.Where(b => b.Status == "Returned").ToList())
-                </div>
-                <div class="tab-pane fade" id="cancelled" role="tabpanel">
-                    @await Html.PartialAsync("_BorrowedBooksList", Model.Where(b => b.Status == "Cancelled").ToList())
-                </div>
-                <div class="tab-pane fade" id="overdue" role="tabpanel">
-                    @await Html.PartialAsync("_BorrowedBooksList", Model.Where(b => b.IsOverdue).ToList())
-                </div>
-            </div>
                 }
         else
         {
@@ -225,10 +230,6 @@
             if (confirm(`Bạn có chắc chắn muốn hủy yêu cầu mượn sách "${bookTitle}"?`)) {
                 document.getElementById('cancelForm_' + borrowRecordId).submit();
             }
-        }
-
-        function extendBorrow(borrowRecordId, bookTitle) {
-            alert("Chức năng gia hạn sách đã bị vô hiệu hóa.");
         }
     </script>
 }
