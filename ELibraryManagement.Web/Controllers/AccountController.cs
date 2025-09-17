@@ -154,7 +154,7 @@ namespace ELibraryManagement.Web.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Profile()
+        public async Task<IActionResult> Profile(long? t = null)
         {
             try
             {
@@ -164,12 +164,27 @@ namespace ELibraryManagement.Web.Controllers
                     return RedirectToAction("Login");
                 }
 
+                // Clear Google login success message on Profile page
+                if (TempData["SuccessMessage"]?.ToString() == "Đăng nhập Google thành công!")
+                {
+                    TempData.Remove("SuccessMessage");
+                }
+
                 var user = await _authApiService.GetCurrentUserAsync();
                 if (user == null)
                 {
                     TempData["ErrorMessage"] = "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.";
                     _authApiService.Logout();
                     return RedirectToAction("Login");
+                }
+
+                // Pass cache-busting timestamp to view
+                ViewBag.CacheBuster = t ?? DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+
+                // Debug: Log avatar URL for troubleshooting
+                if (TempData["DebugMessage"] != null)
+                {
+                    TempData["DebugMessage"] += $" | Avatar URL: {user.AvatarUrl} | Cache-buster: {ViewBag.CacheBuster}";
                 }
 
                 return View(user);
@@ -233,6 +248,25 @@ namespace ELibraryManagement.Web.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> EditProfile(EditProfileViewModel model)
         {
+            // Debug: Check ModelState and incoming data
+            var debugInfo = $"🔍 DEBUG ModelState: Valid={ModelState.IsValid}";
+            if (!ModelState.IsValid)
+            {
+                debugInfo += " | Errors: " + string.Join(", ", ModelState.Values.SelectMany(v => v.Errors).Select(e => e.ErrorMessage));
+            }
+
+            // Debug: Check Request.Form files
+            debugInfo += $" | Request.Form.Files.Count={Request.Form.Files.Count}";
+            foreach (var file in Request.Form.Files)
+            {
+                debugInfo += $" | File: {file.Name}={file.FileName} ({file.Length} bytes)";
+            }
+
+            // Debug: Check model.AvatarFile specifically
+            debugInfo += $" | model.AvatarFile={(model.AvatarFile != null ? $"'{model.AvatarFile.FileName}' ({model.AvatarFile.Length} bytes)" : "NULL")}";
+
+            TempData["DebugMessage"] = debugInfo;
+
             if (!ModelState.IsValid)
             {
                 return View(model);
@@ -240,35 +274,50 @@ namespace ELibraryManagement.Web.Controllers
 
             try
             {
-                // Nếu có file avatar được upload, upload lên Cloudinary trước
+                // Debug: Check if avatar file exists
                 if (model.AvatarFile != null && model.AvatarFile.Length > 0)
                 {
+                    TempData["DebugMessage"] = $"🔍 DEBUG: Avatar file detected - Name: {model.AvatarFile.FileName}, Size: {model.AvatarFile.Length} bytes, Type: {model.AvatarFile.ContentType}";
+
                     var uploadResult = await _authApiService.UploadAvatarAsync(model.AvatarFile);
                     if (uploadResult.Success)
                     {
-                        // Nếu upload thành công, cập nhật AvatarUrl
-                        TempData["SuccessMessage"] = "Upload avatar thành công!";
+                        TempData["DebugMessage"] += $" | ✅ Upload thành công! Avatar URL từ API: {uploadResult.User?.AvatarUrl ?? "N/A"}";
+
+                        // Small delay to ensure database is updated
+                        await Task.Delay(500);
+
+                        TempData["SuccessMessage"] = "Cập nhật avatar thành công!";
+
+                        // Add cache-busting parameter to force avatar refresh
+                        var timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+                        return RedirectToAction("Profile", new { t = timestamp });
                     }
                     else
                     {
                         TempData["ErrorMessage"] = uploadResult.Message;
+                        TempData["DebugMessage"] += $" | ❌ Upload lỗi: {uploadResult.Message}";
                         return View(model);
                     }
                 }
-
-                // Cập nhật thông tin profile
-                var result = await _authApiService.UpdateProfileAsync(model);
-
-                if (result.Success)
+                else
                 {
-                    if (string.IsNullOrEmpty(TempData["SuccessMessage"]?.ToString()))
-                    {
-                        TempData["SuccessMessage"] = result.Message;
-                    }
-                    return RedirectToAction("Profile");
+                    TempData["DebugMessage"] = "🔍 DEBUG: Không có avatar file được upload (chỉ update profile)";
                 }
 
-                TempData["ErrorMessage"] = result.Message;
+                // Chỉ cập nhật thông tin profile (không có avatar)
+                var profileResult = await _authApiService.UpdateProfileAsync(model);
+
+                if (profileResult.Success)
+                {
+                    TempData["SuccessMessage"] = "Cập nhật thông tin cá nhân thành công!";
+                    TempData["DebugMessage"] += " | ✅ Profile-only update thành công!";
+                    var timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+                    return RedirectToAction("Profile", new { t = timestamp });
+                }
+
+                TempData["ErrorMessage"] = profileResult.Message;
+                TempData["DebugMessage"] += $" | ❌ Profile-only update lỗi: {profileResult.Message}";
                 return View(model);
             }
             catch (Exception ex)

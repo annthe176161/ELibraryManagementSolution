@@ -602,8 +602,18 @@ namespace ELibraryManagement.Web.Services
 
                 if (response.IsSuccessStatusCode)
                 {
-                    var result = JsonSerializer.Deserialize<AuthResponseViewModel>(responseContent, _jsonOptions);
-                    return result ?? new AuthResponseViewModel { Success = true, Message = "Upload avatar thành công!" };
+                    var jsonResponse = JsonSerializer.Deserialize<JsonElement>(responseContent, _jsonOptions);
+
+                    var success = jsonResponse.TryGetProperty("success", out var successProp) ? successProp.GetBoolean() : false;
+                    var message = jsonResponse.TryGetProperty("message", out var messageProp) ? messageProp.GetString() ?? "" : "";
+                    var avatarUrl = jsonResponse.TryGetProperty("avatarUrl", out var avatarUrlProp) ? avatarUrlProp.GetString() : null;
+
+                    return new AuthResponseViewModel
+                    {
+                        Success = success,
+                        Message = message,
+                        User = new UserViewModel { AvatarUrl = avatarUrl }
+                    };
                 }
 
                 return new AuthResponseViewModel

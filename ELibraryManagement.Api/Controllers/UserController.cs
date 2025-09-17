@@ -135,26 +135,61 @@ namespace ELibraryManagement.Api.Controllers
             {
                 if (file == null || file.Length == 0)
                 {
-                    return BadRequest("No file provided");
+                    return BadRequest(new
+                    {
+                        Success = false,
+                        Message = "No file provided"
+                    });
                 }
 
                 var userId = User.Identity?.Name;
                 if (string.IsNullOrEmpty(userId))
                 {
-                    return Unauthorized("Không tìm thấy người dùng");
+                    return Unauthorized(new
+                    {
+                        Success = false,
+                        Message = "Không tìm thấy người dùng"
+                    });
                 }
 
                 var user = await _userManager.FindByNameAsync(userId);
                 if (user == null)
                 {
-                    return NotFound("Không tìm thấy người dùng");
+                    return NotFound(new
+                    {
+                        Success = false,
+                        Message = "Không tìm thấy người dùng"
+                    });
                 }
 
                 // Upload ảnh lên Cloudinary
                 var imageUrl = await _cloudinaryService.UploadImageAsync(file, "avatars");
                 if (imageUrl == null)
                 {
-                    return BadRequest("Không thể tải lên hình ảnh");
+                    return BadRequest(new
+                    {
+                        Success = false,
+                        Message = "Không thể tải lên hình ảnh"
+                    });
+                }
+
+                // Delete old avatar from Cloudinary if exists
+                if (!string.IsNullOrEmpty(user.AvatarUrl))
+                {
+                    try
+                    {
+                        // Extract public ID from old URL
+                        var uri = new Uri(user.AvatarUrl);
+                        var pathSegments = uri.AbsolutePath.Split('/');
+                        var fileNameWithExtension = pathSegments.Last();
+                        var publicId = $"elibrary/avatars/{Path.GetFileNameWithoutExtension(fileNameWithExtension)}";
+                        await _cloudinaryService.DeleteImageAsync(publicId);
+                    }
+                    catch (Exception)
+                    {
+                        // Log but don't fail the upload if deletion fails
+                        // (old image will remain on Cloudinary but that's acceptable)
+                    }
                 }
 
                 // Cập nhật AvatarUrl trong database
@@ -165,16 +200,25 @@ namespace ELibraryManagement.Api.Controllers
                 {
                     return Ok(new
                     {
+                        Success = true,
                         Message = "Tải lên avatar thành công",
                         AvatarUrl = imageUrl
                     });
                 }
 
-                return BadRequest("Không thể cập nhật avatar người dùng");
+                return BadRequest(new
+                {
+                    Success = false,
+                    Message = "Không thể cập nhật avatar người dùng"
+                });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                return StatusCode(500, new
+                {
+                    Success = false,
+                    Message = $"Internal server error: {ex.Message}"
+                });
             }
         }
 

@@ -298,7 +298,13 @@ namespace ELibraryManagement.Api.Services.Implementations
                 user.PhoneNumber = request.PhoneNumber;
                 user.DateOfBirth = request.DateOfBirth;
                 user.Address = request.Address;
-                user.AvatarUrl = request.AvatarUrl;
+
+                // Only update AvatarUrl if it's explicitly provided (not null or empty)
+                if (!string.IsNullOrEmpty(request.AvatarUrl))
+                {
+                    user.AvatarUrl = request.AvatarUrl;
+                }
+
                 user.UpdatedAt = DateTime.UtcNow;
 
                 var result = await _userManager.UpdateAsync(user);
