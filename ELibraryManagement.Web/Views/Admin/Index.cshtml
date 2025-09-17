@@ -53,7 +53,7 @@
                 </div>
                 <div class="stat-info">
                     <div class="stat-label">Tổng người dùng</div>
-                    <div class="stat-number" data-count="@Model.TotalUsers">0</div>
+                    <div class="stat-number" data-count="@Model.TotalUsers">@Model.TotalUsers</div>
                     <div class="stat-trend">
                         <i class="fas fa-arrow-up text-success me-1"></i>
                         <span class="text-success">+12% so với tháng trước</span>
@@ -76,7 +76,7 @@
                 </div>
                 <div class="stat-info">
                     <div class="stat-label">Tổng sách</div>
-                    <div class="stat-number" data-count="@Model.TotalBooks">0</div>
+                    <div class="stat-number" data-count="@Model.TotalBooks">@Model.TotalBooks</div>
                     <div class="stat-trend">
                         <i class="fas fa-arrow-up text-success me-1"></i>
                         <span class="text-success">+8% so với tháng trước</span>
@@ -99,7 +99,7 @@
                 </div>
                 <div class="stat-info">
                     <div class="stat-label">Lượt mượn</div>
-                    <div class="stat-number" data-count="@Model.TotalBorrows">0</div>
+                    <div class="stat-number" data-count="@Model.TotalBorrows">@Model.TotalBorrows</div>
                     <div class="stat-trend">
                         <i class="fas fa-arrow-up text-success me-1"></i>
                         <span class="text-success">+15% so với tháng trước</span>
@@ -122,7 +122,7 @@
                 </div>
                 <div class="stat-info">
                     <div class="stat-label">Đánh giá</div>
-                    <div class="stat-number" data-count="@Model.TotalReviews">0</div>
+                    <div class="stat-number" data-count="@Model.TotalReviews">@Model.TotalReviews</div>
                     <div class="stat-trend">
                         <i class="fas fa-arrow-up text-success me-1"></i>
                         <span class="text-success">+22% so với tháng trước</span>
@@ -453,7 +453,7 @@
         function initializeEnhancedDashboard() {
             try {
                 console.log('Initializing enhanced dashboard...');
-                
+
                 // Add staggered animation to elements
                 $('.enhanced-stat-card').each(function (index) {
                     $(this).delay(index * 200).queue(function () {
@@ -473,10 +473,10 @@
                     });
                 });
 
-                // Initialize count-up animations for statistics
+                // Initialize statistics without animation
                 setTimeout(() => {
-                    console.log('Starting count-up animation...');
-                    animateCountUp('.stat-number[data-count]');
+                    console.log('Setting statistics values...');
+                    setStaticValues('.stat-number[data-count]');
                 }, 500);
 
                 // Add hover effects
@@ -488,14 +488,14 @@
                         $(this).css('transform', 'translateY(0) scale(1)');
                     }
                 );
-                
+
                 console.log('Enhanced dashboard initialization completed.');
             } catch (error) {
                 console.error('Error initializing enhanced dashboard:', error);
             }
         }
 
-        function animateCountUp(selector) {
+        function setStaticValues(selector) {
             try {
                 $(selector).each(function () {
                     const $this = $(this);
@@ -507,21 +507,11 @@
                         return;
                     }
 
-                    $({ countNum: 0 }).animate({
-                        countNum: countTo
-                    }, {
-                        duration: 2000,
-                        easing: 'swing',
-                        step: function () {
-                            $this.text(Math.floor(this.countNum).toLocaleString());
-                        },
-                        complete: function () {
-                            $this.text(countTo.toLocaleString());
-                        }
-                    });
+                    // Set value directly without animation
+                    $this.text(countTo.toLocaleString());
                 });
             } catch (error) {
-                console.error('Error in animateCountUp:', error);
+                console.error('Error in setStaticValues:', error);
             }
         }
 
@@ -536,8 +526,8 @@
             setTimeout(() => {
                 $btn.html(originalHtml).prop('disabled', false);
 
-                // Re-animate statistics
-                animateCountUp('.stat-number[data-count]');
+                // Re-set statistics values
+                setStaticValues('.stat-number[data-count]');
 
                 // Show success notification
                 showNotification('Dashboard đã được cập nhật thành công!', 'success');
@@ -618,16 +608,16 @@
             const notification = notificationTypes[type] || notificationTypes.info;
 
             const toast = $(`
-                    <div class="toast align-items-center text-white bg-${notification.color} border-0" role="alert">
-                        <div class="d-flex">
-                            <div class="toast-body">
-                                <i class="fas fa-${notification.icon} me-2"></i>
-                                ${message}
+                        <div class="toast align-items-center text-white bg-${notification.color} border-0" role="alert">
+                            <div class="d-flex">
+                                <div class="toast-body">
+                                    <i class="fas fa-${notification.icon} me-2"></i>
+                                    ${message}
+                                </div>
+                                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
                             </div>
-                            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
                         </div>
-                    </div>
-                `);
+                    `);
 
             // Create toast container if it doesn't exist
             if (!$('.toast-container').length) {
@@ -646,24 +636,24 @@
         // Confirmation dialog
         function showConfirmDialog(title, message, onConfirm) {
             const modal = $(`
-                    <div class="modal fade" tabindex="-1">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title">${title}</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                                </div>
-                                <div class="modal-body">
-                                    <p>${message}</p>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                                    <button type="button" class="btn btn-primary" id="confirmBtn">Xác nhận</button>
+                        <div class="modal fade" tabindex="-1">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">${title}</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p>${message}</p>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                                        <button type="button" class="btn btn-primary" id="confirmBtn">Xác nhận</button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                `);
+                    `);
 
             $('body').append(modal);
             modal.modal('show');

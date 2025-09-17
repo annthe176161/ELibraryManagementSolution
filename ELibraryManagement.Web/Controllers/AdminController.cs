@@ -110,8 +110,25 @@ namespace ELibraryManagement.Web.Controllers
                     dashboardData.TotalUsers = 0;
                 }
 
-                // Set TotalBooks to 0 since we removed book management
-                dashboardData.TotalBooks = 0;
+                // Get total books count
+                try
+                {
+                    var booksResponse = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Book/admin/all");
+                    if (booksResponse.IsSuccessStatusCode)
+                    {
+                        var booksContent = await booksResponse.Content.ReadAsStringAsync();
+                        var books = JsonSerializer.Deserialize<List<object>>(booksContent, _jsonOptions);
+                        dashboardData.TotalBooks = books?.Count ?? 0;
+                    }
+                    else
+                    {
+                        dashboardData.TotalBooks = 0;
+                    }
+                }
+                catch (Exception)
+                {
+                    dashboardData.TotalBooks = 0;
+                }
 
                 // Get total borrow records count
                 try
