@@ -20,6 +20,8 @@ namespace ELibraryManagement.Api.Services.Implementations
 
         public IQueryable<BookDto> GetAvailableBooksQueryable()
         {
+            // Use the simpler approach - rely on AvailableQuantity field in database
+            // This field should be kept in sync by the borrow/return operations
             return _context.Books
                 .Where(b => b.AvailableQuantity > 0 && !b.IsDeleted)
                 .Include(b => b.BookCategories)
@@ -345,10 +347,11 @@ namespace ELibraryManagement.Api.Services.Implementations
 
             // Update status to Cancelled
             borrowRecord.Status = Models.BorrowStatus.Cancelled;
+            borrowRecord.UpdatedAt = DateTime.UtcNow;
             // Note: Don't set ReturnDate for cancelled requests as they were never actually borrowed
 
-            // Increase book available quantity since the request is cancelled
-            borrowRecord.Book.AvailableQuantity++;
+            // Don't increase book available quantity because we never decreased it when the request was created
+            // Only decrease available quantity when admin approves the request (status changes to Borrowed)
 
             // Decrease user's current borrow count (since the request was counted when created)
             await _userStatusService.DecrementBorrowCountAsync(borrowRecord.UserId);
@@ -577,6 +580,34 @@ namespace ELibraryManagement.Api.Services.Implementations
                     Description = c.Description,
                     Color = c.Color
                 }).ToListAsync();
+        }
+
+        public async Task<int> SyncAvailableQuantitiesAsync()
+        {
+            var books = await _context.Books.Where(b => !b.IsDeleted).ToListAsync();
+            int updatedCount = 0;
+
+            foreach (var book in books)
+            {
+                // Calculate actual borrowed count
+                var borrowedCount = await _context.BorrowRecords
+                    .CountAsync(br => br.BookId == book.Id && br.Status == BorrowStatus.Borrowed);
+
+                var correctAvailableQuantity = Math.Max(0, book.Quantity - borrowedCount);
+
+                if (book.AvailableQuantity != correctAvailableQuantity)
+                {
+                    book.AvailableQuantity = correctAvailableQuantity;
+                    updatedCount++;
+                }
+            }
+
+            if (updatedCount > 0)
+            {
+                await _context.SaveChangesAsync();
+            }
+
+            return updatedCount;
         }
     }
 }

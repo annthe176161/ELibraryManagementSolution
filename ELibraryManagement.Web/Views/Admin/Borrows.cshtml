@@ -564,7 +564,21 @@
         // Enhanced status transition functions with validation
         function approveBorrow(borrowId, userName, bookTitle) {
             if (confirm(`Phê duyệt yêu cầu mượn sách?\n\nNgười mượn: ${userName}\nSách: ${bookTitle}`)) {
-                updateBorrowStatus(borrowId, 'Borrowed', 'Yêu cầu mượn sách đã được phê duyệt');
+                $.ajax({
+                    url: `/Admin/ApproveBorrowRequest/${borrowId}`,
+                    type: 'POST',
+                    success: function(response) {
+                        if (response.success) {
+                            showToast('success', response.message);
+                            setTimeout(() => location.reload(), 1500);
+                        } else {
+                            showToast('error', response.message);
+                        }
+                    },
+                    error: function(xhr) {
+                        showToast('error', 'Lỗi khi phê duyệt: ' + xhr.responseText);
+                    }
+                });
             }
         }
 

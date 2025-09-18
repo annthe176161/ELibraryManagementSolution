@@ -317,5 +317,27 @@ namespace ELibraryManagement.Api.Controllers
                 return StatusCode(500, new { message = $"Có lỗi xảy ra: {ex.Message}" });
             }
         }
+
+        /// <summary>
+        /// Sync AvailableQuantity for all books - Emergency admin tool
+        /// </summary>
+        [HttpPost("admin/sync-quantities")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> SyncAvailableQuantities()
+        {
+            try
+            {
+                var result = await _bookService.SyncAvailableQuantitiesAsync();
+                return Ok(new
+                {
+                    message = "Đã đồng bộ thành công",
+                    updatedBooks = result
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
     }
 }

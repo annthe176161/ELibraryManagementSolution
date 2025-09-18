@@ -30,15 +30,6 @@ namespace ELibraryManagement.Web.Services
         public string? FineReason { get; set; }
     }
 
-    public interface IBorrowApiService
-    {
-        Task<ExtendBorrowResponseViewModel> ExtendBorrowAsync(int borrowId, string? reason = null);
-        Task<BorrowResult> BorrowBookAsync(int bookId);
-        Task<bool> IsAuthenticatedAsync();
-        Task<BorrowDetailViewModel?> GetBorrowDetailAsync(int borrowId);
-        Task<bool> UpdateBorrowStatusAsync(int borrowId, string status, string? notes = null);
-    }
-
     public class BorrowApiService : IBorrowApiService
     {
         private readonly HttpClient _httpClient;
@@ -286,6 +277,219 @@ namespace ELibraryManagement.Web.Services
             {
                 Console.WriteLine($"Exception in UpdateBorrowStatusAsync: {ex.Message}");
                 return false;
+            }
+        }
+
+        public async Task<bool> ApproveBorrowRequestAsync(int borrowId)
+        {
+            try
+            {
+                var token = GetCurrentToken();
+                if (string.IsNullOrEmpty(token))
+                {
+                    return false;
+                }
+
+                SetAuthorizationHeader();
+
+                var response = await _httpClient.PostAsync($"{GetApiBaseUrl()}/api/borrow/approve/{borrowId}", null);
+                return response.IsSuccessStatusCode;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        public async Task<ReturnBookResponseViewModel?> ConfirmReturnAsync(int borrowId)
+        {
+            try
+            {
+                var token = GetCurrentToken();
+                if (string.IsNullOrEmpty(token))
+                {
+                    return null;
+                }
+
+                SetAuthorizationHeader();
+
+                var response = await _httpClient.PostAsync($"{GetApiBaseUrl()}/api/Borrow/return/{borrowId}", null);
+                var responseContent = await response.Content.ReadAsStringAsync();
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var result = JsonSerializer.Deserialize<ReturnBookResponseViewModel>(responseContent, _jsonOptions);
+                    return result;
+                }
+
+                return null;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        public async Task<List<BorrowRecordViewModel>?> GetAllBorrowRecordsAsync()
+        {
+            try
+            {
+                var token = GetCurrentToken();
+                if (string.IsNullOrEmpty(token))
+                {
+                    return null;
+                }
+
+                SetAuthorizationHeader();
+
+                var response = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Borrow/admin/all");
+                if (response.IsSuccessStatusCode)
+                {
+                    var responseContent = await response.Content.ReadAsStringAsync();
+                    var borrowRecords = JsonSerializer.Deserialize<List<BorrowRecordViewModel>>(responseContent, _jsonOptions);
+                    return borrowRecords;
+                }
+
+                return null;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        public async Task<BorrowRecordViewModel?> GetBorrowRecordByIdAsync(int id)
+        {
+            try
+            {
+                var token = GetCurrentToken();
+                if (string.IsNullOrEmpty(token))
+                {
+                    return null;
+                }
+
+                SetAuthorizationHeader();
+
+                var response = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Borrow/admin/{id}");
+                if (response.IsSuccessStatusCode)
+                {
+                    var responseContent = await response.Content.ReadAsStringAsync();
+                    var borrowRecord = JsonSerializer.Deserialize<BorrowRecordViewModel>(responseContent, _jsonOptions);
+                    return borrowRecord;
+                }
+
+                return null;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        public async Task<List<BorrowRecordViewModel>?> GetOverdueBorrowsAsync()
+        {
+            try
+            {
+                var token = GetCurrentToken();
+                if (string.IsNullOrEmpty(token))
+                {
+                    return null;
+                }
+
+                SetAuthorizationHeader();
+
+                var response = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Borrow/overdue");
+                if (response.IsSuccessStatusCode)
+                {
+                    var responseContent = await response.Content.ReadAsStringAsync();
+                    var borrowRecords = JsonSerializer.Deserialize<List<BorrowRecordViewModel>>(responseContent, _jsonOptions);
+                    return borrowRecords;
+                }
+
+                return null;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        public async Task<bool> SendReminderAsync(int borrowId)
+        {
+            try
+            {
+                var token = GetCurrentToken();
+                if (string.IsNullOrEmpty(token))
+                {
+                    return false;
+                }
+
+                SetAuthorizationHeader();
+
+                var response = await _httpClient.PostAsync($"{GetApiBaseUrl()}/api/Borrow/{borrowId}/reminder", null);
+                return response.IsSuccessStatusCode;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        public async Task<bool> CancelBorrowRequestAsync(int borrowId)
+        {
+            try
+            {
+                var token = GetCurrentToken();
+                if (string.IsNullOrEmpty(token))
+                {
+                    return false;
+                }
+
+                SetAuthorizationHeader();
+
+                var response = await _httpClient.PostAsync($"{GetApiBaseUrl()}/api/Borrow/cancel/{borrowId}", null);
+                return response.IsSuccessStatusCode;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        public async Task<List<BorrowRecordViewModel>?> GetMyBorrowsAsync()
+        {
+            try
+            {
+                var token = GetCurrentToken();
+                if (string.IsNullOrEmpty(token))
+                {
+                    return null;
+                }
+
+                SetAuthorizationHeader();
+
+                var response = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Borrow/my-borrows");
+                if (response.IsSuccessStatusCode)
+                {
+                    var responseContent = await response.Content.ReadAsStringAsync();
+                    var borrowRecords = JsonSerializer.Deserialize<List<BorrowRecordViewModel>>(responseContent, _jsonOptions);
+                    return borrowRecords;
+                }
+
+                return null;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        public void SetAuthToken(string token)
+        {
+            if (!string.IsNullOrEmpty(token))
+            {
+                _httpClient.DefaultRequestHeaders.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
             }
         }
     }

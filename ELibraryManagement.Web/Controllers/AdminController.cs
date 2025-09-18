@@ -547,6 +547,27 @@ namespace ELibraryManagement.Web.Controllers
         }
 
         // Borrow Management Actions
+        [HttpPost("Admin/ApproveBorrowRequest/{borrowId}")]
+        public async Task<IActionResult> ApproveBorrowRequest(int borrowId)
+        {
+            var accessCheck = await CheckAdminAccessAsync();
+            if (accessCheck != null) return Json(new { success = false, message = "Unauthorized" });
+
+            try
+            {
+                var result = await _borrowApiService.ApproveBorrowRequestAsync(borrowId);
+                if (result)
+                {
+                    return Json(new { success = true, message = "Phê duyệt yêu cầu thành công." });
+                }
+                return Json(new { success = false, message = "Phê duyệt yêu cầu thất bại." });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
+
         [HttpPost]
         public async Task<IActionResult> UpdateBorrowStatus(int id, string status, string? notes)
         {
