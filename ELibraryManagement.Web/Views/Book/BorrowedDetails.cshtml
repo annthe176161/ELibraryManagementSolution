@@ -442,6 +442,16 @@
                     <div class="stat-card">
                         <div class="stat-value">
                             @{
+                                var remainingLimit = 5 - ViewBag.CurrentActiveBorrows;
+                            }
+                            @remainingLimit
+                        </div>
+                        <div class="stat-label">Giới hạn còn lại</div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-value">
+                            @{
                                 var overdueCount = 0; // Placeholder - cần API để lấy số liệu thực
                             }
                             @overdueCount

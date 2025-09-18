@@ -121,9 +121,9 @@ namespace ELibraryManagement.Web.Controllers
                 // Get borrowed books count for validation
                 var allBorrowedBooks = await _bookApiService.GetBorrowedBooksAsync(currentUser?.Id ?? "", token ?? "");
 
-                // Filter only currently active borrow requests and borrowed books (exclude cancelled and returned)
+                // Filter only currently borrowed books (exclude requested, cancelled and returned)
                 var currentlyBorrowedBooks = allBorrowedBooks?.Where(b =>
-                    b.Status == "Requested" || b.Status == "Borrowed").ToList() ?? new List<UserBorrowedBookViewModel>();
+                    b.Status == "Borrowed").ToList() ?? new List<UserBorrowedBookViewModel>();
                 var currentBorrowedCount = currentlyBorrowedBooks.Count;
                 var maxBooksAllowed = 5;
                 var canBorrow = currentBorrowedCount < maxBooksAllowed;
@@ -237,7 +237,7 @@ namespace ELibraryManagement.Web.Controllers
                     // Get borrowed books count for validation
                     var allBorrowedBooks = await _bookApiService.GetBorrowedBooksAsync(currentUser.Id, token);
                     var currentlyBorrowedBooks = allBorrowedBooks?.Where(b =>
-                        b.Status == "Requested" || b.Status == "Borrowed").ToList() ?? new List<UserBorrowedBookViewModel>();
+                        b.Status == "Borrowed").ToList() ?? new List<UserBorrowedBookViewModel>();
                     var currentBorrowedCount = currentlyBorrowedBooks.Count;
                     var maxBooksAllowed = 5;
                     var canBorrow = currentBorrowedCount < maxBooksAllowed;
@@ -276,7 +276,7 @@ namespace ELibraryManagement.Web.Controllers
                     {
                         var allBorrowedBooks = await _bookApiService.GetBorrowedBooksAsync(currentUser.Id, token);
                         var currentlyBorrowedBooks = allBorrowedBooks?.Where(b =>
-                            b.Status == "Requested" || b.Status == "Borrowed").ToList() ?? new List<UserBorrowedBookViewModel>();
+                            b.Status == "Borrowed").ToList() ?? new List<UserBorrowedBookViewModel>();
                         var currentBorrowedCount = currentlyBorrowedBooks.Count;
                         var maxBooksAllowed = 5;
                         var canBorrow = currentBorrowedCount < maxBooksAllowed;

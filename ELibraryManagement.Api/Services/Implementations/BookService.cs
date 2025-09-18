@@ -169,8 +169,12 @@ namespace ELibraryManagement.Api.Services.Implementations
 
         public async Task<IEnumerable<BorrowRecordDto>> GetBorrowedBooksByUserAsync(string userId)
         {
+            // Use int values for enum comparison to ensure proper SQL translation
+            var requestedStatus = (int)BorrowStatus.Requested;
+            var borrowedStatus = (int)BorrowStatus.Borrowed;
+
             var borrowedRecords = await _context.BorrowRecords
-                .Where(br => br.UserId == userId)
+                .Where(br => br.UserId == userId && ((int)br.Status == requestedStatus || (int)br.Status == borrowedStatus))
                 .Include(br => br.Book)
                 .OrderByDescending(br => br.BorrowDate)
                 .Select(br => new BorrowRecordDto
@@ -179,7 +183,7 @@ namespace ELibraryManagement.Api.Services.Implementations
                     BookId = br.BookId,
                     BookTitle = br.Book.Title,
                     BookAuthor = br.Book.Author,
-                    BookCoverUrl = br.Book.CoverImageUrl,
+                    BookCoverUrl = br.Book.CoverImageUrl ?? "",
                     UserId = br.UserId,
                     BorrowDate = br.BorrowDate,
                     DueDate = br.DueDate,
@@ -188,6 +192,13 @@ namespace ELibraryManagement.Api.Services.Implementations
                     Notes = br.Notes
                 })
                 .ToListAsync();
+
+            // Debug logging
+            Console.WriteLine($"Found {borrowedRecords.Count} records for user {userId} using int comparison");
+            foreach (var record in borrowedRecords)
+            {
+                Console.WriteLine($"Book: {record.BookTitle}, Status: {record.Status}");
+            }
 
             return borrowedRecords;
         }
