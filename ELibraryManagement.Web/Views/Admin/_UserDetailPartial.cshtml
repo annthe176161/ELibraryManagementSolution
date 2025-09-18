@@ -225,13 +225,28 @@
                                                 {
                                                     <span class="badge bg-success">Đã trả</span>
                                                 }
-                                                else if (borrow.IsOverdue)
+                                                else if (borrow.Status == "Requested")
                                                 {
-                                                    <span class="badge bg-danger">Quá hạn</span>
+                                                    <span class="badge bg-info">Đã đăng ký</span>
+                                                }
+                                                else if (borrow.Status == "Borrowed")
+                                                {
+                                                    if (borrow.IsOverdue)
+                                                    {
+                                                        <span class="badge bg-danger">Quá hạn</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="badge bg-warning">Đang mượn</span>
+                                                    }
+                                                }
+                                                else if (borrow.Status == "Cancelled")
+                                                {
+                                                    <span class="badge bg-secondary">Đã hủy</span>
                                                 }
                                                 else
                                                 {
-                                                    <span class="badge bg-warning">Đang mượn</span>
+                                                    <span class="badge bg-light text-dark">@borrow.Status</span>
                                                 }
                                             </td>
                                         </tr>

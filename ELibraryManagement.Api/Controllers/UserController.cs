@@ -1,5 +1,6 @@
 using ELibraryManagement.Api.DTOs;
 using ELibraryManagement.Api.Services.Interfaces;
+using ELibraryManagement.Api.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -17,11 +18,13 @@ namespace ELibraryManagement.Api.Controllers
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ICloudinaryService _cloudinaryService;
+        private readonly ApplicationDbContext _context;
 
-        public UserController(UserManager<ApplicationUser> userManager, ICloudinaryService cloudinaryService)
+        public UserController(UserManager<ApplicationUser> userManager, ICloudinaryService cloudinaryService, ApplicationDbContext context)
         {
             _userManager = userManager;
             _cloudinaryService = cloudinaryService;
+            _context = context;
         }
 
         /// <summary>
@@ -37,6 +40,16 @@ namespace ELibraryManagement.Api.Controllers
             foreach (var user in users)
             {
                 var roles = await _userManager.GetRolesAsync(user);
+
+                // Calculate ActiveBorrows and TotalBorrows for each user
+                var activeBorrowsCount = await _context.BorrowRecords
+                    .Where(br => br.UserId == user.Id && br.Status == BorrowStatus.Borrowed)
+                    .CountAsync();
+
+                var totalBorrowsCount = await _context.BorrowRecords
+                    .Where(br => br.UserId == user.Id && (br.Status == BorrowStatus.Borrowed || br.Status == BorrowStatus.Returned))
+                    .CountAsync();
+
                 userDtos.Add(new UserDto
                 {
                     Id = user.Id,
@@ -52,10 +65,8 @@ namespace ELibraryManagement.Api.Controllers
                     IsActive = user.IsActive,
                     LastLoginDate = user.LastLoginDate,
                     Roles = roles.ToList(),
-                    // Note: TotalBorrows and ActiveBorrows will require more complex queries involving other DbSets.
-                    // Leaving them as 0 for now to fix the immediate dashboard loading issue.
-                    TotalBorrows = 0,
-                    ActiveBorrows = 0
+                    TotalBorrows = totalBorrowsCount,
+                    ActiveBorrows = activeBorrowsCount
                 });
             }
 
@@ -288,6 +299,16 @@ namespace ELibraryManagement.Api.Controllers
 
                 var roles = await _userManager.GetRolesAsync(user);
 
+                // Calculate ActiveBorrows - count borrow records with status "Borrowed"
+                var activeBorrowsCount = await _context.BorrowRecords
+                    .Where(br => br.UserId == user.Id && br.Status == BorrowStatus.Borrowed)
+                    .CountAsync();
+
+                // Calculate TotalBorrows - count borrow records that have been actually borrowed (Borrowed or Returned)
+                var totalBorrowsCount = await _context.BorrowRecords
+                    .Where(br => br.UserId == user.Id && (br.Status == BorrowStatus.Borrowed || br.Status == BorrowStatus.Returned))
+                    .CountAsync();
+
                 var result = new
                 {
                     user.Id,
@@ -305,8 +326,8 @@ namespace ELibraryManagement.Api.Controllers
                     user.LockoutEnd,
                     IsActive = user.IsActive,
                     Roles = roles.ToList(),
-                    TotalBorrows = 0, // TODO: Calculate from borrow records
-                    ActiveBorrows = 0 // TODO: Calculate from active borrow records
+                    TotalBorrows = totalBorrowsCount,
+                    ActiveBorrows = activeBorrowsCount
                 };
 
                 return Ok(result);
