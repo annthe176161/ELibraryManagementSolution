@@ -100,7 +100,7 @@
                                     <i class="fas fa-calendar-plus text-primary me-2"></i>
                                     <strong>Ngày tham gia:</strong>
                                 </div>
-                                <span class="badge bg-primary">@Model.User.CreatedAt.ToString("dd/MM/yyyy")</span>
+                                <span class="badge bg-primary">@Model.User.CreatedAt.ToVietnamTime().ToString("dd/MM/yyyy")</span>
                             </div>
                         </div>
                         
@@ -205,15 +205,15 @@
                                                 </div>
                                             </td>
                                             <td>
-                                                <small>@borrow.BorrowDate.ToString("dd/MM/yyyy")</small>
+                                                <small>@borrow.BorrowDate.ToVietnamTime().ToString("dd/MM/yyyy")</small>
                                             </td>
                                             <td>
-                                                <small>@borrow.DueDate.ToString("dd/MM/yyyy")</small>
+                                                <small>@borrow.DueDate.ToVietnamTime().ToString("dd/MM/yyyy")</small>
                                             </td>
                                             <td>
                                                 @if (borrow.ReturnDate.HasValue)
                                                 {
-                                                    <small>@borrow.ReturnDate.Value.ToString("dd/MM/yyyy")</small>
+                                                    <small>@borrow.ReturnDate.Value.ToVietnamTime().ToString("dd/MM/yyyy")</small>
                                                 }
                                                 else
                                                 {

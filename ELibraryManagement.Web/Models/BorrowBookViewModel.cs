@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using ELibraryManagement.Web.Helpers;
 
 namespace ELibraryManagement.Web.Models
 {
@@ -62,7 +63,7 @@ namespace ELibraryManagement.Web.Models
         public DateTime? ReturnDate { get; set; }
         public string Status { get; set; } = string.Empty;
         public string? Notes { get; set; }
-        public bool IsOverdue => DueDate < DateTime.Now && ReturnDate == null;
-        public int DaysOverdue => IsOverdue ? (DateTime.Now - DueDate).Days : 0;
+        public bool IsOverdue => DueDate < DateTimeHelper.VietnamNow() && ReturnDate == null;
+        public int DaysOverdue => IsOverdue ? (DateTimeHelper.VietnamNow() - DueDate).Days : 0;
     }
 }

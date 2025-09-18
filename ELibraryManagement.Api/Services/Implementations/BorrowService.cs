@@ -2,6 +2,7 @@ using ELibraryManagement.Api.Data;
 using ELibraryManagement.Api.DTOs;
 using ELibraryManagement.Api.Models;
 using ELibraryManagement.Api.Services.Interfaces;
+using ELibraryManagement.Api.Helpers;
 using Microsoft.EntityFrameworkCore;
 
 namespace ELibraryManagement.Api.Services.Implementations
@@ -91,7 +92,7 @@ namespace ELibraryManagement.Api.Services.Implementations
 
                 borrowRecord.Status = newStatus;
                 borrowRecord.Notes = updateDto.Notes;
-                borrowRecord.UpdatedAt = DateTime.UtcNow;
+                borrowRecord.UpdatedAt = DateTimeHelper.VietnamNow();
 
                 // Cập nhật các trường liên quan dựa trên trạng thái mới
                 UpdateRelatedFields(borrowRecord, newStatus);
@@ -109,12 +110,12 @@ namespace ELibraryManagement.Api.Services.Implementations
             {
                 case BorrowStatus.Borrowed:
                     // Khi chuyển sang Borrowed, cập nhật ngày xác nhận
-                    borrowRecord.ConfirmedDate = DateTime.UtcNow;
+                    borrowRecord.ConfirmedDate = DateTimeHelper.VietnamNow();
                     break;
 
                 case BorrowStatus.Returned:
                     // Khi trả sách, cập nhật ngày trả
-                    borrowRecord.ReturnDate = DateTime.UtcNow;
+                    borrowRecord.ReturnDate = DateTimeHelper.VietnamNow();
                     break;
 
                 case BorrowStatus.Cancelled:
@@ -137,7 +138,7 @@ namespace ELibraryManagement.Api.Services.Implementations
                 return false;
 
             borrowRecord.Notes = notes;
-            borrowRecord.UpdatedAt = DateTime.UtcNow;
+            borrowRecord.UpdatedAt = DateTimeHelper.VietnamNow();
 
             await _context.SaveChangesAsync();
             return true;
@@ -161,8 +162,8 @@ namespace ELibraryManagement.Api.Services.Implementations
 
             // Here you would implement email sending logic
             // For now, we'll just log it or add a note
-            borrowRecord.Notes = $"{borrowRecord.Notes}\nReminder sent on {DateTime.UtcNow:yyyy-MM-dd HH:mm}";
-            borrowRecord.UpdatedAt = DateTime.UtcNow;
+            borrowRecord.Notes = $"{borrowRecord.Notes}\nReminder sent on {DateTimeHelper.VietnamNow():yyyy-MM-dd HH:mm}";
+            borrowRecord.UpdatedAt = DateTimeHelper.VietnamNow();
 
             await _context.SaveChangesAsync();
             return true;
@@ -192,7 +193,7 @@ namespace ELibraryManagement.Api.Services.Implementations
                 };
             }
 
-            var returnDate = DateTime.UtcNow;
+            var returnDate = DateTimeHelper.VietnamNow();
             var isOverdue = returnDate > borrowRecord.DueDate;
             decimal? fineAmount = null;
 
@@ -210,7 +211,7 @@ namespace ELibraryManagement.Api.Services.Implementations
                     Amount = fineAmount.Value,
                     Reason = $"Overdue return - {overdueDays} days late",
                     Status = FineStatus.Pending,
-                    CreatedAt = DateTime.UtcNow
+                    CreatedAt = DateTimeHelper.VietnamNow()
                 };
 
                 _context.Fines.Add(fine);
@@ -219,7 +220,7 @@ namespace ELibraryManagement.Api.Services.Implementations
             // Update borrow record
             borrowRecord.ReturnDate = returnDate;
             borrowRecord.Status = BorrowStatus.Returned;
-            borrowRecord.UpdatedAt = DateTime.UtcNow;
+            borrowRecord.UpdatedAt = DateTimeHelper.VietnamNow();
 
             // Increase available quantity
             borrowRecord.Book.AvailableQuantity++;
@@ -241,7 +242,7 @@ namespace ELibraryManagement.Api.Services.Implementations
 
         public async Task<IEnumerable<BorrowRecordDto>> GetOverdueBorrowsAsync()
         {
-            var currentDate = DateTime.UtcNow;
+            var currentDate = DateTimeHelper.VietnamNow();
             return await _context.BorrowRecords
                 .Include(br => br.Book)
                 .Include(br => br.User)

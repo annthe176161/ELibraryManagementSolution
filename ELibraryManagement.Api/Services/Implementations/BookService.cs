@@ -2,6 +2,7 @@
 using ELibraryManagement.Api.DTOs;
 using ELibraryManagement.Api.Models;
 using ELibraryManagement.Api.Services.Interfaces;
+using ELibraryManagement.Api.Helpers;
 using Microsoft.EntityFrameworkCore;
 
 namespace ELibraryManagement.Api.Services.Implementations
@@ -129,14 +130,14 @@ namespace ELibraryManagement.Api.Services.Implementations
             }
 
             // Calculate due date (default 14 days if not provided)
-            var dueDate = request.DueDate ?? DateTime.UtcNow.AddDays(14);
+            var dueDate = request.DueDate ?? DateTimeHelper.VietnamNow().AddDays(14);
 
             // Create borrow record with Requested status (pending admin approval)
             var borrowRecord = new BorrowRecord
             {
                 UserId = request.UserId,
                 BookId = request.BookId,
-                BorrowDate = DateTime.UtcNow,
+                BorrowDate = DateTimeHelper.VietnamNow(),
                 DueDate = dueDate,
                 Status = BorrowStatus.Requested,
                 Notes = request.Notes,

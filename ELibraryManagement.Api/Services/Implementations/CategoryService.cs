@@ -2,6 +2,7 @@ using ELibraryManagement.Api.Data;
 using ELibraryManagement.Api.DTOs;
 using ELibraryManagement.Api.Models;
 using ELibraryManagement.Api.Services.Interfaces;
+using ELibraryManagement.Api.Helpers;
 using Microsoft.EntityFrameworkCore;
 
 namespace ELibraryManagement.Api.Services.Implementations
@@ -128,7 +129,7 @@ namespace ELibraryManagement.Api.Services.Implementations
                     Description = createDto.Description?.Trim(),
                     Color = createDto.Color?.Trim(),
                     IsActive = createDto.IsActive,
-                    CreatedAt = DateTime.UtcNow
+                    CreatedAt = DateTimeHelper.VietnamNow()
                 };
 
                 _context.Categories.Add(category);
@@ -192,7 +193,7 @@ namespace ELibraryManagement.Api.Services.Implementations
                 category.Description = updateDto.Description?.Trim();
                 category.Color = updateDto.Color?.Trim();
                 category.IsActive = updateDto.IsActive;
-                category.UpdatedAt = DateTime.UtcNow;
+                category.UpdatedAt = DateTimeHelper.VietnamNow();
 
                 await _context.SaveChangesAsync();
 
@@ -292,7 +293,7 @@ namespace ELibraryManagement.Api.Services.Implementations
                 }
 
                 category.IsActive = !category.IsActive;
-                category.UpdatedAt = DateTime.UtcNow;
+                category.UpdatedAt = DateTimeHelper.VietnamNow();
 
                 await _context.SaveChangesAsync();
 

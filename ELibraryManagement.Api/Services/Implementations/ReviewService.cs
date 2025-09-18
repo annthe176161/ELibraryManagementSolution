@@ -2,6 +2,7 @@ using ELibraryManagement.Api.Data;
 using ELibraryManagement.Api.DTOs;
 using ELibraryManagement.Api.Models;
 using ELibraryManagement.Api.Services.Interfaces;
+using ELibraryManagement.Api.Helpers;
 using Microsoft.EntityFrameworkCore;
 
 namespace ELibraryManagement.Api.Services.Implementations
@@ -62,8 +63,8 @@ namespace ELibraryManagement.Api.Services.Implementations
                     BookId = createReviewDto.BookId,
                     Rating = createReviewDto.Rating,
                     Comment = createReviewDto.Comment,
-                    ReviewDate = DateTime.UtcNow,
-                    CreatedAt = DateTime.UtcNow
+                    ReviewDate = DateTimeHelper.VietnamNow(),
+                    CreatedAt = DateTimeHelper.VietnamNow()
                 };
 
                 _context.Reviews.Add(review);
@@ -119,7 +120,7 @@ namespace ELibraryManagement.Api.Services.Implementations
                 // Cập nhật review
                 review.Rating = updateReviewDto.Rating;
                 review.Comment = updateReviewDto.Comment;
-                review.UpdatedAt = DateTime.UtcNow;
+                review.UpdatedAt = DateTimeHelper.VietnamNow();
 
                 await _context.SaveChangesAsync();
 

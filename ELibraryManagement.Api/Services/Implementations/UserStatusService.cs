@@ -1,6 +1,7 @@
 using ELibraryManagement.Api.Data;
 using ELibraryManagement.Api.Models;
 using ELibraryManagement.Api.Services.Interfaces;
+using ELibraryManagement.Api.Helpers;
 using Microsoft.EntityFrameworkCore;
 
 namespace ELibraryManagement.Api.Services.Implementations
@@ -37,7 +38,7 @@ namespace ELibraryManagement.Api.Services.Implementations
                 OverdueFinesCount = 0,
                 MaxBorrowLimit = 5,
                 CurrentBorrowCount = 0,
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTimeHelper.VietnamNow()
             };
 
             _context.UserStatuses.Add(userStatus);
@@ -48,7 +49,7 @@ namespace ELibraryManagement.Api.Services.Implementations
 
         public async Task UpdateUserStatusAsync(UserStatus userStatus)
         {
-            userStatus.UpdatedAt = DateTime.UtcNow;
+            userStatus.UpdatedAt = DateTimeHelper.VietnamNow();
             _context.UserStatuses.Update(userStatus);
             await _context.SaveChangesAsync();
         }

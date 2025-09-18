@@ -1,5 +1,6 @@
 using ELibraryManagement.Web.Services;
 using ELibraryManagement.Web.Models;
+using ELibraryManagement.Web.Helpers;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ELibraryManagement.Web.Controllers
@@ -58,8 +59,8 @@ namespace ELibraryManagement.Web.Controllers
                         Faculty = "Chưa cập nhật", // Sẽ cần thêm vào UserViewModel sau
                         Class = "Chưa cập nhật" // Sẽ cần thêm vào UserViewModel sau
                     },
-                    BorrowDate = DateTime.Now,
-                    DueDate = DateTime.Now.AddDays(30), // 30 ngày như quy định mới
+                    BorrowDate = DateTimeHelper.VietnamNow(),
+                    DueDate = DateTimeHelper.VietnamNow().AddDays(30), // 30 ngày như quy định mới
                     MaxExtensions = 2
                 };
 
