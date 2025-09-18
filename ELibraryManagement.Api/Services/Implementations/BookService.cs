@@ -60,6 +60,16 @@ namespace ELibraryManagement.Api.Services.Implementations
 
             if (book == null) return null;
 
+            // Calculate actual available quantity based on borrowed books only
+            var borrowedCount = await _context.BorrowRecords
+                .CountAsync(br => br.BookId == book.Id && br.Status == BorrowStatus.Borrowed);
+
+            // Calculate requested count for statistics
+            var requestedCount = await _context.BorrowRecords
+                .CountAsync(br => br.BookId == book.Id && br.Status == BorrowStatus.Requested);
+
+            var actualAvailableQuantity = book.Quantity - borrowedCount;
+
             return new BookDto
             {
                 Id = book.Id,
@@ -71,7 +81,8 @@ namespace ELibraryManagement.Api.Services.Implementations
                 Description = book.Description,
                 CoverImageUrl = book.CoverImageUrl,
                 Quantity = book.Quantity,
-                AvailableQuantity = book.AvailableQuantity,
+                AvailableQuantity = Math.Max(0, actualAvailableQuantity), // Ensure not negative
+                RequestedCount = requestedCount, // Add requested count for admin view
                 Language = book.Language,
                 PageCount = book.PageCount,
                 AverageRating = (float)book.AverageRating,
@@ -144,10 +155,10 @@ namespace ELibraryManagement.Api.Services.Implementations
                 CreatedAt = DateTime.UtcNow
             };
 
-            // Decrease available quantity
-            book.AvailableQuantity--;
+            // Note: Don't decrease available quantity for Requested status
+            // Only decrease when status changes to Borrowed (when admin approves)
 
-            // Update user status - increment borrow count
+            // Update user status - increment borrow count for requested books
             await _userStatusService.IncrementBorrowCountAsync(request.UserId);
 
             // Save changes
@@ -462,27 +473,44 @@ namespace ELibraryManagement.Api.Services.Implementations
 
         public async Task<IEnumerable<BookDto>> GetAllBooksAsync()
         {
-            return await _context.Books
+            var books = await _context.Books
                 .Where(b => !b.IsDeleted)
                 .Include(b => b.BookCategories)
                 .ThenInclude(bc => bc.Category)
-                .Select(b => new BookDto
+                .ToListAsync();
+
+            var bookDtos = new List<BookDto>();
+
+            foreach (var book in books)
+            {
+                // Calculate actual available quantity based on borrowed books only
+                var borrowedCount = await _context.BorrowRecords
+                    .CountAsync(br => br.BookId == book.Id && br.Status == BorrowStatus.Borrowed);
+
+                // Calculate requested count for statistics
+                var requestedCount = await _context.BorrowRecords
+                    .CountAsync(br => br.BookId == book.Id && br.Status == BorrowStatus.Requested);
+
+                var actualAvailableQuantity = book.Quantity - borrowedCount;
+
+                bookDtos.Add(new BookDto
                 {
-                    Id = b.Id,
-                    Title = b.Title,
-                    Author = b.Author,
-                    ISBN = b.ISBN,
-                    Publisher = b.Publisher,
-                    PublicationYear = b.PublicationYear,
-                    Description = b.Description,
-                    CoverImageUrl = b.CoverImageUrl,
-                    Quantity = b.Quantity,
-                    AvailableQuantity = b.AvailableQuantity,
-                    Language = b.Language,
-                    PageCount = b.PageCount,
-                    AverageRating = (float)b.AverageRating,
-                    RatingCount = b.RatingCount,
-                    Categories = b.BookCategories.Select(bc => new CategoryDto
+                    Id = book.Id,
+                    Title = book.Title,
+                    Author = book.Author,
+                    ISBN = book.ISBN,
+                    Publisher = book.Publisher,
+                    PublicationYear = book.PublicationYear,
+                    Description = book.Description,
+                    CoverImageUrl = book.CoverImageUrl,
+                    Quantity = book.Quantity,
+                    AvailableQuantity = Math.Max(0, actualAvailableQuantity), // Ensure not negative
+                    RequestedCount = requestedCount, // Add requested count for admin view
+                    Language = book.Language,
+                    PageCount = book.PageCount,
+                    AverageRating = (float)book.AverageRating,
+                    RatingCount = book.RatingCount,
+                    Categories = book.BookCategories.Select(bc => new CategoryDto
                     {
                         Id = bc.Category.Id,
                         Name = bc.Category.Name,
@@ -493,7 +521,10 @@ namespace ELibraryManagement.Api.Services.Implementations
                         UpdatedAt = bc.Category.UpdatedAt,
                         BookCount = 0 // Set to 0 for performance, not needed in book context
                     }).ToList()
-                }).ToListAsync();
+                });
+            }
+
+            return bookDtos;
         }
 
         public async Task<IEnumerable<CategoryDto>> GetAllCategoriesAsync()

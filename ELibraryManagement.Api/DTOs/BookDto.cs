@@ -51,6 +51,10 @@ namespace ELibraryManagement.Api.DTOs
         public int AvailableQuantity { get; set; }
 
         [DataMember]
+        [XmlElement("RequestedCount")]
+        public int RequestedCount { get; set; }
+
+        [DataMember]
         [XmlElement("Language")]
         public string? Language { get; set; }
 

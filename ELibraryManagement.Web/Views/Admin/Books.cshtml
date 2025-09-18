@@ -67,6 +67,21 @@
         </div>
     </div>
     <div class="col-md-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <div class="small">Đã đăng ký</div>
+                        <div class="h4 mb-0">@Model.Sum(b => b.RequestedCount)</div>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-clock fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
         <div class="card bg-warning text-white">
             <div class="card-body">
                 <div class="d-flex justify-content-between">
@@ -210,6 +225,10 @@
                                         {
                                             <span class="badge bg-success">Có sẵn</span>
                                         }
+                                        else if (book.RequestedCount > 0)
+                                        {
+                                            <span class="badge bg-primary">Đã đăng ký</span>
+                                        }
                                         else
                                         {
                                             <span class="badge bg-warning">Đang mượn</span>
@@ -218,6 +237,7 @@
                                     <td>
                                         <div class="d-flex flex-column">
                                             <small><strong>Có sẵn:</strong> @book.AvailableQuantity</small>
+                                            <small><strong>Đã đăng ký:</strong> @book.RequestedCount</small>
                                             <small><strong>Tổng:</strong> @book.TotalQuantity</small>
                                         </div>
                                     </td>
@@ -642,7 +662,7 @@
             const formData = new FormData();
             formData.append('file', file);
             formData.append('upload_preset', 'your_upload_preset');
-        
+    
             fetch('https://api.cloudinary.com/v1_1/your_cloud_name/image/upload', {
                 method: 'POST',
                 body: formData
@@ -962,22 +982,22 @@
                     console.error('Status:', xhr.status);
                     console.error('Response Text:', xhr.responseText);
                     $('#bookDetailModal .modal-content').html(`
-                            <div class="modal-header">
-                                <h5 class="modal-title">Chi tiết sách</h5>
-                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                            </div>
-                            <div class="modal-body">
-                                <div class="text-center py-4">
-                                    <i class="fas fa-exclamation-triangle text-danger fa-3x mb-3"></i>
-                                    <h5>Lỗi tải dữ liệu</h5>
-                                    <p class="text-muted">Có lỗi xảy ra khi tải thông tin sách. Status: ${xhr.status}</p>
-                                    <p class="text-muted">Chi tiết: ${xhr.responseText}</p>
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Chi tiết sách</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                 </div>
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                            </div>
-                        `);
+                                <div class="modal-body">
+                                    <div class="text-center py-4">
+                                        <i class="fas fa-exclamation-triangle text-danger fa-3x mb-3"></i>
+                                        <h5>Lỗi tải dữ liệu</h5>
+                                        <p class="text-muted">Có lỗi xảy ra khi tải thông tin sách. Status: ${xhr.status}</p>
+                                        <p class="text-muted">Chi tiết: ${xhr.responseText}</p>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                                </div>
+                            `);
                 }
             });
         }

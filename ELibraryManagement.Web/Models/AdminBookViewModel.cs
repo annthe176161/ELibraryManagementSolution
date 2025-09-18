@@ -12,6 +12,7 @@ namespace ELibraryManagement.Web.Models
         public string ImageUrl { get; set; } = string.Empty;
         public int TotalQuantity { get; set; }
         public int AvailableQuantity { get; set; }
+        public int RequestedCount { get; set; }
         public int BorrowedQuantity => TotalQuantity - AvailableQuantity;
         public string Language { get; set; } = string.Empty;
         public int PageCount { get; set; }

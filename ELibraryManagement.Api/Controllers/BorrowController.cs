@@ -460,5 +460,54 @@ namespace ELibraryManagement.Api.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+
+        /// <summary>
+        /// Admin phê duyệt yêu cầu mượn sách - Chỉ dành cho Admin
+        /// </summary>
+        [HttpPost("approve/{borrowRecordId}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> ApproveBorrowRequest(int borrowRecordId)
+        {
+            try
+            {
+                var borrowRecord = await _context.BorrowRecords
+                    .Include(br => br.Book)
+                    .FirstOrDefaultAsync(br => br.Id == borrowRecordId);
+
+                if (borrowRecord == null)
+                {
+                    return NotFound(new { message = "Không tìm thấy yêu cầu mượn sách." });
+                }
+
+                if (borrowRecord.Status != BorrowStatus.Requested)
+                {
+                    return BadRequest(new { message = "Yêu cầu này đã được xử lý." });
+                }
+
+                // Check if book is still available
+                var currentBorrowedCount = await _context.BorrowRecords
+                    .CountAsync(br => br.BookId == borrowRecord.BookId && br.Status == BorrowStatus.Borrowed);
+
+                if (currentBorrowedCount >= borrowRecord.Book.Quantity)
+                {
+                    return BadRequest(new { message = "Sách không còn khả dụng." });
+                }
+
+                // Update status to Borrowed and decrease available quantity
+                borrowRecord.Status = BorrowStatus.Borrowed;
+                borrowRecord.ConfirmedDate = DateTime.UtcNow;
+
+                // Update book's available quantity
+                borrowRecord.Book.AvailableQuantity--;
+
+                await _context.SaveChangesAsync();
+
+                return Ok(new { message = "Đã phê duyệt yêu cầu mượn sách thành công." });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
     }
 }

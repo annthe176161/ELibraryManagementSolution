@@ -950,6 +950,7 @@ namespace ELibraryManagement.Web.Controllers
                         ImageUrl = dto.CoverImageUrl ?? string.Empty,
                         TotalQuantity = dto.Quantity,
                         AvailableQuantity = dto.AvailableQuantity,
+                        RequestedCount = dto.RequestedCount,
                         Language = dto.Language ?? string.Empty,
                         PageCount = dto.PageCount,
                         AverageRating = (decimal)dto.AverageRating,
@@ -992,6 +993,7 @@ namespace ELibraryManagement.Web.Controllers
                     ViewBag.TotalBooks = books?.Sum(b => b.TotalQuantity) ?? 0;  // Tổng số cuốn sách
                     ViewBag.AvailableBooks = books?.Sum(b => b.AvailableQuantity) ?? 0;  // Tổng số cuốn sách có sẵn
                     ViewBag.BorrowedBooks = books?.Sum(b => b.TotalQuantity - b.AvailableQuantity) ?? 0;  // Tổng số cuốn sách đang được mượn
+                    ViewBag.RequestedBooks = books?.Sum(b => b.RequestedCount) ?? 0;  // Tổng số cuốn sách đã được đăng ký
                     ViewBag.OutOfStockBooks = books?.Count(b => b.AvailableQuantity == 0) ?? 0;  // Số loại sách hết hàng
 
                     return View(books ?? new List<AdminBookViewModel>());
@@ -1110,6 +1112,7 @@ namespace ELibraryManagement.Web.Controllers
                                 ImageUrl = bookDto.CoverImageUrl ?? string.Empty,
                                 TotalQuantity = bookDto.Quantity,
                                 AvailableQuantity = bookDto.AvailableQuantity,
+                                RequestedCount = bookDto.RequestedCount,
                                 Language = bookDto.Language ?? string.Empty,
                                 PageCount = bookDto.PageCount,
                                 AverageRating = (decimal)bookDto.AverageRating,

@@ -12,6 +12,7 @@ namespace ELibraryManagement.Web.Models.DTOs
         public string? CoverImageUrl { get; set; }
         public int Quantity { get; set; }
         public int AvailableQuantity { get; set; }
+        public int RequestedCount { get; set; }
         public string? Language { get; set; }
         public int PageCount { get; set; }
         public float AverageRating { get; set; }
