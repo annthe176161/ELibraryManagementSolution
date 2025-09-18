@@ -12,9 +12,12 @@ namespace ELibraryManagement.Web.Services
         public string BookTitle { get; set; } = string.Empty;
         public string BookAuthor { get; set; } = string.Empty;
         public string BookCoverUrl { get; set; } = string.Empty;
+        public string BookIsbn { get; set; } = string.Empty;
         public string UserId { get; set; } = string.Empty;
         public string UserName { get; set; } = string.Empty;
         public string UserEmail { get; set; } = string.Empty;
+        public string UserPhoneNumber { get; set; } = string.Empty;
+        public string StudentId { get; set; } = string.Empty;
         public DateTime BorrowDate { get; set; }
         public DateTime DueDate { get; set; }
         public DateTime? ReturnDate { get; set; }
@@ -220,13 +223,13 @@ namespace ELibraryManagement.Web.Services
                             UserId = borrowRecordDto.UserId,
                             UserName = borrowRecordDto.UserName,
                             UserEmail = borrowRecordDto.UserEmail,
-                            StudentId = "", // Not available in API response
-                            UserPhoneNumber = "", // Not available in API response
+                            StudentId = borrowRecordDto.StudentId,
+                            UserPhoneNumber = borrowRecordDto.UserPhoneNumber,
                             BookId = borrowRecordDto.BookId,
                             BookTitle = borrowRecordDto.BookTitle,
                             BookAuthor = borrowRecordDto.BookAuthor,
                             BookCoverUrl = borrowRecordDto.BookCoverUrl,
-                            BookIsbn = "", // Not available in API response
+                            BookIsbn = borrowRecordDto.BookIsbn,
                             BorrowDate = borrowRecordDto.BorrowDate,
                             DueDate = borrowRecordDto.DueDate,
                             ReturnDate = borrowRecordDto.ReturnDate,

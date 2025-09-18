@@ -35,9 +35,12 @@ namespace ELibraryManagement.Api.DTOs
         public string BookTitle { get; set; } = string.Empty;
         public string BookAuthor { get; set; } = string.Empty;
         public string BookCoverUrl { get; set; } = string.Empty;
+        public string BookIsbn { get; set; } = string.Empty;
         public string UserId { get; set; } = string.Empty;
         public string UserName { get; set; } = string.Empty;
         public string UserEmail { get; set; } = string.Empty;
+        public string UserPhoneNumber { get; set; } = string.Empty;
+        public string StudentId { get; set; } = string.Empty;
         public DateTime BorrowDate { get; set; }
         public DateTime DueDate { get; set; }
         public DateTime? ReturnDate { get; set; }

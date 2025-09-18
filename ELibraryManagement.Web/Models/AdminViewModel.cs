@@ -45,7 +45,7 @@ namespace ELibraryManagement.Web.Models
         public int OverdueDays => IsOverdue ? (DateTimeHelper.VietnamNow() - DueDate).Days : 0;
         public string StatusDisplay => Status switch
         {
-            "Requested" => "Chờ duyệt",
+            "Requested" => "Đã đăng ký",
             "Borrowed" => "Đang mượn",
             "Returned" => "Đã trả",
             "Cancelled" => "Đã hủy",
@@ -90,7 +90,7 @@ namespace ELibraryManagement.Web.Models
         public int OverdueDays => IsOverdue ? (DateTimeHelper.VietnamNow() - DueDate).Days : 0;
         public string StatusDisplay => Status switch
         {
-            "Requested" => "Chờ duyệt",
+            "Requested" => "Đã đăng ký",
             "Borrowed" => "Đang mượn",
             "Returned" => "Đã trả",
             "Cancelled" => "Đã hủy",

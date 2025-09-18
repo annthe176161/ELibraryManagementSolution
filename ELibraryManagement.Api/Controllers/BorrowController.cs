@@ -179,7 +179,7 @@ namespace ELibraryManagement.Api.Controllers
                     Value = status.ToString(),
                     DisplayName = status switch
                     {
-                        BorrowStatus.Requested => "Chờ duyệt",
+                        BorrowStatus.Requested => "Đã đăng ký",
                         BorrowStatus.Borrowed => "Đang mượn",
                         BorrowStatus.Returned => "Đã trả",
                         BorrowStatus.Lost => "Mất sách",
@@ -195,7 +195,7 @@ namespace ELibraryManagement.Api.Controllers
                     currentStatus = borrowRecord.Status.ToString(),
                     currentStatusDisplay = borrowRecord.Status switch
                     {
-                        BorrowStatus.Requested => "Chờ duyệt",
+                        BorrowStatus.Requested => "Đã đăng ký",
                         BorrowStatus.Borrowed => "Đang mượn",
                         BorrowStatus.Returned => "Đã trả",
                         BorrowStatus.Lost => "Mất sách",

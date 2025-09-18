@@ -94,7 +94,7 @@ namespace ELibraryManagement.Api.Services.Implementations
         {
             return status switch
             {
-                BorrowStatus.Requested => "Chờ duyệt",
+                BorrowStatus.Requested => "Đã đăng ký",
                 BorrowStatus.Borrowed => "Đang mượn",
                 BorrowStatus.Returned => "Đã trả",
                 BorrowStatus.Lost => "Mất sách",

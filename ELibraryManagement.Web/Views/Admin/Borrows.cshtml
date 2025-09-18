@@ -350,6 +350,36 @@
             </div>
         </div>
     </div>
+</div>
+
+<!-- Status Update Confirmation Modal -->
+<div class="modal fade" id="statusUpdateModal" tabindex="-1" aria-labelledby="statusUpdateModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="statusUpdateModalLabel">Xác nhận cập nhật trạng thái</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>Lưu ý:</strong> Thao tác này có thể không thể hoàn tác.
+                </div>
+                <div id="statusUpdateDetails">
+                    <!-- Will be populated dynamically -->
+                </div>
+                <div class="mt-3">
+                    <label for="statusUpdateNotes" class="form-label">Ghi chú (tùy chọn):</label>
+                    <textarea class="form-control" id="statusUpdateNotes" rows="3" placeholder="Nhập ghi chú về thay đổi trạng thái này..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-primary" id="confirmStatusUpdate">Xác nhận cập nhật</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 @section Scripts {
     <script>
@@ -391,6 +421,7 @@
         });
 
         let currentBorrowId = null;
+        let currentStatusUpdate = null; // For storing status update information
 
         function viewBorrow(borrowId) {
             // Show borrow details in modal
@@ -441,13 +472,13 @@
                                 <div class="col-12">
                                     <h6>Cập nhật trạng thái</h6>
                                     <div class="btn-group" role="group">
-                                        <button type="button" class="btn btn-success btn-sm" onclick="updateBorrowStatus(${data.id}, 'Returned')">
+                                        <button type="button" class="btn btn-success btn-sm" onclick="confirmUpdateBorrowStatus(${data.id}, 'Returned', '${data.userName.replace(/'/g, "\\'")}', '${data.bookTitle.replace(/'/g, "\\'")}')">
                                             <i class="bi bi-check-circle"></i> Đã trả
                                         </button>
-                                        <button type="button" class="btn btn-warning btn-sm" onclick="updateBorrowStatus(${data.id}, 'Overdue')">
+                                        <button type="button" class="btn btn-warning btn-sm" onclick="confirmUpdateBorrowStatus(${data.id}, 'Overdue', '${data.userName.replace(/'/g, "\\'")}', '${data.bookTitle.replace(/'/g, "\\'")}')">
                                             <i class="bi bi-exclamation-triangle"></i> Quá hạn
                                         </button>
-                                        <button type="button" class="btn btn-primary btn-sm" onclick="updateBorrowStatus(${data.id}, 'Borrowed')">
+                                        <button type="button" class="btn btn-primary btn-sm" onclick="confirmUpdateBorrowStatus(${data.id}, 'Borrowed', '${data.userName.replace(/'/g, "\\'")}', '${data.bookTitle.replace(/'/g, "\\'")}')">
                                             <i class="bi bi-book"></i> Đang mượn
                                         </button>
                                     </div>
@@ -582,6 +613,70 @@
                 });
             }
         }
+
+        // Status update confirmation function
+        function confirmUpdateBorrowStatus(borrowId, status, userName, bookTitle) {
+            currentStatusUpdate = {
+                borrowId: borrowId,
+                status: status,
+                userName: userName,
+                bookTitle: bookTitle
+            };
+
+            const statusDisplayMap = {
+                'Requested': 'Đã đăng ký',
+                'Borrowed': 'Đang mượn', 
+                'Returned': 'Đã trả',
+                'Cancelled': 'Đã hủy',
+                'Lost': 'Mất sách',
+                'Damaged': 'Hư hỏng',
+                'Overdue': 'Quá hạn'
+            };
+
+            const statusDisplay = statusDisplayMap[status] || status;
+            const statusColor = {
+                'Returned': 'success',
+                'Borrowed': 'primary', 
+                'Overdue': 'warning',
+                'Cancelled': 'danger',
+                'Lost': 'dark',
+                'Damaged': 'dark'
+            }[status] || 'secondary';
+
+            $('#statusUpdateDetails').html(`
+                <div class="row">
+                    <div class="col-12">
+                        <div class="card border-0 bg-light">
+                            <div class="card-body">
+                                <h6 class="card-title">Thông tin giao dịch</h6>
+                                <p class="mb-1"><strong>Người mượn:</strong> ${userName}</p>
+                                <p class="mb-1"><strong>Sách:</strong> ${bookTitle}</p>
+                                <p class="mb-0"><strong>Trạng thái mới:</strong> <span class="badge bg-${statusColor}">${statusDisplay}</span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="alert alert-warning mt-3">
+                    <strong>Xác nhận:</strong> Bạn có chắc chắn muốn cập nhật trạng thái thành <strong>"${statusDisplay}"</strong>?
+                </div>
+            `);
+
+            // Clear previous notes
+            $('#statusUpdateNotes').val('');
+            
+            // Show modal
+            $('#statusUpdateModal').modal('show');
+        }
+
+        // Handle status update confirmation
+        $('#confirmStatusUpdate').on('click', function() {
+            if (currentStatusUpdate) {
+                const notes = $('#statusUpdateNotes').val().trim();
+                $('#statusUpdateModal').modal('hide');
+                updateBorrowStatus(currentStatusUpdate.borrowId, currentStatusUpdate.status, notes);
+                currentStatusUpdate = null;
+            }
+        });
 
         // Enhanced status update function with better error handling
         function updateBorrowStatus(borrowId, status, notes = '') {
