@@ -719,19 +719,19 @@
         .borrow-header h2 {
             font-size: 1.5rem;
         }
-        
+
         .student-info-grid {
             grid-template-columns: 1fr;
         }
-        
+
         .guidelines-grid {
             grid-template-columns: 1fr;
         }
-        
+
         .terms-grid {
             grid-template-columns: 1fr;
         }
-        
+
         .student-info-header {
             flex-direction: column;
             gap: 1rem;
@@ -830,31 +830,37 @@
                             var maxAllowed = ViewBag.MaxBooksAllowed ?? 5;
                             var remaining = maxAllowed - currentCount;
                             var canBorrow = ViewBag.CanBorrow ?? true;
-                            var borrowedBooks = ViewBag.BorrowedBooks as List<ELibraryManagement.Web.Models.UserBorrowedBookViewModel>;
-                            
+                            var borrowedBooks = ViewBag.BorrowedBooks as
+                            List<ELibraryManagement.Web.Models.UserBorrowedBookViewModel>;
+
                             string sectionClass = "";
                             string titleClass = "";
                             string progressClass = "";
-                            
-                            if (currentCount >= maxAllowed) {
+
+                            if (currentCount >= maxAllowed)
+                            {
                                 sectionClass = "danger";
                                 titleClass = "danger";
                                 progressClass = "danger";
-                            } else if (currentCount >= maxAllowed - 1) {
+                            }
+                            else if (currentCount >= maxAllowed - 1)
+                            {
                                 sectionClass = "warning";
                                 titleClass = "warning";
                                 progressClass = "warning";
-                            } else {
+                            }
+                            else
+                            {
                                 progressClass = "safe";
                             }
                         }
-                        
+
                         <div class="borrow-limit-section @sectionClass">
                             <h5 class="borrow-limit-title @titleClass">
                                 <i class="fas fa-books"></i>
                                 Thông tin sách đã mượn
                             </h5>
-                            
+
                             <div class="borrow-stats">
                                 <div class="stat-item">
                                     <div class="stat-number current">@currentCount</div>
@@ -865,25 +871,31 @@
                                     <div class="stat-label">Tối đa</div>
                                 </div>
                                 <div class="stat-item">
-                                    <div class="stat-number @(remaining <= 0 ? "danger" : remaining == 1 ? "warning" : "remaining")">@Math.Max(0, remaining)</div>
+                                    <div
+                                        class="stat-number @(remaining <= 0 ? "danger" : remaining == 1 ? "warning" : "remaining")">
+                                        @Math.Max(0, remaining)</div>
                                     <div class="stat-label">Còn lại</div>
                                 </div>
                             </div>
-                            
+
                             <div class="borrow-progress">
                                 <div class="progress-bar-container">
-                                    <div class="progress-bar-fill @progressClass" style="width: @((currentCount * 100.0 / maxAllowed).ToString("F1", System.Globalization.CultureInfo.InvariantCulture))%"></div>
+                                    <div class="progress-bar-fill @progressClass"
+                                        style="width: @((currentCount * 100.0 / maxAllowed).ToString("F1", System.Globalization.CultureInfo.InvariantCulture))%">
+                                    </div>
                                 </div>
                                 <div class="progress-text">
                                     <span>Đã sử dụng: @currentCount/@maxAllowed</span>
                                     <span>@((currentCount * 100.0 / maxAllowed).ToString("F1"))%</span>
                                 </div>
                             </div>
-                            
+
                             @if (borrowedBooks != null && borrowedBooks.Any())
                             {
                                 <div class="borrowed-books-list">
-                                    <h6 style="margin-bottom: 0.75rem; color: #374151; font-size: 0.9rem; font-weight: 600;">Danh sách sách đã mượn:</h6>
+                                    <h6
+                                        style="margin-bottom: 0.75rem; color: #374151; font-size: 0.9rem; font-weight: 600;">
+                                        Danh sách sách đã mượn:</h6>
                                     @foreach (var book in borrowedBooks.Take(5))
                                     {
                                         <div class="borrowed-book-item">
@@ -898,13 +910,14 @@
                                     }
                                 </div>
                             }
-                            
+
                             @if (!canBorrow)
                             {
                                 <div class="warning-message danger">
                                     <i class="fas fa-exclamation-triangle"></i>
                                     <div class="warning-text danger">
-                                        Bạn đã mượn đủ @maxAllowed quyển sách (tối đa cho phép). Vui lòng trả sách trước khi mượn thêm.
+                                        Bạn đã mượn đủ @maxAllowed quyển sách (tối đa cho phép). Vui lòng trả sách trước khi
+                                        mượn thêm.
                                     </div>
                                 </div>
                             }
@@ -979,7 +992,7 @@
                                     <h6><i class="fas fa-money-bill-wave"></i>Phí dịch vụ</h6>
                                     <ul>
                                         <li>Mượn sách: <strong>Miễn phí</strong></li>
-                                        <li>Phí trễ hạn: <strong>2,000đ/ngày/cuốn</strong></li>
+                                        <li>Phí trễ hạn: <strong>5,000đ/ngày/cuốn</strong></li>
                                         <li>Phí làm mất sách: <strong>150% giá sách</strong></li>
                                     </ul>
                                 </div>
@@ -1049,7 +1062,8 @@
                                         <i class="fas fa-hand-holding-heart text-primary"></i>
                                         <div>
                                             <strong>Bảo quản sách tốt</strong>
-                                            <p>Cam kết không làm hỏng, tô vẽ, xé trang hoặc làm mất sách. Sử dụng sách cẩn thận và giữ gìn như tài sản của trường.</p>
+                                            <p>Cam kết không làm hỏng, tô vẽ, xé trang hoặc làm mất sách. Sử dụng sách
+                                                cẩn thận và giữ gìn như tài sản của trường.</p>
                                         </div>
                                     </div>
                                     <div class="term-item">
@@ -1063,14 +1077,16 @@
                                         <i class="fas fa-user-shield text-info"></i>
                                         <div>
                                             <strong>Sử dụng cá nhân</strong>
-                                            <p>Chỉ sinh viên mượn được sử dụng. Không được cho mượn lại, sao chép toàn bộ hoặc sử dụng vào mục đích thương mại.</p>
+                                            <p>Chỉ sinh viên mượn được sử dụng. Không được cho mượn lại, sao chép toàn
+                                                bộ hoặc sử dụng vào mục đích thương mại.</p>
                                         </div>
                                     </div>
                                     <div class="term-item">
                                         <i class="fas fa-exclamation-triangle text-warning"></i>
                                         <div>
                                             <strong>Chịu trách nhiệm</strong>
-                                            <p>Bồi thường 100% giá trị sách nếu làm mất. Thanh toán phí phạt nếu trả trễ theo quy định của thư viện.</p>
+                                            <p>Bồi thường 100% giá trị sách nếu làm mất. Thanh toán phí phạt nếu trả trễ
+                                                theo quy định của thư viện.</p>
                                         </div>
                                     </div>
                                 </div>
@@ -1079,7 +1095,10 @@
                                     <div class="form-check">
                                         <input class="form-check-input" type="checkbox" id="agreeTerms" required>
                                         <label class="form-check-label" for="agreeTerms">
-                                            <strong>Tôi đã đọc, hiểu và đồng ý với tất cả các quy định mượn sách của thư viện. Cam kết bảo quản sách tốt, trả đúng hạn, chịu trách nhiệm về sách đã mượn và thanh toán phí phạt nếu vi phạm quy định. Xác nhận thông tin cá nhân trên là chính xác và cập nhật.</strong>
+                                            <strong>Tôi đã đọc, hiểu và đồng ý với tất cả các quy định mượn sách của thư
+                                                viện. Cam kết bảo quản sách tốt, trả đúng hạn, chịu trách nhiệm về sách
+                                                đã mượn và thanh toán phí phạt nếu vi phạm quy định. Xác nhận thông tin
+                                                cá nhân trên là chính xác và cập nhật.</strong>
                                         </label>
                                     </div>
                                 </div>
@@ -1108,7 +1127,7 @@
 <script>
     document.addEventListener('DOMContentLoaded', function () {
         const dueDateInput = document.querySelector('input[name="DueDate"]');
-        
+
         // Auto-set due date to 14 days from today if not set
         if (dueDateInput && !dueDateInput.value) {
             const defaultDate = new Date();
@@ -1119,7 +1138,7 @@
         // Form validation for checkboxes
         const submitButton = document.querySelector('button[type="submit"]');
         const checkboxes = document.querySelectorAll('input[type="checkbox"][required]');
-        
+
         function validateForm() {
             let allChecked = true;
             checkboxes.forEach(checkbox => {
@@ -1127,7 +1146,7 @@
                     allChecked = false;
                 }
             });
-            
+
             submitButton.disabled = !allChecked;
             if (allChecked) {
                 submitButton.classList.remove('btn-secondary');
@@ -1141,17 +1160,17 @@
         checkboxes.forEach(checkbox => {
             checkbox.addEventListener('change', validateForm);
         });
-        
+
         // Initial validation
         validateForm();
 
         // Smooth animations for cards
         const cards = document.querySelectorAll('.info-item, .guideline-card, .term-item');
         cards.forEach(card => {
-            card.addEventListener('mouseenter', function() {
+            card.addEventListener('mouseenter', function () {
                 this.style.transform = 'translateY(-3px)';
             });
-            card.addEventListener('mouseleave', function() {
+            card.addEventListener('mouseleave', function () {
                 this.style.transform = 'translateY(0)';
             });
         });
