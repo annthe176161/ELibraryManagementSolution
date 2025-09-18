@@ -5,11 +5,15 @@ namespace ELibraryManagement.Web.Models
     public class AdminDashboardViewModel
     {
         public int TotalUsers { get; set; }
+        public int TotalStudents { get; set; } // Chỉ sinh viên, không tính admin
         public int TotalBooks { get; set; }
         public int TotalBorrows { get; set; }
+        public int ActiveBorrows { get; set; } // Sách đang được mượn thực sự
+        public int RequestedBorrows { get; set; } // Sách đã đăng ký mượn
+        public int ReturnedBorrows { get; set; } // Sách đã trả
+        public int CancelledBorrows { get; set; } // Sách đã hủy
+        public int OverdueBorrows { get; set; } // Sách quá hạn
         public int TotalReviews { get; set; }
-        public int ActiveBorrows { get; set; }
-        public int OverdueBorrows { get; set; }
         public List<RecentActivityViewModel> RecentActivities { get; set; } = new();
     }
 

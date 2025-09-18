@@ -93,7 +93,7 @@ namespace ELibraryManagement.Web.Controllers
                 // Get dashboard statistics
                 var dashboardData = new AdminDashboardViewModel();
 
-                // Get total users count
+                // Get total users count (all users)
                 try
                 {
                     var usersResponse = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/User");
@@ -102,15 +102,19 @@ namespace ELibraryManagement.Web.Controllers
                         var usersContent = await usersResponse.Content.ReadAsStringAsync();
                         var users = JsonSerializer.Deserialize<List<AdminUserViewModel>>(usersContent, _jsonOptions);
                         dashboardData.TotalUsers = users?.Count ?? 0;
+                        // Count only students (exclude admins)
+                        dashboardData.TotalStudents = users?.Count(u => !u.Roles.Contains("Admin")) ?? 0;
                     }
                     else
                     {
                         dashboardData.TotalUsers = 0;
+                        dashboardData.TotalStudents = 0;
                     }
                 }
                 catch (Exception)
                 {
                     dashboardData.TotalUsers = 0;
+                    dashboardData.TotalStudents = 0;
                 }
 
                 // Get total books count
@@ -133,24 +137,52 @@ namespace ELibraryManagement.Web.Controllers
                     dashboardData.TotalBooks = 0;
                 }
 
-                // Get total borrow records count
+                // Get borrow records statistics
                 try
                 {
                     var borrowsResponse = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Borrow/admin/all");
                     if (borrowsResponse.IsSuccessStatusCode)
                     {
                         var borrowsContent = await borrowsResponse.Content.ReadAsStringAsync();
-                        var borrows = JsonSerializer.Deserialize<List<object>>(borrowsContent, _jsonOptions);
-                        dashboardData.TotalBorrows = borrows?.Count ?? 0;
+                        var borrows = JsonSerializer.Deserialize<List<BorrowRecordViewModel>>(borrowsContent, _jsonOptions);
+
+                        if (borrows != null)
+                        {
+                            dashboardData.TotalBorrows = borrows.Count;
+                            dashboardData.ActiveBorrows = borrows.Count(b => b.Status == "Borrowed");
+                            dashboardData.RequestedBorrows = borrows.Count(b => b.Status == "Requested");
+                            dashboardData.ReturnedBorrows = borrows.Count(b => b.Status == "Returned");
+                            dashboardData.CancelledBorrows = borrows.Count(b => b.Status == "Cancelled");
+                            dashboardData.OverdueBorrows = borrows.Count(b => b.IsOverdue);
+                        }
+                        else
+                        {
+                            dashboardData.TotalBorrows = 0;
+                            dashboardData.ActiveBorrows = 0;
+                            dashboardData.RequestedBorrows = 0;
+                            dashboardData.ReturnedBorrows = 0;
+                            dashboardData.CancelledBorrows = 0;
+                            dashboardData.OverdueBorrows = 0;
+                        }
                     }
                     else
                     {
                         dashboardData.TotalBorrows = 0;
+                        dashboardData.ActiveBorrows = 0;
+                        dashboardData.RequestedBorrows = 0;
+                        dashboardData.ReturnedBorrows = 0;
+                        dashboardData.CancelledBorrows = 0;
+                        dashboardData.OverdueBorrows = 0;
                     }
                 }
                 catch (Exception)
                 {
                     dashboardData.TotalBorrows = 0;
+                    dashboardData.ActiveBorrows = 0;
+                    dashboardData.RequestedBorrows = 0;
+                    dashboardData.ReturnedBorrows = 0;
+                    dashboardData.CancelledBorrows = 0;
+                    dashboardData.OverdueBorrows = 0;
                 }
 
                 // Get total reviews count
