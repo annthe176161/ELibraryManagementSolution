@@ -40,7 +40,7 @@
                                             }
                                             else
                                             {
-                                                <text>Ngày mượn: @book.BorrowDate.ToString("dd/MM/yyyy")</text>
+                                                <text>Ngày mượn: @(book.ConfirmedDate.HasValue ? book.ConfirmedDate.Value.ToString("dd/MM/yyyy") : book.BorrowDate.ToString("dd/MM/yyyy"))</text>
                                             }
                                         </small>
                                     </div>

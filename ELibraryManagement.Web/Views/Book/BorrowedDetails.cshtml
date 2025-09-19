@@ -321,9 +321,20 @@
 
                         var returnDate = Model.BorrowRecord.ReturnDate;
 
-                        var borrowDuration = returnDate.HasValue
-                        ? (returnDate.Value - displayBorrowDate).Days
-                        : (DateTime.Now - displayBorrowDate).Days;
+                        // Use Vietnam timezone consistently for duration calculations
+                        var nowVn = ELibraryManagement.Web.Helpers.DateTimeHelper.VietnamNow();
+                        var displayBorrowDateVn = displayBorrowDate.ToVietnamTime();
+
+                        // borrowDuration: days between borrow start and return (or now). If borrow hasn't started yet, show 0 days.
+                        var borrowDuration = 0;
+                        if (returnDate.HasValue)
+                        {
+                            borrowDuration = (returnDate.Value.ToVietnamTime().Date - displayBorrowDateVn.Date).Days;
+                        }
+                        else
+                        {
+                            borrowDuration = nowVn.Date < displayBorrowDateVn.Date ? 0 : (nowVn.Date - displayBorrowDateVn.Date).Days;
+                        }
                     }
                     <div class="detail-item">
                         <div class="detail-label">
@@ -385,7 +396,7 @@
                                 <i class="fas fa-clock text-info"></i>
                                 Thời gian mượn
                             </div>
-                            <div class="detail-value">
+                                <div class="detail-value">
                                 @borrowDuration ngày
                             </div>
                         </div>
@@ -406,9 +417,11 @@
                                 }
                                 else
                                 {
-                                    var daysLeft = (Model.BorrowRecord.DueDate.ToVietnamTime().Date -
-                                    ELibraryManagement.Web.Helpers.DateTimeHelper.VietnamNow().Date).Days;
-                                    <span class="text-success">@daysLeft ngày</span>
+                        var dueVn = Model.BorrowRecord.DueDate.ToVietnamTime().Date;
+                        var todayVn = ELibraryManagement.Web.Helpers.DateTimeHelper.VietnamNow().Date;
+                        var daysLeft = (dueVn - todayVn).Days;
+                        if (daysLeft < 0) daysLeft = 0;
+                        <span class="text-success">@daysLeft ngày</span>
                                 }
                             </div>
                         </div>

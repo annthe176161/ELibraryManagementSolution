@@ -451,6 +451,7 @@ namespace ELibraryManagement.Api.Controllers
                     bookAuthor = br.Book.Author,
                     bookCoverUrl = br.Book.CoverImageUrl,
                     borrowDate = br.BorrowDate,
+                    confirmedDate = br.ConfirmedDate,
                     dueDate = br.DueDate,
                     returnDate = br.ReturnDate,
                     status = br.Status.ToString(),
