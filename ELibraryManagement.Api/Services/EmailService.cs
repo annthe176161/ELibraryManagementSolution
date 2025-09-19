@@ -20,20 +20,31 @@ namespace ELibraryManagement.Api.Services
             {
                 var emailSettings = _configuration.GetSection("EmailSettings");
 
+                var fromEmail = emailSettings["FromEmail"];
+                var username = emailSettings["Username"];
+                var password = emailSettings["Password"];
+
+                _logger.LogInformation("Attempting to send email to {toEmail} with subject: {subject}", toEmail, subject);
+                _logger.LogInformation("Email settings - FromEmail: {fromEmail}, Username: {username}, Password: {hasPassword}",
+                    fromEmail, username, !string.IsNullOrEmpty(password) ? "***" : "EMPTY");
+
+                if (string.IsNullOrEmpty(fromEmail) || string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
+                {
+                    _logger.LogError("Email configuration is incomplete. FromEmail, Username, and Password must be provided.");
+                    return false;
+                }
+
                 var smtpClient = new SmtpClient(emailSettings["SmtpServer"])
                 {
                     Port = int.Parse(emailSettings["SmtpPort"] ?? "587"),
-                    Credentials = new NetworkCredential(
-                        emailSettings["Username"],
-                        emailSettings["Password"]
-                    ),
+                    Credentials = new NetworkCredential(username, password),
                     EnableSsl = bool.Parse(emailSettings["EnableSsl"] ?? "true")
                 };
 
                 var mailMessage = new MailMessage
                 {
                     From = new MailAddress(
-                        emailSettings["FromEmail"] ?? emailSettings["Username"],
+                        fromEmail,
                         emailSettings["FromName"]
                     ),
                     Subject = subject,

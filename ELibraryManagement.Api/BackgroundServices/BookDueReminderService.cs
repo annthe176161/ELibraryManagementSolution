@@ -68,7 +68,10 @@ namespace ELibraryManagement.Api.BackgroundServices
             var vietnamNow = TimeZoneInfo.ConvertTimeFromUtc(nowUtc, vietnamTz!);
             var vietnamToday = vietnamNow.Date;
             var vietnamOneDay = vietnamToday.AddDays(1);
+            var vietnamTwoDay = vietnamToday.AddDays(2);
             var vietnamThreeDays = vietnamToday.AddDays(3);
+
+            _logger.LogInformation("Vietnam time now: {vietnamNow}, today: {vietnamToday}", vietnamNow, vietnamToday);
 
             // Convert Vietnam local-day boundaries back to UTC so EF query can compare UTC DueDate columns in SQL.
             DateTime startTodayUtc = TimeZoneInfo.ConvertTimeToUtc(vietnamToday, vietnamTz!);
@@ -77,11 +80,14 @@ namespace ELibraryManagement.Api.BackgroundServices
             DateTime startOneDayUtc = TimeZoneInfo.ConvertTimeToUtc(vietnamOneDay, vietnamTz!);
             DateTime endOneDayUtc = startOneDayUtc.AddDays(1);
 
+            DateTime startTwoDayUtc = TimeZoneInfo.ConvertTimeToUtc(vietnamTwoDay, vietnamTz!);
+            DateTime endTwoDayUtc = startTwoDayUtc.AddDays(1);
+
             DateTime startThreeDayUtc = TimeZoneInfo.ConvertTimeToUtc(vietnamThreeDays, vietnamTz!);
             DateTime endThreeDayUtc = startThreeDayUtc.AddDays(1);
 
             // Chỉ lấy những bản ghi có trạng thái Borrowed, chưa trả, DueDate vẫn còn lớn hơn giờ UTC hiện tại (không quá hạn),
-            // và có DueDate thuộc một trong các ngày mục tiêu theo ngày Việt Nam (3 ngày, 1 ngày, hôm nay)
+            // và có DueDate thuộc một trong các ngày mục tiêu theo ngày Việt Nam (3 ngày, 2 ngày, 1 ngày, hôm nay)
             var borrowsNearingDue = await context.BorrowRecords
                 .Include(br => br.User)
                 .Include(br => br.Book)
@@ -89,9 +95,12 @@ namespace ELibraryManagement.Api.BackgroundServices
                              && br.ReturnDate == null
                              && br.DueDate > nowUtc
                              && ((br.DueDate >= startThreeDayUtc && br.DueDate < endThreeDayUtc)
+                                 || (br.DueDate >= startTwoDayUtc && br.DueDate < endTwoDayUtc)
                                  || (br.DueDate >= startOneDayUtc && br.DueDate < endOneDayUtc)
                                  || (br.DueDate >= startTodayUtc && br.DueDate < endTodayUtc)))
                 .ToListAsync();
+
+            _logger.LogInformation("Found {count} borrows nearing due date", borrowsNearingDue.Count);
 
             foreach (var borrow in borrowsNearingDue)
             {
@@ -130,6 +139,10 @@ namespace ELibraryManagement.Api.BackgroundServices
                     // Tính daysLeft theo ngày Việt Nam: convert due date (UTC) -> Vietnam local date
                     var dueInVietnam = TimeZoneInfo.ConvertTimeFromUtc(borrow.DueDate, vietnamTz).Date;
                     var daysLeft = (dueInVietnam - vietnamToday).Days;
+
+                    _logger.LogInformation("Processing borrow {borrowId}: DueDate={dueDate}, DueInVietnam={dueInVietnam}, DaysLeft={daysLeft}",
+                        borrow.Id, borrow.DueDate, dueInVietnam, daysLeft);
+
                     // Ensure required related data exists
                     if (borrow.User == null || string.IsNullOrWhiteSpace(borrow.User.Email) || borrow.Book == null || string.IsNullOrWhiteSpace(borrow.Book.Title))
                     {
