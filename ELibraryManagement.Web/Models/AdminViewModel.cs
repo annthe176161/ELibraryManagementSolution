@@ -36,6 +36,7 @@ namespace ELibraryManagement.Web.Models
         public string BookAuthor { get; set; } = "";
         public string BookCoverUrl { get; set; } = "";
         public DateTime BorrowDate { get; set; }
+        public DateTime? ConfirmedDate { get; set; }
         public DateTime DueDate { get; set; }
         public DateTime? ReturnDate { get; set; }
         public string Status { get; set; } = "";
@@ -81,6 +82,7 @@ namespace ELibraryManagement.Web.Models
         public string BookCoverUrl { get; set; } = "";
         public string BookIsbn { get; set; } = "";
         public DateTime BorrowDate { get; set; }
+        public DateTime? ConfirmedDate { get; set; }
         public DateTime DueDate { get; set; }
         public DateTime? ReturnDate { get; set; }
         public string Status { get; set; } = "";

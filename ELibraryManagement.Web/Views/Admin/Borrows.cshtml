@@ -155,7 +155,7 @@
                                 <tr>
                                     <th scope="col">Người mượn</th>
                                     <th scope="col">Sách</th>
-                                    <th scope="col">Ngày mượn</th>
+                                    <th scope="col">Ngày yêu cầu/Ngày mượn</th>
                                     <th scope="col">Hạn trả</th>
                                     <th scope="col">Ngày trả</th>
                                     <th scope="col">Trạng thái</th>
@@ -185,7 +185,20 @@
                                             </div>
                                         </td>
                                         <td>
-                                            <small>@borrow.BorrowDate.ToString("dd/MM/yyyy")</small>
+                                            @if (borrow.Status == "Requested")
+                                            {
+                                                <div>
+                                                    <small class="text-primary fw-bold">Ngày yêu cầu:</small><br>
+                                                    <small>@borrow.BorrowDate.ToString("dd/MM/yyyy")</small>
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div>
+                                                    <small class="text-success fw-bold">Ngày mượn:</small><br>
+                                                    <small>@(borrow.ConfirmedDate.HasValue ? borrow.ConfirmedDate.Value.ToString("dd/MM/yyyy") : borrow.BorrowDate.ToString("dd/MM/yyyy"))</small>
+                                                </div>
+                                            }
                                         </td>
                                         <td>
                                             <small class="@(borrow.IsOverdue ? "text-danger fw-bold" : "")">
@@ -436,35 +449,64 @@
                 type: 'GET',
                 success: function(response) {
                     if (response.success && response.data) {
-                        const data = response.data;
+                        // Normalize property names coming from server (support camelCase and PascalCase)
+                        const raw = response.data;
+                        const data = {
+                            Id: raw.Id ?? raw.id,
+                            UserName: raw.UserName || raw.userName || '',
+                            UserEmail: raw.UserEmail || raw.userEmail || '',
+                            StudentId: raw.StudentId || raw.studentId || '',
+                            UserPhoneNumber: raw.UserPhoneNumber || raw.userPhoneNumber || '',
+                            BookTitle: raw.BookTitle || raw.bookTitle || '',
+                            BookAuthor: raw.BookAuthor || raw.bookAuthor || '',
+                            BookIsbn: raw.BookIsbn || raw.bookIsbn || '',
+                            BookCoverUrl: raw.BookCoverUrl || raw.bookCoverUrl || '',
+                            BorrowDate: raw.BorrowDate || raw.borrowDate || null,
+                            ConfirmedDate: raw.ConfirmedDate || raw.confirmedDate || null,
+                            DueDate: raw.DueDate || raw.dueDate || null,
+                            ReturnDate: raw.ReturnDate || raw.returnDate || null,
+                            Status: raw.Status || raw.status || '',
+                            Notes: raw.Notes || raw.notes || '',
+                            FineAmount: raw.FineAmount ?? raw.fineAmount ?? null,
+                            IsOverdue: raw.IsOverdue ?? raw.isOverdue ?? false,
+                            OverdueDays: raw.OverdueDays ?? raw.overdueDays ?? 0,
+                            StatusDisplay: raw.StatusDisplay || raw.statusDisplay || '',
+                            StatusClass: raw.StatusClass || raw.statusClass || '',
+                            FormattedBorrowDate: raw.FormattedBorrowDate || raw.formattedBorrowDate || (raw.BorrowDate || raw.borrowDate ? new Date(raw.BorrowDate || raw.borrowDate).toLocaleString('vi-VN', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit', year: 'numeric' }) : ''),
+                            FormattedDueDate: raw.FormattedDueDate || raw.formattedDueDate || (raw.DueDate || raw.dueDate ? new Date(raw.DueDate || raw.dueDate).toLocaleDateString('vi-VN') : ''),
+                            FormattedReturnDate: raw.FormattedReturnDate || raw.formattedReturnDate || (raw.ReturnDate || raw.returnDate ? new Date(raw.ReturnDate || raw.returnDate).toLocaleString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : '')
+                        };
                         $('#borrowDetails').html(`
                             <div class="row">
                                 <div class="col-md-6">
                                     <h6>Thông tin người mượn</h6>
-                                    <p><strong>Họ tên:</strong> ${data.userName || 'Không có thông tin'}</p>
-                                    <p><strong>Email:</strong> ${data.userEmail || 'Không có thông tin'}</p>
-                                    <p><strong>Mã sinh viên:</strong> ${data.studentId || 'Không có thông tin'}</p>
-                                    <p><strong>Số điện thoại:</strong> ${data.userPhoneNumber || 'Không có thông tin'}</p>
+                                    <p><strong>Họ tên:</strong> ${data.UserName || 'Không có thông tin'}</p>
+                                    <p><strong>Email:</strong> ${data.UserEmail || 'Không có thông tin'}</p>
+                                    <p><strong>Mã sinh viên:</strong> ${data.StudentId || 'Không có thông tin'}</p>
+                                    <p><strong>Số điện thoại:</strong> ${data.UserPhoneNumber || 'Không có thông tin'}</p>
                                 </div>
                                 <div class="col-md-6">
                                     <h6>Thông tin sách</h6>
-                                    <p><strong>Tên sách:</strong> ${data.bookTitle || 'Không có thông tin'}</p>
-                                    <p><strong>Tác giả:</strong> ${data.bookAuthor || 'Không có thông tin'}</p>
-                                    <p><strong>ISBN:</strong> ${data.bookIsbn || 'Không có thông tin'}</p>
-                                    ${data.bookCoverUrl ? `<img src="${data.bookCoverUrl}" alt="Book Cover" class="img-thumbnail" style="max-width: 120px;">` : ''}
+                                    <p><strong>Tên sách:</strong> ${data.BookTitle || 'Không có thông tin'}</p>
+                                    <p><strong>Tác giả:</strong> ${data.BookAuthor || 'Không có thông tin'}</p>
+                                    <p><strong>ISBN:</strong> ${data.BookIsbn || 'Không có thông tin'}</p>
+                                    ${data.BookCoverUrl ? `<img src="${data.BookCoverUrl}" alt="Book Cover" class="img-thumbnail" style="max-width: 120px;">` : ''}
                                 </div>
                             </div>
                             <hr>
                             <div class="row">
                                 <div class="col-12">
                                     <h6>Thông tin mượn trả</h6>
-                                    <p><strong>Ngày mượn:</strong> ${data.formattedBorrowDate || 'Không có thông tin'}</p>
-                                    <p><strong>Ngày đến hạn:</strong> ${data.formattedDueDate || 'Không có thông tin'}</p>
-                                    <p><strong>Ngày trả:</strong> ${data.formattedReturnDate || 'Chưa trả'}</p>
-                                    <p><strong>Trạng thái:</strong> <span class="badge bg-${data.statusClass}">${data.statusDisplay || 'Không có thông tin'}</span></p>
-                                    ${data.isOverdue ? `<p><strong>Số ngày quá hạn:</strong> <span class="text-danger">${data.overdueDays} ngày</span></p>` : ''}
-                                    <p><strong>Ghi chú:</strong> ${data.notes || 'Không có ghi chú'}</p>
-                                    ${data.fineAmount ? `<p><strong>Tiền phạt:</strong> <span class="text-danger">${data.fineAmount.toLocaleString('vi-VN')} VND</span></p>` : ''}
+                                    ${data.Status === 'Requested' ?
+                                        `<p><strong>Ngày yêu cầu:</strong> <span class="text-primary fw-bold">${data.FormattedBorrowDate || 'Không có thông tin'}</span></p>` :
+                                        `<p><strong>Ngày mượn:</strong> <span class="text-success fw-bold">${data.ConfirmedDate ? new Date(data.ConfirmedDate).toLocaleDateString('vi-VN') + ' ' + new Date(data.ConfirmedDate).toLocaleTimeString('vi-VN', {hour: '2-digit', minute: '2-digit'}) : (data.FormattedBorrowDate || 'Không có thông tin')}</span></p>`
+                                    }
+                                    <p><strong>Ngày đến hạn:</strong> ${data.FormattedDueDate || 'Không có thông tin'}</p>
+                                    <p><strong>Ngày trả:</strong> ${data.FormattedReturnDate || 'Chưa trả'}</p>
+                                    <p><strong>Trạng thái:</strong> <span class="badge bg-${data.StatusClass}">${data.StatusDisplay || 'Không có thông tin'}</span></p>
+                                    ${data.IsOverdue ? `<p><strong>Số ngày quá hạn:</strong> <span class="text-danger">${data.OverdueDays} ngày</span></p>` : ''}
+                                    <p><strong>Ghi chú:</strong> ${data.Notes || 'Không có ghi chú'}</p>
+                                    ${data.FineAmount ? `<p><strong>Tiền phạt:</strong> <span class="text-danger">${data.FineAmount.toLocaleString('vi-VN')} VND</span></p>` : ''}
                                 </div>
                             </div>
                             <hr>
@@ -472,13 +514,13 @@
                                 <div class="col-12">
                                     <h6>Cập nhật trạng thái</h6>
                                     <div class="btn-group" role="group">
-                                        <button type="button" class="btn btn-success btn-sm" onclick="confirmUpdateBorrowStatus(${data.id}, 'Returned', '${data.userName.replace(/'/g, "\\'")}', '${data.bookTitle.replace(/'/g, "\\'")}')">
+                                        <button type="button" class="btn btn-success btn-sm" onclick="confirmUpdateBorrowStatus(${data.Id}, 'Returned', '${(data.UserName || '').replace(/'/g, "\\'")}', '${(data.BookTitle || '').replace(/'/g, "\\'")}')">
                                             <i class="bi bi-check-circle"></i> Đã trả
                                         </button>
-                                        <button type="button" class="btn btn-warning btn-sm" onclick="confirmUpdateBorrowStatus(${data.id}, 'Overdue', '${data.userName.replace(/'/g, "\\'")}', '${data.bookTitle.replace(/'/g, "\\'")}')">
+                                        <button type="button" class="btn btn-warning btn-sm" onclick="confirmUpdateBorrowStatus(${data.Id}, 'Overdue', '${(data.UserName || '').replace(/'/g, "\\'")}', '${(data.BookTitle || '').replace(/'/g, "\\'")}')">
                                             <i class="bi bi-exclamation-triangle"></i> Quá hạn
                                         </button>
-                                        <button type="button" class="btn btn-primary btn-sm" onclick="confirmUpdateBorrowStatus(${data.id}, 'Borrowed', '${data.userName.replace(/'/g, "\\'")}', '${data.bookTitle.replace(/'/g, "\\'")}')">
+                                        <button type="button" class="btn btn-primary btn-sm" onclick="confirmUpdateBorrowStatus(${data.Id}, 'Borrowed', '${(data.UserName || '').replace(/'/g, "\\'")}', '${(data.BookTitle || '').replace(/'/g, "\\'")}')">
                                             <i class="bi bi-book"></i> Đang mượn
                                         </button>
                                     </div>

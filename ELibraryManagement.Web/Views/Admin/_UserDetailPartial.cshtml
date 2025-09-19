@@ -181,7 +181,7 @@
                                 <thead class="table-dark">
                                     <tr>
                                         <th>Sách</th>
-                                        <th>Ngày mượn</th>
+                                        <th>Ngày yêu cầu/Ngày mượn</th>
                                         <th>Hạn trả</th>
                                         <th>Ngày trả</th>
                                         <th>Trạng thái</th>
@@ -205,15 +205,28 @@
                                                 </div>
                                             </td>
                                             <td>
-                                                <small>@borrow.BorrowDate.ToVietnamTime().ToString("dd/MM/yyyy")</small>
+                                                @if (borrow.Status == "Requested")
+                                                {
+                                                    <div>
+                                                        <small class="text-primary fw-bold">Ngày yêu cầu:</small><br>
+                                                        <small>@borrow.BorrowDate.ToString("dd/MM/yyyy")</small>
+                                                    </div>
+                                                }
+                                                else
+                                                {
+                                                    <div>
+                                                        <small class="text-success fw-bold">Ngày mượn:</small><br>
+                                                        <small>@(borrow.ConfirmedDate.HasValue ? borrow.ConfirmedDate.Value.ToString("dd/MM/yyyy") : borrow.BorrowDate.ToString("dd/MM/yyyy"))</small>
+                                                    </div>
+                                                }
                                             </td>
                                             <td>
-                                                <small>@borrow.DueDate.ToVietnamTime().ToString("dd/MM/yyyy")</small>
+                                                <small>@borrow.DueDate.ToString("dd/MM/yyyy")</small>
                                             </td>
                                             <td>
                                                 @if (borrow.ReturnDate.HasValue)
                                                 {
-                                                    <small>@borrow.ReturnDate.Value.ToVietnamTime().ToString("dd/MM/yyyy")</small>
+                                                    <small>@borrow.ReturnDate.Value.ToString("dd/MM/yyyy")</small>
                                                 }
                                                 else
                                                 {

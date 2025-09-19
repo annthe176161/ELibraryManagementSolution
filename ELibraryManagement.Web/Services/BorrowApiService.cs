@@ -19,6 +19,7 @@ namespace ELibraryManagement.Web.Services
         public string UserPhoneNumber { get; set; } = string.Empty;
         public string StudentId { get; set; } = string.Empty;
         public DateTime BorrowDate { get; set; }
+        public DateTime? ConfirmedDate { get; set; }
         public DateTime DueDate { get; set; }
         public DateTime? ReturnDate { get; set; }
         public string Status { get; set; } = string.Empty;
@@ -224,6 +225,7 @@ namespace ELibraryManagement.Web.Services
                             BookCoverUrl = borrowRecordDto.BookCoverUrl,
                             BookIsbn = borrowRecordDto.BookIsbn,
                             BorrowDate = borrowRecordDto.BorrowDate,
+                            ConfirmedDate = borrowRecordDto.ConfirmedDate,
                             DueDate = borrowRecordDto.DueDate,
                             ReturnDate = borrowRecordDto.ReturnDate,
                             Status = borrowRecordDto.Status,
