@@ -72,11 +72,11 @@ namespace ELibraryManagement.Api.Controllers
                 Console.WriteLine($"Error in BorrowBook: {ex.Message}");
                 Console.WriteLine($"Stack trace: {ex.StackTrace}");
 
-                return StatusCode(500, new
+                // Return user-friendly error message
+                return BadRequest(new
                 {
-                    message = "Internal server error",
-                    details = ex.Message,
-                    stackTrace = ex.StackTrace
+                    message = ex.Message,
+                    success = false
                 });
             }
         }

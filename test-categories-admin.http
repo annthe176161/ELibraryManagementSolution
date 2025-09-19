@@ -1,2 +1,0 @@
-### Test Admin GetCategories endpoint
-GET https://localhost:7208/Admin/GetCategories

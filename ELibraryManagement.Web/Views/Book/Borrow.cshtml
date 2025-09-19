@@ -219,6 +219,154 @@
         color: #dc2626;
     }
 
+    /* Error Notification Styles */
+    .error-notification {
+        margin: 1.5rem 0;
+        padding: 0;
+        opacity: 0;
+        transform: translateY(-20px);
+        animation: slideDownFadeIn 0.5s ease-out forwards;
+    }
+
+    .error-notification.show {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .error-alert {
+        background: linear-gradient(135deg, #fef2f2 0%, #fecaca 100%);
+        border: 2px solid #ef4444;
+        border-radius: 15px;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        box-shadow: 0 8px 25px rgba(239, 68, 68, 0.15);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .error-alert::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    }
+
+    .error-alert::after {
+        content: '⚠️';
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        font-size: 2rem;
+        opacity: 0.3;
+        animation: pulse 2s infinite;
+    }
+
+    .error-content {
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .error-icon {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        color: white;
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        flex-shrink: 0;
+        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+    }
+
+    .error-text {
+        flex: 1;
+    }
+
+    .error-title {
+        color: #dc2626;
+        font-size: 1.2rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .error-message {
+        color: #374151;
+        font-size: 1rem;
+        line-height: 1.6;
+        margin: 0;
+    }
+
+    .error-actions {
+        margin-top: 1rem;
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .error-action-btn {
+        background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        text-decoration: none;
+        font-size: 0.9rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        border: none;
+        cursor: pointer;
+    }
+
+    .error-action-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(59, 130, 246, 0.3);
+        color: white;
+        text-decoration: none;
+    }
+
+    .error-action-btn.secondary {
+        background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+    }
+
+    .error-action-btn.secondary:hover {
+        box-shadow: 0 5px 15px rgba(107, 114, 128, 0.3);
+    }
+
+    @@keyframes slideDownFadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @@keyframes pulse {
+
+        0%,
+        100% {
+            transform: scale(1);
+        }
+
+        50% {
+            transform: scale(1.1);
+        }
+    }
+
     .borrow-stats {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -754,6 +902,36 @@
                     </div>
 
                     <div class="content-section">
+                        <!-- Error Notification Section -->
+                        <div class="error-notification" id="errorNotification" style="display: none;">
+                            <div class="error-alert">
+                                <div class="error-content">
+                                    <div class="error-icon">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                    </div>
+                                    <div class="error-text">
+                                        <div class="error-title">
+                                            <i class="fas fa-info-circle"></i>
+                                            Thông báo quan trọng
+                                        </div>
+                                        <div class="error-message" id="errorMessage">
+                                            <!-- Error message will be populated by JavaScript -->
+                                        </div>
+                                        <div class="error-actions">
+                                            <a href="@Url.Action("Index", "Book")" class="error-action-btn">
+                                                <i class="fas fa-arrow-left"></i>
+                                                Chọn sách khác
+                                            </a>
+                                            <a href="@Url.Action("MyBooks", "Book")" class="error-action-btn secondary">
+                                                <i class="fas fa-book"></i>
+                                                Xem sách đã mượn
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- Student Information -->
                         <div class="student-info-card">
                             <div class="student-info-header">
@@ -1024,7 +1202,22 @@
                             <input type="hidden" asp-for="BookAuthor" />
                             <input type="hidden" asp-for="BookCoverUrl" />
 
-                            <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+                            <!-- Hidden input to store error message -->
+                            <input type="hidden" id="modelStateError" value="@ViewBag.ErrorMessage" />
+                            <input type="hidden" id="tempDataError" value="@TempData["ErrorMessage"]" />
+
+                            @* Robust trigger: JSON-encode server-side message and call showErrorNotification on DOMContentLoaded. *@
+                            <script type="text/javascript">
+                                // Render the server message safely into a JS global variable for later consumption by the page script
+                                window.__serverErrorMessage = '';
+                                try {
+                                    window.__serverErrorMessage = @Html.Raw(Json.Serialize(ViewBag.ErrorMessage ?? TempData["ErrorMessage"] ?? ""));
+                                } catch (e) {
+                                    window.__serverErrorMessage = '';
+                                }
+                            </script>
+
+                            <!-- Validation summary removed - now handled by custom error notification -->
 
                             <div class="form-group">
                                 <label asp-for="DueDate" class="form-label">
@@ -1125,54 +1318,55 @@
 </div>
 
 <script>
+    // Handle error notification display - Global function
+    function showErrorNotification(message) {
+        const errorNotification = document.getElementById('errorNotification');
+        const errorMessage = document.getElementById('errorMessage');
+
+        if (errorNotification && errorMessage && message) {
+            errorMessage.textContent = message;
+            errorNotification.style.display = 'block';
+
+            // Add show class after a small delay for animation
+            setTimeout(() => {
+                errorNotification.classList.add('show');
+            }, 100);
+
+            // Scroll to error notification
+            errorNotification.scrollIntoView({
+                behavior: 'smooth',
+                block: 'center'
+            });
+        }
+    }
+
     document.addEventListener('DOMContentLoaded', function () {
-        const dueDateInput = document.querySelector('input[name="DueDate"]');
-
-        // Auto-set due date to 14 days from today if not set
-        if (dueDateInput && !dueDateInput.value) {
-            const defaultDate = new Date();
-            defaultDate.setDate(defaultDate.getDate() + 14);
-            dueDateInput.value = defaultDate.toISOString().split('T')[0];
-        }
-
-        // Form validation for checkboxes
-        const submitButton = document.querySelector('button[type="submit"]');
-        const checkboxes = document.querySelectorAll('input[type="checkbox"][required]');
-
-        function validateForm() {
-            let allChecked = true;
-            checkboxes.forEach(checkbox => {
-                if (!checkbox.checked) {
-                    allChecked = false;
-                }
-            });
-
-            submitButton.disabled = !allChecked;
-            if (allChecked) {
-                submitButton.classList.remove('btn-secondary');
-                submitButton.classList.add('btn-primary');
-            } else {
-                submitButton.classList.remove('btn-primary');
-                submitButton.classList.add('btn-secondary');
+        // Consolidated handler: prefer server-rendered JSON message, then hidden inputs as fallback
+        try {
+            var msg = '';
+            if (window && window.__serverErrorMessage && window.__serverErrorMessage.toString().trim()) {
+                msg = window.__serverErrorMessage.toString().trim();
             }
+
+            if (!msg) {
+                const modelStateErrorInput = document.getElementById('modelStateError');
+                const tempDataErrorInput = document.getElementById('tempDataError');
+
+                if (modelStateErrorInput && modelStateErrorInput.value && modelStateErrorInput.value.trim()) {
+                    msg = modelStateErrorInput.value.trim();
+                }
+
+                if (!msg && tempDataErrorInput && tempDataErrorInput.value && tempDataErrorInput.value.trim()) {
+                    msg = tempDataErrorInput.value.trim();
+                }
+            }
+
+            if (msg) {
+                showErrorNotification(msg);
+            }
+        } catch (err) {
+            // swallow errors to avoid breaking the page
+            console && console.warn && console.warn('Error showing notification', err);
         }
-
-        checkboxes.forEach(checkbox => {
-            checkbox.addEventListener('change', validateForm);
-        });
-
-        // Initial validation
-        validateForm();
-
-        // Smooth animations for cards
-        const cards = document.querySelectorAll('.info-item, .guideline-card, .term-item');
-        cards.forEach(card => {
-            card.addEventListener('mouseenter', function () {
-                this.style.transform = 'translateY(-3px)';
-            });
-            card.addEventListener('mouseleave', function () {
-                this.style.transform = 'translateY(0)';
-            });
-        });
     });
 </script>

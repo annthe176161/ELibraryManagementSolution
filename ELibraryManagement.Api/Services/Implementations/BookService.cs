@@ -135,18 +135,52 @@ namespace ELibraryManagement.Api.Services.Implementations
             // Check if user already has this book borrowed or requested
             var existingBorrow = await _context.BorrowRecords
                 .AnyAsync(br => br.UserId == request.UserId && br.BookId == request.BookId &&
-                         (br.Status == BorrowStatus.Borrowed || br.Status == BorrowStatus.Requested));
+                         (br.Status == BorrowStatus.Borrowed ||
+                          br.Status == BorrowStatus.Requested ||
+                          br.Status == BorrowStatus.Overdue));
 
             if (existingBorrow)
             {
-                throw new InvalidOperationException("Bạn đã có yêu cầu mượn hoặc đang mượn cuốn sách này rồi.");
+                // Get the specific borrow record to provide more detailed information
+                var borrowRecord = await _context.BorrowRecords
+                    .Where(br => br.UserId == request.UserId && br.BookId == request.BookId &&
+                           (br.Status == BorrowStatus.Borrowed ||
+                            br.Status == BorrowStatus.Requested ||
+                            br.Status == BorrowStatus.Overdue))
+                    .OrderByDescending(br => br.CreatedAt)
+                    .FirstOrDefaultAsync();
+
+                if (borrowRecord != null)
+                {
+                    string statusMessage = "";
+                    switch (borrowRecord.Status)
+                    {
+                        case BorrowStatus.Requested:
+                            statusMessage = "Bạn đã có yêu cầu mượn cuốn sách này và đang chờ xác nhận từ thủ thư.";
+                            break;
+                        case BorrowStatus.Borrowed:
+                            statusMessage = $"Bạn đang mượn cuốn sách này. Hạn trả: {borrowRecord.DueDate:dd/MM/yyyy}.";
+                            break;
+                        case BorrowStatus.Overdue:
+                            statusMessage = $"Bạn đang mượn cuốn sách này nhưng đã quá hạn. Hạn trả: {borrowRecord.DueDate:dd/MM/yyyy}. Vui lòng trả sách trước khi mượn sách khác.";
+                            break;
+                        default:
+                            statusMessage = "Bạn đã có liên quan đến cuốn sách này.";
+                            break;
+                    }
+                    throw new InvalidOperationException(statusMessage);
+                }
+                else
+                {
+                    throw new InvalidOperationException("Bạn đã có yêu cầu mượn hoặc đang mượn cuốn sách này rồi.");
+                }
             }
 
             // Calculate due date (default 14 days if not provided)
             var dueDate = request.DueDate ?? DateTimeHelper.VietnamNow().AddDays(14);
 
             // Create borrow record with Requested status (pending admin approval)
-            var borrowRecord = new BorrowRecord
+            var newBorrowRecord = new BorrowRecord
             {
                 UserId = request.UserId,
                 BookId = request.BookId,
@@ -164,18 +198,18 @@ namespace ELibraryManagement.Api.Services.Implementations
             await _userStatusService.IncrementBorrowCountAsync(request.UserId);
 
             // Save changes
-            _context.BorrowRecords.Add(borrowRecord);
+            _context.BorrowRecords.Add(newBorrowRecord);
             await _context.SaveChangesAsync();
 
             return new BorrowBookResponseDto
             {
-                BorrowRecordId = borrowRecord.Id,
+                BorrowRecordId = newBorrowRecord.Id,
                 BookId = book.Id,
                 BookTitle = book.Title,
                 UserId = request.UserId,
-                BorrowDate = borrowRecord.BorrowDate,
-                DueDate = borrowRecord.DueDate,
-                Status = borrowRecord.Status.ToString(),
+                BorrowDate = newBorrowRecord.BorrowDate,
+                DueDate = newBorrowRecord.DueDate,
+                Status = newBorrowRecord.Status.ToString(),
                 Message = "Yêu cầu mượn sách đã được gửi và đang chờ xác nhận từ thủ thư."
             };
         }

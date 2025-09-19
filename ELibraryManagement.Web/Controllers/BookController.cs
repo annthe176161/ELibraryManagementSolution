@@ -258,6 +258,7 @@ namespace ELibraryManagement.Web.Controllers
                     ViewBag.BorrowedBooks = currentlyBorrowedBooks;
 
                     ModelState.AddModelError("", result.Message);
+                    ViewBag.ErrorMessage = result.Message; // Add to ViewBag for easy access
                     return View(model);
                 }
             }
@@ -303,6 +304,7 @@ namespace ELibraryManagement.Web.Controllers
                 }
 
                 ModelState.AddModelError("", $"Có lỗi xảy ra: {ex.Message}");
+                ViewBag.ErrorMessage = $"Có lỗi xảy ra: {ex.Message}"; // Add to ViewBag for easy access
                 return View(model);
             }
         }

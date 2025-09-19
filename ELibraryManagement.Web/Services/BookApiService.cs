@@ -1037,18 +1037,48 @@ namespace ELibraryManagement.Web.Services
                 {
                     System.Diagnostics.Debug.WriteLine($"API Error: {response.StatusCode} - {responseContent}");
 
+                    // Handle different error status codes
+                    string errorMessage = $"Lỗi hệ thống: {response.StatusCode}";
+                    if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+                    {
+                        errorMessage = "Yêu cầu không hợp lệ";
+                    }
+                    else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                    {
+                        errorMessage = "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.";
+                    }
+                    else if (response.StatusCode == System.Net.HttpStatusCode.Forbidden)
+                    {
+                        errorMessage = "Bạn không có quyền thực hiện thao tác này.";
+                    }
+                    else if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+                    {
+                        errorMessage = "Không tìm thấy sách hoặc thông tin người dùng.";
+                    }
+                    else if (response.StatusCode == System.Net.HttpStatusCode.InternalServerError)
+                    {
+                        errorMessage = "Lỗi máy chủ nội bộ. Vui lòng thử lại sau.";
+                    }
+
                     // Try to parse error response for detailed message
-                    string errorMessage = $"Lỗi API: {response.StatusCode}";
                     try
                     {
                         var errorResponse = JsonSerializer.Deserialize<JsonElement>(responseContent, _jsonOptions);
                         if (errorResponse.TryGetProperty("message", out var messageProperty))
                         {
-                            errorMessage = messageProperty.GetString() ?? errorMessage;
+                            var apiMessage = messageProperty.GetString();
+                            if (!string.IsNullOrEmpty(apiMessage))
+                            {
+                                errorMessage = apiMessage;
+                            }
                         }
                         else if (errorResponse.TryGetProperty("title", out var titleProperty))
                         {
-                            errorMessage = titleProperty.GetString() ?? errorMessage;
+                            var apiTitle = titleProperty.GetString();
+                            if (!string.IsNullOrEmpty(apiTitle))
+                            {
+                                errorMessage = apiTitle;
+                            }
                         }
                         else if (errorResponse.TryGetProperty("errors", out var errorsProperty))
                         {
