@@ -16,17 +16,18 @@ namespace ELibraryManagement.Api.Data
             );
 
             // Seed Categories - Danh mục sách tiếng Việt
+            var seedDate = new DateTime(2023, 1, 1, 0, 0, 0, DateTimeKind.Utc);
             modelBuilder.Entity<Category>().HasData(
-                new Category { Id = 1, Name = "Tiểu Thuyết", Description = "Các tác phẩm tiểu thuyết, truyện dài", Color = "#FF6B6B", CreatedAt = DateTime.UtcNow },
-                new Category { Id = 2, Name = "Phi Tiểu Thuyết", Description = "Sách phi hư cấu, sách thực tế", Color = "#4ECDC4", CreatedAt = DateTime.UtcNow },
-                new Category { Id = 3, Name = "Khoa Học", Description = "Sách khoa học và công nghệ", Color = "#45B7D1", CreatedAt = DateTime.UtcNow },
-                new Category { Id = 4, Name = "Lịch Sử", Description = "Sách lịch sử và văn hóa", Color = "#96CEB4", CreatedAt = DateTime.UtcNow },
-                new Category { Id = 5, Name = "Tiểu Sử", Description = "Tiểu sử và hồi ký", Color = "#FECA57", CreatedAt = DateTime.UtcNow },
-                new Category { Id = 6, Name = "Lập Trình", Description = "Sách lập trình và phát triển phần mềm", Color = "#FF9FF3", CreatedAt = DateTime.UtcNow },
-                new Category { Id = 7, Name = "Kinh Doanh", Description = "Sách kinh doanh và kinh tế", Color = "#54A0FF", CreatedAt = DateTime.UtcNow },
-                new Category { Id = 8, Name = "Văn Học Việt Nam", Description = "Tác phẩm văn học Việt Nam", Color = "#FF8A65", CreatedAt = DateTime.UtcNow },
-                new Category { Id = 9, Name = "Thiếu Nhi", Description = "Sách dành cho thiếu nhi", Color = "#81C784", CreatedAt = DateTime.UtcNow },
-                new Category { Id = 10, Name = "Nấu Ăn", Description = "Sách công thức nấu ăn", Color = "#FFB74D", CreatedAt = DateTime.UtcNow }
+                new Category { Id = 1, Name = "Tiểu Thuyết", Description = "Các tác phẩm tiểu thuyết, truyện dài", Color = "#FF6B6B", CreatedAt = seedDate },
+                new Category { Id = 2, Name = "Phi Tiểu Thuyết", Description = "Sách phi hư cấu, sách thực tế", Color = "#4ECDC4", CreatedAt = seedDate },
+                new Category { Id = 3, Name = "Khoa Học", Description = "Sách khoa học và công nghệ", Color = "#45B7D1", CreatedAt = seedDate },
+                new Category { Id = 4, Name = "Lịch Sử", Description = "Sách lịch sử và văn hóa", Color = "#96CEB4", CreatedAt = seedDate },
+                new Category { Id = 5, Name = "Tiểu Sử", Description = "Tiểu sử và hồi ký", Color = "#FECA57", CreatedAt = seedDate },
+                new Category { Id = 6, Name = "Lập Trình", Description = "Sách lập trình và phát triển phần mềm", Color = "#FF9FF3", CreatedAt = seedDate },
+                new Category { Id = 7, Name = "Kinh Doanh", Description = "Sách kinh doanh và kinh tế", Color = "#54A0FF", CreatedAt = seedDate },
+                new Category { Id = 8, Name = "Văn Học Việt Nam", Description = "Tác phẩm văn học Việt Nam", Color = "#FF8A65", CreatedAt = seedDate },
+                new Category { Id = 9, Name = "Thiếu Nhi", Description = "Sách dành cho thiếu nhi", Color = "#81C784", CreatedAt = seedDate },
+                new Category { Id = 10, Name = "Nấu Ăn", Description = "Sách công thức nấu ăn", Color = "#FFB74D", CreatedAt = seedDate }
             );
 
             // Seed Books - Sách mẫu tiếng Việt
@@ -47,7 +48,7 @@ namespace ELibraryManagement.Api.Data
                     PageCount = 320,
                     AverageRating = 4.5f,
                     RatingCount = 25,
-                    CreatedAt = DateTime.UtcNow
+                    CreatedAt = seedDate
                 },
                 new Book
                 {
@@ -65,7 +66,7 @@ namespace ELibraryManagement.Api.Data
                     PageCount = 280,
                     AverageRating = 4.3f,
                     RatingCount = 18,
-                    CreatedAt = DateTime.UtcNow
+                    CreatedAt = seedDate
                 },
                 new Book
                 {
@@ -83,7 +84,7 @@ namespace ELibraryManagement.Api.Data
                     PageCount = 200,
                     AverageRating = 4.7f,
                     RatingCount = 32,
-                    CreatedAt = DateTime.UtcNow
+                    CreatedAt = seedDate
                 },
                 new Book
                 {
@@ -101,7 +102,7 @@ namespace ELibraryManagement.Api.Data
                     PageCount = 400,
                     AverageRating = 4.2f,
                     RatingCount = 15,
-                    CreatedAt = DateTime.UtcNow
+                    CreatedAt = seedDate
                 },
                 new Book
                 {
@@ -119,7 +120,7 @@ namespace ELibraryManagement.Api.Data
                     PageCount = 350,
                     AverageRating = 4.4f,
                     RatingCount = 22,
-                    CreatedAt = DateTime.UtcNow
+                    CreatedAt = seedDate
                 },
                 new Book
                 {
@@ -137,7 +138,7 @@ namespace ELibraryManagement.Api.Data
                     PageCount = 500,
                     AverageRating = 4.6f,
                     RatingCount = 28,
-                    CreatedAt = DateTime.UtcNow
+                    CreatedAt = seedDate
                 },
                 new Book
                 {
@@ -155,7 +156,7 @@ namespace ELibraryManagement.Api.Data
                     PageCount = 280,
                     AverageRating = 4.1f,
                     RatingCount = 20,
-                    CreatedAt = DateTime.UtcNow
+                    CreatedAt = seedDate
                 },
                 new Book
                 {
@@ -173,7 +174,7 @@ namespace ELibraryManagement.Api.Data
                     PageCount = 180,
                     AverageRating = 4.8f,
                     RatingCount = 35,
-                    CreatedAt = DateTime.UtcNow
+                    CreatedAt = seedDate
                 }
             );
 
