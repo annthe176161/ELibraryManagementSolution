@@ -18,17 +18,20 @@ namespace ELibraryManagement.Api.Controllers
         private readonly IBorrowStatusValidationService _validationService;
         private readonly ApplicationDbContext _context;
         private readonly IEmailService _emailService;
+        private readonly IUserStatusService _userStatusService;
 
         public BorrowController(
             IBorrowService borrowService,
             IBorrowStatusValidationService validationService,
             ApplicationDbContext context,
-            IEmailService emailService)
+            IEmailService emailService,
+            IUserStatusService userStatusService)
         {
             _borrowService = borrowService;
             _validationService = validationService;
             _context = context;
             _emailService = emailService;
+            _userStatusService = userStatusService;
         }
 
         /// <summary>
@@ -493,6 +496,28 @@ namespace ELibraryManagement.Api.Controllers
                     return BadRequest(new { message = "Sách không còn khả dụng." });
                 }
 
+                // Check if user is allowed to borrow (respect user's borrow limit, block status and outstanding fines)
+                var userStatus = await _userStatusService.GetUserStatusAsync(borrowRecord.UserId);
+
+                // Compute live count of currently borrowed books for the user
+                var userLiveBorrowedCount = await _context.BorrowRecords
+                    .CountAsync(br => br.UserId == borrowRecord.UserId && br.Status == BorrowStatus.Borrowed);
+
+                if (userStatus.AccountStatus == UserAccountStatus.Blocked)
+                {
+                    return BadRequest(new { message = $"Tài khoản người dùng đã bị khóa. Lý do: {userStatus.BlockReason}" });
+                }
+
+                if (userLiveBorrowedCount >= userStatus.MaxBorrowLimit)
+                {
+                    return BadRequest(new { message = $"Người dùng đã đạt giới hạn mượn sách ({userStatus.MaxBorrowLimit} cuốn)." });
+                }
+
+                if (userStatus.TotalOutstandingFines > 50000)
+                {
+                    return BadRequest(new { message = $"Người dùng có khoản phạt chưa thanh toán là {userStatus.TotalOutstandingFines:N0} VND. Vui lòng thanh toán trước." });
+                }
+
                 // Update status to Borrowed and decrease available quantity
                 borrowRecord.Status = BorrowStatus.Borrowed;
                 borrowRecord.ConfirmedDate = DateTime.UtcNow;
@@ -501,6 +526,19 @@ namespace ELibraryManagement.Api.Controllers
                 borrowRecord.Book.AvailableQuantity--;
 
                 await _context.SaveChangesAsync();
+
+                // Increment user's current borrow count now that the request has been approved
+                // and the status changed to Borrowed. This keeps CurrentBorrowCount in sync
+                // with actual borrowed items.
+                try
+                {
+                    await _userStatusService.IncrementBorrowCountAsync(borrowRecord.UserId);
+                }
+                catch
+                {
+                    // Log or ignore - we don't want to fail the approval if user status update fails,
+                    // but this should be investigated if it happens.
+                }
 
                 return Ok(new { message = "Đã phê duyệt yêu cầu mượn sách thành công." });
             }

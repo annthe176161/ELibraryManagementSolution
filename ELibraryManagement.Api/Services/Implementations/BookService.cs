@@ -194,8 +194,10 @@ namespace ELibraryManagement.Api.Services.Implementations
             // Note: Don't decrease available quantity for Requested status
             // Only decrease when status changes to Borrowed (when admin approves)
 
-            // Update user status - increment borrow count for requested books
-            await _userStatusService.IncrementBorrowCountAsync(request.UserId);
+            // NOTE: Do NOT increment stored CurrentBorrowCount for Requested status here.
+            // The CurrentBorrowCount represents actual 'Borrowed' items. Incrementing should happen
+            // when an admin confirms and the status becomes Borrowed. This avoids blocking users
+            // who have many requests but fewer active borrows.
 
             // Save changes
             _context.BorrowRecords.Add(newBorrowRecord);
@@ -387,8 +389,10 @@ namespace ELibraryManagement.Api.Services.Implementations
             // Don't increase book available quantity because we never decreased it when the request was created
             // Only decrease available quantity when admin approves the request (status changes to Borrowed)
 
-            // Decrease user's current borrow count (since the request was counted when created)
-            await _userStatusService.DecrementBorrowCountAsync(borrowRecord.UserId);
+            // Previously this code decremented the user's CurrentBorrowCount because
+            // requests were counted when created. After the change to not count
+            // requests at creation time, there's nothing to decrement here.
+            // If in the future requests are counted again, adjust this logic accordingly.
 
             await _context.SaveChangesAsync();
 

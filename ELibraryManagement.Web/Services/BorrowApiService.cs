@@ -293,7 +293,25 @@ namespace ELibraryManagement.Web.Services
                 SetAuthorizationHeader();
 
                 var response = await _httpClient.PostAsync($"{GetApiBaseUrl()}/api/borrow/approve/{borrowId}", null);
-                return response.IsSuccessStatusCode;
+                if (response.IsSuccessStatusCode)
+                {
+                    return true;
+                }
+
+                // Try to read error message from API and log it for the UI
+                var errorContent = await response.Content.ReadAsStringAsync();
+                try
+                {
+                    var json = JsonSerializer.Deserialize<JsonElement>(errorContent, _jsonOptions);
+                    if (json.ValueKind == JsonValueKind.Object && json.TryGetProperty("message", out var msg))
+                    {
+                        // Store last error in session so AdminController can retrieve it if needed
+                        _httpContextAccessor.HttpContext?.Session.SetString("LastApproveError", msg.GetString() ?? "");
+                    }
+                }
+                catch { }
+
+                return false;
             }
             catch (Exception)
             {

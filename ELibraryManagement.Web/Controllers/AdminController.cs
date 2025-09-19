@@ -560,6 +560,15 @@ namespace ELibraryManagement.Web.Controllers
                 {
                     return Json(new { success = true, message = "Phê duyệt yêu cầu thành công." });
                 }
+                // Try to get more detailed error from session
+                var lastError = HttpContext.Session.GetString("LastApproveError");
+                if (!string.IsNullOrEmpty(lastError))
+                {
+                    // Clear it after reading
+                    HttpContext.Session.Remove("LastApproveError");
+                    return Json(new { success = false, message = lastError });
+                }
+
                 return Json(new { success = false, message = "Phê duyệt yêu cầu thất bại." });
             }
             catch (Exception ex)
