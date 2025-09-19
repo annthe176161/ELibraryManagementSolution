@@ -303,6 +303,28 @@
                 </h4>
 
                 <div class="borrow-details-grid">
+                    @{
+                        // Hiển thị ngày tương ứng với trạng thái:
+                        // - Nếu status là "Requested": hiển thị BorrowDate (ngày yêu cầu)
+                        // - Nếu đã confirmed và có ConfirmedDate: hiển thị ConfirmedDate (ngày mượn thực tế)
+                        // - Fallback: BorrowDate
+                        // Hiển thị đúng thời gian từ database mà không chuyển đổi timezone
+                        DateTime displayBorrowDate;
+                        if (Model.BorrowRecord.Status == "Requested")
+                        {
+                            displayBorrowDate = Model.BorrowRecord.BorrowDate;
+                        }
+                        else
+                        {
+                            displayBorrowDate = Model.BorrowRecord.ConfirmedDate ?? Model.BorrowRecord.BorrowDate;
+                        }
+
+                        var returnDate = Model.BorrowRecord.ReturnDate;
+
+                        var borrowDuration = returnDate.HasValue
+                        ? (returnDate.Value - displayBorrowDate).Days
+                        : (DateTime.Now - displayBorrowDate).Days;
+                    }
                     <div class="detail-item">
                         <div class="detail-label">
                             <i class="fas fa-calendar-plus text-primary"></i>
@@ -315,7 +337,7 @@
                                 <text>Ngày mượn</text>
                             }
                         </div>
-                        <div class="detail-value">@Model.BorrowRecord.BorrowDate.ToString("dd/MM/yyyy HH:mm")</div>
+                        <div class="detail-value">@displayBorrowDate.ToString("dd/MM/yyyy HH:mm")</div>
                     </div>
 
                     @if (Model.BorrowRecord.Status != "Requested")
@@ -364,11 +386,6 @@
                                 Thời gian mượn
                             </div>
                             <div class="detail-value">
-                                @{
-                                    var borrowDuration = Model.BorrowRecord.ReturnDate.HasValue
-                                    ? (Model.BorrowRecord.ReturnDate.Value - Model.BorrowRecord.BorrowDate).Days
-                                    : (DateTime.Now - Model.BorrowRecord.BorrowDate).Days;
-                                }
                                 @borrowDuration ngày
                             </div>
                         </div>
@@ -389,7 +406,8 @@
                                 }
                                 else
                                 {
-                                    var daysLeft = (Model.BorrowRecord.DueDate - DateTime.Now).Days;
+                                    var daysLeft = (Model.BorrowRecord.DueDate.ToVietnamTime().Date -
+                                    ELibraryManagement.Web.Helpers.DateTimeHelper.VietnamNow().Date).Days;
                                     <span class="text-success">@daysLeft ngày</span>
                                 }
                             </div>
@@ -554,7 +572,7 @@
                             </h6>
                             <small class="text-muted">
                                 <i class="fas fa-calendar me-1"></i>
-                                @Model.BorrowRecord.BorrowDate.ToString("dd/MM/yyyy HH:mm")
+                                @displayBorrowDate.ToString("dd/MM/yyyy HH:mm")
                             </small>
                             <p class="timeline-desc">
                                 <i class="fas fa-info-circle me-1"></i>
@@ -670,7 +688,8 @@
                                         }
                                         else
                                         {
-                                            var daysLeft = (Model.BorrowRecord.DueDate - DateTime.Now).Days;
+                                            var daysLeft = (Model.BorrowRecord.DueDate.ToVietnamTime().Date -
+                                            ELibraryManagement.Web.Helpers.DateTimeHelper.VietnamNow().Date).Days;
                                             <span class="text-info">
                                                 <i class="fas fa-hourglass-half me-1"></i>
                                                 Còn @daysLeft ngày

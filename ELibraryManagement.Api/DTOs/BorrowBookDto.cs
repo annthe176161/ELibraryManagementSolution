@@ -41,6 +41,8 @@ namespace ELibraryManagement.Api.DTOs
         public string UserEmail { get; set; } = string.Empty;
         public string UserPhoneNumber { get; set; } = string.Empty;
         public string StudentId { get; set; } = string.Empty;
+        // ConfirmedDate stored in DB as UTC when admin approves the borrow
+        public DateTime? ConfirmedDate { get; set; }
         public DateTime BorrowDate { get; set; }
         public DateTime DueDate { get; set; }
         public DateTime? ReturnDate { get; set; }

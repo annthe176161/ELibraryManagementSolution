@@ -59,6 +59,9 @@ namespace ELibraryManagement.Web.Models
         public string BookAuthor { get; set; } = string.Empty;
         public string BookCoverUrl { get; set; } = string.Empty;
         public DateTime BorrowDate { get; set; }
+        // ConfirmedDate is stored in the API as UTC. We keep the UTC value here and
+        // convert to Vietnam time in the views when displaying.
+        public DateTime? ConfirmedDate { get; set; }
         public DateTime DueDate { get; set; }
         public DateTime? ReturnDate { get; set; }
         public string Status { get; set; } = string.Empty;
@@ -66,6 +69,8 @@ namespace ELibraryManagement.Web.Models
         public decimal? FineAmount { get; set; }
         public string? FineStatus { get; set; }
         public string? FineReason { get; set; }
+        // Helper that returns the UTC DateTime to use as borrow start: prefer ConfirmedDate when present
+        public DateTime DisplayBorrowDateUtc => ConfirmedDate ?? BorrowDate;
         public bool IsOverdue => DueDate < DateTimeHelper.VietnamNow() && ReturnDate == null;
         public int DaysOverdue => IsOverdue ? (DateTimeHelper.VietnamNow() - DueDate).Days : 0;
         public bool HasFine => FineAmount.HasValue && FineAmount.Value > 0;

@@ -129,7 +129,7 @@ namespace ELibraryManagement.Api.Services.Implementations
                     Description = createDto.Description?.Trim(),
                     Color = createDto.Color?.Trim(),
                     IsActive = createDto.IsActive,
-                    CreatedAt = DateTimeHelper.VietnamNow()
+                    CreatedAt = DateTime.UtcNow
                 };
 
                 _context.Categories.Add(category);
@@ -193,7 +193,7 @@ namespace ELibraryManagement.Api.Services.Implementations
                 category.Description = updateDto.Description?.Trim();
                 category.Color = updateDto.Color?.Trim();
                 category.IsActive = updateDto.IsActive;
-                category.UpdatedAt = DateTimeHelper.VietnamNow();
+                category.UpdatedAt = DateTime.UtcNow;
 
                 await _context.SaveChangesAsync();
 
@@ -293,7 +293,7 @@ namespace ELibraryManagement.Api.Services.Implementations
                 }
 
                 category.IsActive = !category.IsActive;
-                category.UpdatedAt = DateTimeHelper.VietnamNow();
+                category.UpdatedAt = DateTime.UtcNow;
 
                 await _context.SaveChangesAsync();
 

@@ -63,8 +63,8 @@ namespace ELibraryManagement.Api.Services.Implementations
                     BookId = createReviewDto.BookId,
                     Rating = createReviewDto.Rating,
                     Comment = createReviewDto.Comment,
-                    ReviewDate = DateTimeHelper.VietnamNow(),
-                    CreatedAt = DateTimeHelper.VietnamNow()
+                    ReviewDate = DateTime.UtcNow,
+                    CreatedAt = DateTime.UtcNow
                 };
 
                 _context.Reviews.Add(review);
@@ -120,7 +120,7 @@ namespace ELibraryManagement.Api.Services.Implementations
                 // Cập nhật review
                 review.Rating = updateReviewDto.Rating;
                 review.Comment = updateReviewDto.Comment;
-                review.UpdatedAt = DateTimeHelper.VietnamNow();
+                review.UpdatedAt = DateTime.UtcNow;
 
                 await _context.SaveChangesAsync();
 

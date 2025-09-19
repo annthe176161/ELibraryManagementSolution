@@ -38,7 +38,7 @@ namespace ELibraryManagement.Api.Services.Implementations
                 OverdueFinesCount = 0,
                 MaxBorrowLimit = 5,
                 CurrentBorrowCount = 0,
-                CreatedAt = DateTimeHelper.VietnamNow()
+                CreatedAt = DateTime.UtcNow
             };
 
             _context.UserStatuses.Add(userStatus);
@@ -49,7 +49,7 @@ namespace ELibraryManagement.Api.Services.Implementations
 
         public async Task UpdateUserStatusAsync(UserStatus userStatus)
         {
-            userStatus.UpdatedAt = DateTimeHelper.VietnamNow();
+            userStatus.UpdatedAt = DateTime.UtcNow;
             _context.UserStatuses.Update(userStatus);
             await _context.SaveChangesAsync();
         }

@@ -177,14 +177,14 @@ namespace ELibraryManagement.Api.Services.Implementations
             }
 
             // Calculate due date (default 14 days if not provided)
-            var dueDate = request.DueDate ?? DateTimeHelper.VietnamNow().AddDays(14);
+            var dueDate = request.DueDate ?? DateTime.UtcNow.AddDays(14);
 
             // Create borrow record with Requested status (pending admin approval)
             var newBorrowRecord = new BorrowRecord
             {
                 UserId = request.UserId,
                 BookId = request.BookId,
-                BorrowDate = DateTimeHelper.VietnamNow(),
+                BorrowDate = DateTime.UtcNow,
                 DueDate = dueDate,
                 Status = BorrowStatus.Requested,
                 Notes = request.Notes,
@@ -234,6 +234,7 @@ namespace ELibraryManagement.Api.Services.Implementations
                     BookAuthor = br.Book.Author,
                     BookCoverUrl = br.Book.CoverImageUrl ?? "",
                     UserId = br.UserId,
+                    ConfirmedDate = br.ConfirmedDate,
                     BorrowDate = br.BorrowDate,
                     DueDate = br.DueDate,
                     ReturnDate = br.ReturnDate,
@@ -267,6 +268,7 @@ namespace ELibraryManagement.Api.Services.Implementations
                     BookAuthor = br.Book.Author,
                     BookCoverUrl = br.Book.CoverImageUrl ?? "",
                     UserId = br.UserId,
+                    ConfirmedDate = br.ConfirmedDate,
                     BorrowDate = br.BorrowDate,
                     DueDate = br.DueDate,
                     ReturnDate = br.ReturnDate,

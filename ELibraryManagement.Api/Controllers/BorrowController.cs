@@ -4,6 +4,7 @@ using ELibraryManagement.Api.Services.Interfaces;
 using ELibraryManagement.Api.Services;
 using ELibraryManagement.Api.Models;
 using Microsoft.AspNetCore.Authorization;
+using ELibraryManagement.Api.Helpers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -240,7 +241,7 @@ namespace ELibraryManagement.Api.Controllers
                     return BadRequest(new { message = "Sách này không đang trong trạng thái mượn" });
                 }
 
-                var daysLeft = (borrowRecord.DueDate.Date - DateTime.UtcNow.Date).Days;
+                var daysLeft = (borrowRecord.DueDate.ToVietnamTime().Date - DateTime.UtcNow.ToVietnamTime().Date).Days;
                 var userName = $"{borrowRecord.User.FirstName} {borrowRecord.User.LastName}".Trim();
 
                 if (string.IsNullOrEmpty(userName))
@@ -301,7 +302,7 @@ namespace ELibraryManagement.Api.Controllers
         {
             try
             {
-                var today = DateTime.UtcNow.Date;
+                var today = DateTime.UtcNow.ToVietnamTime().Date;
                 var targetDate = today.AddDays(days);
 
                 var dueSoonBooks = await _context.BorrowRecords
@@ -320,7 +321,7 @@ namespace ELibraryManagement.Api.Controllers
                         userEmail = br.User.Email,
                         borrowDate = br.BorrowDate,
                         dueDate = br.DueDate,
-                        daysLeft = (br.DueDate.Date - today).Days,
+                        daysLeft = (br.DueDate.ToVietnamTime().Date - today).Days,
                         canExtend = br.CanExtend,
                         extensionCount = br.ExtensionCount,
                         isOverdue = br.IsOverdue,
