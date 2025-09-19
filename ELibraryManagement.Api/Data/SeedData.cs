@@ -43,11 +43,11 @@ namespace ELibraryManagement.Api.Data
                     Description = "Cuốn sách về nghệ thuật giao tiếp và thu phục lòng người",
                     CoverImageUrl = "https://cdn1.fahasa.com/media/catalog/product/d/n/dntttttuntitled.jpg",
                     Quantity = 10,
-                    AvailableQuantity = 8,
+                    AvailableQuantity = 10,
                     Language = "Tiếng Việt",
                     PageCount = 320,
-                    AverageRating = 4.5f,
-                    RatingCount = 25,
+                    AverageRating = 0f,
+                    RatingCount = 0,
                     CreatedAt = seedDate
                 },
                 new Book
@@ -61,11 +61,11 @@ namespace ELibraryManagement.Api.Data
                     Description = "Sách về phát triển bản thân và thành công",
                     CoverImageUrl = "https://lh4.googleusercontent.com/proxy/92QuMwJnEjAGTfNMAB9joNXoouO9NuduIgBPaKtL0h0UPvaeTFj3Xef967P3mbrE7F1J5cfnvn2PKw8cwIINHMhxf9L2C3bPRQ2Ef14EVeZAIb_rdt3WzLOb98FXMVhAs2lNuT9ABlcODTeUqt5z27FQ8fQE4ZtQEw",
                     Quantity = 15,
-                    AvailableQuantity = 12,
+                    AvailableQuantity = 15,
                     Language = "Tiếng Việt",
                     PageCount = 280,
-                    AverageRating = 4.3f,
-                    RatingCount = 18,
+                    AverageRating = 0f,
+                    RatingCount = 0,
                     CreatedAt = seedDate
                 },
                 new Book
@@ -79,11 +79,11 @@ namespace ELibraryManagement.Api.Data
                     Description = "Tác phẩm kinh điển của văn học Việt Nam",
                     CoverImageUrl = "https://upload.wikimedia.org/wikipedia/vi/b/b1/T%E1%BA%AFt_%C4%91%C3%A8n-Nh%C3%A3_Nam.jpeg",
                     Quantity = 8,
-                    AvailableQuantity = 6,
+                    AvailableQuantity = 8,
                     Language = "Tiếng Việt",
                     PageCount = 200,
-                    AverageRating = 4.7f,
-                    RatingCount = 32,
+                    AverageRating = 0f,
+                    RatingCount = 0,
                     CreatedAt = seedDate
                 },
                 new Book
@@ -97,11 +97,11 @@ namespace ELibraryManagement.Api.Data
                     Description = "Sách hướng dẫn lập trình C# từ cơ bản đến nâng cao",
                     CoverImageUrl = "https://images.nxbbachkhoa.vn/Picture/2024/5/8/image-20240508180323597.jpg",
                     Quantity = 12,
-                    AvailableQuantity = 10,
+                    AvailableQuantity = 12,
                     Language = "Tiếng Việt",
                     PageCount = 400,
-                    AverageRating = 4.2f,
-                    RatingCount = 15,
+                    AverageRating = 0f,
+                    RatingCount = 0,
                     CreatedAt = seedDate
                 },
                 new Book
@@ -115,11 +115,11 @@ namespace ELibraryManagement.Api.Data
                     Description = "Những bí quyết thực tế để thành công trong kinh doanh",
                     CoverImageUrl = "https://cdn1.fahasa.com/media/catalog/product/8/9/8935236401296.jpg",
                     Quantity = 20,
-                    AvailableQuantity = 18,
+                    AvailableQuantity = 20,
                     Language = "Tiếng Việt",
                     PageCount = 350,
-                    AverageRating = 4.4f,
-                    RatingCount = 22,
+                    AverageRating = 0f,
+                    RatingCount = 0,
                     CreatedAt = seedDate
                 },
                 new Book
@@ -133,11 +133,11 @@ namespace ELibraryManagement.Api.Data
                     Description = "Tổng quan về lịch sử Việt Nam từ cổ đại đến hiện đại",
                     CoverImageUrl = "https://sachvuii.com/wp-content/uploads/2024/06/Ebook-Lich-su-Viet-Nam.jpg",
                     Quantity = 6,
-                    AvailableQuantity = 5,
+                    AvailableQuantity = 6,
                     Language = "Tiếng Việt",
                     PageCount = 500,
-                    AverageRating = 4.6f,
-                    RatingCount = 28,
+                    AverageRating = 0f,
+                    RatingCount = 0,
                     CreatedAt = seedDate
                 },
                 new Book
@@ -151,11 +151,11 @@ namespace ELibraryManagement.Api.Data
                     Description = "Bộ sưu tập công thức nấu ăn ngon và đơn giản",
                     CoverImageUrl = "https://salt.tikicdn.com/cache/w1200/ts/product/6d/30/f5/88c01835d4b7107e03373bcc346c028f.jpg",
                     Quantity = 25,
-                    AvailableQuantity = 22,
+                    AvailableQuantity = 25,
                     Language = "Tiếng Việt",
                     PageCount = 280,
-                    AverageRating = 4.1f,
-                    RatingCount = 20,
+                    AverageRating = 0f,
+                    RatingCount = 0,
                     CreatedAt = seedDate
                 },
                 new Book
@@ -169,11 +169,11 @@ namespace ELibraryManagement.Api.Data
                     Description = "Tuyển tập truyện cổ tích Việt Nam cho thiếu nhi",
                     CoverImageUrl = "https://product.hstatic.net/1000237375/product/100-truyen-co-tich-viet-nam-440.jpg",
                     Quantity = 30,
-                    AvailableQuantity = 28,
+                    AvailableQuantity = 30,
                     Language = "Tiếng Việt",
                     PageCount = 180,
-                    AverageRating = 4.8f,
-                    RatingCount = 35,
+                    AverageRating = 0f,
+                    RatingCount = 0,
                     CreatedAt = seedDate
                 }
             );
