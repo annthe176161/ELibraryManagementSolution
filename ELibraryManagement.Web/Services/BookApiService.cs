@@ -1294,8 +1294,16 @@ namespace ELibraryManagement.Web.Services
         {
             try
             {
+                // Check current borrowed books
                 var borrowedBooks = await GetBorrowedBooksAsync(userId, token);
-                return borrowedBooks.Any(b => b.BookId == bookId);
+                if (borrowedBooks.Any(b => b.BookId == bookId))
+                {
+                    return true;
+                }
+
+                // Also check borrow history (including returned books) to allow reviews
+                var borrowHistory = await GetBorrowHistoryAsync(userId, token);
+                return borrowHistory.Any(b => b.BookId == bookId);
             }
             catch
             {

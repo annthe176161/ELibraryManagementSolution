@@ -341,7 +341,7 @@ namespace ELibraryManagement.Web.Services
 
                     if (!canReview)
                     {
-                        result.Message = "Bạn chỉ có thể đánh giá sách sau khi đã mượn và trả sách.";
+                        result.Message = "Bạn cần mượn sách này trước khi có thể viết đánh giá.";
                     }
                     else if (hasExistingReview)
                     {
