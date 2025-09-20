@@ -175,6 +175,7 @@ namespace ELibraryManagement.Web.Controllers
 
                 // Kiểm tra xem user đã từng mượn sách này chưa
                 bool hasBorrowedBook = false;
+                string? borrowStatus = null;
                 if (isAuthenticated)
                 {
                     try
@@ -186,6 +187,27 @@ namespace ELibraryManagement.Web.Controllers
                             if (!string.IsNullOrEmpty(authToken))
                             {
                                 hasBorrowedBook = await _bookApiService.HasUserBorrowedBookAsync(currentUser.Id, id, authToken);
+
+                                // Nếu đã từng mượn, lấy trạng thái mượn hiện tại
+                                if (hasBorrowedBook)
+                                {
+                                    var borrowedBooks = await _bookApiService.GetBorrowedBooksAsync(currentUser.Id, authToken);
+                                    var bookBorrow = borrowedBooks.FirstOrDefault(b => b.BookId == id);
+                                    if (bookBorrow != null)
+                                    {
+                                        borrowStatus = bookBorrow.Status;
+                                    }
+                                    else
+                                    {
+                                        // Kiểm tra lịch sử mượn
+                                        var borrowHistory = await _bookApiService.GetBorrowHistoryAsync(currentUser.Id, authToken);
+                                        var historyBorrow = borrowHistory.FirstOrDefault(b => b.BookId == id);
+                                        if (historyBorrow != null)
+                                        {
+                                            borrowStatus = historyBorrow.Status;
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
@@ -193,9 +215,11 @@ namespace ELibraryManagement.Web.Controllers
                     {
                         _logger.LogWarning(ex, "Could not check if user has borrowed book {BookId}", id);
                         hasBorrowedBook = false;
+                        borrowStatus = null;
                     }
                 }
                 ViewBag.HasBorrowedBook = hasBorrowedBook;
+                ViewBag.BorrowStatus = borrowStatus;
 
                 return View(book);
             }

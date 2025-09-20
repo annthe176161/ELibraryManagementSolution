@@ -340,12 +340,11 @@ namespace ELibraryManagement.Api.Services.Implementations
 
         public async Task<bool> CanUserReviewBookAsync(string userId, int bookId)
         {
-            // Kiểm tra user đã từng mượn sách này (bao gồm đang mượn, đã trả, hoặc đã hủy)
+            // Kiểm tra user đã từng mượn sách này (chỉ cho phép đánh giá sau khi trả sách hoặc hủy)
             var hasBorrowedBook = await _context.BorrowRecords
                 .AnyAsync(br => br.UserId == userId &&
                                br.BookId == bookId &&
-                               (br.Status == BorrowStatus.Borrowed ||
-                                br.Status == BorrowStatus.Returned ||
+                               (br.Status == BorrowStatus.Returned ||
                                 br.Status == BorrowStatus.Cancelled));
 
             return hasBorrowedBook;
