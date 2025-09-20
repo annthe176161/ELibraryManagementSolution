@@ -157,7 +157,7 @@ namespace ELibraryManagement.Web.Controllers
                 var review = await _reviewApiService.GetReviewByIdAsync(id, token);
                 if (review == null)
                 {
-                    TempData["ErrorMessage"] = "Không tìm thấy đánh giá.";
+                    // TempData["ErrorMessage"] = "Không tìm thấy đánh giá.";
                     return RedirectToAction("MyReviews");
                 }
 

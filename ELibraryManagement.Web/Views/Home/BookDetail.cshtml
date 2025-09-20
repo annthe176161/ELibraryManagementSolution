@@ -902,26 +902,19 @@
                         {
                             @if (ViewBag.HasBorrowedBook)
                             {
-                                @if (ViewBag.BorrowStatus == "Returned" || ViewBag.BorrowStatus == "Cancelled")
+                                @if (ViewBag.CanReview)
                                 {
                                     <a href="@Url.Action("Create", "Review", new { bookId = Model.Id })" class="btn btn-primary">
                                         <i class="fas fa-edit"></i>
                                         Viết đánh giá
                                     </a>
                                 }
-                                else if (ViewBag.BorrowStatus == "Requested" || ViewBag.BorrowStatus == "Borrowed")
+                                else
                                 {
                                     <div class="alert alert-info mb-0">
                                         <i class="fas fa-info-circle me-2"></i>
                                         Bạn có thể đánh giá sách này sau khi trả sách.
                                     </div>
-                                }
-                                else
-                                {
-                                    <a href="@Url.Action("Create", "Review", new { bookId = Model.Id })" class="btn btn-primary">
-                                        <i class="fas fa-edit"></i>
-                                        Viết đánh giá
-                                    </a>
                                 }
                             }
                             else

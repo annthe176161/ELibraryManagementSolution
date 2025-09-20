@@ -176,6 +176,7 @@ namespace ELibraryManagement.Web.Controllers
                 // Kiểm tra xem user đã từng mượn sách này chưa
                 bool hasBorrowedBook = false;
                 string? borrowStatus = null;
+                bool canReview = false;
                 if (isAuthenticated)
                 {
                     try
@@ -188,7 +189,7 @@ namespace ELibraryManagement.Web.Controllers
                             {
                                 hasBorrowedBook = await _bookApiService.HasUserBorrowedBookAsync(currentUser.Id, id, authToken);
 
-                                // Nếu đã từng mượn, lấy trạng thái mượn hiện tại
+                                // Nếu đã từng mượn, lấy trạng thái mượn hiện tại và kiểm tra có thể đánh giá không
                                 if (hasBorrowedBook)
                                 {
                                     var borrowedBooks = await _bookApiService.GetBorrowedBooksAsync(currentUser.Id, authToken);
@@ -207,6 +208,10 @@ namespace ELibraryManagement.Web.Controllers
                                             borrowStatus = historyBorrow.Status;
                                         }
                                     }
+
+                                    // Kiểm tra xem user có thể đánh giá sách này không (đã từng trả hoặc hủy)
+                                    var borrowHistoryForReview = await _bookApiService.GetBorrowHistoryAsync(currentUser.Id, authToken);
+                                    canReview = borrowHistoryForReview.Any(b => b.BookId == id && (b.Status == "Returned" || b.Status == "Cancelled"));
                                 }
                             }
                         }
@@ -216,12 +221,12 @@ namespace ELibraryManagement.Web.Controllers
                         _logger.LogWarning(ex, "Could not check if user has borrowed book {BookId}", id);
                         hasBorrowedBook = false;
                         borrowStatus = null;
+                        canReview = false;
                     }
                 }
                 ViewBag.HasBorrowedBook = hasBorrowedBook;
                 ViewBag.BorrowStatus = borrowStatus;
-
-                return View(book);
+                ViewBag.CanReview = canReview; return View(book);
             }
             catch (Exception ex)
             {
