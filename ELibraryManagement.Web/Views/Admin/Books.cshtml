@@ -662,7 +662,7 @@
             const formData = new FormData();
             formData.append('file', file);
             formData.append('upload_preset', 'your_upload_preset');
-    
+ 
             fetch('https://api.cloudinary.com/v1_1/your_cloud_name/image/upload', {
                 method: 'POST',
                 body: formData
@@ -731,7 +731,13 @@
                             $('#imagePreview').hide();
                         }
 
-                        $('#quantity').val(book.totalCopies || 0);
+                        // The API may return different property names depending on the source (Quantity, quantity, totalCopies).
+                        // Try common variants and fall back to 0.
+                        const qty = (book.Quantity !== undefined && book.Quantity !== null) ? book.Quantity
+                            : (book.quantity !== undefined && book.quantity !== null) ? book.quantity
+                                : (book.totalCopies !== undefined && book.totalCopies !== null) ? book.totalCopies
+                                    : 0;
+                        $('#quantity').val(qty);
                         $('#language').val(book.language || 'Tiếng Việt');
                         $('#pageCount').val(book.pageCount || 0);
 
@@ -982,22 +988,22 @@
                     console.error('Status:', xhr.status);
                     console.error('Response Text:', xhr.responseText);
                     $('#bookDetailModal .modal-content').html(`
-                                <div class="modal-header">
-                                    <h5 class="modal-title">Chi tiết sách</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body">
-                                    <div class="text-center py-4">
-                                        <i class="fas fa-exclamation-triangle text-danger fa-3x mb-3"></i>
-                                        <h5>Lỗi tải dữ liệu</h5>
-                                        <p class="text-muted">Có lỗi xảy ra khi tải thông tin sách. Status: ${xhr.status}</p>
-                                        <p class="text-muted">Chi tiết: ${xhr.responseText}</p>
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">Chi tiết sách</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                     </div>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                                </div>
-                            `);
+                                    <div class="modal-body">
+                                        <div class="text-center py-4">
+                                            <i class="fas fa-exclamation-triangle text-danger fa-3x mb-3"></i>
+                                            <h5>Lỗi tải dữ liệu</h5>
+                                            <p class="text-muted">Có lỗi xảy ra khi tải thông tin sách. Status: ${xhr.status}</p>
+                                            <p class="text-muted">Chi tiết: ${xhr.responseText}</p>
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                                    </div>
+                                `);
                 }
             });
         }
