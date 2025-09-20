@@ -44,7 +44,8 @@ namespace ELibraryManagement.Api.Seeders
                         PhoneNumber = "0123456789",
                         Address = "System Admin",
                         DateOfBirth = new DateTime(1980, 1, 1),
-                        CreatedAt = DateTime.UtcNow
+                        CreatedAt = DateTime.UtcNow,
+                        EmailConfirmed = true
                     };
 
                     var result = await userManager.CreateAsync(adminUser, "Admin@123");
@@ -68,6 +69,13 @@ namespace ELibraryManagement.Api.Seeders
                 else
                 {
                     Console.WriteLine("Admin user already exists.");
+                    // Ensure email is confirmed
+                    if (!adminUser.EmailConfirmed)
+                    {
+                        adminUser.EmailConfirmed = true;
+                        await userManager.UpdateAsync(adminUser);
+                        Console.WriteLine("Updated admin email confirmation.");
+                    }
                 }
             }
             catch (Exception ex)
