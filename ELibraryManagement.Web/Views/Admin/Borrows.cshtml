@@ -8,321 +8,314 @@
 <!-- Page Header -->
 <div class="row mb-4">
     <div class="col-12">
-            <div class="d-flex align-items-center justify-content-between">
-                <div>
-                    <h2 class="h3 mb-0">
-                        <i class="fas fa-clipboard-list me-2 text-info"></i>
-                        Quản lý mượn sách
-                    </h2>
-                    <nav aria-label="breadcrumb">
-                        <ol class="breadcrumb">
-                            <li class="breadcrumb-item">
-                                <a asp-action="Index">Quản trị</a>
+        <div class="d-flex align-items-center justify-content-between">
+            <div>
+                <h2 class="h3 mb-0">
+                    <i class="fas fa-clipboard-list me-2 text-info"></i>
+                    Quản lý mượn sách
+                </h2>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item">
+                            <a asp-action="Index">Quản trị</a>
+                        </li>
+                        <li class="breadcrumb-item active">Mượn sách</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Statistics Row -->
+<div class="row mb-4">
+    <div class="col-md-2">
+        <div class="card bg-info text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <div class="small">Tổng lượt mượn</div>
+                        <div class="h4 mb-0">@Model.Count</div>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-clipboard-list fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="card bg-warning text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <div class="small">Đã đăng ký</div>
+                        <div class="h4 mb-0">@Model.Count(b => b.Status == "Requested")</div>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-clock fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <div class="small">Đang mượn</div>
+                        <div class="h4 mb-0">@Model.Count(b => b.Status == "Borrowed")</div>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-hand-holding fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="card bg-danger text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <div class="small">Quá hạn</div>
+                        <div class="h4 mb-0">@Model.Count(b => b.IsOverdue)</div>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-exclamation-triangle fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <div class="small">Đã trả</div>
+                        <div class="h4 mb-0">@Model.Count(b => b.Status == "Returned")</div>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-check-circle fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-2">
+        <div class="card bg-secondary text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <div class="small">Đã hủy</div>
+                        <div class="h4 mb-0">@Model.Count(b => b.Status == "Cancelled")</div>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-times-circle fa-2x opacity-75"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Borrow Records Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="card shadow">
+            <div class="card-header bg-light">
+                <div class="d-flex align-items-center justify-content-between">
+                    <h5 class="mb-0">Danh sách mượn sách</h5>
+                    <div class="d-flex">
+                        <div class="input-group input-group-sm me-3" style="width: 300px;">
+                            <input type="text" class="form-control" placeholder="Tìm kiếm..." id="searchInput">
+                            <button class="btn btn-outline-secondary" type="button">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </div>
+                        <select class="form-select form-select-sm" id="statusFilter" style="width: 150px;">
+                            <option value="">Tất cả trạng thái</option>
+                            <option value="requested">Đã đăng ký</option>
+                            <option value="borrowed">Đang mượn</option>
+                            <option value="overdue">Quá hạn</option>
+                            <option value="returned">Đã trả</option>
+                            <option value="cancelled">Đã hủy</option>
+                            <option value="lost">Mất sách</option>
+                            <option value="damaged">Hư hỏng</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0" id="borrowsTable">
+                        <thead class="table-light">
+                            <tr>
+                                <th scope="col">Người mượn</th>
+                                <th scope="col">Sách</th>
+                                <th scope="col">Ngày yêu cầu/Ngày mượn</th>
+                                <th scope="col">Hạn trả</th>
+                                <th scope="col">Ngày trả</th>
+                                <th scope="col">Trạng thái</th>
+                                <th scope="col">Phí phạt</th>
+                                <th scope="col">Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var borrow in Model.OrderByDescending(b => b.BorrowDate))
+                            {
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar avatar-sm me-2">
+                                                <i class="fas fa-user-circle fa-2x text-muted"></i>
+                                            </div>
+                                            <div>
+                                                <h6 class="mb-0">@borrow.UserName</h6>
+                                                <small class="text-muted">@borrow.UserEmail</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div>
+                                            <h6 class="mb-1">@borrow.BookTitle</h6>
+                                            <small class="text-muted">@borrow.BookAuthor</small>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        @* Show request date for Requested and Cancelled statuses; otherwise show confirmed borrow date *@
+                                        @if (borrow.Status == "Requested" || borrow.Status == "Cancelled")
+                                        {
+                                            <div>
+                                                <small class="text-primary fw-bold">Ngày yêu cầu:</small><br>
+                                                <small>@borrow.BorrowDate.ToString("dd/MM/yyyy")</small>
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <div>
+                                                <small class="text-success fw-bold">Ngày mượn:</small><br>
+                                                <small>@(borrow.ConfirmedDate.HasValue ?
+                                                                                        borrow.ConfirmedDate.Value.ToString("dd/MM/yyyy") :
+                                                                                        borrow.BorrowDate.ToString("dd/MM/yyyy"))</small>
+                                            </div>
+                                        }
+                                    </td>
+                                    <td>
+                                        <small class="@(borrow.IsOverdue ? "text-danger fw-bold" : "")">
+                                            @borrow.DueDate.ToString("dd/MM/yyyy")
+                                        </small>
+                                    </td>
+                                    <td>
+                                        @if (borrow.ReturnDate.HasValue)
+                                        {
+                                            <small>@borrow.ReturnDate.Value.ToString("dd/MM/yyyy")</small>
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">Chưa trả</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-@borrow.StatusClass">@borrow.StatusDisplay</span>
+                                        @if (borrow.IsOverdue)
+                                        {
+                                            <br>
+                                    
+                                            <small class="text-danger">Quá hạn @borrow.OverdueDays ngày</small>
+                                        }
+                                    </td>
+                                    <td>
+                                        @if (borrow.FineAmount.HasValue && borrow.FineAmount.Value > 0)
+                                        {
+                                            <span class="fw-bold text-danger">@borrow.FineAmount.Value.ToString("C0", new
+                                                                                        System.Globalization.CultureInfo("vi-VN"))</span>
+                                                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">Không có phạt</span>
+                                        }
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <button type="button" class="btn btn-sm btn-outline-primary"
+                                                title="Xem chi tiết" onclick="viewBorrow(@borrow.Id)">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+
+                                            @* Status transition buttons based on current status *@
+                                            @if (borrow.Status == "Requested")
+                                            {
+                                                <button type="button" class="btn btn-sm btn-outline-success"
+                                                    title="Phê duyệt mượn sách"
+                                                    onclick="approveBorrow(@borrow.Id, '@borrow.UserName', '@borrow.BookTitle')">
+                                                    <i class="fas fa-check"></i>
+                                                </button>
+                                                <button type="button" class="btn btn-sm btn-outline-danger"
+                                                    title="Từ chối yêu cầu"
+                                                    onclick="rejectBorrow(@borrow.Id, '@borrow.UserName', '@borrow.BookTitle')">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            }
+                                            else if (borrow.Status == "Borrowed")
+                                            {
+                                                <button type="button" class="btn btn-sm btn-outline-success"
+                                                    title="Xác nhận trả sách"
+                                                    onclick="returnBook(@borrow.Id, '@borrow.UserName', '@borrow.BookTitle')">
+                                                    <i class="fas fa-undo"></i>
+                                                </button>
+                                                @if (borrow.IsOverdue)
+                                                {
+                                                    <button type="button" class="btn btn-sm btn-outline-warning"
+                                                        title="Gửi nhắc nhở"
+                                                        onclick="sendReminder(@borrow.Id, '@borrow.UserEmail')">
+                                                        <i class="fas fa-bell"></i>
+                                                    </button>
+                                                }
+                                            }
+                                            else if (borrow.Status == "Returned" || borrow.Status == "Cancelled" ||
+                                            borrow.Status == "Lost" || borrow.Status == "Damaged")
+                                            {
+                                                @* Final states - compact display *@
+                                                <span class="badge bg-secondary" title="Trạng thái cuối - không thể thay đổi">
+                                                    <i class="fas fa-lock"></i>
+                                                </span>
+                                            }
+
+                                            <!-- settings dropdown removed as requested -->
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="card-footer bg-light">
+                <div class="d-flex justify-content-between align-items-center">
+                    <small class="text-muted">
+                        Hiển thị @Model.Count giao dịch mượn
+                    </small>
+                    <nav>
+                        <ul class="pagination pagination-sm mb-0">
+                            <li class="page-item disabled">
+                                <span class="page-link">Trước</span>
                             </li>
-                            <li class="breadcrumb-item active">Mượn sách</li>
-                        </ol>
+                            <li class="page-item active">
+                                <span class="page-link">1</span>
+                            </li>
+                            <li class="page-item disabled">
+                                <span class="page-link">Sau</span>
+                            </li>
+                        </ul>
                     </nav>
                 </div>
             </div>
         </div>
     </div>
-
-    <!-- Statistics Row -->
-    <div class="row mb-4">
-        <div class="col-md-2">
-            <div class="card bg-info text-white">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <div class="small">Tổng lượt mượn</div>
-                            <div class="h4 mb-0">@Model.Count</div>
-                        </div>
-                        <div class="align-self-center">
-                            <i class="fas fa-clipboard-list fa-2x opacity-75"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-2">
-            <div class="card bg-warning text-white">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <div class="small">Đã đăng ký</div>
-                            <div class="h4 mb-0">@Model.Count(b => b.Status == "Requested")</div>
-                        </div>
-                        <div class="align-self-center">
-                            <i class="fas fa-clock fa-2x opacity-75"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-2">
-            <div class="card bg-primary text-white">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <div class="small">Đang mượn</div>
-                            <div class="h4 mb-0">@Model.Count(b => b.Status == "Borrowed")</div>
-                        </div>
-                        <div class="align-self-center">
-                            <i class="fas fa-hand-holding fa-2x opacity-75"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-2">
-            <div class="card bg-danger text-white">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <div class="small">Quá hạn</div>
-                            <div class="h4 mb-0">@Model.Count(b => b.IsOverdue)</div>
-                        </div>
-                        <div class="align-self-center">
-                            <i class="fas fa-exclamation-triangle fa-2x opacity-75"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-2">
-            <div class="card bg-success text-white">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <div class="small">Đã trả</div>
-                            <div class="h4 mb-0">@Model.Count(b => b.Status == "Returned")</div>
-                        </div>
-                        <div class="align-self-center">
-                            <i class="fas fa-check-circle fa-2x opacity-75"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-2">
-            <div class="card bg-secondary text-white">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                        <div>
-                            <div class="small">Đã hủy</div>
-                            <div class="h4 mb-0">@Model.Count(b => b.Status == "Cancelled")</div>
-                        </div>
-                        <div class="align-self-center">
-                            <i class="fas fa-times-circle fa-2x opacity-75"></i>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Borrow Records Table -->
-    <div class="row">
-        <div class="col-12">
-            <div class="card shadow">
-                <div class="card-header bg-light">
-                    <div class="d-flex align-items-center justify-content-between">
-                        <h5 class="mb-0">Danh sách mượn sách</h5>
-                        <div class="d-flex">
-                            <div class="input-group input-group-sm me-3" style="width: 300px;">
-                                <input type="text" class="form-control" placeholder="Tìm kiếm..." id="searchInput">
-                                <button class="btn btn-outline-secondary" type="button">
-                                    <i class="fas fa-search"></i>
-                                </button>
-                            </div>
-                            <select class="form-select form-select-sm" id="statusFilter" style="width: 150px;">
-                                <option value="">Tất cả trạng thái</option>
-                                <option value="requested">Đã đăng ký</option>
-                                <option value="borrowed">Đang mượn</option>
-                                <option value="overdue">Quá hạn</option>
-                                <option value="returned">Đã trả</option>
-                                <option value="cancelled">Đã hủy</option>
-                                <option value="lost">Mất sách</option>
-                                <option value="damaged">Hư hỏng</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-                <div class="card-body p-0">
-                    <div class="table-responsive">
-                        <table class="table table-hover mb-0" id="borrowsTable">
-                            <thead class="table-light">
-                                <tr>
-                                    <th scope="col">Người mượn</th>
-                                    <th scope="col">Sách</th>
-                                    <th scope="col">Ngày yêu cầu/Ngày mượn</th>
-                                    <th scope="col">Hạn trả</th>
-                                    <th scope="col">Ngày trả</th>
-                                    <th scope="col">Trạng thái</th>
-                                    <th scope="col">Phí phạt</th>
-                                    <th scope="col">Thao tác</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @foreach (var borrow in Model.OrderByDescending(b => b.BorrowDate))
-                                {
-                                    <tr>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                <div class="avatar avatar-sm me-2">
-                                                    <i class="fas fa-user-circle fa-2x text-muted"></i>
-                                                </div>
-                                                <div>
-                                                    <h6 class="mb-0">@borrow.UserName</h6>
-                                                    <small class="text-muted">@borrow.UserEmail</small>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <div>
-                                                <h6 class="mb-1">@borrow.BookTitle</h6>
-                                                <small class="text-muted">@borrow.BookAuthor</small>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            @* Show request date for Requested and Cancelled statuses; otherwise show confirmed borrow date *@
-                                            @if (borrow.Status == "Requested" || borrow.Status == "Cancelled")
-                                            {
-                                                <div>
-                                                    <small class="text-primary fw-bold">Ngày yêu cầu:</small><br>
-                                                    <small>@borrow.BorrowDate.ToString("dd/MM/yyyy")</small>
-                                                </div>
-                                            }
-                                            else
-                                            {
-                                                <div>
-                                                    <small class="text-success fw-bold">Ngày mượn:</small><br>
-                                                    <small>@(borrow.ConfirmedDate.HasValue ? borrow.ConfirmedDate.Value.ToString("dd/MM/yyyy") : borrow.BorrowDate.ToString("dd/MM/yyyy"))</small>
-                                                </div>
-                                            }
-                                        </td>
-                                        <td>
-                                            <small class="@(borrow.IsOverdue ? "text-danger fw-bold" : "")">
-                                                @borrow.DueDate.ToString("dd/MM/yyyy")
-                                            </small>
-                                        </td>
-                                        <td>
-                                            @if (borrow.ReturnDate.HasValue)
-                                            {
-                                                <small>@borrow.ReturnDate.Value.ToString("dd/MM/yyyy")</small>
-                                            }
-                                            else
-                                            {
-                                                <span class="text-muted">Chưa trả</span>
-                                            }
-                                        </td>
-                                        <td>
-                                            <span class="badge bg-@borrow.StatusClass">@borrow.StatusDisplay</span>
-                                            @if (borrow.IsOverdue)
-                                            {
-                                                <br><small class="text-danger">Quá hạn @borrow.OverdueDays ngày</small>
-                                            }
-                                        </td>
-                                        <td>
-                                            @if (borrow.FineAmount.HasValue && borrow.FineAmount.Value > 0)
-                                            {
-                                                <span class="fw-bold text-danger">@borrow.FineAmount.Value.ToString("C0", new System.Globalization.CultureInfo("vi-VN"))</span>
-                                            }
-                                            else
-                                            {
-                                                <span class="text-muted">Không có phạt</span>
-                                            }
-                                        </td>
-                                        <td>
-                                            <div class="btn-group" role="group">
-                                                <button type="button" class="btn btn-sm btn-outline-primary" title="Xem chi tiết" onclick="viewBorrow(@borrow.Id)">
-                                                    <i class="fas fa-eye"></i>
-                                                </button>
-                                                
-                                                @* Status transition buttons based on current status *@
-                                                @if (borrow.Status == "Requested")
-                                                {
-                                                    <button type="button" class="btn btn-sm btn-outline-success" title="Phê duyệt mượn sách" onclick="approveBorrow(@borrow.Id, '@borrow.UserName', '@borrow.BookTitle')">
-                                                        <i class="fas fa-check"></i>
-                                                    </button>
-                                                    <button type="button" class="btn btn-sm btn-outline-danger" title="Từ chối yêu cầu" onclick="rejectBorrow(@borrow.Id, '@borrow.UserName', '@borrow.BookTitle')">
-                                                        <i class="fas fa-times"></i>
-                                                    </button>
-                                                }
-                                                else if (borrow.Status == "Borrowed")
-                                                {
-                                                    <button type="button" class="btn btn-sm btn-outline-success" title="Xác nhận trả sách" onclick="returnBook(@borrow.Id, '@borrow.UserName', '@borrow.BookTitle')">
-                                                        <i class="fas fa-undo"></i>
-                                                    </button>
-                                                    @if (borrow.IsOverdue)
-                                                    {
-                                                        <button type="button" class="btn btn-sm btn-outline-warning" title="Gửi nhắc nhở" onclick="sendReminder(@borrow.Id, '@borrow.UserEmail')">
-                                                            <i class="fas fa-bell"></i>
-                                                        </button>
-                                                    }
-                                                }
-                                                else if (borrow.Status == "Returned" || borrow.Status == "Cancelled" || borrow.Status == "Lost" || borrow.Status == "Damaged")
-                                                {
-                                                    @* Final states - compact display *@
-                                                    <span class="badge bg-secondary" title="Trạng thái cuối - không thể thay đổi">
-                                                        <i class="fas fa-lock"></i>
-                                                    </span>
-                                                }
-                                                
-                                                <div class="btn-group" role="group">
-                                                    <button type="button" class="btn btn-sm btn-outline-secondary dropdown-toggle" data-bs-toggle="dropdown">
-                                                        <i class="fas fa-cog"></i>
-                                                    </button>
-                                                    <ul class="dropdown-menu">
-                                                        @if (borrow.Status == "Borrowed")
-                                                        {
-                                                            <li><a class="dropdown-item text-warning" href="#" onclick="markAsLost(@borrow.Id)"><i class="fas fa-question-circle me-2"></i>Báo mất sách</a></li>
-                                                            <li><a class="dropdown-item text-warning" href="#" onclick="markAsDamaged(@borrow.Id)"><i class="fas fa-exclamation-circle me-2"></i>Báo hư hỏng</a></li>
-                                                        }
-                                                        <li><a class="dropdown-item" href="#" onclick="viewHistory('@borrow.UserId')"><i class="fas fa-history me-2"></i>Lịch sử mượn</a></li>
-                                                        @if (!string.IsNullOrEmpty(borrow.Notes))
-                                                        {
-                                                            <li><hr class="dropdown-divider"></li>
-                                                            <li><a class="dropdown-item" href="#" onclick="viewNotes(@borrow.Id)"><i class="fas fa-sticky-note me-2"></i>Xem ghi chú</a></li>
-                                                        }
-                                                        @if (borrow.Status != "Returned" && borrow.Status != "Cancelled" && borrow.Status != "Lost" && borrow.Status != "Damaged")
-                                                        {
-                                                            <li><hr class="dropdown-divider"></li>
-                                                            <li><a class="dropdown-item" href="#" onclick="editNotes(@borrow.Id)"><i class="fas fa-edit me-2"></i>Thêm ghi chú</a></li>
-                                                        }
-                                                    </ul>
-                                                </div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                <div class="card-footer bg-light">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <small class="text-muted">
-                            Hiển thị @Model.Count giao dịch mượn
-                        </small>
-                        <nav>
-                            <ul class="pagination pagination-sm mb-0">
-                                <li class="page-item disabled">
-                                    <span class="page-link">Trước</span>
-                                </li>
-                                <li class="page-item active">
-                                    <span class="page-link">1</span>
-                                </li>
-                                <li class="page-item disabled">
-                                    <span class="page-link">Sau</span>
-                                </li>
-                            </ul>
-                        </nav>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+</div>
 </div>
 
 <!-- Extend Due Date Modal -->
@@ -367,7 +360,8 @@
 </div>
 
 <!-- Status Update Confirmation Modal -->
-<div class="modal fade" id="statusUpdateModal" tabindex="-1" aria-labelledby="statusUpdateModalLabel" aria-hidden="true">
+<div class="modal fade" id="statusUpdateModal" tabindex="-1" aria-labelledby="statusUpdateModalLabel"
+    aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -384,7 +378,8 @@
                 </div>
                 <div class="mt-3">
                     <label for="statusUpdateNotes" class="form-label">Ghi chú (tùy chọn):</label>
-                    <textarea class="form-control" id="statusUpdateNotes" rows="3" placeholder="Nhập ghi chú về thay đổi trạng thái này..."></textarea>
+                    <textarea class="form-control" id="statusUpdateNotes" rows="3"
+                        placeholder="Nhập ghi chú về thay đổi trạng thái này..."></textarea>
                 </div>
             </div>
             <div class="modal-footer">
@@ -397,19 +392,19 @@
 
 @section Scripts {
     <script>
-        $(document).ready(function() {
+        $(document).ready(function () {
             // Search functionality
-            $('#searchInput').on('keyup', function() {
+            $('#searchInput').on('keyup', function () {
                 var value = $(this).val().toLowerCase();
-                $('#borrowsTable tbody tr').filter(function() {
+                $('#borrowsTable tbody tr').filter(function () {
                     $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
                 });
             });
 
             // Status filter
-            $('#statusFilter').on('change', function() {
+            $('#statusFilter').on('change', function () {
                 var value = $(this).val();
-                $('#borrowsTable tbody tr').filter(function() {
+                $('#borrowsTable tbody tr').filter(function () {
                     if (value === '') {
                         $(this).show();
                     } else {
@@ -440,15 +435,15 @@
         function viewBorrow(borrowId) {
             // Show borrow details in modal
             $('#detailsModal').modal('show');
-            
+
             // Show loading spinner
             $('#borrowDetails').html('<div class="text-center"><div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div></div>');
-            
+
             // Fetch details from API
             $.ajax({
                 url: `/Admin/GetBorrowDetail/${borrowId}`,
                 type: 'GET',
-                success: function(response) {
+                success: function (response) {
                     if (response.success && response.data) {
                         // Normalize property names coming from server (support camelCase and PascalCase)
                         const raw = response.data;
@@ -478,61 +473,59 @@
                             FormattedReturnDate: raw.FormattedReturnDate || raw.formattedReturnDate || (raw.ReturnDate || raw.returnDate ? new Date(raw.ReturnDate || raw.returnDate).toLocaleString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : '')
                         };
                         $('#borrowDetails').html(`
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <h6>Thông tin người mượn</h6>
-                                    <p><strong>Họ tên:</strong> ${data.UserName || 'Không có thông tin'}</p>
-                                    <p><strong>Email:</strong> ${data.UserEmail || 'Không có thông tin'}</p>
-                                    <p><strong>Mã sinh viên:</strong> ${data.StudentId || 'Không có thông tin'}</p>
-                                    <p><strong>Số điện thoại:</strong> ${data.UserPhoneNumber || 'Không có thông tin'}</p>
-                                </div>
-                                <div class="col-md-6">
-                                    <h6>Thông tin sách</h6>
-                                    <p><strong>Tên sách:</strong> ${data.BookTitle || 'Không có thông tin'}</p>
-                                    <p><strong>Tác giả:</strong> ${data.BookAuthor || 'Không có thông tin'}</p>
-                                    <p><strong>ISBN:</strong> ${data.BookIsbn || 'Không có thông tin'}</p>
-                                    ${data.BookCoverUrl ? `<img src="${data.BookCoverUrl}" alt="Book Cover" class="img-thumbnail" style="max-width: 120px;">` : ''}
-                                </div>
-                            </div>
-                            <hr>
-                            <div class="row">
-                                <div class="col-12">
-                                    <h6>Thông tin mượn trả</h6>
-                                    ${data.Status === 'Requested' ?
-                                        `<p><strong>Ngày yêu cầu:</strong> <span class="text-primary fw-bold">${data.FormattedBorrowDate || 'Không có thông tin'}</span></p>` :
-                                        `<p><strong>Ngày mượn:</strong> <span class="text-success fw-bold">${data.ConfirmedDate ? new Date(data.ConfirmedDate).toLocaleDateString('vi-VN') + ' ' + new Date(data.ConfirmedDate).toLocaleTimeString('vi-VN', {hour: '2-digit', minute: '2-digit'}) : (data.FormattedBorrowDate || 'Không có thông tin')}</span></p>`
-                                    }
-                                    <p><strong>Ngày đến hạn:</strong> ${data.FormattedDueDate || 'Không có thông tin'}</p>
-                                    <p><strong>Ngày trả:</strong> ${data.FormattedReturnDate || 'Chưa trả'}</p>
-                                    <p><strong>Trạng thái:</strong> <span class="badge bg-${data.StatusClass}">${data.StatusDisplay || 'Không có thông tin'}</span></p>
-                                    ${data.IsOverdue ? `<p><strong>Số ngày quá hạn:</strong> <span class="text-danger">${data.OverdueDays} ngày</span></p>` : ''}
-                                    <p><strong>Ghi chú:</strong> ${data.Notes || 'Không có ghi chú'}</p>
-                                    ${data.FineAmount ? `<p><strong>Tiền phạt:</strong> <span class="text-danger">${data.FineAmount.toLocaleString('vi-VN')} VND</span></p>` : ''}
-                                </div>
-                            </div>
-                            <hr>
-                            <div class="row">
-                                <div class="col-12">
-                                    <h6>Cập nhật trạng thái</h6>
-                                    <div class="btn-group" role="group">
-                                        <button type="button" class="btn btn-success btn-sm" onclick="confirmUpdateBorrowStatus(${data.Id}, 'Returned', '${(data.UserName || '').replace(/'/g, "\\'")}', '${(data.BookTitle || '').replace(/'/g, "\\'")}')">
-                                            <i class="bi bi-check-circle"></i> Đã trả
-                                        </button>
-                                        <button type="button" class="btn btn-warning btn-sm" onclick="confirmUpdateBorrowStatus(${data.Id}, 'Overdue', '${(data.UserName || '').replace(/'/g, "\\'")}', '${(data.BookTitle || '').replace(/'/g, "\\'")}')">
-                                            <i class="bi bi-exclamation-triangle"></i> Quá hạn
-                                        </button>
-                                        <button type="button" class="btn btn-primary btn-sm" onclick="confirmUpdateBorrowStatus(${data.Id}, 'Borrowed', '${(data.UserName || '').replace(/'/g, "\\'")}', '${(data.BookTitle || '').replace(/'/g, "\\'")}')">
-                                            <i class="bi bi-book"></i> Đang mượn
-                                        </button>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h6>Thông tin người mượn</h6>
+                                        <p><strong>Họ tên:</strong> ${data.UserName || 'Không có thông tin'}</p>
+                                        <p><strong>Email:</strong> ${data.UserEmail || 'Không có thông tin'}</p>
+                                        <p><strong>Mã sinh viên:</strong> ${data.StudentId || 'Không có thông tin'}</p>
+                                        <p><strong>Số điện thoại:</strong> ${data.UserPhoneNumber || 'Không có thông tin'}</p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h6>Thông tin sách</h6>
+                                        <p><strong>Tên sách:</strong> ${data.BookTitle || 'Không có thông tin'}</p>
+                                        <p><strong>Tác giả:</strong> ${data.BookAuthor || 'Không có thông tin'}</p>
+                                        <p><strong>ISBN:</strong> ${data.BookIsbn || 'Không có thông tin'}</p>
+                                        ${data.BookCoverUrl ? `<img src="${data.BookCoverUrl}" alt="Book Cover" class="img-thumbnail" style="max-width: 120px;">` : ''}
                                     </div>
                                 </div>
-                            </div>
-                        `);
+                                <hr>
+                                <div class="row">
+                                    <div class="col-12">
+                                        <h6>Thông tin mượn trả</h6>
+                                        ${data.Status === 'Requested' || data.Status === 'Cancelled' ?
+                                `<p><strong>Ngày yêu cầu:</strong> <span class="text-primary fw-bold">${data.FormattedBorrowDate || 'Không có thông tin'}</span></p>` :
+                                `<p><strong>Ngày mượn:</strong> <span class="text-success fw-bold">${data.ConfirmedDate ? new Date(data.ConfirmedDate).toLocaleDateString('vi-VN') + ' ' + new Date(data.ConfirmedDate).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) : (data.FormattedBorrowDate || 'Không có thông tin')}</span></p>`
+                            }
+                                        <p><strong>Ngày đến hạn:</strong> ${data.FormattedDueDate || 'Không có thông tin'}</p>
+                                        <p><strong>Ngày trả:</strong> ${data.FormattedReturnDate || 'Chưa trả'}</p>
+                                        <p><strong>Trạng thái:</strong> <span class="badge bg-${data.StatusClass}">${data.StatusDisplay || 'Không có thông tin'}</span></p>
+                                        ${data.IsOverdue ? `<p><strong>Số ngày quá hạn:</strong> <span class="text-danger">${data.OverdueDays} ngày</span></p>` : ''}
+                                        <p><strong>Ghi chú:</strong> ${data.Notes || 'Không có ghi chú'}</p>
+                                        ${data.FineAmount ? `<p><strong>Tiền phạt:</strong> <span class="text-danger">${data.FineAmount.toLocaleString('vi-VN')} VND</span></p>` : ''}
+                                    </div>
+                                </div>
+                                <hr>
+                                <div class="row">
+                                    <div class="col-12">
+                                        <h6>Cập nhật trạng thái</h6>
+                                        <div class="btn-group" role="group">
+                                            <button type="button" class="btn btn-success btn-sm" onclick="confirmUpdateBorrowStatus(${data.Id}, 'Returned', '${(data.UserName || '').replace(/'/g, "\\'")}', '${(data.BookTitle || '').replace(/'/g, "\\'")}')">
+                                                <i class="bi bi-check-circle"></i> Đã trả
+                                            </button>
+                                            <!-- Removed manual 'Quá hạn' button to prevent admins from setting Overdue manually. Overdue is determined automatically by the background process. -->
+                                            <button type="button" class="btn btn-primary btn-sm" onclick="confirmUpdateBorrowStatus(${data.Id}, 'Borrowed', '${(data.UserName || '').replace(/'/g, "\\'")}', '${(data.BookTitle || '').replace(/'/g, "\\'")}')">
+                                                <i class="bi bi-book"></i> Đang mượn
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            `);
                     } else {
                         $('#borrowDetails').html('<div class="alert alert-danger">Không thể tải thông tin chi tiết: ' + (response.message || 'Lỗi không xác định') + '</div>');
                     }
                 },
-                error: function(xhr, status, error) {
+                error: function (xhr, status, error) {
                     $('#borrowDetails').html('<div class="alert alert-danger">Có lỗi xảy ra khi tải thông tin chi tiết</div>');
                 }
             });
@@ -541,17 +534,17 @@
         function returnBook(borrowId, userName, bookTitle) {
             currentBorrowId = borrowId;
             $('#returnDetails').html(`
-                <strong>Người mượn:</strong> ${userName}<br>
-                <strong>Sách:</strong> ${bookTitle}
-            `);
+                    <strong>Người mượn:</strong> ${userName}<br>
+                    <strong>Sách:</strong> ${bookTitle}
+                `);
             $('#returnModal').modal('show');
         }
 
-        $('#confirmReturn').on('click', function() {
+        $('#confirmReturn').on('click', function () {
             if (currentBorrowId) {
                 // Call API to confirm return
                 const token = localStorage.getItem('token');
-                
+
                 $.ajax({
                     url: `/Admin/ConfirmReturn`,
                     type: 'POST',
@@ -561,12 +554,12 @@
                     data: {
                         id: currentBorrowId
                     },
-                    success: function(response) {
+                    success: function (response) {
                         $('#returnModal').modal('hide');
                         showToast('success', 'Sách đã được xác nhận trả thành công!');
                         setTimeout(() => location.reload(), 1500);
                     },
-                    error: function(xhr) {
+                    error: function (xhr) {
                         showToast('error', 'Có lỗi xảy ra khi xác nhận trả sách: ' + xhr.responseText);
                     }
                 });
@@ -575,7 +568,7 @@
 
         function sendReminder(borrowId, userEmail) {
             const token = localStorage.getItem('token');
-            
+
             $.ajax({
                 url: `/Admin/SendReminder`,
                 type: 'POST',
@@ -585,10 +578,10 @@
                 data: {
                     borrowId: borrowId
                 },
-                success: function(response) {
+                success: function (response) {
                     showToast('success', `Đã gửi email nhắc nhở đến ${userEmail}`);
                 },
-                error: function(xhr) {
+                error: function (xhr) {
                     showToast('error', 'Có lỗi xảy ra khi gửi email nhắc nhở: ' + xhr.responseText);
                 }
             });
@@ -610,7 +603,7 @@
                 $.ajax({
                     url: `/Admin/ApproveBorrowRequest/${borrowId}`,
                     type: 'POST',
-                    success: function(response) {
+                    success: function (response) {
                         if (response.success) {
                             showToast('success', response.message);
                             setTimeout(() => location.reload(), 1500);
@@ -618,7 +611,7 @@
                             showToast('error', response.message);
                         }
                     },
-                    error: function(xhr) {
+                    error: function (xhr) {
                         showToast('error', 'Lỗi khi phê duyệt: ' + xhr.responseText);
                     }
                 });
@@ -656,7 +649,7 @@
                         id: borrowId,
                         notes: notes
                     },
-                    success: function(response) {
+                    success: function (response) {
                         if (response.success) {
                             showToast('success', 'Cập nhật ghi chú thành công!');
                             setTimeout(() => location.reload(), 1500);
@@ -664,7 +657,7 @@
                             showToast('error', response.message || 'Không thể cập nhật ghi chú');
                         }
                     },
-                    error: function(xhr, status, error) {
+                    error: function (xhr, status, error) {
                         showToast('error', 'Có lỗi xảy ra khi cập nhật ghi chú');
                     }
                 });
@@ -682,7 +675,7 @@
 
             const statusDisplayMap = {
                 'Requested': 'Đã đăng ký',
-                'Borrowed': 'Đang mượn', 
+                'Borrowed': 'Đang mượn',
                 'Returned': 'Đã trả',
                 'Cancelled': 'Đã hủy',
                 'Lost': 'Mất sách',
@@ -693,7 +686,7 @@
             const statusDisplay = statusDisplayMap[status] || status;
             const statusColor = {
                 'Returned': 'success',
-                'Borrowed': 'primary', 
+                'Borrowed': 'primary',
                 'Overdue': 'warning',
                 'Cancelled': 'danger',
                 'Lost': 'dark',
@@ -701,32 +694,32 @@
             }[status] || 'secondary';
 
             $('#statusUpdateDetails').html(`
-                <div class="row">
-                    <div class="col-12">
-                        <div class="card border-0 bg-light">
-                            <div class="card-body">
-                                <h6 class="card-title">Thông tin giao dịch</h6>
-                                <p class="mb-1"><strong>Người mượn:</strong> ${userName}</p>
-                                <p class="mb-1"><strong>Sách:</strong> ${bookTitle}</p>
-                                <p class="mb-0"><strong>Trạng thái mới:</strong> <span class="badge bg-${statusColor}">${statusDisplay}</span></p>
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="card border-0 bg-light">
+                                <div class="card-body">
+                                    <h6 class="card-title">Thông tin giao dịch</h6>
+                                    <p class="mb-1"><strong>Người mượn:</strong> ${userName}</p>
+                                    <p class="mb-1"><strong>Sách:</strong> ${bookTitle}</p>
+                                    <p class="mb-0"><strong>Trạng thái mới:</strong> <span class="badge bg-${statusColor}">${statusDisplay}</span></p>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="alert alert-warning mt-3">
-                    <strong>Xác nhận:</strong> Bạn có chắc chắn muốn cập nhật trạng thái thành <strong>"${statusDisplay}"</strong>?
-                </div>
-            `);
+                    <div class="alert alert-warning mt-3">
+                        <strong>Xác nhận:</strong> Bạn có chắc chắn muốn cập nhật trạng thái thành <strong>"${statusDisplay}"</strong>?
+                    </div>
+                `);
 
             // Clear previous notes
             $('#statusUpdateNotes').val('');
-            
+
             // Show modal
             $('#statusUpdateModal').modal('show');
         }
 
         // Handle status update confirmation
-        $('#confirmStatusUpdate').on('click', function() {
+        $('#confirmStatusUpdate').on('click', function () {
             if (currentStatusUpdate) {
                 const notes = $('#statusUpdateNotes').val().trim();
                 $('#statusUpdateModal').modal('hide');
@@ -738,7 +731,7 @@
         // Enhanced status update function with better error handling
         function updateBorrowStatus(borrowId, status, notes = '') {
             console.log('Updating borrow status:', { borrowId, status, notes });
-            
+
             $.ajax({
                 url: '/Admin/UpdateBorrowStatus',
                 type: 'POST',
@@ -747,15 +740,15 @@
                     status: status,
                     notes: notes
                 },
-                beforeSend: function() {
+                beforeSend: function () {
                     console.log('Sending request to update borrow status...');
                 },
-                success: function(response) {
+                success: function (response) {
                     console.log('Update response:', response);
                     if (response.success) {
                         const statusDisplayMap = {
                             'Requested': 'Đã đăng ký',
-                            'Borrowed': 'Đang mượn', 
+                            'Borrowed': 'Đang mượn',
                             'Returned': 'Đã trả',
                             'Cancelled': 'Đã hủy',
                             'Lost': 'Mất sách',
@@ -769,12 +762,12 @@
                         showToast('error', response.message || 'Không thể cập nhật trạng thái');
                     }
                 },
-                error: function(xhr, status, error) {
+                error: function (xhr, status, error) {
                     console.error('AJAX Error:', { xhr, status, error });
                     console.error('Response Text:', xhr.responseText);
-                    
+
                     let errorMessage = 'Có lỗi xảy ra khi cập nhật trạng thái';
-                    
+
                     try {
                         const response = JSON.parse(xhr.responseText);
                         if (response && response.message) {
@@ -783,7 +776,7 @@
                     } catch (e) {
                         // Ignore parsing error
                     }
-                    
+
                     showToast('error', errorMessage);
                 }
             });
@@ -792,29 +785,29 @@
         // Toast notification function
         function showToast(type, message) {
             const toastHtml = `
-                <div class="toast align-items-center text-white bg-${type === 'success' ? 'success' : type === 'error' ? 'danger' : 'info'} border-0" role="alert" aria-live="assertive" aria-atomic="true">
-                    <div class="d-flex">
-                        <div class="toast-body">
-                            ${message}
+                    <div class="toast align-items-center text-white bg-${type === 'success' ? 'success' : type === 'error' ? 'danger' : 'info'} border-0" role="alert" aria-live="assertive" aria-atomic="true">
+                        <div class="d-flex">
+                            <div class="toast-body">
+                                ${message}
+                            </div>
+                            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
                         </div>
-                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
                     </div>
-                </div>
-            `;
-            
+                `;
+
             // Create toast container if it doesn't exist
             if (!$('#toastContainer').length) {
                 $('body').append('<div id="toastContainer" class="toast-container position-fixed end-0 p-3" style="top: 80px; z-index: 1055;"></div>');
             }
-            
+
             const $toast = $(toastHtml);
             $('#toastContainer').append($toast);
-            
+
             const toast = new bootstrap.Toast($toast[0]);
             toast.show();
-            
+
             // Remove toast element after it's hidden
-            $toast.on('hidden.bs.toast', function() {
+            $toast.on('hidden.bs.toast', function () {
                 $(this).remove();
             });
         }
