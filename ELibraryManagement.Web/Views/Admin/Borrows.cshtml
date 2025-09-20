@@ -185,7 +185,8 @@
                                             </div>
                                         </td>
                                         <td>
-                                            @if (borrow.Status == "Requested")
+                                            @* Show request date for Requested and Cancelled statuses; otherwise show confirmed borrow date *@
+                                            @if (borrow.Status == "Requested" || borrow.Status == "Cancelled")
                                             {
                                                 <div>
                                                     <small class="text-primary fw-bold">Ngày yêu cầu:</small><br>
