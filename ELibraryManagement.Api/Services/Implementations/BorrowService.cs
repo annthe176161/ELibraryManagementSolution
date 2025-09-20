@@ -11,11 +11,13 @@ namespace ELibraryManagement.Api.Services.Implementations
     {
         private readonly ApplicationDbContext _context;
         private readonly IBorrowStatusValidationService _validationService;
+        private readonly IUserStatusService _userStatusService;
 
-        public BorrowService(ApplicationDbContext context, IBorrowStatusValidationService validationService)
+        public BorrowService(ApplicationDbContext context, IBorrowStatusValidationService validationService, IUserStatusService userStatusService)
         {
             _context = context;
             _validationService = validationService;
+            _userStatusService = userStatusService;
         }
 
         public async Task<IEnumerable<BorrowRecordDto>> GetAllBorrowRecordsAsync()
@@ -229,6 +231,9 @@ namespace ELibraryManagement.Api.Services.Implementations
 
             // Increase available quantity
             borrowRecord.Book.AvailableQuantity++;
+
+            // Decrease user's current borrow count
+            await _userStatusService.DecrementBorrowCountAsync(borrowRecord.UserId);
 
             await _context.SaveChangesAsync();
 
