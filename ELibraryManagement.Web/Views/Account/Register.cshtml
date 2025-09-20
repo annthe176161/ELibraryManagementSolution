@@ -484,10 +484,6 @@
                     <div class="input-group">
                         <input asp-for="Password" type="password" id="Password" class="form-control"
                             placeholder="Nhập mật khẩu" />
-                        <button class="toggle-password-btn" type="button"
-                            onclick="togglePasswordVisibility('Password', this)">
-                            <i class="fas fa-eye"></i>
-                        </button>
                     </div>
                     <span asp-validation-for="Password" class="text-danger"></span>
                 </div>
@@ -499,10 +495,6 @@
                     <div class="input-group">
                         <input asp-for="ConfirmPassword" type="password" id="ConfirmPassword" class="form-control"
                             placeholder="Nhập lại mật khẩu" />
-                        <button class="toggle-password-btn" type="button"
-                            onclick="togglePasswordVisibility('ConfirmPassword', this)">
-                            <i class="fas fa-eye"></i>
-                        </button>
                     </div>
                     <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
                 </div>
@@ -552,21 +544,7 @@
 </div>
 
 <script>
-    // Toggle password visibility function
-    function togglePasswordVisibility(inputId, button) {
-        const input = document.getElementById(inputId);
-        const icon = button.querySelector('i');
-
-        if (input.type === 'password') {
-            input.type = 'text';
-            icon.classList.remove('fa-eye');
-            icon.classList.add('fa-eye-slash');
-        } else {
-            input.type = 'password';
-            icon.classList.remove('fa-eye-slash');
-            icon.classList.add('fa-eye');
-        }
-    }
+    // ...existing code...
 
     // Real-time password validation
     document.addEventListener('DOMContentLoaded', function () {
