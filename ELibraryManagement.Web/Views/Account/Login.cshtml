@@ -533,31 +533,30 @@
                 <p class="form-subtitle">Sử dụng thông tin sinh viên để truy cập thư viện</p>
             </div>
 
-            @if (TempData["SuccessMessage"] != null)
+            @if (TempData["ShowEmailVerificationMessage"] != null)
             {
                 <div class="modern-alert alert-success">
-                    <i class="fas fa-check-circle"></i>
-                    @TempData["SuccessMessage"]
-                    @if (TempData["ShowEmailVerificationMessage"] != null)
-                    {
-                        <div class="mt-2">
-                            <small>
-                                Chưa nhận được email?
-                                <a href="@Url.Action("ResendEmailConfirmation", "Account")" class="text-primary">
-                                    Gửi lại email xác nhận
-                                </a>
-                            </small>
-                        </div>
-                    }
+                    <i class="fas fa-envelope"></i>
+                    Vui lòng xác nhận địa chỉ email của bạn trước khi đăng nhập. Kiểm tra email để nhận liên kết xác nhận.
                 </div>
             }
-
-            @if (TempData["ErrorMessage"] != null)
+            else
             {
-                <div class="modern-alert alert-danger">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    @TempData["ErrorMessage"]
-                </div>
+                @if (TempData["SuccessMessage"] != null)
+                {
+                    <div class="modern-alert alert-success">
+                        <i class="fas fa-check-circle"></i>
+                        @TempData["SuccessMessage"]
+                    </div>
+                }
+
+                @if (TempData["ErrorMessage"] != null)
+                {
+                    <div class="modern-alert alert-danger">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        @TempData["ErrorMessage"]
+                    </div>
+                }
             }
 
             <form asp-action="Login" method="post">
