@@ -205,7 +205,8 @@
                                                 </div>
                                             </td>
                                             <td>
-                                                @if (borrow.Status == "Requested")
+                                                @* Show 'Ngày yêu cầu' for Requested and Cancelled statuses; otherwise show 'Ngày mượn' *@
+                                                @if (borrow.Status == "Requested" || borrow.Status == "Cancelled")
                                                 {
                                                     <div>
                                                         <small class="text-primary fw-bold">Ngày yêu cầu:</small><br>
