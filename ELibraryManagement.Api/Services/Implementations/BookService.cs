@@ -63,9 +63,9 @@ namespace ELibraryManagement.Api.Services.Implementations
             if (book == null) return null;
 
             // Calculate actual available quantity based on borrowed books only
-            // Treat Overdue as borrowed so overdue copies are not counted as available
+            // Treat Overdue and Lost as borrowed so overdue and lost copies are not counted as available
             var borrowedCount = await _context.BorrowRecords
-                .CountAsync(br => br.BookId == book.Id && (br.Status == BorrowStatus.Borrowed || br.Status == BorrowStatus.Overdue));
+                .CountAsync(br => br.BookId == book.Id && (br.Status == BorrowStatus.Borrowed || br.Status == BorrowStatus.Overdue || br.Status == BorrowStatus.Lost));
 
             // Calculate requested count for statistics
             var requestedCount = await _context.BorrowRecords
@@ -568,9 +568,9 @@ namespace ELibraryManagement.Api.Services.Implementations
             foreach (var book in books)
             {
                 // Calculate actual available quantity based on borrowed books only
-                // Treat Overdue as borrowed so overdue copies are not counted as available
+                // Treat Overdue and Lost as borrowed so overdue and lost copies are not counted as available
                 var borrowedCount = await _context.BorrowRecords
-                    .CountAsync(br => br.BookId == book.Id && (br.Status == BorrowStatus.Borrowed || br.Status == BorrowStatus.Overdue));
+                    .CountAsync(br => br.BookId == book.Id && (br.Status == BorrowStatus.Borrowed || br.Status == BorrowStatus.Overdue || br.Status == BorrowStatus.Lost));
 
                 // Calculate requested count for statistics
                 var requestedCount = await _context.BorrowRecords
@@ -633,9 +633,9 @@ namespace ELibraryManagement.Api.Services.Implementations
             foreach (var book in books)
             {
                 // Calculate actual borrowed count
-                // Treat Overdue as borrowed so sync keeps AvailableQuantity accurate
+                // Treat Overdue and Lost as borrowed so sync keeps AvailableQuantity accurate
                 var borrowedCount = await _context.BorrowRecords
-                    .CountAsync(br => br.BookId == book.Id && (br.Status == BorrowStatus.Borrowed || br.Status == BorrowStatus.Overdue));
+                    .CountAsync(br => br.BookId == book.Id && (br.Status == BorrowStatus.Borrowed || br.Status == BorrowStatus.Overdue || br.Status == BorrowStatus.Lost));
 
                 var correctAvailableQuantity = Math.Max(0, book.Quantity - borrowedCount);
 
