@@ -1555,6 +1555,12 @@ namespace ELibraryManagement.Web.Controllers
                 _httpClient.DefaultRequestHeaders.Authorization =
                     new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
+                // Handle special fine types that require BorrowRecord status update
+                if (!string.IsNullOrEmpty(model.FineType) && model.BorrowRecordId.HasValue && !string.IsNullOrEmpty(token))
+                {
+                    await UpdateBorrowRecordStatusBasedOnFineType(model.FineType, model.BorrowRecordId.Value, token);
+                }
+
                 var success = await _fineApiService.CreateFineAsync(model);
 
                 if (success)
@@ -1788,6 +1794,111 @@ namespace ELibraryManagement.Web.Controllers
             {
                 _logger.LogError(ex, "Error in DebugAuthToken");
                 return Json(new { success = false, message = ex.Message });
+            }
+        }
+
+        /// <summary>
+        /// Update BorrowRecord status based on fine type
+        /// </summary>
+        private async Task UpdateBorrowRecordStatusBasedOnFineType(string fineType, int borrowRecordId, string token)
+        {
+            try
+            {
+                string? newStatus = fineType switch
+                {
+                    "lost" => "Lost",        // 4
+                    "damaged" => "Damaged",  // 5
+                    "overdue" => "Overdue",  // 2 (if not already overdue)
+                    _ => null
+                };
+
+                if (string.IsNullOrEmpty(newStatus))
+                {
+                    _logger.LogInformation("No status update needed for fine type: {FineType}", fineType);
+                    return;
+                }
+
+                // Create request payload for API
+                var updateRequest = new
+                {
+                    Status = newStatus,
+                    Notes = $"Status updated due to {fineType} fine created on {DateTime.Now:yyyy-MM-dd HH:mm:ss}"
+                };
+
+                var jsonContent = JsonSerializer.Serialize(updateRequest);
+                var content = new StringContent(jsonContent, System.Text.Encoding.UTF8);
+                content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
+
+                // Call API to update BorrowRecord
+                using var httpClient = new HttpClient();
+                httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+                var response = await httpClient.PutAsync($"{GetApiBaseUrl()}/api/Borrow/{borrowRecordId}/status", content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    _logger.LogInformation("Successfully updated BorrowRecord {BorrowRecordId} status to {Status}", borrowRecordId, newStatus);
+
+                    // For lost books, also decrease available quantity
+                    if (fineType == "lost")
+                    {
+                        await DecrementBookAvailableQuantity(borrowRecordId, token);
+                    }
+                }
+                else
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    _logger.LogWarning("Failed to update BorrowRecord {BorrowRecordId} status. Response: {Response}", borrowRecordId, errorContent);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating BorrowRecord {BorrowRecordId} status for fine type {FineType}", borrowRecordId, fineType);
+            }
+        }
+
+        /// <summary>
+        /// Decrease book's available quantity when marking as lost
+        /// </summary>
+        private async Task DecrementBookAvailableQuantity(int borrowRecordId, string token)
+        {
+            try
+            {
+                using var httpClient = new HttpClient();
+                httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+                // Get borrow record to find the book ID
+                var borrowResponse = await httpClient.GetAsync($"{GetApiBaseUrl()}/api/Borrow/{borrowRecordId}");
+                if (!borrowResponse.IsSuccessStatusCode)
+                {
+                    _logger.LogWarning("Could not fetch BorrowRecord {BorrowRecordId} to decrement book quantity", borrowRecordId);
+                    return;
+                }
+
+                var borrowContent = await borrowResponse.Content.ReadAsStringAsync();
+                var borrowRecord = JsonSerializer.Deserialize<JsonElement>(borrowContent, _jsonOptions);
+
+                if (borrowRecord.TryGetProperty("bookId", out var bookIdElement))
+                {
+                    var bookId = bookIdElement.GetInt32();
+
+                    // Call API to decrement available quantity
+                    var response = await httpClient.PostAsync($"{GetApiBaseUrl()}/api/Book/{bookId}/decrement-quantity", null);
+
+                    if (response.IsSuccessStatusCode)
+                    {
+                        _logger.LogInformation("Successfully decremented available quantity for Book {BookId}", bookId);
+                    }
+                    else
+                    {
+                        var errorContent = await response.Content.ReadAsStringAsync();
+                        _logger.LogWarning("Failed to decrement available quantity for Book {BookId}. Response: {Response}", bookId, errorContent);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error decrementing book quantity for BorrowRecord {BorrowRecordId}", borrowRecordId);
             }
         }
     }

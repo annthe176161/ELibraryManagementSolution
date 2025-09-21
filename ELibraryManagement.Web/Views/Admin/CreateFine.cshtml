@@ -32,6 +32,31 @@
                 </div>
                 <div class="card-body">
                     <form asp-action="CreateFine" method="post" id="createFineForm">
+                        <!-- Hidden field to store fine type -->
+                        <input type="hidden" id="selectedFineType" name="FineType" value="" />
+
+                        <!-- Loại phạt -->
+                        <div class="row mb-3">
+                            <div class="col-12">
+                                <div class="form-group">
+                                    <label class="form-label">
+                                        <i class="fas fa-tags"></i>
+                                        Loại phạt <span class="text-danger">*</span>
+                                    </label>
+                                    <select id="fineType" class="form-control" required>
+                                        <option value="">-- Chọn loại phạt --</option>
+                                        <option value="overdue">Trả sách muộn (5,000 VND)</option>
+                                        <option value="lost">Mất sách (200,000 VND)</option>
+                                        <option value="damaged">Làm hỏng sách (50,000 VND)</option>
+                                        <option value="other">Vi phạm khác (Tự định nghĩa)</option>
+                                    </select>
+                                    <small class="form-text text-muted">
+                                        Chọn loại phạt để tự động điền thông tin và cập nhật trạng thái tương ứng
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-group">
@@ -228,6 +253,12 @@
                 }
             });
 
+            // Handle fine type selection
+            $('#fineType').change(function () {
+                const fineType = $(this).val();
+                updateFormBasedOnFineType(fineType);
+            });
+
             // If a user is pre-selected, load their info
             const preSelectedUserId = '@selectedUserId';
             if (preSelectedUserId) {
@@ -255,6 +286,46 @@
             }
         }
 
+        function updateFormBasedOnFineType(fineType) {
+            // Save selected fine type to hidden field
+            $('#selectedFineType').val(fineType);
+
+            // Reset form fields first
+            $('#Amount').val('');
+            $('#Reason').val('');
+            $('#Description').val('');
+
+            switch (fineType) {
+                case 'overdue':
+                    $('#Amount').val(5000);
+                    $('#Reason').val('Trả sách muộn');
+                    $('#Description').val('Phạt tiêu chuẩn cho việc trả sách quá hạn theo quy định thư viện.');
+                    break;
+
+                case 'lost':
+                    $('#Amount').val(200000);
+                    $('#Reason').val('Mất sách');
+                    $('#Description').val('Sách bị mất hoàn toàn, cần bồi thường theo giá trị sách.');
+                    break;
+
+                case 'damaged':
+                    $('#Amount').val(50000);
+                    $('#Reason').val('Làm hỏng sách');
+                    $('#Description').val('Sách bị hỏng nhẹ, cần sửa chữa hoặc thay thế.');
+                    break;
+
+                case 'other':
+                    $('#Amount').val(20000);
+                    $('#Reason').val('Vi phạm quy định thư viện');
+                    $('#Description').val('Vi phạm các quy định khác của thư viện.');
+                    break;
+
+                default:
+                    // Leave fields empty for custom input
+                    break;
+            }
+        }
+
         function loadUserInfo(userId) {
             // Show loading
             $('#userInfoContent').html('<div class="text-center"><i class="fas fa-spinner fa-spin"></i> Đang tải...</div>');
@@ -266,13 +337,13 @@
             const userEmail = selectedOption.data('email');
 
             $('#userInfoContent').html(`
-                        <div class="row">
-                            <div class="col-12">
-                                <h6>${userName}</h6>
-                                <p class="text-muted mb-2">${userEmail}</p>
-                            </div>
-                        </div>
-                    `);
+                                <div class="row">
+                                    <div class="col-12">
+                                        <h6>${userName}</h6>
+                                        <p class="text-muted mb-2">${userEmail}</p>
+                                    </div>
+                                </div>
+                            `);
 
             // Load additional user info via AJAX (fines, etc.)
             $.get('@Url.Action("GetUserFines")', { userId: userId }, function (response) {
