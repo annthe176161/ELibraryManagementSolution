@@ -262,6 +262,14 @@
                                                 {
                                                     <span class="badge bg-danger">Quá hạn</span>
                                                 }
+                                                else if (borrow.Status == "Lost")
+                                                {
+                                                    <span class="badge bg-dark">Mất sách</span>
+                                                }
+                                                else if (borrow.Status == "Damaged")
+                                                {
+                                                    <span class="badge bg-dark">Hư hỏng</span>
+                                                }
                                                 else
                                                 {
                                                     <span class="badge bg-light text-dark">@borrow.Status</span>

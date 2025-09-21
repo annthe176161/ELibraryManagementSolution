@@ -43,12 +43,24 @@ namespace ELibraryManagement.Api.Controllers
 
                 // Calculate ActiveBorrows and TotalBorrows for each user
                 // Treat Overdue as active so admin shows overdue items under "Đang mượn"
+                // Treat Overdue, Lost and Damaged as active so admin shows them under "Đang mượn"
                 var activeBorrowsCount = await _context.BorrowRecords
-                    .Where(br => br.UserId == user.Id && (br.Status == BorrowStatus.Borrowed || br.Status == BorrowStatus.Overdue))
+                    .Where(br => br.UserId == user.Id && (
+                        br.Status == BorrowStatus.Borrowed ||
+                        br.Status == BorrowStatus.Overdue ||
+                        br.Status == BorrowStatus.Lost ||
+                        br.Status == BorrowStatus.Damaged))
                     .CountAsync();
 
+                // Count total borrows for the user. Include Lost and Damaged in total so admin statistics
+                // reflect all completed/consumed borrow transactions (Borrowed, Returned, Overdue, Lost, Damaged).
                 var totalBorrowsCount = await _context.BorrowRecords
-                    .Where(br => br.UserId == user.Id && (br.Status == BorrowStatus.Borrowed || br.Status == BorrowStatus.Returned || br.Status == BorrowStatus.Overdue))
+                    .Where(br => br.UserId == user.Id && (
+                        br.Status == BorrowStatus.Borrowed ||
+                        br.Status == BorrowStatus.Returned ||
+                        br.Status == BorrowStatus.Overdue ||
+                        br.Status == BorrowStatus.Lost ||
+                        br.Status == BorrowStatus.Damaged))
                     .CountAsync();
 
                 userDtos.Add(new UserDto
@@ -300,14 +312,23 @@ namespace ELibraryManagement.Api.Controllers
 
                 var roles = await _userManager.GetRolesAsync(user);
 
-                // Calculate ActiveBorrows - count borrow records with status Borrowed or Overdue
+                // Calculate ActiveBorrows - treat Borrowed, Overdue, Lost and Damaged as active for admin display
                 var activeBorrowsCount = await _context.BorrowRecords
-                    .Where(br => br.UserId == user.Id && (br.Status == BorrowStatus.Borrowed || br.Status == BorrowStatus.Overdue))
+                    .Where(br => br.UserId == user.Id && (
+                        br.Status == BorrowStatus.Borrowed ||
+                        br.Status == BorrowStatus.Overdue ||
+                        br.Status == BorrowStatus.Lost ||
+                        br.Status == BorrowStatus.Damaged))
                     .CountAsync();
 
-                // Calculate TotalBorrows - count borrow records that were borrowed (Borrowed, Returned, or Overdue)
+                // Calculate TotalBorrows - include Borrowed, Returned, Overdue, Lost and Damaged
                 var totalBorrowsCount = await _context.BorrowRecords
-                    .Where(br => br.UserId == user.Id && (br.Status == BorrowStatus.Borrowed || br.Status == BorrowStatus.Returned || br.Status == BorrowStatus.Overdue))
+                    .Where(br => br.UserId == user.Id && (
+                        br.Status == BorrowStatus.Borrowed ||
+                        br.Status == BorrowStatus.Returned ||
+                        br.Status == BorrowStatus.Overdue ||
+                        br.Status == BorrowStatus.Lost ||
+                        br.Status == BorrowStatus.Damaged))
                     .CountAsync();
 
                 var result = new
