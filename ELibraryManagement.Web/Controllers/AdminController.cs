@@ -154,6 +154,8 @@ namespace ELibraryManagement.Web.Controllers
                             dashboardData.ReturnedBorrows = borrows.Count(b => b.Status == "Returned");
                             dashboardData.CancelledBorrows = borrows.Count(b => b.Status == "Cancelled");
                             dashboardData.OverdueBorrows = borrows.Count(b => b.IsOverdue);
+                            dashboardData.LostBorrows = borrows.Count(b => b.Status == "Lost");
+                            dashboardData.DamagedBorrows = borrows.Count(b => b.Status == "Damaged");
                         }
                         else
                         {
@@ -163,6 +165,8 @@ namespace ELibraryManagement.Web.Controllers
                             dashboardData.ReturnedBorrows = 0;
                             dashboardData.CancelledBorrows = 0;
                             dashboardData.OverdueBorrows = 0;
+                            dashboardData.LostBorrows = 0;
+                            dashboardData.DamagedBorrows = 0;
                         }
                     }
                     else
@@ -183,6 +187,8 @@ namespace ELibraryManagement.Web.Controllers
                     dashboardData.ReturnedBorrows = 0;
                     dashboardData.CancelledBorrows = 0;
                     dashboardData.OverdueBorrows = 0;
+                    dashboardData.LostBorrows = 0;
+                    dashboardData.DamagedBorrows = 0;
                 }
 
                 // Get total reviews count

@@ -13,6 +13,8 @@ namespace ELibraryManagement.Web.Models
         public int ReturnedBorrows { get; set; } // Sách đã trả
         public int CancelledBorrows { get; set; } // Sách đã hủy
         public int OverdueBorrows { get; set; } // Sách quá hạn
+        public int LostBorrows { get; set; } // Sách mất
+        public int DamagedBorrows { get; set; } // Sách hư hỏng
         public int TotalReviews { get; set; }
         public List<RecentActivityViewModel> RecentActivities { get; set; } = new();
     }
