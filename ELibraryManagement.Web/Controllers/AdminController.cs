@@ -1709,6 +1709,86 @@ namespace ELibraryManagement.Web.Controllers
             }
         }
 
+        // GET: Admin/GetUserActiveBorrowRecords/{userId} - Lấy borrow records đang mượn/quá hạn của user
+        [HttpGet]
+        public async Task<IActionResult> GetUserActiveBorrowRecords(string userId)
+        {
+            var accessCheck = await CheckAdminAccessAsync();
+            if (accessCheck != null) return Json(new { success = false, message = "Unauthorized" });
+
+            try
+            {
+                var token = _authApiService.GetCurrentToken();
+
+                if (string.IsNullOrEmpty(token))
+                {
+                    _logger.LogWarning("GetUserActiveBorrowRecords missing token for user {UserId}", userId);
+                    return Json(new { success = false, message = "MissingAuthToken", detail = "Auth token not found in session. Please login again." });
+                }
+
+                // Create a new HttpClient instance to avoid header conflicts
+                using var httpClient = new HttpClient();
+                httpClient.DefaultRequestHeaders.Authorization =
+                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+                _logger.LogInformation("Calling API: {Url} with token ending in: {TokenEnd}",
+                    $"{GetApiBaseUrl()}/api/Borrow/user/{userId}/active",
+                    token.Length > 10 ? token.Substring(token.Length - 10) : token);
+
+                var response = await httpClient.GetAsync($"{GetApiBaseUrl()}/api/Borrow/user/{userId}/active");
+                var content = await response.Content.ReadAsStringAsync();
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var borrowRecords = JsonSerializer.Deserialize<List<BorrowRecordViewModel>>(content, _jsonOptions) ?? new List<BorrowRecordViewModel>();
+                    _logger.LogInformation("GetUserActiveBorrowRecords returned {Count} records for user {UserId}", borrowRecords.Count, userId);
+                    return Json(new { success = true, data = borrowRecords });
+                }
+                else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+                {
+                    _logger.LogWarning("GetUserActiveBorrowRecords API returned 401 Unauthorized for user {UserId}. Token may be expired.", userId);
+                    return Json(new { success = false, message = "TokenExpired", detail = "Authentication token has expired. Please login again." });
+                }
+                else
+                {
+                    _logger.LogWarning("GetUserActiveBorrowRecords API returned {Status} for user {UserId}: {Content}", response.StatusCode, userId, content);
+                    return Json(new { success = false, message = "Không thể tải dữ liệu borrow records từ API.", detail = content, status = (int)response.StatusCode });
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in GetUserActiveBorrowRecords for user {UserId}", userId);
+                return Json(new { success = false, message = $"Có lỗi xảy ra: {ex.Message}" });
+            }
+        }
+
         #endregion
+
+        // GET: Admin/DebugAuthToken - DEBUG ONLY: kiểm tra token trong session
+        [HttpGet]
+        public async Task<IActionResult> DebugAuthToken()
+        {
+            var accessCheck = await CheckAdminAccessAsync();
+            if (accessCheck != null) return Json(new { success = false, message = "Unauthorized" });
+
+            try
+            {
+                var token = _authApiService.GetCurrentToken();
+                if (string.IsNullOrEmpty(token))
+                {
+                    _logger.LogInformation("DebugAuthToken: no token in session");
+                    return Json(new { success = true, hasToken = false });
+                }
+
+                var preview = token.Length > 10 ? token.Substring(token.Length - 10) : token;
+                _logger.LogInformation("DebugAuthToken: token present, preview={Preview}", preview);
+                return Json(new { success = true, hasToken = true, tokenPreview = preview });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in DebugAuthToken");
+                return Json(new { success = false, message = ex.Message });
+            }
+        }
     }
 }

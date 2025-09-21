@@ -63,6 +63,7 @@
                                     <small class="form-text text-muted">
                                         Chọn sinh viên trước để xem các bản ghi mượn sách
                                     </small>
+                                    <div id="borrowRecordStatus" class="mt-2 text-muted small"></div>
                                 </div>
                             </div>
                         </div>
@@ -265,16 +266,16 @@
             const userEmail = selectedOption.data('email');
 
             $('#userInfoContent').html(`
-                    <div class="row">
-                        <div class="col-12">
-                            <h6>${userName}</h6>
-                            <p class="text-muted mb-2">${userEmail}</p>
+                        <div class="row">
+                            <div class="col-12">
+                                <h6>${userName}</h6>
+                                <p class="text-muted mb-2">${userEmail}</p>
+                            </div>
                         </div>
-                    </div>
-                `);
+                    `);
 
             // Load additional user info via AJAX (fines, etc.)
-            $.get('@Url.Action("GetUserFines")/' + userId, function (response) {
+            $.get('@Url.Action("GetUserFines")', { userId: userId }, function (response) {
                 if (response.success && response.data.length > 0) {
                     let finesHtml = '<hr><h6>Phạt hiện tại:</h6><ul class="list-unstyled">';
                     let totalPending = 0;
@@ -298,13 +299,95 @@
         }
 
         function loadUserBorrowRecords(userId) {
-            $('#borrowRecordSelect').html('<option value="">Đang tải...</option>');
+            // Disable select while loading to prevent user interaction
+            $('#borrowRecordSelect').prop('disabled', true).html('<option value="">Đang tải...</option>');
+            $('#borrowRecordStatus').text('Đang tải bản ghi mượn...');
 
-            // This would require an API endpoint to get user's borrow records
-            // For now, we'll just reset to default
-            setTimeout(() => {
-                $('#borrowRecordSelect').html('<option value="">-- Không liên quan đến mượn sách --</option>');
-            }, 500);
+            // Call Admin controller action explicitly so the request goes via the web app (includes token)
+            const url = '@Url.Action("GetUserActiveBorrowRecords", "Admin")';
+
+            $.get(url, { userId: userId }, function (response) {
+                let options = '<option value="">-- Không liên quan đến mượn sách --</option>';
+
+                if (!response) {
+                    console.warn('No response from GetUserActiveBorrowRecords');
+                    $('#borrowRecordSelect').html('<option value="">-- Lỗi tải dữ liệu --</option>').prop('disabled', false).trigger('change');
+                    $('#borrowRecordStatus').text('Không có phản hồi từ server.');
+                    return;
+                }
+
+                if (!response.success) {
+                    console.warn('GetUserActiveBorrowRecords returned error:', response.message || response.detail || response);
+
+                    if (response.message === 'MissingAuthToken') {
+                        $('#borrowRecordSelect').html('<option value="">-- Yêu cầu đăng nhập (token không có) --</option>').prop('disabled', false).trigger('change');
+                        $('#borrowRecordStatus').html('Token đăng nhập bị thiếu. <a href="@Url.Action("Login", "Account")">Đăng nhập lại</a>');
+                        return;
+                    }
+
+                    if (response.message === 'TokenExpired') {
+                        $('#borrowRecordSelect').html('<option value="">-- Token hết hạn --</option>').prop('disabled', false).trigger('change');
+                        $('#borrowRecordStatus').html('Token đăng nhập đã hết hạn. <a href="@Url.Action("Login", "Account")">Đăng nhập lại</a>');
+                        return;
+                    }
+
+                    // show detailed error in status area
+                    $('#borrowRecordSelect').html('<option value="">-- Lỗi tải dữ liệu --</option>').prop('disabled', false).trigger('change');
+                    const detail = response.detail || response.message || 'Không thể tải dữ liệu';
+                    $('#borrowRecordStatus').text('Lỗi API: ' + detail);
+
+                    // If status is 401, suggest re-login
+                    if (response.status === 401) {
+                        $('#borrowRecordStatus').html('Lỗi xác thực (401). <a href="@Url.Action("Login", "Account")">Đăng nhập lại</a>');
+                    }
+                    return;
+                }
+
+                const data = response.data || [];
+                if (data.length === 0) {
+                    $('#borrowRecordSelect').html('<option value="">-- Không có bản ghi đang mượn hoặc quá hạn --</option>').prop('disabled', false).trigger('change');
+                    $('#borrowRecordStatus').text('Không tìm thấy bản ghi đang mượn hoặc quá hạn cho sinh viên này.');
+                    return;
+                }
+
+                data.forEach(function (record) {
+                    // Accept both camelCase and PascalCase property names from different serializers
+                    const id = record.id ?? record.Id;
+                    const bookTitle = record.bookTitle ?? record.BookTitle ?? 'Không rõ tên sách';
+                    const borrowDate = record.borrowDate ?? record.BorrowDate;
+                    const dueDate = record.dueDate ?? record.DueDate;
+                    const status = record.status ?? record.Status ?? '';
+                    const isOverdue = (typeof record.isOverdue !== 'undefined') ? record.isOverdue : (record.IsOverdue ?? false);
+                    const overdueDays = record.overdueDays ?? record.OverdueDays ?? 0;
+
+                    const statusText = status === 'Borrowed' ? 'Đang mượn' : (status === 'Overdue' ? 'Quá hạn' : status);
+                    const overdueText = isOverdue ? ` (Quá hạn ${overdueDays} ngày)` : '';
+
+                    let borrowDateText = '';
+                    let dueDateText = '';
+                    try {
+                        if (borrowDate) borrowDateText = new Date(borrowDate).toLocaleDateString('vi-VN');
+                        if (dueDate) dueDateText = new Date(dueDate).toLocaleDateString('vi-VN');
+                    } catch (e) {
+                        borrowDateText = '';
+                        dueDateText = '';
+                    }
+
+                    const displayText = `${bookTitle} - ${statusText}${overdueText}${(borrowDateText ? ` (Mượn: ${borrowDateText}` : '')}${(dueDateText ? `, Hạn: ${dueDateText})` : (borrowDateText ? ')' : ''))}`;
+
+                    options += `<option value="${id}">${displayText}</option>`;
+                });
+
+                // Populate and enable select, trigger change so select2 updates
+                $('#borrowRecordSelect').html(options).prop('disabled', false).trigger('change');
+
+                // Update status message with count
+                $('#borrowRecordStatus').text(data.length + ' bản ghi đang mượn / quá hạn được tải.');
+            }).fail(function (jqxhr, textStatus, error) {
+                console.error('AJAX error loading borrow records:', textStatus, error, jqxhr.responseText);
+                $('#borrowRecordSelect').html('<option value="">-- Lỗi tải dữ liệu --</option>').prop('disabled', false).trigger('change');
+                $('#borrowRecordStatus').text('Lỗi khi tải bản ghi mượn. Kiểm tra console để biết chi tiết.');
+            });
         }
 
         // Form validation

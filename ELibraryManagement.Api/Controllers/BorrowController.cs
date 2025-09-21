@@ -590,5 +590,46 @@ namespace ELibraryManagement.Api.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+
+        /// <summary>
+        /// Lấy borrow records đang mượn hoặc quá hạn của user - Chỉ dành cho Admin
+        /// </summary>
+        [HttpGet("user/{userId}/active")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetUserActiveBorrowRecords(string userId)
+        {
+            try
+            {
+                var borrowRecords = await _context.BorrowRecords
+                    .Include(br => br.Book)
+                    .Include(br => br.User)
+                    .Where(br => br.UserId == userId && (br.Status == BorrowStatus.Borrowed || br.Status == BorrowStatus.Overdue))
+                    .OrderByDescending(br => br.CreatedAt)
+                    .ToListAsync();
+
+                var result = borrowRecords.Select(br => new
+                {
+                    id = br.Id,
+                    bookId = br.BookId,
+                    bookTitle = br.Book.Title,
+                    bookAuthor = br.Book.Author,
+                    bookCoverUrl = br.Book.CoverImageUrl,
+                    borrowDate = br.BorrowDate,
+                    confirmedDate = br.ConfirmedDate,
+                    dueDate = br.DueDate,
+                    returnDate = br.ReturnDate,
+                    status = br.Status.ToString(),
+                    notes = br.Notes,
+                    isOverdue = br.IsOverdue,
+                    overdueDays = br.OverdueDays
+                });
+
+                return Ok(result);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
     }
 }
