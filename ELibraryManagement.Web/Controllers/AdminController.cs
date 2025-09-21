@@ -1555,6 +1555,12 @@ namespace ELibraryManagement.Web.Controllers
                 _httpClient.DefaultRequestHeaders.Authorization =
                     new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
+                // Set token for FineApiService
+                if (!string.IsNullOrEmpty(token))
+                {
+                    _fineApiService.SetAuthToken(token);
+                }
+
                 // Handle special fine types that require BorrowRecord status update
                 if (!string.IsNullOrEmpty(model.FineType) && model.BorrowRecordId.HasValue && !string.IsNullOrEmpty(token))
                 {
@@ -1830,10 +1836,9 @@ namespace ELibraryManagement.Web.Controllers
                 content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/json");
 
                 // Call API to update BorrowRecord
-                using var httpClient = new HttpClient();
-                httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
-                var response = await httpClient.PutAsync($"{GetApiBaseUrl()}/api/Borrow/{borrowRecordId}/status", content);
+                var response = await _httpClient.PutAsync($"{GetApiBaseUrl()}/api/Borrow/admin/{borrowRecordId}/status", content);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -1864,11 +1869,10 @@ namespace ELibraryManagement.Web.Controllers
         {
             try
             {
-                using var httpClient = new HttpClient();
-                httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
                 // Get borrow record to find the book ID
-                var borrowResponse = await httpClient.GetAsync($"{GetApiBaseUrl()}/api/Borrow/{borrowRecordId}");
+                var borrowResponse = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Borrow/{borrowRecordId}");
                 if (!borrowResponse.IsSuccessStatusCode)
                 {
                     _logger.LogWarning("Could not fetch BorrowRecord {BorrowRecordId} to decrement book quantity", borrowRecordId);
@@ -1883,7 +1887,7 @@ namespace ELibraryManagement.Web.Controllers
                     var bookId = bookIdElement.GetInt32();
 
                     // Call API to decrement available quantity
-                    var response = await httpClient.PostAsync($"{GetApiBaseUrl()}/api/Book/{bookId}/decrement-quantity", null);
+                    var response = await _httpClient.PostAsync($"{GetApiBaseUrl()}/api/Book/admin/{bookId}/decrement-quantity", null);
 
                     if (response.IsSuccessStatusCode)
                     {

@@ -19,5 +19,6 @@ namespace ELibraryManagement.Api.Services.Interfaces
         Task<IEnumerable<BookDto>> GetAllBooksAsync();
         Task<IEnumerable<CategoryDto>> GetAllCategoriesAsync();
         Task<int> SyncAvailableQuantitiesAsync();
+        Task<bool> DecrementAvailableQuantityAsync(int bookId);
     }
 }

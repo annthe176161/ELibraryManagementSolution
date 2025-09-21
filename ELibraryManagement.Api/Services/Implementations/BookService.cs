@@ -653,5 +653,25 @@ namespace ELibraryManagement.Api.Services.Implementations
 
             return updatedCount;
         }
+
+        public async Task<bool> DecrementAvailableQuantityAsync(int bookId)
+        {
+            try
+            {
+                var book = await _context.Books.FindAsync(bookId);
+                if (book == null || book.AvailableQuantity <= 0)
+                {
+                    return false;
+                }
+
+                book.AvailableQuantity--;
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
     }
 }

@@ -339,5 +339,47 @@ namespace ELibraryManagement.Api.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+
+        /// <summary>
+        /// Giảm AvailableQuantity của sách khi đánh dấu mất sách
+        /// </summary>
+        [HttpPost("admin/{id}/decrement-quantity")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> DecrementAvailableQuantity(int id)
+        {
+            try
+            {
+                var book = await _bookService.GetBookByIdAsync(id);
+                if (book == null)
+                {
+                    return NotFound(new { message = "Không tìm thấy sách" });
+                }
+
+                if (book.AvailableQuantity <= 0)
+                {
+                    return BadRequest(new { message = "Số lượng sách khả dụng đã là 0" });
+                }
+
+                // Update book through service
+                var result = await _bookService.DecrementAvailableQuantityAsync(id);
+                if (result)
+                {
+                    return Ok(new
+                    {
+                        message = "Đã giảm số lượng sách khả dụng",
+                        bookId = id,
+                        newAvailableQuantity = book.AvailableQuantity - 1
+                    });
+                }
+                else
+                {
+                    return BadRequest(new { message = "Không thể cập nhật số lượng sách" });
+                }
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
     }
 }
