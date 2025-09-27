@@ -1407,7 +1407,7 @@ namespace ELibraryManagement.Web.Controllers
                 _httpClient.DefaultRequestHeaders.Clear();
                 _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
 
-                var response = await _httpClient.DeleteAsync($"{GetApiBaseUrl()}/api/Books/{id}");
+                var response = await _httpClient.DeleteAsync($"{GetApiBaseUrl()}/api/Books/admin/delete/{id}");
 
                 if (response.IsSuccessStatusCode)
                 {

@@ -455,6 +455,11 @@
             <div class="modal-body">
                 <p>Bạn có chắc chắn muốn xóa sách này không?</p>
                 <div id="deleteDetails"></div>
+                <div class="alert alert-info mt-3">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>Lưu ý:</strong> Sách sẽ bị ẩn khỏi hệ thống nhưng vẫn được lưu trữ trong cơ sở dữ liệu (xóa
+                    mềm).
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
@@ -834,10 +839,10 @@
                     console.log('Response:', response); // Debug log
                     if (response.success) {
                         $('#bookModal').modal('hide');
-                        alert(response.message);
-                        location.reload(); // Reload page to show updated data
+                        showToast('success', response.message);
+                        setTimeout(() => location.reload(), 1500); // Reload page to show updated data
                     } else {
-                        alert('Lỗi: ' + response.message);
+                        showToast('error', 'Lỗi: ' + response.message);
                         if (response.errors) {
                             console.error('Validation errors:', response.errors);
                         }
@@ -847,9 +852,9 @@
                     console.error('Error:', xhr);
                     try {
                         const errorResponse = JSON.parse(xhr.responseText);
-                        alert('Có lỗi xảy ra: ' + (errorResponse.message || 'Lỗi không xác định'));
+                        showToast('error', 'Có lỗi xảy ra: ' + (errorResponse.message || 'Lỗi không xác định'));
                     } catch (e) {
-                        alert('Có lỗi xảy ra khi lưu sách');
+                        showToast('error', 'Có lỗi xảy ra khi lưu sách');
                     }
                 },
                 complete: function () {
@@ -918,12 +923,12 @@
                         $('.progress-bar').css('width', '0%');
                     }, 1000);
                 } else {
-                    alert('Upload thất bại: ' + (response.message || 'Lỗi không xác định'));
+                    showToast('error', 'Upload thất bại: ' + (response.message || 'Lỗi không xác định'));
                     $('#uploadProgress').hide();
                 }
             } catch (error) {
                 console.error('Upload error:', error);
-                alert('Có lỗi xảy ra khi upload ảnh: ' + (error.responseJSON?.message || error.message || 'Lỗi không xác định'));
+                showToast('error', 'Có lỗi xảy ra khi upload ảnh: ' + (error.responseJSON?.message || error.message || 'Lỗi không xác định'));
                 $('#uploadProgress').hide();
             }
         }
@@ -944,16 +949,16 @@
                     success: function (response) {
                         $('#deleteModal').modal('hide');
                         if (response.success) {
-                            alert(response.message);
-                            location.reload();
+                            showToast('success', response.message);
+                            setTimeout(() => location.reload(), 1500);
                         } else {
-                            alert('Lỗi: ' + response.message);
+                            showToast('error', 'Lỗi: ' + response.message);
                         }
                     },
                     error: function (xhr) {
                         $('#deleteModal').modal('hide');
                         console.error('Error:', xhr);
-                        alert('Có lỗi xảy ra khi xóa sách');
+                        showToast('error', 'Có lỗi xảy ra khi xóa sách');
                     }
                 });
             });
@@ -988,23 +993,59 @@
                     console.error('Status:', xhr.status);
                     console.error('Response Text:', xhr.responseText);
                     $('#bookDetailModal .modal-content').html(`
-                                    <div class="modal-header">
-                                        <h5 class="modal-title">Chi tiết sách</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <div class="text-center py-4">
-                                            <i class="fas fa-exclamation-triangle text-danger fa-3x mb-3"></i>
-                                            <h5>Lỗi tải dữ liệu</h5>
-                                            <p class="text-muted">Có lỗi xảy ra khi tải thông tin sách. Status: ${xhr.status}</p>
-                                            <p class="text-muted">Chi tiết: ${xhr.responseText}</p>
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">Chi tiết sách</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                                         </div>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
-                                    </div>
-                                `);
+                                        <div class="modal-body">
+                                            <div class="text-center py-4">
+                                                <i class="fas fa-exclamation-triangle text-danger fa-3x mb-3"></i>
+                                                <h5>Lỗi tải dữ liệu</h5>
+                                                <p class="text-muted">Có lỗi xảy ra khi tải thông tin sách. Status: ${xhr.status}</p>
+                                                <p class="text-muted">Chi tiết: ${xhr.responseText}</p>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                                        </div>
+                                    `);
                 }
+            });
+        }
+
+        // Toast notification function
+        function showToast(type, message) {
+            console.log(`Showing ${type} toast:`, message);
+
+            const bgClass = type === 'success' ? 'bg-success' : 'bg-danger';
+            const iconClass = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
+
+            const toastHtml = `
+                    <div class="toast align-items-center text-white ${bgClass} border-0" role="alert" aria-live="assertive" aria-atomic="true">
+                        <div class="d-flex">
+                            <div class="toast-body">
+                                <i class="fas ${iconClass} me-2"></i>${message}
+                            </div>
+                            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                        </div>
+                    </div>
+                `;
+
+            // Create toast container if it doesn't exist
+            if (!$('#toastContainer').length) {
+                $('body').append('<div id="toastContainer" class="toast-container position-fixed end-0 p-3" style="top: 100px; z-index: 9999;"></div>');
+            }
+
+            const $toast = $(toastHtml);
+            $('#toastContainer').append($toast);
+
+            // Show the toast using Bootstrap
+            const toast = new bootstrap.Toast($toast[0]);
+            toast.show();
+
+            // Remove toast element after it's hidden
+            $toast[0].addEventListener('hidden.bs.toast', () => {
+                $toast.remove();
             });
         }
     </script>
