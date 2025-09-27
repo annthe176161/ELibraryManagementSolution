@@ -1,9 +1,10 @@
 using ELibraryManagement.Web.Models;
+using ELibraryManagement.Web.Services.Interfaces;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 
-namespace ELibraryManagement.Web.Services
+namespace ELibraryManagement.Web.Services.Implementations
 {
     public class ReviewApiService : IReviewApiService
     {

@@ -172,4 +172,80 @@ namespace ELibraryManagement.Web.Models
             return displayNames.ContainsKey(actionType) ? displayNames[actionType] : actionType;
         }
     }
+
+    // API Service ViewModels
+    public class FineViewModel
+    {
+        public int Id { get; set; }
+        public string UserId { get; set; } = string.Empty;
+        public string UserFullName { get; set; } = string.Empty;
+        public string UserEmail { get; set; } = string.Empty;
+        public int? BorrowRecordId { get; set; }
+        public string? BookTitle { get; set; }
+        public decimal Amount { get; set; }
+        public string Reason { get; set; } = string.Empty;
+        public string? Description { get; set; }
+        public string Status { get; set; } = string.Empty;
+        public DateTime FineDate { get; set; }
+        public DateTime? PaidDate { get; set; }
+        public DateTime? DueDate { get; set; }
+        public int ReminderCount { get; set; }
+        public DateTime? LastReminderDate { get; set; }
+        public string? EscalationReason { get; set; }
+        public DateTime? EscalationDate { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public bool IsOverdue { get; set; }
+    }
+
+    public class FineDetailViewModel : FineViewModel
+    {
+        public string? BookAuthor { get; set; }
+        public DateTime? UpdatedAt { get; set; }
+        public List<FineActionHistoryViewModel> ActionHistory { get; set; } = new List<FineActionHistoryViewModel>();
+    }
+
+    public class FineActionHistoryViewModel
+    {
+        public int Id { get; set; }
+        public string ActionType { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+        public decimal? Amount { get; set; }
+        public string? Notes { get; set; }
+        public DateTime ActionDate { get; set; }
+        public string UserFullName { get; set; } = string.Empty;
+        public string UserEmail { get; set; } = string.Empty;
+    }
+
+    public class FineStatisticsViewModel
+    {
+        public int TotalFines { get; set; }
+        public int PendingFines { get; set; }
+        public int PaidFines { get; set; }
+        public int WaivedFines { get; set; }
+        public int OverdueFines { get; set; }
+        public decimal TotalAmount { get; set; }
+        public decimal PaidAmount { get; set; }
+        public decimal PendingAmount { get; set; }
+    }
+
+    public class CreateFineRequest
+    {
+        public string UserId { get; set; } = string.Empty;
+        public int? BorrowRecordId { get; set; }
+        public decimal Amount { get; set; }
+        public string Reason { get; set; } = string.Empty;
+        public string? Description { get; set; }
+        public DateTime? DueDate { get; set; }
+        public string? FineType { get; set; } // overdue, lost, damaged, other
+    }
+
+    public class UpdateFineRequest
+    {
+        public decimal Amount { get; set; }
+        public string Reason { get; set; } = string.Empty;
+        public string? Description { get; set; }
+        public DateTime? DueDate { get; set; }
+        public string? Status { get; set; }
+        public string? Notes { get; set; }
+    }
 }

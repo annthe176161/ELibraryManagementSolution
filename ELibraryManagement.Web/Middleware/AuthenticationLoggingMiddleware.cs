@@ -1,4 +1,4 @@
-using ELibraryManagement.Web.Services;
+using ELibraryManagement.Web.Services.Interfaces;
 
 namespace ELibraryManagement.Web.Middleware
 {

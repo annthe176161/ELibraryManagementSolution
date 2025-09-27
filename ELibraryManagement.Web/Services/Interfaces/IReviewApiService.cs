@@ -1,6 +1,6 @@
 using ELibraryManagement.Web.Models;
 
-namespace ELibraryManagement.Web.Services
+namespace ELibraryManagement.Web.Services.Interfaces
 {
     public interface IReviewApiService
     {

@@ -1,9 +1,9 @@
-@model List<ELibraryManagement.Web.Services.FineViewModel>
+@model List<ELibraryManagement.Web.Models.FineViewModel>
 @using ELibraryManagement.Web.Models
 @{
     ViewData["Title"] = "Quản lý phạt";
     Layout = "_AdminLayout";
-    var statistics = ViewBag.Statistics as ELibraryManagement.Web.Services.FineStatisticsViewModel;
+    var statistics = ViewBag.Statistics as ELibraryManagement.Web.Models.FineStatisticsViewModel;
     var currentPage = ViewBag.CurrentPage as int? ?? 1;
     var totalPages = ViewBag.TotalPages as int? ?? 1;
     var totalCount = ViewBag.TotalCount as int? ?? 0;

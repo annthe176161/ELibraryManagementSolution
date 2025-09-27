@@ -1,4 +1,4 @@
-using ELibraryManagement.Web.Services;
+using ELibraryManagement.Web.Services.Interfaces;
 using ELibraryManagement.Web.Models;
 using ELibraryManagement.Web.Helpers;
 using Microsoft.AspNetCore.Mvc;

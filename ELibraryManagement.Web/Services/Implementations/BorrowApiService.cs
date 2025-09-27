@@ -1,9 +1,10 @@
 using ELibraryManagement.Web.Models;
 using ELibraryManagement.Web.Helpers;
+using ELibraryManagement.Web.Services.Interfaces;
 using System.Text.Json;
 using System.Text;
 
-namespace ELibraryManagement.Web.Services
+namespace ELibraryManagement.Web.Services.Implementations
 {
     // DTO to match API response
     public class BorrowRecordDto
