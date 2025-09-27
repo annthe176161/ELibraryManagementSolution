@@ -140,7 +140,9 @@
                                         <div class="d-flex align-items-center">
                                             @if (!string.IsNullOrEmpty(category.Color))
                                             {
-                                                <div class="me-2" style="width: 20px; height: 20px; background-color: @category.Color; border-radius: 3px; border: 1px solid #ddd;"></div>
+                                                <div class="me-2"
+                                                    style="width: 20px; height: 20px; background-color: @category.Color; border-radius: 3px; border: 1px solid #ddd;">
+                                                </div>
                                             }
                                             <strong>@category.Name</strong>
                                         </div>
@@ -153,12 +155,14 @@
                                                 {
                                                     <div class="description-preview">
                                                         <p class="mb-1">@category.Description.Substring(0, 100)...</p>
-                                                        <button class="btn btn-sm btn-link p-0 text-decoration-none" onclick="toggleDescription(this)">
+                                                        <button class="btn btn-sm btn-link p-0 text-decoration-none"
+                                                            onclick="toggleDescription(this)">
                                                             <small>Xem thêm</small>
                                                         </button>
                                                         <div class="description-full d-none">
                                                             <p class="mb-1">@category.Description</p>
-                                                            <button class="btn btn-sm btn-link p-0 text-decoration-none" onclick="toggleDescription(this)">
+                                                            <button class="btn btn-sm btn-link p-0 text-decoration-none"
+                                                                onclick="toggleDescription(this)">
                                                                 <small>Thu gọn</small>
                                                             </button>
                                                         </div>
@@ -179,7 +183,9 @@
                                         @if (!string.IsNullOrEmpty(category.Color))
                                         {
                                             <div class="d-flex align-items-center">
-                                                <div class="me-2" style="width: 30px; height: 20px; background-color: @category.Color; border-radius: 3px; border: 1px solid #ddd;"></div>
+                                                <div class="me-2"
+                                                    style="width: 30px; height: 20px; background-color: @category.Color; border-radius: 3px; border: 1px solid #ddd;">
+                                                </div>
                                                 <small class="text-muted">@category.Color</small>
                                             </div>
                                         }
@@ -201,10 +207,13 @@
                                     </td>
                                     <td>
                                         <div class="btn-group" role="group">
-                                            <button type="button" class="btn btn-sm btn-outline-warning" title="Chỉnh sửa" onclick="editCategory(@category.Id, '@category.Name', '@category.Description', '@category.Color', @category.IsActive.ToString().ToLower())">
+                                            <button type="button" class="btn btn-sm btn-outline-warning" title="Chỉnh sửa"
+                                                onclick="editCategory(@category.Id, '@category.Name', '@category.Description', '@category.Color', @category.IsActive.ToString().ToLower())">
                                                 <i class="fas fa-edit"></i>
                                             </button>
-                                            <button type="button" class="btn btn-sm btn-outline-danger" title="Xóa" onclick="deleteCategory(@category.Id, '@category.Name', @category.BookCount)" @(category.BookCount > 0 ? "disabled" : "")>
+                                            <button type="button" class="btn btn-sm btn-outline-danger" title="Xóa"
+                                                onclick="deleteCategory(@category.Id, '@category.Name', @category.BookCount)"
+                                                @(category.BookCount > 0 ? "disabled" : "")>
                                                 <i class="fas fa-trash"></i>
                                             </button>
                                         </div>
@@ -237,9 +246,10 @@
             <form id="categoryForm">
                 <div class="modal-body">
                     <input type="hidden" id="categoryId" name="Id" value="0">
-                    
+
                     <div class="mb-3">
-                        <label for="categoryName" class="form-label">Tên thể loại <span class="text-danger">*</span></label>
+                        <label for="categoryName" class="form-label">Tên thể loại <span
+                                class="text-danger">*</span></label>
                         <input type="text" class="form-control" id="categoryName" name="Name" required maxlength="100">
                         <div class="invalid-feedback">
                             Vui lòng nhập tên thể loại (tối đa 100 ký tự).
@@ -248,22 +258,26 @@
 
                     <div class="mb-3">
                         <label for="categoryDescription" class="form-label">Mô tả</label>
-                        <textarea class="form-control" id="categoryDescription" name="Description" rows="3" maxlength="500"></textarea>
+                        <textarea class="form-control" id="categoryDescription" name="Description" rows="3"
+                            maxlength="500"></textarea>
                         <div class="form-text">Tối đa 500 ký tự</div>
                     </div>
 
                     <div class="mb-3">
                         <label for="categoryColor" class="form-label">Màu sắc</label>
                         <div class="input-group">
-                            <input type="color" class="form-control form-control-color" id="categoryColor" name="Color" title="Chọn màu">
-                            <input type="text" class="form-control" id="categoryColorText" placeholder="#ffffff" maxlength="7" pattern="^#[0-9A-Fa-f]{6}$">
+                            <input type="color" class="form-control form-control-color" id="categoryColor" name="Color"
+                                title="Chọn màu">
+                            <input type="text" class="form-control" id="categoryColorText" placeholder="#ffffff"
+                                maxlength="7" pattern="^#[0-9A-Fa-f]{6}$">
                         </div>
                         <div class="form-text">Chọn màu đại diện cho thể loại</div>
                     </div>
 
                     <div class="mb-3">
                         <div class="form-check">
-                            <input class="form-check-input" type="checkbox" id="categoryIsActive" name="IsActive" checked>
+                            <input class="form-check-input" type="checkbox" id="categoryIsActive" name="IsActive"
+                                checked>
                             <label class="form-check-label" for="categoryIsActive">
                                 Kích hoạt thể loại
                             </label>
@@ -292,6 +306,11 @@
             <div class="modal-body">
                 <p>Bạn có chắc chắn muốn xóa thể loại này không?</p>
                 <div id="deleteDetails"></div>
+                <div class="alert alert-info mt-3">
+                    <i class="fas fa-info-circle me-2"></i>
+                    <strong>Lưu ý:</strong> Thể loại sẽ bị ẩn khỏi hệ thống nhưng vẫn được lưu trữ trong cơ sở dữ liệu
+                    (xóa mềm).
+                </div>
                 <div id="deleteWarning" class="alert alert-warning d-none mt-3"></div>
             </div>
             <div class="modal-footer">
@@ -306,19 +325,19 @@
     <script>
         let currentCategoryId = null;
 
-        $(document).ready(function() {
+        $(document).ready(function () {
             // Search functionality
-            $('#searchInput').on('keyup', function() {
+            $('#searchInput').on('keyup', function () {
                 var value = $(this).val().toLowerCase();
-                $('#categoriesTable tbody tr').filter(function() {
+                $('#categoriesTable tbody tr').filter(function () {
                     $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
                 });
             });
 
             // Status filter
-            $('#statusFilter').on('change', function() {
+            $('#statusFilter').on('change', function () {
                 var value = $(this).val();
-                $('#categoriesTable tbody tr').filter(function() {
+                $('#categoriesTable tbody tr').filter(function () {
                     if (value === '') {
                         $(this).show();
                     } else {
@@ -328,11 +347,11 @@
             });
 
             // Color picker sync
-            $('#categoryColor').on('change', function() {
+            $('#categoryColor').on('change', function () {
                 $('#categoryColorText').val($(this).val());
             });
 
-            $('#categoryColorText').on('input', function() {
+            $('#categoryColorText').on('input', function () {
                 var color = $(this).val();
                 if (/^#[0-9A-Fa-f]{6}$/.test(color)) {
                     $('#categoryColor').val(color);
@@ -340,7 +359,7 @@
             });
 
             // Form submission
-            $('#categoryForm').on('submit', function(e) {
+            $('#categoryForm').on('submit', function (e) {
                 e.preventDefault();
                 saveCategory();
             });
@@ -392,7 +411,7 @@
 
             const isEdit = currentCategoryId !== null && currentCategoryId > 0;
             const url = isEdit ? '/Admins/UpdateCategory' : '/Admins/CreateCategory';
-            
+
             $('#saveCategoryBtn').prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i>Đang lưu...');
 
             $.ajax({
@@ -400,61 +419,100 @@
                 type: 'POST',
                 contentType: 'application/json',
                 data: JSON.stringify(formData),
-                success: function(response) {
+                success: function (response) {
+                    console.log('Save response:', response); // Debug log
+
                     if (response.success) {
                         $('#categoryModal').modal('hide');
-                        showToast('success', response.message);
-                        setTimeout(() => location.reload(), 1500);
+                        const actionText = isEdit ? 'Cập nhật' : 'Thêm mới';
+                        const successMessage = response.message || `${actionText} thể loại thành công!`;
+                        showToast('success', successMessage);
+
+                        setTimeout(() => {
+                            location.reload();
+                        }, 1500);
                     } else {
-                        showToast('error', response.message);
+                        const errorMessage = response.message || 'Có lỗi xảy ra khi lưu thể loại';
+                        showToast('error', errorMessage);
                     }
                 },
-                error: function(xhr) {
-                    console.error('Error:', xhr);
-                    showToast('error', 'Có lỗi xảy ra khi lưu thể loại');
+                error: function (xhr, status, error) {
+                    console.error('Save error:', xhr, status, error); // Debug log
+
+                    let errorMessage = 'Có lỗi xảy ra khi lưu thể loại';
+                    if (xhr.responseJSON && xhr.responseJSON.message) {
+                        errorMessage = xhr.responseJSON.message;
+                    }
+                    showToast('error', errorMessage);
                 },
-                complete: function() {
+                complete: function () {
                     $('#saveCategoryBtn').prop('disabled', false).html('<i class="fas fa-save me-1"></i>Lưu');
                 }
             });
         }
 
         function deleteCategory(categoryId, categoryName, bookCount) {
+            console.log('deleteCategory called:', categoryId, categoryName, bookCount); // Debug log
+
             currentCategoryId = categoryId;
-            $('#deleteDetails').html(`<strong>Thể loại:</strong> ${categoryName}`);
-            
+            $('#deleteDetails').html(`<strong>Thể loại:</strong> ${categoryName}<br><strong>Số sách:</strong> ${bookCount} sách`);
+
             if (bookCount > 0) {
                 $('#deleteWarning').removeClass('d-none').html(`
-                    <i class="fas fa-exclamation-triangle me-2"></i>
-                    Không thể xóa thể loại này vì có ${bookCount} sách đang sử dụng.
-                `);
-                $('#confirmDeleteBtn').prop('disabled', true);
+                        <div class="alert alert-warning mb-0">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            <strong>Không thể xóa!</strong> Thể loại này có <strong>${bookCount} sách</strong> đang sử dụng.
+                            <br><small class="text-muted">Vui lòng xóa hoặc chuyển các sách sang thể loại khác trước.</small>
+                        </div>
+                    `);
+                $('#confirmDeleteBtn').prop('disabled', true).text('Không thể xóa');
             } else {
                 $('#deleteWarning').addClass('d-none');
-                $('#confirmDeleteBtn').prop('disabled', false);
+                $('#confirmDeleteBtn').prop('disabled', false).html('<i class="fas fa-trash me-1"></i>Xóa thể loại');
+                // Thêm thông tin về soft delete
+                $('#deleteDetails').append('<br><small class="text-muted"><i class="fas fa-info-circle me-1"></i>Thể loại sẽ được đánh dấu đã xóa (có thể khôi phục).</small>');
             }
-            
+
             $('#deleteModal').modal('show');
         }
 
-        $('#confirmDeleteBtn').on('click', function() {
+        $('#confirmDeleteBtn').on('click', function () {
             if (currentCategoryId) {
+                console.log('Deleting category:', currentCategoryId); // Debug log
+
+                // Disable button và hiển thị loading
+                $(this).prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i>Đang xóa...');
+
                 $.ajax({
                     url: '/Admins/DeleteCategory',
                     type: 'POST',
                     data: { categoryId: currentCategoryId },
-                    success: function(response) {
+                    success: function (response) {
+                        console.log('Delete response:', response); // Debug log
                         $('#deleteModal').modal('hide');
+
                         if (response.success) {
-                            showToast('success', response.message);
-                            setTimeout(() => location.reload(), 1500);
+                            showToast('success', response.message || 'Xóa thể loại thành công!');
+                            setTimeout(() => {
+                                location.reload();
+                            }, 1500);
                         } else {
-                            showToast('error', response.message);
+                            showToast('error', response.message || 'Không thể xóa thể loại');
                         }
                     },
-                    error: function(xhr) {
+                    error: function (xhr, status, error) {
+                        console.error('Delete error:', xhr, status, error); // Debug log
                         $('#deleteModal').modal('hide');
-                        showToast('error', 'Có lỗi xảy ra khi xóa thể loại');
+
+                        let errorMessage = 'Có lỗi xảy ra khi xóa thể loại';
+                        if (xhr.responseJSON && xhr.responseJSON.message) {
+                            errorMessage = xhr.responseJSON.message;
+                        }
+                        showToast('error', errorMessage);
+                    },
+                    complete: function () {
+                        // Reset button state
+                        $('#confirmDeleteBtn').prop('disabled', false).html('<i class="fas fa-trash me-1"></i>Xóa thể loại');
                     }
                 });
             }
@@ -462,32 +520,49 @@
 
         // Toast notification function
         function showToast(type, message) {
+            console.log('showToast called:', type, message); // Debug log
+
+            const bgClass = type === 'success' ? 'success' : type === 'error' ? 'danger' : 'info';
+            const iconClass = type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-triangle' : 'info-circle';
+
             const toastHtml = `
-                <div class="toast align-items-center text-white bg-${type === 'success' ? 'success' : type === 'error' ? 'danger' : 'info'} border-0" role="alert" aria-live="assertive" aria-atomic="true">
-                    <div class="d-flex">
-                        <div class="toast-body">
-                            ${message}
+                    <div class="toast align-items-center text-white bg-${bgClass} border-0" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="4000">
+                        <div class="d-flex">
+                            <div class="toast-body">
+                                <i class="fas fa-${iconClass} me-2"></i>${message}
+                            </div>
+                            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
                         </div>
-                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
                     </div>
-                </div>
-            `;
-            
+                `;
+
             // Create toast container if it doesn't exist
             if (!$('#toastContainer').length) {
-                $('body').append('<div id="toastContainer" class="toast-container position-fixed top-0 end-0 p-3"></div>');
+                $('body').append('<div id="toastContainer" class="toast-container position-fixed end-0 p-3" style="top: 100px; z-index: 9999;"></div>');
             }
-            
+
             const $toast = $(toastHtml);
             $('#toastContainer').append($toast);
-            
+
             const toast = new bootstrap.Toast($toast[0]);
             toast.show();
-            
+
             // Remove toast element after it's hidden
-            $toast.on('hidden.bs.toast', function() {
+            $toast.on('hidden.bs.toast', function () {
                 $(this).remove();
             });
         }
+
+        // Test function cho toast (có thể gọi từ console để test)
+        window.testToast = function (type, message) {
+            showToast(type, message || 'Test toast notification');
+        };
+
+        // Document ready
+        $(document).ready(function () {
+            console.log('Categories page loaded');
+            // Uncomment dòng dưới để test toast khi load trang
+            // showToast('info', 'Trang quản lý thể loại đã sẵn sàng!');
+        });
     </script>
 }

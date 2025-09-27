@@ -22,7 +22,7 @@ namespace ELibraryManagement.Api.Services.Implementations
         {
             try
             {
-                var query = _context.Categories.AsQueryable();
+                var query = _context.Categories.Where(c => !c.IsDeleted); // Không lấy categories đã bị xóa
 
                 if (!includeInactive)
                 {
@@ -68,7 +68,7 @@ namespace ELibraryManagement.Api.Services.Implementations
             try
             {
                 var category = await _context.Categories
-                    .Where(c => c.Id == id)
+                    .Where(c => c.Id == id && !c.IsDeleted) // Không trả về categories đã bị xóa
                     .Select(c => new CategoryDto
                     {
                         Id = c.Id,
@@ -150,7 +150,7 @@ namespace ELibraryManagement.Api.Services.Implementations
                 return new CategoryResponseDto
                 {
                     Success = true,
-                    Message = "Tạo danh mục thành công",
+                    Message = $"Tạo danh mục '{category.Name}' thành công",
                     Category = categoryDto
                 };
             }
@@ -170,7 +170,7 @@ namespace ELibraryManagement.Api.Services.Implementations
             try
             {
                 var category = await _context.Categories.FindAsync(id);
-                if (category == null)
+                if (category == null || category.IsDeleted)
                 {
                     return new CategoryResponseDto
                     {
@@ -213,7 +213,7 @@ namespace ELibraryManagement.Api.Services.Implementations
                 return new CategoryResponseDto
                 {
                     Success = true,
-                    Message = "Cập nhật danh mục thành công",
+                    Message = $"Cập nhật danh mục '{category.Name}' thành công",
                     Category = categoryDto
                 };
             }
@@ -245,6 +245,16 @@ namespace ELibraryManagement.Api.Services.Implementations
                     };
                 }
 
+                // Kiểm tra danh mục đã bị xóa chưa
+                if (category.IsDeleted)
+                {
+                    return new CategoryResponseDto
+                    {
+                        Success = false,
+                        Message = "Danh mục đã được xóa trước đó"
+                    };
+                }
+
                 // Kiểm tra có sách nào đang sử dụng danh mục này không
                 var hasActiveBooks = await _context.BookCategories
                     .AnyAsync(bc => bc.CategoryId == id && !bc.Book.IsDeleted);
@@ -258,13 +268,17 @@ namespace ELibraryManagement.Api.Services.Implementations
                     };
                 }
 
-                _context.Categories.Remove(category);
+                // Soft delete - chỉ đánh dấu IsDeleted = true
+                category.IsDeleted = true;
+                category.UpdatedAt = DateTime.UtcNow;
+                category.IsActive = false; // Cũng set IsActive = false để đảm bảo
+
                 await _context.SaveChangesAsync();
 
                 return new CategoryResponseDto
                 {
                     Success = true,
-                    Message = "Xóa danh mục thành công"
+                    Message = $"Đã xóa danh mục '{category.Name}' thành công"
                 };
             }
             catch (Exception ex)
