@@ -453,7 +453,7 @@
             </div>
             <div class="col-md-4">
                 <div class="d-flex justify-content-end">
-                    <a asp-controller="Book" asp-action="MyBooks" class="nav-button">
+                    <a asp-controller="Books" asp-action="MyBooks" class="nav-button">
                         <i class="fas fa-book"></i>Sách của tôi
                     </a>
                 </div>
@@ -578,7 +578,7 @@
                                         <div class="action-buttons">
                                             @if (review.CanEdit)
                                             {
-                                                <a asp-controller="Review" asp-action="Edit" asp-route-id="@review.Id" 
+                                                <a asp-controller="Reviews" asp-action="Edit" asp-route-id="@review.Id" 
                                                    class="btn-edit">
                                                     <i class="fas fa-edit"></i>Sửa
                                                 </a>

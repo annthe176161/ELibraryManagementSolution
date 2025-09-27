@@ -59,7 +59,7 @@
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end">
                         <li>
-                            <a class="dropdown-item" asp-controller="Account" asp-action="Profile">
+                            <a class="dropdown-item" asp-controller="Accounts" asp-action="Profile">
                                 <i class="fas fa-user me-2"></i>Thông tin cá nhân
                             </a>
                         </li>
@@ -72,7 +72,7 @@
                             <hr class="dropdown-divider">
                         </li>
                         <li>
-                            <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
+                            <form asp-controller="Accounts" asp-action="Logout" method="post" class="d-inline">
                                 <button type="submit" class="dropdown-item border-0 bg-transparent">
                                     <i class="fas fa-sign-out-alt me-2"></i>Đăng xuất
                                 </button>
@@ -99,7 +99,7 @@
                     <!-- Dashboard -->
                     <li class="nav-item">
                         <a class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Index" ? "active" : "")"
-                            asp-controller="Admin" asp-action="Index">
+                            asp-controller="Admins" asp-action="Index">
                             <i class="fas fa-tachometer-alt me-3"></i>
                             Dashboard
                         </a>
@@ -108,7 +108,7 @@
                     <!-- User Management -->
                     <li class="nav-item">
                         <a class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Users" ? "active" : "")"
-                            asp-controller="Admin" asp-action="Users">
+                            asp-controller="Admins" asp-action="Users">
                             <i class="fas fa-users me-3"></i>
                             Quản lý người dùng
                         </a>
@@ -117,7 +117,7 @@
                     <!-- Book Management -->
                     <li class="nav-item">
                         <a class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Books" ? "active" : "")"
-                            asp-controller="Admin" asp-action="Books">
+                            asp-controller="Admins" asp-action="Books">
                             <i class="fas fa-book me-3"></i>
                             Quản lý sách
                         </a>
@@ -126,7 +126,7 @@
                     <!-- Borrow Management -->
                     <li class="nav-item">
                         <a class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Borrows" ? "active" : "")"
-                            asp-controller="Admin" asp-action="Borrows">
+                            asp-controller="Admins" asp-action="Borrows">
                             <i class="fas fa-clipboard-list me-3"></i>
                             Quản lý mượn sách
                         </a>
@@ -135,7 +135,7 @@
                     <!-- Review Management -->
                     <li class="nav-item">
                         <a class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Reviews" ? "active" : "")"
-                            asp-controller="Admin" asp-action="Reviews">
+                            asp-controller="Admins" asp-action="Reviews">
                             <i class="fas fa-star me-3"></i>
                             Quản lý đánh giá
                         </a>
@@ -144,7 +144,7 @@
                     <!-- Fine Management -->
                     <li class="nav-item">
                         <a class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Fines" || ViewContext.RouteData.Values["action"]?.ToString() == "CreateFine" ? "active" : "")"
-                            asp-controller="Admin" asp-action="Fines">
+                            asp-controller="Admins" asp-action="Fines">
                             <i class="fas fa-money-bill-wave me-3"></i>
                             Quản lý phạt
                         </a>
@@ -154,7 +154,7 @@
 
                     <!-- Categories -->
                     <li class="nav-item">
-                        <a class="nav-link" asp-controller="Admin" asp-action="Categories">
+                        <a class="nav-link" asp-controller="Admins" asp-action="Categories">
                             <i class="fas fa-tags me-3"></i>
                             Quản lý thể loại
                         </a>

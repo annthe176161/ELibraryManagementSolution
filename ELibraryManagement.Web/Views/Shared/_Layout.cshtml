@@ -1,4 +1,4 @@
-﻿@using ELibraryManagement.Web.Services.Interfaces
+@using ELibraryManagement.Web.Services.Interfaces
 @inject IAuthApiService AuthService
 <!DOCTYPE html>
 <html lang="vi">
@@ -6,8 +6,8 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Thư viện điện tử ELibrary - Nơi khởi nguồn tri thức cho người Việt Nam" />
-    <meta name="keywords" content="thư viện điện tử, sách online, đọc sách, library, ebook, vietnam" />
+    <meta name="description" content="Thu vi?n di?n t? ELibrary - Noi kh?i ngu?n tri th?c cho ngu?i Vi?t Nam" />
+    <meta name="keywords" content="thu vi?n di?n t?, s�ch online, d?c s�ch, library, ebook, vietnam" />
     <title>@ViewData["Title"] - ELibrary</title>
 
     <!-- Favicon -->
@@ -24,7 +24,7 @@
 
 <body class="d-flex flex-column min-vh-100">
     <header class="fixed-top">
-        <!-- Top bar với thông tin liên hệ -->
+        <!-- Top bar v?i th�ng tin li�n h? -->
         <div class="top-bar bg-primary text-white py-1">
             <div class="container">
                 <div class="row align-items-center">
@@ -37,7 +37,7 @@
                     </div>
                     <div class="col-md-6 text-md-end">
                         <small>
-                            <i class="fas fa-clock me-1"></i> Thời gian phục vụ: 7:00 - 22:00 (T2-CN)
+                            <i class="fas fa-clock me-1"></i> Th?i gian ph?c v?: 7:00 - 22:00 (T2-CN)
                         </small>
                     </div>
                 </div>
@@ -56,7 +56,7 @@
                     </div>
                     <div>
                         <div class="fw-bold text-primary" style="font-size: 1.2rem;">
-                            THỨ VIỆN TRƯỜNG ĐẠI HỌC
+                            TH? VI?N TRU?NG �?I H?C
                         </div>
                         <div class="text-secondary" style="font-size: 0.9rem;">
                             UNIVERSITY LIBRARY SYSTEM
@@ -74,50 +74,50 @@
                     <ul class="navbar-nav ms-auto">
                         <li class="nav-item">
                             <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">
-                                <i class="fas fa-home me-1"></i>Trang Chủ
+                                <i class="fas fa-home me-1"></i>Trang Ch?
                             </a>
                         </li>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                                <i class="fas fa-book me-1"></i>Thư Viện
+                                <i class="fas fa-book me-1"></i>Thu Vi?n
                             </a>
                             <ul class="dropdown-menu">
                                 <li><a class="dropdown-item" asp-area="" asp-controller="Home" asp-action="Books">
-                                        <i class="fas fa-book me-2"></i>Danh Mục Sách
+                                        <i class="fas fa-book me-2"></i>Danh M?c S�ch
                                     </a></li>
                                 <li><a class="dropdown-item" href="#">
-                                        <i class="fas fa-newspaper me-2"></i>Tạp Chí Khoa Học
+                                        <i class="fas fa-newspaper me-2"></i>T?p Ch� Khoa H?c
                                     </a></li>
                                 <li><a class="dropdown-item" href="#">
-                                        <i class="fas fa-file-pdf me-2"></i>Luận Văn / Luận Án
+                                        <i class="fas fa-file-pdf me-2"></i>Lu?n Van / Lu?n �n
                                     </a></li>
                                 <li><a class="dropdown-item" href="#">
-                                        <i class="fas fa-database me-2"></i>Cơ Sở Dữ Liệu
+                                        <i class="fas fa-database me-2"></i>Co S? D? Li?u
                                     </a></li>
                             </ul>
                         </li>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                                <i class="fas fa-cogs me-1"></i>Dịch Vụ
+                                <i class="fas fa-cogs me-1"></i>D?ch V?
                             </a>
                             <ul class="dropdown-menu">
                                 <li><a class="dropdown-item" href="#">
-                                        <i class="fas fa-book-reader me-2"></i>Mượn Sách Online
+                                        <i class="fas fa-book-reader me-2"></i>Mu?n S�ch Online
                                     </a></li>
                                 <li><a class="dropdown-item" href="#">
-                                        <i class="fas fa-laptop me-2"></i>Đặt Chỗ Học
+                                        <i class="fas fa-laptop me-2"></i>�?t Ch? H?c
                                     </a></li>
                                 <li><a class="dropdown-item" href="#">
-                                        <i class="fas fa-print me-2"></i>Dịch Vụ In Ấn
+                                        <i class="fas fa-print me-2"></i>D?ch V? In ?n
                                     </a></li>
                                 <li><a class="dropdown-item" href="#">
-                                        <i class="fas fa-users me-2"></i>Hỗ Trợ Nghiên Cứu
+                                        <i class="fas fa-users me-2"></i>H? Tr? Nghi�n C?u
                                     </a></li>
                             </ul>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="#about">
-                                <i class="fas fa-info-circle me-1"></i>Giới Thiệu
+                                <i class="fas fa-info-circle me-1"></i>Gi?i Thi?u
                             </a>
                         </li>
 
@@ -127,38 +127,38 @@
                                 <a class="nav-link d-flex align-items-center" href="#" id="navbarDropdown" role="button"
                                     data-bs-toggle="dropdown" aria-expanded="false">
                                     <i class="fas fa-user-shield fa-lg text-primary me-2"></i>
-                                    <span class="fw-medium">Quản lý tài khoản</span>
+                                    <span class="fw-medium">Qu?n l� t�i kho?n</span>
                                     <i class="fas fa-chevron-down ms-2"></i>
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                                    <li><a class="dropdown-item" asp-controller="Account" asp-action="Profile">
-                                            <i class="fas fa-user me-2"></i>Thông tin cá nhân
+                                    <li><a class="dropdown-item" asp-controller="Accounts" asp-action="Profile">
+                                            <i class="fas fa-user me-2"></i>Th�ng tin c� nh�n
                                         </a></li>
-                                    <li><a class="dropdown-item" asp-controller="Book" asp-action="MyBooks">
-                                            <i class="fas fa-book me-2"></i>Sách đã mượn
+                                    <li><a class="dropdown-item" asp-controller="Books" asp-action="MyBooks">
+                                            <i class="fas fa-book me-2"></i>S�ch d� mu?n
                                         </a></li>
-                                    <li><a class="dropdown-item" asp-controller="Review" asp-action="MyReviews">
-                                            <i class="fas fa-star me-2"></i>Đánh giá của tôi
+                                    <li><a class="dropdown-item" asp-controller="Reviews" asp-action="MyReviews">
+                                            <i class="fas fa-star me-2"></i>��nh gi� c?a t�i
                                         </a></li>
                                     <li><a class="dropdown-item" href="#">
-                                            <i class="fas fa-bookmark me-2"></i>Sách yêu thích
+                                            <i class="fas fa-bookmark me-2"></i>S�ch y�u th�ch
                                         </a></li>
                                     <li>
                                         <hr class="dropdown-divider">
                                     </li>
                                     @if (await AuthService.IsInRoleAsync("Admin"))
                                     {
-                                        <li><a class="dropdown-item text-primary" asp-controller="Admin" asp-action="Index">
-                                                <i class="fas fa-tachometer-alt me-2"></i>Quản trị hệ thống
+                                        <li><a class="dropdown-item text-primary" asp-controller="Admins" asp-action="Index">
+                                                <i class="fas fa-tachometer-alt me-2"></i>Qu?n tr? h? th?ng
                                             </a></li>
                                         <li>
                                             <hr class="dropdown-divider">
                                         </li>
                                     }
                                     <li>
-                                        <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
+                                        <form asp-controller="Accounts" asp-action="Logout" method="post" class="d-inline">
                                             <button type="submit" class="dropdown-item border-0 bg-transparent text-danger">
-                                                <i class="fas fa-sign-out-alt me-2"></i>Đăng xuất
+                                                <i class="fas fa-sign-out-alt me-2"></i>�ang xu?t
                                             </button>
                                         </form>
                                     </li>
@@ -168,15 +168,15 @@
                         else
                         {
                             <li class="nav-item">
-                                <a class="nav-link btn btn-outline-dark rounded-pill px-3 me-2" asp-controller="Account"
+                                <a class="nav-link btn btn-outline-dark rounded-pill px-3 me-2" asp-controller="Accounts"
                                     asp-action="Login">
-                                    <i class="fas fa-sign-in-alt me-1"></i>Đăng Nhập
+                                    <i class="fas fa-sign-in-alt me-1"></i>�ang Nh?p
                                 </a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link btn btn-dark text-white rounded-pill px-3" asp-controller="Account"
+                                <a class="nav-link btn btn-dark text-white rounded-pill px-3" asp-controller="Accounts"
                                     asp-action="Register">
-                                    <i class="fas fa-user-plus me-1"></i>Đăng Ký
+                                    <i class="fas fa-user-plus me-1"></i>�ang K�
                                 </a>
                             </li>
                         }
@@ -193,7 +193,7 @@
         </main>
     </div>
 
-    <!-- Footer với thiết kế thư viện đại học -->
+    <!-- Footer v?i thi?t k? thu vi?n d?i h?c -->
     <footer class="bg-dark text-white">
         <!-- Main Footer Content -->
         <div class="py-5">
@@ -206,14 +206,14 @@
                                 <i class="fas fa-university fa-3x text-warning"></i>
                             </div>
                             <div>
-                                <h5 class="text-white mb-1">THƯ VIỆN TRƯỜNG ĐẠI HỌC</h5>
+                                <h5 class="text-white mb-1">THU VI?N TRU?NG �?I H?C</h5>
                                 <p class="text-white-50 mb-0" style="font-size: 0.9rem;">University Library System</p>
                             </div>
                         </div>
                         <p class="text-white mb-3">
-                            Trung tâm tri thức và nghiên cứu hàng đầu, phục vụ cộng đồng học thuật với hơn 500,000 đầu
-                            sách
-                            và tài liệu số. Chúng tôi cam kết hỗ trợ học tập, giảng dạy và nghiên cứu khoa học.
+                            Trung t�m tri th?c v� nghi�n c?u h�ng d?u, ph?c v? c?ng d?ng h?c thu?t v?i hon 500,000 d?u
+                            s�ch
+                            v� t�i li?u s?. Ch�ng t�i cam k?t h? tr? h?c t?p, gi?ng d?y v� nghi�n c?u khoa h?c.
                         </p>
                         <div class="social-links">
                             <a href="#" class="text-white me-3 hover-effect" title="Facebook">
@@ -234,23 +234,23 @@
                     <!-- Library Services -->
                     <div class="col-lg-2 col-md-6 mb-4">
                         <h6 class="text-warning mb-3">
-                            <i class="fas fa-books me-2"></i>Dịch Vụ Thư Viện
+                            <i class="fas fa-books me-2"></i>D?ch V? Thu Vi?n
                         </h6>
                         <ul class="list-unstyled">
                             <li class="mb-2"><a href="#" class="text-white text-decoration-none hover-link">
-                                    <i class="fas fa-book-reader me-2"></i>Mượn sách trực tuyến
+                                    <i class="fas fa-book-reader me-2"></i>Mu?n s�ch tr?c tuy?n
                                 </a></li>
                             <li class="mb-2"><a href="#" class="text-white text-decoration-none hover-link">
-                                    <i class="fas fa-laptop me-2"></i>Đặt chỗ học nhóm
+                                    <i class="fas fa-laptop me-2"></i>�?t ch? h?c nh�m
                                 </a></li>
                             <li class="mb-2"><a href="#" class="text-white text-decoration-none hover-link">
-                                    <i class="fas fa-database me-2"></i>Cơ sở dữ liệu
+                                    <i class="fas fa-database me-2"></i>Co s? d? li?u
                                 </a></li>
                             <li class="mb-2"><a href="#" class="text-white text-decoration-none hover-link">
-                                    <i class="fas fa-graduation-cap me-2"></i>Hỗ trợ nghiên cứu
+                                    <i class="fas fa-graduation-cap me-2"></i>H? tr? nghi�n c?u
                                 </a></li>
                             <li class="mb-2"><a href="#" class="text-white text-decoration-none hover-link">
-                                    <i class="fas fa-print me-2"></i>Dịch vụ in ấn
+                                    <i class="fas fa-print me-2"></i>D?ch v? in ?n
                                 </a></li>
                         </ul>
                     </div>
@@ -258,23 +258,23 @@
                     <!-- Academic Resources -->
                     <div class="col-lg-2 col-md-6 mb-4">
                         <h6 class="text-warning mb-3">
-                            <i class="fas fa-university me-2"></i>Tài Nguyên Học Thuật
+                            <i class="fas fa-university me-2"></i>T�i Nguy�n H?c Thu?t
                         </h6>
                         <ul class="list-unstyled">
                             <li class="mb-2"><a href="#" class="text-white text-decoration-none hover-link">
-                                    <i class="fas fa-file-pdf me-2"></i>Luận văn - Luận án
+                                    <i class="fas fa-file-pdf me-2"></i>Lu?n van - Lu?n �n
                                 </a></li>
                             <li class="mb-2"><a href="#" class="text-white text-decoration-none hover-link">
-                                    <i class="fas fa-newspaper me-2"></i>Tạp chí khoa học
+                                    <i class="fas fa-newspaper me-2"></i>T?p ch� khoa h?c
                                 </a></li>
                             <li class="mb-2"><a href="#" class="text-white text-decoration-none hover-link">
-                                    <i class="fas fa-archive me-2"></i>Tài liệu lưu trữ
+                                    <i class="fas fa-archive me-2"></i>T�i li?u luu tr?
                                 </a></li>
                             <li class="mb-2"><a href="#" class="text-white text-decoration-none hover-link">
-                                    <i class="fas fa-globe me-2"></i>Tài nguyên số
+                                    <i class="fas fa-globe me-2"></i>T�i nguy�n s?
                                 </a></li>
                             <li class="mb-2"><a href="#" class="text-white text-decoration-none hover-link">
-                                    <i class="fas fa-bookmark me-2"></i>Thư mục chuyên đề
+                                    <i class="fas fa-bookmark me-2"></i>Thu m?c chuy�n d?
                                 </a></li>
                         </ul>
                     </div>
@@ -282,23 +282,23 @@
                     <!-- Quick Links -->
                     <div class="col-lg-2 col-md-6 mb-4">
                         <h6 class="text-warning mb-3">
-                            <i class="fas fa-link me-2"></i>Liên Kết Nhanh
+                            <i class="fas fa-link me-2"></i>Li�n K?t Nhanh
                         </h6>
                         <ul class="list-unstyled">
                             <li class="mb-2"><a href="#about" class="text-white text-decoration-none hover-link">
-                                    <i class="fas fa-info-circle me-2"></i>Về chúng tôi
+                                    <i class="fas fa-info-circle me-2"></i>V? ch�ng t�i
                                 </a></li>
                             <li class="mb-2"><a href="#" class="text-white text-decoration-none hover-link">
-                                    <i class="fas fa-clock me-2"></i>Giờ mở cửa
+                                    <i class="fas fa-clock me-2"></i>Gi? m? c?a
                                 </a></li>
                             <li class="mb-2"><a href="#" class="text-white text-decoration-none hover-link">
-                                    <i class="fas fa-map-marker-alt me-2"></i>Sơ đồ thư viện
+                                    <i class="fas fa-map-marker-alt me-2"></i>So d? thu vi?n
                                 </a></li>
                             <li class="mb-2"><a href="#" class="text-white text-decoration-none hover-link">
-                                    <i class="fas fa-question-circle me-2"></i>Hỗ trợ
+                                    <i class="fas fa-question-circle me-2"></i>H? tr?
                                 </a></li>
                             <li class="mb-2"><a href="#" class="text-white text-decoration-none hover-link">
-                                    <i class="fas fa-bell me-2"></i>Thông báo
+                                    <i class="fas fa-bell me-2"></i>Th�ng b�o
                                 </a></li>
                         </ul>
                     </div>
@@ -306,12 +306,12 @@
                     <!-- Contact Information -->
                     <div class="col-lg-2 mb-4">
                         <h6 class="text-warning mb-3">
-                            <i class="fas fa-phone me-2"></i>Liên Hệ
+                            <i class="fas fa-phone me-2"></i>Li�n H?
                         </h6>
                         <div class="text-white">
                             <p class="mb-2">
                                 <i class="fas fa-map-marker-alt me-2 text-warning"></i>
-                                <small>123 Đường Đại Học<br>Quận 1, TP. Hồ Chí Minh</small>
+                                <small>123 �u?ng �?i H?c<br>Qu?n 1, TP. H? Ch� Minh</small>
                             </p>
                             <p class="mb-2">
                                 <i class="fas fa-phone me-2 text-warning"></i>
@@ -344,17 +344,17 @@
                             &copy; 2025 University Library System. All rights reserved.
                             <br>
                             <small class="text-white-50">
-                                Phát triển bởi Phòng Công nghệ Thông tin - Trường Đại học
+                                Ph�t tri?n b?i Ph�ng C�ng ngh? Th�ng tin - Tru?ng �?i h?c
                             </small>
                         </p>
                     </div>
                     <div class="col-md-4 text-md-end">
                         <a asp-area="" asp-controller="Home" asp-action="Privacy"
                             class="text-white text-decoration-none me-3 hover-link">
-                            <i class="fas fa-shield-alt me-1"></i>Chính sách bảo mật
+                            <i class="fas fa-shield-alt me-1"></i>Ch�nh s�ch b?o m?t
                         </a>
                         <a href="#" class="text-white text-decoration-none hover-link">
-                            <i class="fas fa-file-contract me-1"></i>Điều khoản sử dụng
+                            <i class="fas fa-file-contract me-1"></i>�i?u kho?n s? d?ng
                         </a>
                     </div>
                 </div>

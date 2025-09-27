@@ -229,7 +229,7 @@
                             </div>
                         }
 
-                        <form asp-controller="Account" asp-action="EditProfile" method="post" enctype="multipart/form-data">
+                        <form asp-controller="Accounts" asp-action="EditProfile" method="post" enctype="multipart/form-data">
                             @Html.AntiForgeryToken()
                             
                             <!-- Student ID - Highlighted Section -->
@@ -329,7 +329,7 @@
                             </div>
 
                             <div class="form-actions">
-                                <a asp-controller="Account" asp-action="Profile" class="btn-cancel">
+                                <a asp-controller="Accounts" asp-action="Profile" class="btn-cancel">
                                     <i class="fas fa-times"></i>
                                     Hủy bỏ
                                 </a>

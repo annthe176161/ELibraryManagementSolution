@@ -819,7 +819,7 @@
                         @if (Model.BorrowRecord.Status == "Requested")
                         {
                             <!-- Cancel Request button for pending requests -->
-                            <form asp-controller="Book" asp-action="Cancel" asp-route-id="@Model.BorrowRecord.BorrowRecordId"
+                            <form asp-controller="Books" asp-action="Cancel" asp-route-id="@Model.BorrowRecord.BorrowRecordId"
                                 method="post" class="d-inline">
                                 <button type="submit" class="btn btn-outline-danger"
                                     onclick="return confirm('Bạn có chắc chắn muốn hủy yêu cầu mượn sách này?')">
