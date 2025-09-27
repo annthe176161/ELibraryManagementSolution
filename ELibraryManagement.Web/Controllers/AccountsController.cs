@@ -5,11 +5,11 @@ using System.Text.Json;
 
 namespace ELibraryManagement.Web.Controllers
 {
-    public class AccountController : Controller
+    public class AccountsController : Controller
     {
         private readonly IAuthApiService _authApiService;
 
-        public AccountController(IAuthApiService authApiService)
+        public AccountsController(IAuthApiService authApiService)
         {
             _authApiService = authApiService;
         }

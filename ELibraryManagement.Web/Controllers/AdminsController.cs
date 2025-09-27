@@ -8,7 +8,7 @@ using ViewModels = ELibraryManagement.Web.Models.ViewModels;
 
 namespace ELibraryManagement.Web.Controllers
 {
-    public class AdminController : Controller
+    public class AdminsController : Controller
     {
         private readonly IAuthApiService _authApiService;
         private readonly IReviewApiService _reviewApiService;
@@ -18,9 +18,9 @@ namespace ELibraryManagement.Web.Controllers
         private readonly HttpClient _httpClient;
         private readonly IConfiguration _configuration;
         private readonly JsonSerializerOptions _jsonOptions;
-        private readonly ILogger<AdminController> _logger;
+        private readonly ILogger<AdminsController> _logger;
 
-        public AdminController(
+        public AdminsController(
             IAuthApiService authApiService,
             IReviewApiService reviewApiService,
             IBorrowApiService borrowApiService,
@@ -28,7 +28,7 @@ namespace ELibraryManagement.Web.Controllers
             IFineApiService fineApiService,
             HttpClient httpClient,
             IConfiguration configuration,
-            ILogger<AdminController> logger)
+            ILogger<AdminsController> logger)
         {
             _authApiService = authApiService;
             _reviewApiService = reviewApiService;

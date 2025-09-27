@@ -5,13 +5,13 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ELibraryManagement.Web.Controllers
 {
-    public class BorrowController : Controller
+    public class BorrowsController : Controller
     {
         private readonly IBorrowApiService _borrowApiService;
         private readonly IBookApiService _bookApiService;
         private readonly IAuthApiService _authApiService;
 
-        public BorrowController(IBorrowApiService borrowApiService, IBookApiService bookApiService, IAuthApiService authApiService)
+        public BorrowsController(IBorrowApiService borrowApiService, IBookApiService bookApiService, IAuthApiService authApiService)
         {
             _borrowApiService = borrowApiService;
             _bookApiService = bookApiService;

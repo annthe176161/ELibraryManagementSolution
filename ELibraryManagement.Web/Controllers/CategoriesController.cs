@@ -4,12 +4,12 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ELibraryManagement.Web.Controllers
 {
-    public class CategoryController : Controller
+    public class CategoriesController : Controller
     {
         private readonly ICategoryApiService _categoryApiService;
-        private readonly ILogger<CategoryController> _logger;
+        private readonly ILogger<CategoriesController> _logger;
 
-        public CategoryController(ICategoryApiService categoryApiService, ILogger<CategoryController> logger)
+        public CategoriesController(ICategoryApiService categoryApiService, ILogger<CategoriesController> logger)
         {
             _categoryApiService = categoryApiService;
             _logger = logger;

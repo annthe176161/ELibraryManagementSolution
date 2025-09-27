@@ -4,12 +4,12 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace ELibraryManagement.Web.Controllers
 {
-    public class BookController : Controller
+    public class BooksController : Controller
     {
         private readonly IBookApiService _bookApiService;
         private readonly IAuthApiService _authApiService;
 
-        public BookController(IBookApiService bookApiService, IAuthApiService authApiService)
+        public BooksController(IBookApiService bookApiService, IAuthApiService authApiService)
         {
             _bookApiService = bookApiService;
             _authApiService = authApiService;
