@@ -35,25 +35,25 @@
                         <i class="fas fa-info-circle"></i>
                         Thông tin cơ bản
                     </h6>
-                    
+
                     <dl class="row">
                         <dt class="col-sm-4">Mã phạt:</dt>
                         <dd class="col-sm-8">#@Model.Id</dd>
-                        
+
                         <dt class="col-sm-4">Sinh viên:</dt>
                         <dd class="col-sm-8">
                             <strong>@Model.UserFullName</strong><br>
                             <small class="text-muted">@Model.UserEmail</small>
                         </dd>
-                        
+
                         <dt class="col-sm-4">Số tiền:</dt>
                         <dd class="col-sm-8">
                             <span class="h5 text-danger">@Model.Amount.ToString("N0") VND</span>
                         </dd>
-                        
+
                         <dt class="col-sm-4">Trạng thái:</dt>
                         <dd class="col-sm-8">
-                            @{ 
+                            @{
                                 // Use high-contrast bg/text classes so badge is readable on white background
                                 var statusClass = Model.Status switch
                                 {
@@ -68,7 +68,9 @@
                             </span>
                             @if (Model.IsOverdue)
                             {
-                                <br><small class="text-danger">
+                                <br>
+                            
+                                <small class="text-danger">
                                     <i class="fas fa-exclamation-triangle"></i> Quá hạn
                                 </small>
                             }
@@ -86,11 +88,11 @@
                         <i class="fas fa-calendar"></i>
                         Thông tin thời gian
                     </h6>
-                    
+
                     <dl class="row">
                         <dt class="col-sm-5">Ngày tạo:</dt>
                         <dd class="col-sm-7">@Model.FineDate.ToString("dd/MM/yyyy HH:mm")</dd>
-                        
+
                         <dt class="col-sm-5">Hạn thanh toán:</dt>
                         <dd class="col-sm-7">
                             @if (Model.DueDate.HasValue)
@@ -104,19 +106,19 @@
                                 <span class="text-muted">Không giới hạn</span>
                             }
                         </dd>
-                        
+
                         @if (Model.PaidDate.HasValue)
                         {
                             <dt class="col-sm-5">Ngày thanh toán:</dt>
                             <dd class="col-sm-7 text-success">@Model.PaidDate.Value.ToString("dd/MM/yyyy HH:mm")</dd>
                         }
-                        
+
                         @if (Model.UpdatedAt.HasValue)
                         {
                             <dt class="col-sm-5">Cập nhật cuối:</dt>
                             <dd class="col-sm-7">@Model.UpdatedAt.Value.ToString("dd/MM/yyyy HH:mm")</dd>
                         }
-                        
+
                         <!-- Reminder count removed per UX request -->
                     </dl>
                 </div>
@@ -139,7 +141,9 @@
                             <strong>@Model.BookTitle</strong>
                             @if (!string.IsNullOrEmpty(Model.BookAuthor))
                             {
-                                <br><small class="text-muted">Tác giả: @Model.BookAuthor</small>
+                                <br>
+                        
+                                <small class="text-muted">Tác giả: @Model.BookAuthor</small>
                             }
                         </p>
                         @if (Model.BorrowRecordId.HasValue)
@@ -164,13 +168,13 @@
                     <dl class="row">
                         <dt class="col-sm-2">Lý do:</dt>
                         <dd class="col-sm-10"><strong>@Model.Reason</strong></dd>
-                        
+
                         @if (!string.IsNullOrEmpty(Model.Description))
                         {
                             <dt class="col-sm-2">Mô tả:</dt>
                             <dd class="col-sm-10">@Model.Description</dd>
                         }
-                        
+
                         @if (!string.IsNullOrEmpty(Model.EscalationReason))
                         {
                             <dt class="col-sm-2">Lý do chuyển lên:</dt>
@@ -222,7 +226,9 @@
                                         }
                                         @if (!string.IsNullOrEmpty(action.Notes))
                                         {
-                                            <br><small class="text-muted">Ghi chú: @action.Notes</small>
+                                            <br>
+                                
+                                            <small class="text-muted">Ghi chú: @action.Notes</small>
                                         }
                                         <div class="text-muted">
                                             <small>Thực hiện bởi: @action.UserFullName</small>
