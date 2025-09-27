@@ -550,7 +550,7 @@
         function loadCategories() {
             return new Promise((resolve, reject) => {
                 $.ajax({
-                    url: '/Admin/GetCategories',
+                    url: '/Admins/GetCategories',
                     type: 'GET',
                     success: function (response) {
                         console.log('Categories response:', response);
@@ -706,7 +706,7 @@
             $('#saveBookBtn').prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i>Đang tải...');
 
             $.ajax({
-                url: '/Admin/GetBookDetail',
+                url: '/Admins/GetBookDetail',
                 type: 'GET',
                 data: { id: bookId },
                 success: function (response) {
@@ -821,7 +821,7 @@
             console.log('CoverImageUrl value:', $('#coverImageUrl').val()); // Debug specific field
 
             const isEdit = currentBookId !== null && currentBookId > 0;
-            const url = isEdit ? '/Admin/SaveBook' : '/Admin/SaveBook';
+            const url = isEdit ? '/Admins/SaveBook' : '/Admins/SaveBook';
 
             $('#saveBookBtn').prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i>Đang lưu...');
 
@@ -898,7 +898,7 @@
                 formData.append('file', file);
 
                 const response = await $.ajax({
-                    url: '/Admin/UploadImage',
+                    url: '/Admins/UploadImage',
                     type: 'POST',
                     data: formData,
                     processData: false,
@@ -938,7 +938,7 @@
 
             $('#confirmDeleteBtn').off('click').on('click', function () {
                 $.ajax({
-                    url: '/Admin/DeleteBook',
+                    url: '/Admins/DeleteBook',
                     type: 'POST',
                     data: { id: bookId },
                     success: function (response) {
@@ -975,9 +975,9 @@
             $('#bookDetailModal .modal-content').html('<div class="modal-body text-center"><div class="spinner-border" role="status"><span class="visually-hidden">Đang tải...</span></div></div>');
             $('#bookDetailModal').modal('show');
 
-            console.log('Making AJAX request to:', '/Admin/BookDetail/' + bookId);
+            console.log('Making AJAX request to:', '/Admins/BookDetail/' + bookId);
             $.ajax({
-                url: '/Admin/BookDetail/' + bookId,
+                url: '/Admins/BookDetail/' + bookId,
                 type: 'GET',
                 success: function (response) {
                     console.log('AJAX success, response received');

@@ -441,7 +441,7 @@
 
             // Fetch details from API
             $.ajax({
-                url: `/Admin/GetBorrowDetail/${borrowId}`,
+                url: `/Admins/GetBorrowDetail/${borrowId}`,
                 type: 'GET',
                 success: function (response) {
                     if (response.success && response.data) {
@@ -546,7 +546,7 @@
                 const token = localStorage.getItem('token');
 
                 $.ajax({
-                    url: `/Admin/ConfirmReturn`,
+                    url: `/Admins/ConfirmReturn`,
                     type: 'POST',
                     headers: {
                         'Authorization': 'Bearer ' + token
@@ -570,7 +570,7 @@
             const token = localStorage.getItem('token');
 
             $.ajax({
-                url: `/Admin/SendReminder`,
+                url: `/Admins/SendReminder`,
                 type: 'POST',
                 headers: {
                     'Authorization': 'Bearer ' + token
@@ -601,7 +601,7 @@
         function approveBorrow(borrowId, userName, bookTitle) {
             if (confirm(`Phê duyệt yêu cầu mượn sách?\n\nNgười mượn: ${userName}\nSách: ${bookTitle}`)) {
                 $.ajax({
-                    url: `/Admin/ApproveBorrowRequest/${borrowId}`,
+                    url: `/Admins/ApproveBorrowRequest/${borrowId}`,
                     type: 'POST',
                     success: function (response) {
                         if (response.success) {
@@ -643,7 +643,7 @@
             const notes = prompt('Nhập ghi chú cho giao dịch mượn này:');
             if (notes !== null) {
                 $.ajax({
-                    url: '/Admin/UpdateBorrowNotes',
+                    url: '/Admins/UpdateBorrowNotes',
                     type: 'POST',
                     data: {
                         id: borrowId,
@@ -733,7 +733,7 @@
             console.log('Updating borrow status:', { borrowId, status, notes });
 
             $.ajax({
-                url: '/Admin/UpdateBorrowStatus',
+                url: '/Admins/UpdateBorrowStatus',
                 type: 'POST',
                 data: {
                     id: borrowId,

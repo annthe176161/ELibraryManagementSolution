@@ -391,7 +391,7 @@
             };
 
             const isEdit = currentCategoryId !== null && currentCategoryId > 0;
-            const url = isEdit ? '/Admin/UpdateCategory' : '/Admin/CreateCategory';
+            const url = isEdit ? '/Admins/UpdateCategory' : '/Admins/CreateCategory';
             
             $('#saveCategoryBtn').prop('disabled', true).html('<i class="fas fa-spinner fa-spin me-1"></i>Đang lưu...');
 
@@ -440,7 +440,7 @@
         $('#confirmDeleteBtn').on('click', function() {
             if (currentCategoryId) {
                 $.ajax({
-                    url: '/Admin/DeleteCategory',
+                    url: '/Admins/DeleteCategory',
                     type: 'POST',
                     data: { categoryId: currentCategoryId },
                     success: function(response) {

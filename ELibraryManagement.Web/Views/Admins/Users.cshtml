@@ -380,7 +380,7 @@
             $('#userDetailModal').modal('show');
 
             // Load user details via AJAX
-            $.get(`/Admin/GetUserDetail/${userId}`)
+            $.get(`/Admins/GetUserDetail/${userId}`)
                 .done(function (data) {
                     $('#userDetailContent').html(data);
                 })
@@ -412,7 +412,7 @@
         function confirmDisableUser() {
             if (!currentUserId) return;
 
-            $.post(`/Admin/DisableUser/${currentUserId}`)
+            $.post(`/Admins/DisableUser/${currentUserId}`)
                 .done(function (response) {
                     if (response.success) {
                         $('#disableUserModal').modal('hide');
@@ -431,7 +431,7 @@
         function confirmEnableUser() {
             if (!currentUserId) return;
 
-            $.post(`/Admin/EnableUser/${currentUserId}`)
+            $.post(`/Admins/EnableUser/${currentUserId}`)
                 .done(function (response) {
                     if (response.success) {
                         $('#enableUserModal').modal('hide');

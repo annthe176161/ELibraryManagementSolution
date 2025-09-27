@@ -353,7 +353,7 @@
             function viewReview(reviewId) {
                 // Load review details from server
                 $.ajax({
-                    url: '/Admin/GetReviewDetail',
+                    url: '/Admins/GetReviewDetail',
                     type: 'GET',
                     data: { id: reviewId },
                     success: function (response) {
@@ -420,7 +420,7 @@
             $('#confirmDelete').on('click', function () {
                 if (reviewToDelete) {
                     $.ajax({
-                        url: '/Admin/DeleteReview',
+                        url: '/Admins/DeleteReview',
                         type: 'POST',
                         data: {
                             reviewId: reviewToDelete

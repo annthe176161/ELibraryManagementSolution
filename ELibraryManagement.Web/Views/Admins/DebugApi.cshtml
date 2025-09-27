@@ -24,7 +24,7 @@
         $('#testApiBtn').click(function () {
             $('#apiResponse').html('<div class="spinner-border" role="status"><span class="visually-hidden">Loading...</span></div>');
 
-            $.get('/Admin/TestApiUsers')
+            $.get('/Admins/TestApiUsers')
                 .done(function (data) {
                     $('#apiResponse').html('<pre>' + JSON.stringify(data, null, 2) + '</pre>');
                 })
