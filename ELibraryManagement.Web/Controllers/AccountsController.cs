@@ -83,7 +83,7 @@ namespace ELibraryManagement.Web.Controllers
                         var isAdmin = await _authApiService.IsInRoleAsync("Admin");
                         if (isAdmin)
                         {
-                            return RedirectToAction("Index", "Admin");
+                            return RedirectToAction("Index", "Admins");
                         }
                         return RedirectToAction("Index", "Home");
                     }
@@ -104,7 +104,7 @@ namespace ELibraryManagement.Web.Controllers
                 var isAdmin = await _authApiService.IsInRoleAsync("Admin");
                 if (isAdmin)
                 {
-                    return RedirectToAction("Index", "Admin");
+                    return RedirectToAction("Index", "Admins");
                 }
                 return RedirectToAction("Index", "Home");
             }
@@ -130,7 +130,7 @@ namespace ELibraryManagement.Web.Controllers
                 var isAdmin = await _authApiService.IsInRoleAsync("Admin");
                 if (isAdmin)
                 {
-                    return RedirectToAction("Index", "Admin");
+                    return RedirectToAction("Index", "Admins");
                 }
 
                 return RedirectToAction("Index", "Home");
