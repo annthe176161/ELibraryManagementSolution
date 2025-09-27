@@ -3,7 +3,7 @@ using ELibraryManagement.Api.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
-namespace ELibraryManagement.Api.Seeders
+namespace ELibraryManagement.Api.Data.Seeders
 {
     public class AdminUserSeeder
     {

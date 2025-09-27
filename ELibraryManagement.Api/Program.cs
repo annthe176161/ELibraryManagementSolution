@@ -1,9 +1,9 @@
 
 using ELibraryManagement.Api.Data;
+using ELibraryManagement.Api.Data.Seeders;
 using ELibraryManagement.Api.DTOs;
 using ELibraryManagement.Api.Formatters;
 using ELibraryManagement.Api.Models;
-using ELibraryManagement.Api.Seeders;
 using ELibraryManagement.Api.Services;
 using ELibraryManagement.Api.Services.Implementations;
 using ELibraryManagement.Api.Services.Interfaces;

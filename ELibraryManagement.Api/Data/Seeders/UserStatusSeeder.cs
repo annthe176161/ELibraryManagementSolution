@@ -1,7 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using ELibraryManagement.Api.Data;
 
-namespace ELibraryManagement.Api.Seeders
+namespace ELibraryManagement.Api.Data.Seeders
 {
     public static class UserStatusSeeder
     {

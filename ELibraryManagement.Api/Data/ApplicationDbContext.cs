@@ -1,4 +1,5 @@
-﻿using ELibraryManagement.Api.Models;
+﻿using ELibraryManagement.Api.Data.Seeders;
+using ELibraryManagement.Api.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -131,7 +132,7 @@ namespace ELibraryManagement.Api.Data
                 .HasQueryFilter(bc => !bc.Book.IsDeleted && !bc.Category.IsDeleted);
 
             // Seed data
-            SeedData.Initialize(modelBuilder);
+            InitialDataSeeder.Initialize(modelBuilder);
         }
 
         public override int SaveChanges()

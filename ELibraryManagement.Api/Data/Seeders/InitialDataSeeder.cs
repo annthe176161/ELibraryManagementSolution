@@ -2,9 +2,9 @@ using ELibraryManagement.Api.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
-namespace ELibraryManagement.Api.Data
+namespace ELibraryManagement.Api.Data.Seeders
 {
-    public static class SeedData
+    public static class InitialDataSeeder
     {
         public static void Initialize(ModelBuilder modelBuilder)
         {

@@ -2,14 +2,14 @@ using ELibraryManagement.Api.Data;
 using ELibraryManagement.Api.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace ELibraryManagement.Api.Seeders
+namespace ELibraryManagement.Api.Data.Seeders
 {
     public class BookSeeder
     {
         public static void SeedBooks(ModelBuilder modelBuilder)
         {
             // This is an example of how you could seed additional books
-            // The main seeding is done in SeedData.cs in the Data folder
+            // The main seeding is done in InitialDataSeeder.cs in the same folder
 
             // You can add more seed data here if needed
             // For example:
