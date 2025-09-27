@@ -11,8 +11,7 @@ namespace ELibraryManagement.Api.Data.Seeders
             // Seed Roles
             modelBuilder.Entity<IdentityRole>().HasData(
                 new IdentityRole { Id = "1", Name = "Admin", NormalizedName = "ADMIN" },
-                new IdentityRole { Id = "2", Name = "Librarian", NormalizedName = "LIBRARIAN" },
-                new IdentityRole { Id = "3", Name = "User", NormalizedName = "USER" }
+                new IdentityRole { Id = "2", Name = "User", NormalizedName = "USER" }
             );
 
             // Seed Categories - Danh mục sách tiếng Việt

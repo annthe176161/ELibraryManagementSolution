@@ -86,8 +86,8 @@ namespace ELibraryManagement.Api.Controllers
                 return Unauthorized("Không thể xác định user.");
             }
 
-            // Admin/Librarian có thể xóa bất kỳ review nào
-            if (userRole == "Admin" || userRole == "Librarian")
+            // Admin có thể xóa bất kỳ review nào
+            if (userRole == "Admin")
             {
                 var adminResult = await _reviewService.DeleteReviewByAdminAsync(id);
                 if (adminResult.Success)
@@ -258,7 +258,7 @@ namespace ELibraryManagement.Api.Controllers
         /// Lấy tất cả reviews cho admin
         /// </summary>
         [HttpGet("all")]
-        [Authorize(Roles = "Admin,Librarian")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAllReviews()
         {
             var reviews = await _reviewService.GetAllReviewsAsync();

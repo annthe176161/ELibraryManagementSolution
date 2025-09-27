@@ -22,7 +22,7 @@ namespace ELibraryManagement.Api.Data.Seeders
                 await context.Database.MigrateAsync();
 
                 // Create roles if they don't exist
-                string[] roleNames = { "Admin", "Librarian", "User" };
+                string[] roleNames = { "Admin", "User" };
                 foreach (var roleName in roleNames)
                 {
                     if (!await roleManager.RoleExistsAsync(roleName))
