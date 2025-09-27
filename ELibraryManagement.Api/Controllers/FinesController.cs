@@ -11,13 +11,13 @@ namespace ELibraryManagement.Api.Controllers
     [ApiController]
     [Route("api/[controller]")]
     [Produces("application/json")]
-    public class FineController : ControllerBase
+    public class FinesController : ControllerBase
     {
         private readonly ApplicationDbContext _context;
-        private readonly ILogger<FineController> _logger;
+        private readonly ILogger<FinesController> _logger;
         private readonly IUserStatusService _userStatusService;
 
-        public FineController(ApplicationDbContext context, ILogger<FineController> logger, IUserStatusService userStatusService)
+        public FinesController(ApplicationDbContext context, ILogger<FinesController> logger, IUserStatusService userStatusService)
         {
             _context = context;
             _logger = logger;

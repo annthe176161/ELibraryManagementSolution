@@ -14,13 +14,13 @@ namespace ELibraryManagement.Api.Controllers
     [ApiController]
     [Route("api/[controller]")]
     [Produces("application/json")]
-    public class UserController : ControllerBase
+    public class UsersController : ControllerBase
     {
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly ICloudinaryService _cloudinaryService;
         private readonly ApplicationDbContext _context;
 
-        public UserController(UserManager<ApplicationUser> userManager, ICloudinaryService cloudinaryService, ApplicationDbContext context)
+        public UsersController(UserManager<ApplicationUser> userManager, ICloudinaryService cloudinaryService, ApplicationDbContext context)
         {
             _userManager = userManager;
             _cloudinaryService = cloudinaryService;

@@ -10,12 +10,12 @@ namespace ELibraryManagement.Api.Controllers
     [ApiController]
     [Route("api/[controller]")]
     [Produces("application/json")]
-    public class AuthController : ControllerBase
+    public class AuthsController : ControllerBase
     {
         private readonly IAuthService _authService;
         private readonly SignInManager<Models.ApplicationUser> _signInManager;
 
-        public AuthController(IAuthService authService, SignInManager<Models.ApplicationUser> signInManager)
+        public AuthsController(IAuthService authService, SignInManager<Models.ApplicationUser> signInManager)
         {
             _authService = authService;
             _signInManager = signInManager;

@@ -13,7 +13,7 @@ namespace ELibraryManagement.Api.Controllers
     [ApiController]
     [Route("api/[controller]")]
     [Produces("application/json")]
-    public class BorrowController : ControllerBase
+    public class BorrowsController : ControllerBase
     {
         private readonly IBorrowService _borrowService;
         private readonly IBorrowStatusValidationService _validationService;
@@ -21,7 +21,7 @@ namespace ELibraryManagement.Api.Controllers
         private readonly IEmailService _emailService;
         private readonly IUserStatusService _userStatusService;
 
-        public BorrowController(
+        public BorrowsController(
             IBorrowService borrowService,
             IBorrowStatusValidationService validationService,
             ApplicationDbContext context,

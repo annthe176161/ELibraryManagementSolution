@@ -10,12 +10,12 @@ namespace ELibraryManagement.Api.Controllers
     [Route("api/[controller]")]
     [Route("odata/[controller]")]
     [Produces("application/json", "application/xml", "text/csv")]
-    public class BookController : ControllerBase
+    public class BooksController : ControllerBase
     {
         private readonly IBookService _bookService;
         private readonly ICloudinaryService _cloudinaryService;
 
-        public BookController(IBookService bookService, ICloudinaryService cloudinaryService)
+        public BooksController(IBookService bookService, ICloudinaryService cloudinaryService)
         {
             _bookService = bookService;
             _cloudinaryService = cloudinaryService;
