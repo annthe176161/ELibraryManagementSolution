@@ -55,7 +55,7 @@ namespace ELibraryManagement.Web.Services.Implementations
                 var json = JsonSerializer.Serialize(requestData, _jsonOptions);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                var response = await _httpClient.PostAsync($"{apiBaseUrl}/api/Auth/register", content);
+                var response = await _httpClient.PostAsync($"{apiBaseUrl}/api/Auths/register", content);
                 var responseContent = await response.Content.ReadAsStringAsync();
 
                 if (response.IsSuccessStatusCode)
@@ -103,7 +103,7 @@ namespace ELibraryManagement.Web.Services.Implementations
                 var json = JsonSerializer.Serialize(requestData, _jsonOptions);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                var response = await _httpClient.PostAsync($"{apiBaseUrl}/api/Auth/login", content);
+                var response = await _httpClient.PostAsync($"{apiBaseUrl}/api/Auths/login", content);
                 var responseContent = await response.Content.ReadAsStringAsync();
 
                 if (response.IsSuccessStatusCode)
@@ -176,7 +176,7 @@ namespace ELibraryManagement.Web.Services.Implementations
                 _httpClient.DefaultRequestHeaders.Authorization =
                     new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
-                var response = await _httpClient.GetAsync($"{apiBaseUrl}/api/Auth/me");
+                var response = await _httpClient.GetAsync($"{apiBaseUrl}/api/Auths/me");
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -355,7 +355,7 @@ namespace ELibraryManagement.Web.Services.Implementations
                 _httpClient.DefaultRequestHeaders.Authorization =
                     new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
-                var response = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Auth/roles");
+                var response = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Auths/roles");
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -397,7 +397,7 @@ namespace ELibraryManagement.Web.Services.Implementations
                 var json = JsonSerializer.Serialize(model, _jsonOptions);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                var response = await _httpClient.PutAsync($"{GetApiBaseUrl()}/api/Auth/update-profile", content);
+                var response = await _httpClient.PutAsync($"{GetApiBaseUrl()}/api/Auths/update-profile", content);
                 var responseContent = await response.Content.ReadAsStringAsync();
 
                 if (response.IsSuccessStatusCode)
@@ -442,7 +442,7 @@ namespace ELibraryManagement.Web.Services.Implementations
                 var json = JsonSerializer.Serialize(model, _jsonOptions);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                var response = await _httpClient.PutAsync($"{GetApiBaseUrl()}/api/Auth/change-password", content);
+                var response = await _httpClient.PutAsync($"{GetApiBaseUrl()}/api/Auths/change-password", content);
                 var responseContent = await response.Content.ReadAsStringAsync();
 
                 if (response.IsSuccessStatusCode)
@@ -479,7 +479,7 @@ namespace ELibraryManagement.Web.Services.Implementations
                 var json = JsonSerializer.Serialize(requestData, _jsonOptions);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                var response = await _httpClient.PostAsync($"{GetApiBaseUrl()}/api/Auth/forgot-password", content);
+                var response = await _httpClient.PostAsync($"{GetApiBaseUrl()}/api/Auths/forgot-password", content);
                 var responseContent = await response.Content.ReadAsStringAsync();
 
                 if (response.IsSuccessStatusCode)
@@ -519,7 +519,7 @@ namespace ELibraryManagement.Web.Services.Implementations
                 var json = JsonSerializer.Serialize(requestData, _jsonOptions);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                var response = await _httpClient.PostAsync($"{GetApiBaseUrl()}/api/Auth/reset-password", content);
+                var response = await _httpClient.PostAsync($"{GetApiBaseUrl()}/api/Auths/reset-password", content);
                 var responseContent = await response.Content.ReadAsStringAsync();
 
                 if (response.IsSuccessStatusCode)
@@ -576,7 +576,7 @@ namespace ELibraryManagement.Web.Services.Implementations
                 _httpClient.DefaultRequestHeaders.Authorization =
                     new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
-                var response = await _httpClient.PostAsync($"{GetApiBaseUrl()}/api/User/upload-avatar", formData);
+                var response = await _httpClient.PostAsync($"{GetApiBaseUrl()}/api/Users/upload-avatar", formData);
                 var responseContent = await response.Content.ReadAsStringAsync();
 
                 if (response.IsSuccessStatusCode)
@@ -618,7 +618,7 @@ namespace ELibraryManagement.Web.Services.Implementations
                 var json = JsonSerializer.Serialize(model);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                var response = await _httpClient.PostAsync($"{GetApiBaseUrl()}/api/auth/resend-email-confirmation", content);
+                var response = await _httpClient.PostAsync($"{GetApiBaseUrl()}/api/Auths/resend-email-confirmation", content);
                 var responseContent = await response.Content.ReadAsStringAsync();
 
                 if (response.IsSuccessStatusCode)

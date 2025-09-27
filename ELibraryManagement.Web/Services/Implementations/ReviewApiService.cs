@@ -45,7 +45,7 @@ namespace ELibraryManagement.Web.Services.Implementations
                 var json = JsonSerializer.Serialize(createDto);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                var response = await _httpClient.PostAsync($"{apiBaseUrl}/api/Review", content);
+                var response = await _httpClient.PostAsync($"{apiBaseUrl}/api/Reviews", content);
                 var responseContent = await response.Content.ReadAsStringAsync();
 
                 if (response.IsSuccessStatusCode)
@@ -92,7 +92,7 @@ namespace ELibraryManagement.Web.Services.Implementations
                 var json = JsonSerializer.Serialize(updateDto);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                var response = await _httpClient.PutAsync($"{apiBaseUrl}/api/Review/{updateReview.Id}", content);
+                var response = await _httpClient.PutAsync($"{apiBaseUrl}/api/Reviews/{updateReview.Id}", content);
                 var responseContent = await response.Content.ReadAsStringAsync();
 
                 if (response.IsSuccessStatusCode)
@@ -128,7 +128,7 @@ namespace ELibraryManagement.Web.Services.Implementations
                 var apiBaseUrl = GetApiBaseUrl();
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-                var response = await _httpClient.DeleteAsync($"{apiBaseUrl}/api/Review/{reviewId}");
+                var response = await _httpClient.DeleteAsync($"{apiBaseUrl}/api/Reviews/{reviewId}");
                 var responseContent = await response.Content.ReadAsStringAsync();
 
                 if (response.IsSuccessStatusCode)
@@ -163,7 +163,7 @@ namespace ELibraryManagement.Web.Services.Implementations
             {
                 var apiBaseUrl = GetApiBaseUrl();
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-                var response = await _httpClient.GetAsync($"{apiBaseUrl}/api/Review/{reviewId}");
+                var response = await _httpClient.GetAsync($"{apiBaseUrl}/api/Reviews/{reviewId}");
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -188,10 +188,10 @@ namespace ELibraryManagement.Web.Services.Implementations
                 var apiBaseUrl = GetApiBaseUrl();
 
                 // Get reviews list
-                var reviewsResponse = await _httpClient.GetAsync($"{apiBaseUrl}/api/Review/book/{bookId}?page={page}&pageSize={pageSize}");
+                var reviewsResponse = await _httpClient.GetAsync($"{apiBaseUrl}/api/Reviews/book/{bookId}?page={page}&pageSize={pageSize}");
 
                 // Get summary data for rating statistics
-                var summaryResponse = await _httpClient.GetAsync($"{apiBaseUrl}/api/Review/book/{bookId}/summary");
+                var summaryResponse = await _httpClient.GetAsync($"{apiBaseUrl}/api/Reviews/book/{bookId}/summary");
 
                 if (reviewsResponse.IsSuccessStatusCode)
                 {
@@ -250,7 +250,7 @@ namespace ELibraryManagement.Web.Services.Implementations
             try
             {
                 var apiBaseUrl = GetApiBaseUrl();
-                var response = await _httpClient.GetAsync($"{apiBaseUrl}/api/Review/book/{bookId}/summary");
+                var response = await _httpClient.GetAsync($"{apiBaseUrl}/api/Reviews/book/{bookId}/summary");
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -293,7 +293,7 @@ namespace ELibraryManagement.Web.Services.Implementations
                 var apiBaseUrl = GetApiBaseUrl();
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-                var response = await _httpClient.GetAsync($"{apiBaseUrl}/api/Review/my-reviews");
+                var response = await _httpClient.GetAsync($"{apiBaseUrl}/api/Reviews/my-reviews");
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -318,7 +318,7 @@ namespace ELibraryManagement.Web.Services.Implementations
                 var apiBaseUrl = GetApiBaseUrl();
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-                var response = await _httpClient.GetAsync($"{apiBaseUrl}/api/Review/can-review/{bookId}");
+                var response = await _httpClient.GetAsync($"{apiBaseUrl}/api/Reviews/can-review/{bookId}");
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -375,7 +375,7 @@ namespace ELibraryManagement.Web.Services.Implementations
                 var apiBaseUrl = GetApiBaseUrl();
                 _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-                var response = await _httpClient.GetAsync($"{apiBaseUrl}/api/Review/my-review/{bookId}");
+                var response = await _httpClient.GetAsync($"{apiBaseUrl}/api/Reviews/my-review/{bookId}");
 
                 if (response.IsSuccessStatusCode)
                 {

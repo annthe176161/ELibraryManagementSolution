@@ -95,7 +95,7 @@ namespace ELibraryManagement.Web.Controllers
                 // Get total users count (all users)
                 try
                 {
-                    var usersResponse = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/User");
+                    var usersResponse = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Users");
                     if (usersResponse.IsSuccessStatusCode)
                     {
                         var usersContent = await usersResponse.Content.ReadAsStringAsync();
@@ -119,7 +119,7 @@ namespace ELibraryManagement.Web.Controllers
                 // Get total books count
                 try
                 {
-                    var booksResponse = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Book/admin/all");
+                    var booksResponse = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Books/admin/all");
                     if (booksResponse.IsSuccessStatusCode)
                     {
                         var booksContent = await booksResponse.Content.ReadAsStringAsync();
@@ -139,7 +139,7 @@ namespace ELibraryManagement.Web.Controllers
                 // Get borrow records statistics
                 try
                 {
-                    var borrowsResponse = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Borrow/admin/all");
+                    var borrowsResponse = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Borrows/admin/all");
                     if (borrowsResponse.IsSuccessStatusCode)
                     {
                         var borrowsContent = await borrowsResponse.Content.ReadAsStringAsync();
@@ -193,7 +193,7 @@ namespace ELibraryManagement.Web.Controllers
                 // Get total reviews count
                 try
                 {
-                    var reviewsResponse = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Review/all");
+                    var reviewsResponse = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Reviews/all");
                     if (reviewsResponse.IsSuccessStatusCode)
                     {
                         var reviewsContent = await reviewsResponse.Content.ReadAsStringAsync();
@@ -231,7 +231,7 @@ namespace ELibraryManagement.Web.Controllers
                 _httpClient.DefaultRequestHeaders.Authorization =
                     new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
-                var response = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/User");
+                var response = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Users");
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -262,7 +262,7 @@ namespace ELibraryManagement.Web.Controllers
                 _httpClient.DefaultRequestHeaders.Authorization =
                     new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
-                var response = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Review/all");
+                var response = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Reviews/all");
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -294,7 +294,7 @@ namespace ELibraryManagement.Web.Controllers
                 _httpClient.DefaultRequestHeaders.Authorization =
                     new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
-                var response = await _httpClient.DeleteAsync($"{GetApiBaseUrl()}/api/Review/{reviewId}");
+                var response = await _httpClient.DeleteAsync($"{GetApiBaseUrl()}/api/Reviews/{reviewId}");
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -323,7 +323,7 @@ namespace ELibraryManagement.Web.Controllers
                 _httpClient.DefaultRequestHeaders.Authorization =
                     new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
-                var response = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Review/{id}");
+                var response = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Reviews/{id}");
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -501,7 +501,7 @@ namespace ELibraryManagement.Web.Controllers
                 _httpClient.DefaultRequestHeaders.Authorization =
                     new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
-                var response = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/borrow/admin/all");
+                var response = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Borrows/admin/all");
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -638,7 +638,7 @@ namespace ELibraryManagement.Web.Controllers
                 _httpClient.DefaultRequestHeaders.Clear();
                 _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
 
-                var response = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/borrow/admin/{id}/allowed-transitions");
+                var response = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Borrows/admin/{id}/allowed-transitions");
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -671,7 +671,7 @@ namespace ELibraryManagement.Web.Controllers
             var json = JsonSerializer.Serialize(notesDto, _jsonOptions);
             var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
 
-            var response = await _httpClient.PutAsync($"{GetApiBaseUrl()}/api/borrow/admin/{id}/notes", content);
+            var response = await _httpClient.PutAsync($"{GetApiBaseUrl()}/api/Borrows/admin/{id}/notes", content);
 
             if (!response.IsSuccessStatusCode)
             {
@@ -700,7 +700,7 @@ namespace ELibraryManagement.Web.Controllers
                 var json = JsonSerializer.Serialize(extendDto, _jsonOptions);
                 var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
 
-                var response = await _httpClient.PutAsync($"{GetApiBaseUrl()}/api/borrow/admin/{id}/extend", content);
+                var response = await _httpClient.PutAsync($"{GetApiBaseUrl()}/api/Borrows/admin/{id}/extend", content);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -734,7 +734,7 @@ namespace ELibraryManagement.Web.Controllers
                 _httpClient.DefaultRequestHeaders.Clear();
                 _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
 
-                var response = await _httpClient.PostAsync($"{GetApiBaseUrl()}/api/borrow/admin/{id}/remind", null);
+                var response = await _httpClient.PostAsync($"{GetApiBaseUrl()}/api/Borrows/admin/{id}/remind", null);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -768,7 +768,7 @@ namespace ELibraryManagement.Web.Controllers
                 _httpClient.DefaultRequestHeaders.Clear();
                 _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
 
-                var response = await _httpClient.PostAsync($"{GetApiBaseUrl()}/api/borrow/admin/{id}/return", null);
+                var response = await _httpClient.PostAsync($"{GetApiBaseUrl()}/api/Borrows/admin/{id}/return", null);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -807,7 +807,7 @@ namespace ELibraryManagement.Web.Controllers
                     new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
                 // Get user info
-                var userResponse = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/User/admin/{id}");
+                var userResponse = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Users/admin/{id}");
                 AdminUserViewModel? user = null;
                 if (userResponse.IsSuccessStatusCode)
                 {
@@ -816,7 +816,7 @@ namespace ELibraryManagement.Web.Controllers
                 }
 
                 // Get user's borrow history
-                var borrowResponse = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Borrow/user/{id}");
+                var borrowResponse = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Borrows/user/{id}");
                 List<UserBorrowedBookViewModel> borrows = new List<UserBorrowedBookViewModel>();
                 if (borrowResponse.IsSuccessStatusCode)
                 {
@@ -852,7 +852,7 @@ namespace ELibraryManagement.Web.Controllers
                 _httpClient.DefaultRequestHeaders.Authorization =
                     new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
-                var response = await _httpClient.PostAsync($"{GetApiBaseUrl()}/api/User/{id}/disable", null);
+                var response = await _httpClient.PostAsync($"{GetApiBaseUrl()}/api/Users/{id}/disable", null);
                 if (response.IsSuccessStatusCode)
                 {
                     return Json(new { success = true, message = "Đã vô hiệu hóa sinh viên thành công" });
@@ -880,7 +880,7 @@ namespace ELibraryManagement.Web.Controllers
                 _httpClient.DefaultRequestHeaders.Authorization =
                     new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
-                var response = await _httpClient.PostAsync($"{GetApiBaseUrl()}/api/User/{id}/enable", null);
+                var response = await _httpClient.PostAsync($"{GetApiBaseUrl()}/api/Users/{id}/enable", null);
                 if (response.IsSuccessStatusCode)
                 {
                     return Json(new { success = true, message = "Đã kích hoạt sinh viên thành công" });
@@ -909,7 +909,7 @@ namespace ELibraryManagement.Web.Controllers
                     new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
                 // Get user info
-                var userResponse = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/User/admin/{id}");
+                var userResponse = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Users/admin/{id}");
                 AdminUserViewModel? user = null;
                 if (userResponse.IsSuccessStatusCode)
                 {
@@ -918,7 +918,7 @@ namespace ELibraryManagement.Web.Controllers
                 }
 
                 // Get user's borrow history
-                var borrowResponse = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Borrow/user/{id}");
+                var borrowResponse = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Borrows/user/{id}");
                 List<UserBorrowedBookViewModel> borrows = new List<UserBorrowedBookViewModel>();
                 if (borrowResponse.IsSuccessStatusCode)
                 {
@@ -949,7 +949,7 @@ namespace ELibraryManagement.Web.Controllers
                 _httpClient.DefaultRequestHeaders.Authorization =
                     new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
-                var response = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/User/admin/{id}");
+                var response = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Users/admin/{id}");
                 if (response.IsSuccessStatusCode)
                 {
                     var content = await response.Content.ReadAsStringAsync();
@@ -984,7 +984,7 @@ namespace ELibraryManagement.Web.Controllers
                     new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
                 // Get all books from API
-                var response = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Book/admin/all");
+                var response = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Books/admin/all");
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -1031,7 +1031,7 @@ namespace ELibraryManagement.Web.Controllers
                     }).ToList() ?? new List<AdminBookViewModel>();
 
                     // Get categories for filtering
-                    var categoriesResponse = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Category");
+                    var categoriesResponse = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Categories");
                     List<ELibraryManagement.Web.Models.DTOs.CategoryDto> categories = new();
 
                     if (categoriesResponse.IsSuccessStatusCode)
@@ -1088,7 +1088,7 @@ namespace ELibraryManagement.Web.Controllers
                 _httpClient.DefaultRequestHeaders.Authorization =
                     new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
-                var response = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Book/admin/all");
+                var response = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Books/admin/all");
                 var content = await response.Content.ReadAsStringAsync();
 
                 return Json(new
@@ -1096,7 +1096,7 @@ namespace ELibraryManagement.Web.Controllers
                     statusCode = response.StatusCode,
                     isSuccess = response.IsSuccessStatusCode,
                     content = content,
-                    apiUrl = $"{GetApiBaseUrl()}/api/Book/admin/all",
+                    apiUrl = $"{GetApiBaseUrl()}/api/Books/admin/all",
                     hasToken = !string.IsNullOrEmpty(token)
                 });
             }
@@ -1105,7 +1105,7 @@ namespace ELibraryManagement.Web.Controllers
                 return Json(new
                 {
                     error = ex.Message,
-                    apiUrl = $"{GetApiBaseUrl()}/api/Book/admin/all"
+                    apiUrl = $"{GetApiBaseUrl()}/api/Books/admin/all"
                 });
             }
         }
@@ -1119,7 +1119,7 @@ namespace ELibraryManagement.Web.Controllers
                 _httpClient.DefaultRequestHeaders.Authorization =
                     new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
-                var response = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/User");
+                var response = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Users");
                 var content = await response.Content.ReadAsStringAsync();
 
                 return Json(new
@@ -1127,7 +1127,7 @@ namespace ELibraryManagement.Web.Controllers
                     statusCode = response.StatusCode,
                     isSuccess = response.IsSuccessStatusCode,
                     content = content,
-                    apiUrl = $"{GetApiBaseUrl()}/api/User",
+                    apiUrl = $"{GetApiBaseUrl()}/api/Users",
                     hasToken = !string.IsNullOrEmpty(token)
                 });
             }
@@ -1136,7 +1136,7 @@ namespace ELibraryManagement.Web.Controllers
                 return Json(new
                 {
                     error = ex.Message,
-                    apiUrl = $"{GetApiBaseUrl()}/api/User"
+                    apiUrl = $"{GetApiBaseUrl()}/api/Users"
                 });
             }
         }
@@ -1155,7 +1155,7 @@ namespace ELibraryManagement.Web.Controllers
                 _httpClient.DefaultRequestHeaders.Authorization =
                     new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
-                var response = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Book/admin/{id}");
+                var response = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Books/admin/{id}");
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -1242,7 +1242,7 @@ namespace ELibraryManagement.Web.Controllers
                 fileContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(file.ContentType);
                 formData.Add(fileContent, "file", file.FileName);
 
-                var response = await _httpClient.PostAsync($"{GetApiBaseUrl()}/api/Book/admin/upload-image", formData);
+                var response = await _httpClient.PostAsync($"{GetApiBaseUrl()}/api/Books/admin/upload-image", formData);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -1328,7 +1328,7 @@ namespace ELibraryManagement.Web.Controllers
                 {
                     // Update existing book
                     var bookId = idProperty.GetInt32();
-                    apiUrl = $"{GetApiBaseUrl()}/api/Book/admin/update";
+                    apiUrl = $"{GetApiBaseUrl()}/api/Books/admin/update";
                     var json = bookData.GetRawText();
                     var content = new StringContent(json, System.Text.Encoding.UTF8, new System.Net.Http.Headers.MediaTypeHeaderValue("application/json"));
                     response = await _httpClient.PutAsync(apiUrl, content);
@@ -1336,7 +1336,7 @@ namespace ELibraryManagement.Web.Controllers
                 else
                 {
                     // Create new book
-                    apiUrl = $"{GetApiBaseUrl()}/api/Book/admin/create";
+                    apiUrl = $"{GetApiBaseUrl()}/api/Books/admin/create";
                     var json = bookData.GetRawText();
                     var content = new StringContent(json, System.Text.Encoding.UTF8, new System.Net.Http.Headers.MediaTypeHeaderValue("application/json"));
                     response = await _httpClient.PostAsync(apiUrl, content);
@@ -1371,7 +1371,7 @@ namespace ELibraryManagement.Web.Controllers
                 _httpClient.DefaultRequestHeaders.Clear();
                 _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
 
-                var response = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Book/admin/{id}");
+                var response = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Books/admin/{id}");
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -1407,7 +1407,7 @@ namespace ELibraryManagement.Web.Controllers
                 _httpClient.DefaultRequestHeaders.Clear();
                 _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
 
-                var response = await _httpClient.DeleteAsync($"{GetApiBaseUrl()}/api/Book/{id}");
+                var response = await _httpClient.DeleteAsync($"{GetApiBaseUrl()}/api/Books/{id}");
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -1506,7 +1506,7 @@ namespace ELibraryManagement.Web.Controllers
                 _httpClient.DefaultRequestHeaders.Authorization =
                     new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
-                var usersResponse = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/User");
+                var usersResponse = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Users");
                 List<AdminUserViewModel> users = new List<AdminUserViewModel>();
 
                 if (usersResponse.IsSuccessStatusCode)
@@ -1541,7 +1541,7 @@ namespace ELibraryManagement.Web.Controllers
                 _httpClient.DefaultRequestHeaders.Authorization =
                     new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
-                var usersResponse = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/User");
+                var usersResponse = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Users");
                 List<AdminUserViewModel> users = new List<AdminUserViewModel>();
 
                 if (usersResponse.IsSuccessStatusCode)
@@ -1584,7 +1584,7 @@ namespace ELibraryManagement.Web.Controllers
                     TempData["ErrorMessage"] = "Không thể tạo phạt. Vui lòng thử lại.";
 
                     // Reload users for dropdown
-                    var usersResponse = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/User");
+                    var usersResponse = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Users");
                     List<AdminUserViewModel> users = new List<AdminUserViewModel>();
 
                     if (usersResponse.IsSuccessStatusCode)
@@ -1749,10 +1749,10 @@ namespace ELibraryManagement.Web.Controllers
                     new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
                 _logger.LogInformation("Calling API: {Url} with token ending in: {TokenEnd}",
-                    $"{GetApiBaseUrl()}/api/Borrow/user/{userId}/active",
+                    $"{GetApiBaseUrl()}/api/Borrows/user/{userId}/active",
                     token.Length > 10 ? token.Substring(token.Length - 10) : token);
 
-                var response = await httpClient.GetAsync($"{GetApiBaseUrl()}/api/Borrow/user/{userId}/active");
+                var response = await httpClient.GetAsync($"{GetApiBaseUrl()}/api/Borrows/user/{userId}/active");
                 var content = await response.Content.ReadAsStringAsync();
 
                 if (response.IsSuccessStatusCode)
@@ -1843,7 +1843,7 @@ namespace ELibraryManagement.Web.Controllers
                 // Call API to update BorrowRecord
                 _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
-                var response = await _httpClient.PutAsync($"{GetApiBaseUrl()}/api/Borrow/admin/{borrowRecordId}/status", content);
+                var response = await _httpClient.PutAsync($"{GetApiBaseUrl()}/api/Borrows/admin/{borrowRecordId}/status", content);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -1877,7 +1877,7 @@ namespace ELibraryManagement.Web.Controllers
                 _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
                 // Get borrow record to find the book ID
-                var borrowResponse = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Borrow/{borrowRecordId}");
+                var borrowResponse = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Borrows/{borrowRecordId}");
                 if (!borrowResponse.IsSuccessStatusCode)
                 {
                     _logger.LogWarning("Could not fetch BorrowRecord {BorrowRecordId} to decrement book quantity", borrowRecordId);
@@ -1892,7 +1892,7 @@ namespace ELibraryManagement.Web.Controllers
                     var bookId = bookIdElement.GetInt32();
 
                     // Call API to decrement available quantity
-                    var response = await _httpClient.PostAsync($"{GetApiBaseUrl()}/api/Book/admin/{bookId}/decrement-quantity", null);
+                    var response = await _httpClient.PostAsync($"{GetApiBaseUrl()}/api/Books/admin/{bookId}/decrement-quantity", null);
 
                     if (response.IsSuccessStatusCode)
                     {

@@ -107,7 +107,7 @@ namespace ELibraryManagement.Web.Services.Implementations
                 var json = JsonSerializer.Serialize(requestData, _jsonOptions);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                var response = await _httpClient.PostAsync($"{GetApiBaseUrl()}/api/Borrow/{borrowId}/extend", content);
+                var response = await _httpClient.PostAsync($"{GetApiBaseUrl()}/api/Borrows/{borrowId}/extend", content);
                 var responseContent = await response.Content.ReadAsStringAsync();
 
                 if (response.IsSuccessStatusCode)
@@ -145,7 +145,7 @@ namespace ELibraryManagement.Web.Services.Implementations
                 _httpClient.DefaultRequestHeaders.Authorization =
                     new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
-                var apiUrl = $"{_configuration["ApiSettings:BaseUrl"]}/api/Borrow/borrow";
+                var apiUrl = $"{_configuration["ApiSettings:BaseUrl"]}/api/Borrows/borrow";
                 var requestContent = new StringContent(
                     JsonSerializer.Serialize(new { BookId = bookId }),
                     Encoding.UTF8,
@@ -204,7 +204,7 @@ namespace ELibraryManagement.Web.Services.Implementations
 
                 SetAuthorizationHeader();
 
-                var response = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Borrow/admin/{borrowId}");
+                var response = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Borrows/admin/{borrowId}");
                 if (response.IsSuccessStatusCode)
                 {
                     var responseContent = await response.Content.ReadAsStringAsync();
@@ -262,10 +262,10 @@ namespace ELibraryManagement.Web.Services.Implementations
                 var json = JsonSerializer.Serialize(requestData, _jsonOptions);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                Console.WriteLine($"Sending PUT request to: {GetApiBaseUrl()}/api/Borrow/admin/{borrowId}/status");
+                Console.WriteLine($"Sending PUT request to: {GetApiBaseUrl()}/api/Borrows/admin/{borrowId}/status");
                 Console.WriteLine($"Request payload: {json}");
 
-                var response = await _httpClient.PutAsync($"{GetApiBaseUrl()}/api/Borrow/admin/{borrowId}/status", content);
+                var response = await _httpClient.PutAsync($"{GetApiBaseUrl()}/api/Borrows/admin/{borrowId}/status", content);
 
                 Console.WriteLine($"Response status: {response.StatusCode}");
 
@@ -296,7 +296,7 @@ namespace ELibraryManagement.Web.Services.Implementations
 
                 SetAuthorizationHeader();
 
-                var response = await _httpClient.PostAsync($"{GetApiBaseUrl()}/api/borrow/approve/{borrowId}", null);
+                var response = await _httpClient.PostAsync($"{GetApiBaseUrl()}/api/Borrows/approve/{borrowId}", null);
                 if (response.IsSuccessStatusCode)
                 {
                     return true;
@@ -335,7 +335,7 @@ namespace ELibraryManagement.Web.Services.Implementations
 
                 SetAuthorizationHeader();
 
-                var response = await _httpClient.PostAsync($"{GetApiBaseUrl()}/api/Borrow/return/{borrowId}", null);
+                var response = await _httpClient.PostAsync($"{GetApiBaseUrl()}/api/Borrows/return/{borrowId}", null);
                 var responseContent = await response.Content.ReadAsStringAsync();
 
                 if (response.IsSuccessStatusCode)
@@ -364,7 +364,7 @@ namespace ELibraryManagement.Web.Services.Implementations
 
                 SetAuthorizationHeader();
 
-                var response = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Borrow/admin/all");
+                var response = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Borrows/admin/all");
                 if (response.IsSuccessStatusCode)
                 {
                     var responseContent = await response.Content.ReadAsStringAsync();
@@ -392,7 +392,7 @@ namespace ELibraryManagement.Web.Services.Implementations
 
                 SetAuthorizationHeader();
 
-                var response = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Borrow/admin/{id}");
+                var response = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Borrows/admin/{id}");
                 if (response.IsSuccessStatusCode)
                 {
                     var responseContent = await response.Content.ReadAsStringAsync();
@@ -420,7 +420,7 @@ namespace ELibraryManagement.Web.Services.Implementations
 
                 SetAuthorizationHeader();
 
-                var response = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Borrow/overdue");
+                var response = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Borrows/overdue");
                 if (response.IsSuccessStatusCode)
                 {
                     var responseContent = await response.Content.ReadAsStringAsync();
@@ -448,7 +448,7 @@ namespace ELibraryManagement.Web.Services.Implementations
 
                 SetAuthorizationHeader();
 
-                var response = await _httpClient.PostAsync($"{GetApiBaseUrl()}/api/Borrow/{borrowId}/reminder", null);
+                var response = await _httpClient.PostAsync($"{GetApiBaseUrl()}/api/Borrows/{borrowId}/reminder", null);
                 return response.IsSuccessStatusCode;
             }
             catch (Exception)
@@ -469,7 +469,7 @@ namespace ELibraryManagement.Web.Services.Implementations
 
                 SetAuthorizationHeader();
 
-                var response = await _httpClient.PostAsync($"{GetApiBaseUrl()}/api/Borrow/cancel/{borrowId}", null);
+                var response = await _httpClient.PostAsync($"{GetApiBaseUrl()}/api/Borrows/cancel/{borrowId}", null);
                 return response.IsSuccessStatusCode;
             }
             catch (Exception)
@@ -490,7 +490,7 @@ namespace ELibraryManagement.Web.Services.Implementations
 
                 SetAuthorizationHeader();
 
-                var response = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Borrow/my-borrows");
+                var response = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Borrows/my-borrows");
                 if (response.IsSuccessStatusCode)
                 {
                     var responseContent = await response.Content.ReadAsStringAsync();

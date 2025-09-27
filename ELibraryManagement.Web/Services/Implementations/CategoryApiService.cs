@@ -47,7 +47,7 @@ namespace ELibraryManagement.Web.Services.Implementations
                 SetAuthorizationHeader();
 
                 var baseUrl = GetApiBaseUrl();
-                var url = $"{baseUrl}/api/Category?includeInactive={includeInactive}";
+                var url = $"{baseUrl}/api/Categories?includeInactive={includeInactive}";
 
                 var response = await _httpClient.GetAsync(url);
                 var content = await response.Content.ReadAsStringAsync();
@@ -81,7 +81,7 @@ namespace ELibraryManagement.Web.Services.Implementations
             try
             {
                 var baseUrl = GetApiBaseUrl();
-                var response = await _httpClient.GetAsync($"{baseUrl}/api/Category/{id}");
+                var response = await _httpClient.GetAsync($"{baseUrl}/api/Categories/{id}");
                 var content = await response.Content.ReadAsStringAsync();
 
                 if (response.IsSuccessStatusCode)
@@ -118,7 +118,7 @@ namespace ELibraryManagement.Web.Services.Implementations
                 var httpContent = new StringContent(json, Encoding.UTF8, System.Net.Mime.MediaTypeNames.Application.Json);
 
                 var baseUrl = GetApiBaseUrl();
-                var response = await _httpClient.PostAsync($"{baseUrl}/api/Category", httpContent);
+                var response = await _httpClient.PostAsync($"{baseUrl}/api/Categories", httpContent);
                 var content = await response.Content.ReadAsStringAsync();
 
                 if (response.IsSuccessStatusCode)
@@ -170,7 +170,7 @@ namespace ELibraryManagement.Web.Services.Implementations
                 var httpContent = new StringContent(json, Encoding.UTF8, System.Net.Mime.MediaTypeNames.Application.Json);
 
                 var baseUrl = GetApiBaseUrl();
-                var response = await _httpClient.PutAsync($"{baseUrl}/api/Category/{id}", httpContent);
+                var response = await _httpClient.PutAsync($"{baseUrl}/api/Categories/{id}", httpContent);
                 var content = await response.Content.ReadAsStringAsync();
 
                 if (response.IsSuccessStatusCode)
@@ -219,7 +219,7 @@ namespace ELibraryManagement.Web.Services.Implementations
                 SetAuthorizationHeader();
 
                 var baseUrl = GetApiBaseUrl();
-                var response = await _httpClient.DeleteAsync($"{baseUrl}/api/Category/{id}");
+                var response = await _httpClient.DeleteAsync($"{baseUrl}/api/Categories/{id}");
                 var content = await response.Content.ReadAsStringAsync();
 
                 if (response.IsSuccessStatusCode)
@@ -268,7 +268,7 @@ namespace ELibraryManagement.Web.Services.Implementations
                 SetAuthorizationHeader();
 
                 var baseUrl = GetApiBaseUrl();
-                var response = await _httpClient.PatchAsync($"{baseUrl}/api/Category/{id}/toggle-status", null);
+                var response = await _httpClient.PatchAsync($"{baseUrl}/api/Categories/{id}/toggle-status", null);
                 var content = await response.Content.ReadAsStringAsync();
 
                 if (response.IsSuccessStatusCode)
@@ -317,7 +317,7 @@ namespace ELibraryManagement.Web.Services.Implementations
                 SetAuthorizationHeader();
 
                 var baseUrl = GetApiBaseUrl();
-                var url = $"{baseUrl}/api/Category/check-name?name={Uri.EscapeDataString(name)}";
+                var url = $"{baseUrl}/api/Categories/check-name?name={Uri.EscapeDataString(name)}";
                 if (excludeId.HasValue)
                 {
                     url += $"&excludeId={excludeId.Value}";

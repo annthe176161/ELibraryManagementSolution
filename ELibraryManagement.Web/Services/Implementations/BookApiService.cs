@@ -70,7 +70,7 @@ namespace ELibraryManagement.Web.Services.Implementations
                 _logger.LogInformation("GetAvailableBooksAsync (simple) called");
 
                 var apiBaseUrl = GetApiBaseUrl();
-                var fullUrl = $"{apiBaseUrl}/api/Book/available";
+                var fullUrl = $"{apiBaseUrl}/api/Books/available";
 
                 _logger.LogInformation("Making API call to: {Url}", fullUrl);
 
@@ -175,7 +175,7 @@ namespace ELibraryManagement.Web.Services.Implementations
                 var apiBaseUrl = GetApiBaseUrl();
 
                 // Use simple API call and filter client-side since OData filtering is not working properly
-                var fullUrl = $"{apiBaseUrl}/api/Book/available";
+                var fullUrl = $"{apiBaseUrl}/api/Books/available";
 
                 _logger.LogInformation("Making API call to: {Url}", fullUrl);
 
@@ -363,7 +363,7 @@ namespace ELibraryManagement.Web.Services.Implementations
                 queryParams.Add("$top=0"); // We only want the count
 
                 var queryString = queryParams.Any() ? "?" + string.Join("&", queryParams) : "";
-                var response = await _httpClient.GetAsync($"{apiBaseUrl}/api/Book/available{queryString}");
+                var response = await _httpClient.GetAsync($"{apiBaseUrl}/api/Books/available{queryString}");
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -437,7 +437,7 @@ namespace ELibraryManagement.Web.Services.Implementations
                 queryParams.Add($"$top={pageSize}");
 
                 var queryString = queryParams.Any() ? "?" + string.Join("&", queryParams) : "";
-                var response = await _httpClient.GetAsync($"{apiBaseUrl}/api/Book/available{queryString}");
+                var response = await _httpClient.GetAsync($"{apiBaseUrl}/api/Books/available{queryString}");
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -475,10 +475,10 @@ namespace ELibraryManagement.Web.Services.Implementations
                 var apiBaseUrl = GetApiBaseUrl();
                 // Try different endpoints
                 var endpoints = new[] {
-                    $"{apiBaseUrl}/api/Book/categories",
-                    $"{apiBaseUrl}/api/Book?$select=category",
-                    $"{apiBaseUrl}/api/Book/available?$select=categories&$expand=categories",
-                    $"{apiBaseUrl}/api/Book"
+                    $"{apiBaseUrl}/api/Books/categories",
+                    $"{apiBaseUrl}/api/Books?$select=category",
+                    $"{apiBaseUrl}/api/Books/available?$select=categories&$expand=categories",
+                    $"{apiBaseUrl}/api/Books"
                 };
 
                 foreach (var endpoint in endpoints)
@@ -553,10 +553,10 @@ namespace ELibraryManagement.Web.Services.Implementations
                 var apiBaseUrl = GetApiBaseUrl();
                 // Try different endpoints
                 var endpoints = new[] {
-                    $"{apiBaseUrl}/api/Book/authors",
-                    $"{apiBaseUrl}/api/Book?$select=author",
-                    $"{apiBaseUrl}/api/Book/available?$select=author",
-                    $"{apiBaseUrl}/api/Book"
+                    $"{apiBaseUrl}/api/Books/authors",
+                    $"{apiBaseUrl}/api/Books?$select=author",
+                    $"{apiBaseUrl}/api/Books/available?$select=author",
+                    $"{apiBaseUrl}/api/Books"
                 };
 
                 foreach (var endpoint in endpoints)
@@ -783,7 +783,7 @@ namespace ELibraryManagement.Web.Services.Implementations
             try
             {
                 var apiBaseUrl = GetApiBaseUrl();
-                var response = await _httpClient.GetAsync($"{apiBaseUrl}/api/Book/{id}");
+                var response = await _httpClient.GetAsync($"{apiBaseUrl}/api/Books/{id}");
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -884,7 +884,7 @@ namespace ELibraryManagement.Web.Services.Implementations
                     filter = $"?$filter=id ne {excludeId}&$top={count}";
                 }
 
-                var response = await _httpClient.GetAsync($"{apiBaseUrl}/api/Book/available{filter}");
+                var response = await _httpClient.GetAsync($"{apiBaseUrl}/api/Books/available{filter}");
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -992,7 +992,7 @@ namespace ELibraryManagement.Web.Services.Implementations
                 _httpClient.DefaultRequestHeaders.Authorization =
                     new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
-                var fullUrl = $"{apiBaseUrl}/api/Book/borrow";
+                var fullUrl = $"{apiBaseUrl}/api/Books/borrow";
                 System.Diagnostics.Debug.WriteLine($"Full URL: {fullUrl}");
 
                 var response = await _httpClient.PostAsync(fullUrl, content);
@@ -1122,7 +1122,7 @@ namespace ELibraryManagement.Web.Services.Implementations
                 _httpClient.DefaultRequestHeaders.Authorization =
                     new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
-                var response = await _httpClient.GetAsync($"{apiBaseUrl}/api/Book/borrowed/{userId}");
+                var response = await _httpClient.GetAsync($"{apiBaseUrl}/api/Books/borrowed/{userId}");
                 var responseContent = await response.Content.ReadAsStringAsync();
 
                 if (response.IsSuccessStatusCode)
@@ -1162,7 +1162,7 @@ namespace ELibraryManagement.Web.Services.Implementations
                 _httpClient.DefaultRequestHeaders.Authorization =
                     new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
-                var response = await _httpClient.GetAsync($"{apiBaseUrl}/api/Book/history/{userId}");
+                var response = await _httpClient.GetAsync($"{apiBaseUrl}/api/Books/history/{userId}");
                 var responseContent = await response.Content.ReadAsStringAsync();
 
                 if (response.IsSuccessStatusCode)
@@ -1205,7 +1205,7 @@ namespace ELibraryManagement.Web.Services.Implementations
                 _httpClient.DefaultRequestHeaders.Authorization =
                     new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
-                var response = await _httpClient.PostAsync($"{apiBaseUrl}/api/Book/return/{borrowRecordId}", null);
+                var response = await _httpClient.PostAsync($"{apiBaseUrl}/api/Books/return/{borrowRecordId}", null);
                 var responseContent = await response.Content.ReadAsStringAsync();
 
                 if (response.IsSuccessStatusCode)
@@ -1244,7 +1244,7 @@ namespace ELibraryManagement.Web.Services.Implementations
                 _httpClient.DefaultRequestHeaders.Authorization =
                     new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
-                var response = await _httpClient.PostAsync($"{apiBaseUrl}/api/Book/cancel/{borrowRecordId}", null);
+                var response = await _httpClient.PostAsync($"{apiBaseUrl}/api/Books/cancel/{borrowRecordId}", null);
                 var responseContent = await response.Content.ReadAsStringAsync();
 
                 if (response.IsSuccessStatusCode)

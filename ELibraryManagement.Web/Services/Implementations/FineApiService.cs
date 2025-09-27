@@ -53,7 +53,7 @@ namespace ELibraryManagement.Web.Services.Implementations
                     queryParams.Add($"search={Uri.EscapeDataString(search)}");
 
                 var queryString = string.Join("&", queryParams);
-                var response = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Fine?{queryString}");
+                var response = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Fines?{queryString}");
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -77,7 +77,7 @@ namespace ELibraryManagement.Web.Services.Implementations
         {
             try
             {
-                var response = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Fine/{id}");
+                var response = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Fines/{id}");
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -102,7 +102,7 @@ namespace ELibraryManagement.Web.Services.Implementations
                 var json = JsonSerializer.Serialize(request, _jsonOptions);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                var response = await _httpClient.PostAsync($"{GetApiBaseUrl()}/api/Fine", content);
+                var response = await _httpClient.PostAsync($"{GetApiBaseUrl()}/api/Fines", content);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -128,7 +128,7 @@ namespace ELibraryManagement.Web.Services.Implementations
                 var json = JsonSerializer.Serialize(request, _jsonOptions);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                var response = await _httpClient.PutAsync($"{GetApiBaseUrl()}/api/Fine/{id}", content);
+                var response = await _httpClient.PutAsync($"{GetApiBaseUrl()}/api/Fines/{id}", content);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -157,7 +157,7 @@ namespace ELibraryManagement.Web.Services.Implementations
                 var json = JsonSerializer.Serialize(request, _jsonOptions);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                var url = $"{GetApiBaseUrl()}/api/Fine/{id}/pay";
+                var url = $"{GetApiBaseUrl()}/api/Fines/{id}/pay";
                 _logger.LogInformation("Calling API endpoint: {Url}", url);
 
                 // Log authorization header
@@ -194,7 +194,7 @@ namespace ELibraryManagement.Web.Services.Implementations
                 var json = JsonSerializer.Serialize(request, _jsonOptions);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                var response = await _httpClient.PostAsync($"{GetApiBaseUrl()}/api/Fine/{id}/waive", content);
+                var response = await _httpClient.PostAsync($"{GetApiBaseUrl()}/api/Fines/{id}/waive", content);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -217,7 +217,7 @@ namespace ELibraryManagement.Web.Services.Implementations
         {
             try
             {
-                var response = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Fine/user/{userId}");
+                var response = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Fines/user/{userId}");
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -239,7 +239,7 @@ namespace ELibraryManagement.Web.Services.Implementations
         {
             try
             {
-                var response = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Fine/statistics");
+                var response = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Fines/statistics");
 
                 if (response.IsSuccessStatusCode)
                 {
