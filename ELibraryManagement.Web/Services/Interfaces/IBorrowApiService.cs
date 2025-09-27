@@ -1,4 +1,5 @@
 using ELibraryManagement.Web.Models;
+using ELibraryManagement.Web.Models.ViewModels;
 
 namespace ELibraryManagement.Web.Services.Interfaces
 {
@@ -19,3 +20,4 @@ namespace ELibraryManagement.Web.Services.Interfaces
         void SetAuthToken(string token);
     }
 }
+
