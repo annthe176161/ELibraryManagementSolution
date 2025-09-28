@@ -359,7 +359,7 @@ namespace ELibraryManagement.Api.Services.Implementations
                 // Tạo link reset password
                 var encodedToken = Uri.EscapeDataString(token);
                 var encodedEmail = Uri.EscapeDataString(user.Email);
-                var resetLink = $"{_configuration["FrontendUrl"]}/Account/ResetPassword?email={encodedEmail}&token={encodedToken}";
+                var resetLink = $"{_configuration["FrontendUrl"]}/Accounts/ResetPassword?email={encodedEmail}&token={encodedToken}";
 
                 // Gửi email với link reset password
                 var emailSent = await _emailService.SendPasswordResetEmailAsync(user.Email, resetLink);

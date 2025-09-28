@@ -290,11 +290,11 @@ namespace ELibraryManagement.Api.Controllers
             if (result.Success)
             {
                 // Redirect to frontend with success message
-                return Redirect($"https://localhost:7208/Account/EmailConfirmed?success=true&message={Uri.EscapeDataString(result.Message)}");
+                return Redirect($"https://localhost:7208/Accounts/EmailConfirmed?success=true&message={Uri.EscapeDataString(result.Message)}");
             }
 
             // Redirect to frontend with error message
-            return Redirect($"https://localhost:7208/Account/EmailConfirmed?success=false&message={Uri.EscapeDataString(result.Message)}");
+            return Redirect($"https://localhost:7208/Accounts/EmailConfirmed?success=false&message={Uri.EscapeDataString(result.Message)}");
         }
 
         /// <summary>

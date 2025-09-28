@@ -31,7 +31,7 @@ namespace ELibraryManagement.Web.Controllers
             if (!IsUserAuthenticated())
             {
                 TempData["ErrorMessage"] = "Bạn cần đăng nhập để sử dụng tính năng này.";
-                return RedirectToAction("Login", "Account");
+                return RedirectToAction("Login", "Accounts");
             }
             return null;
         }
@@ -48,7 +48,7 @@ namespace ELibraryManagement.Web.Controllers
                 if (string.IsNullOrEmpty(token))
                 {
                     TempData["ErrorMessage"] = "Phiên đăng nhập đã hết hạn.";
-                    return RedirectToAction("Login", "Account");
+                    return RedirectToAction("Login", "Accounts");
                 }
 
                 // Kiểm tra điều kiện có thể review
@@ -118,7 +118,7 @@ namespace ELibraryManagement.Web.Controllers
                 if (string.IsNullOrEmpty(token))
                 {
                     TempData["ErrorMessage"] = "Phiên đăng nhập đã hết hạn.";
-                    return RedirectToAction("Login", "Account");
+                    return RedirectToAction("Login", "Accounts");
                 }
 
                 var result = await _reviewApiService.CreateReviewAsync(model, token);
@@ -151,7 +151,7 @@ namespace ELibraryManagement.Web.Controllers
                 if (string.IsNullOrEmpty(token))
                 {
                     TempData["ErrorMessage"] = "Phiên đăng nhập đã hết hạn.";
-                    return RedirectToAction("Login", "Account");
+                    return RedirectToAction("Login", "Accounts");
                 }
 
                 var review = await _reviewApiService.GetReviewByIdAsync(id, token);
@@ -204,7 +204,7 @@ namespace ELibraryManagement.Web.Controllers
                 if (string.IsNullOrEmpty(token))
                 {
                     TempData["ErrorMessage"] = "Phiên đăng nhập đã hết hạn.";
-                    return RedirectToAction("Login", "Account");
+                    return RedirectToAction("Login", "Accounts");
                 }
 
                 var result = await _reviewApiService.UpdateReviewAsync(model, token);
@@ -268,7 +268,7 @@ namespace ELibraryManagement.Web.Controllers
                 if (string.IsNullOrEmpty(token))
                 {
                     TempData["ErrorMessage"] = "Phiên đăng nhập đã hết hạn.";
-                    return RedirectToAction("Login", "Account");
+                    return RedirectToAction("Login", "Accounts");
                 }
 
                 var reviews = await _reviewApiService.GetMyReviewsAsync(token);

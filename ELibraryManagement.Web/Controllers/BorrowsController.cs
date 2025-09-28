@@ -26,7 +26,7 @@ namespace ELibraryManagement.Web.Controllers
             if (!isAuthenticated)
             {
                 TempData["ErrorMessage"] = "Vui lòng đăng nhập để mượn sách.";
-                return RedirectToAction("Login", "Account", new { returnUrl = Url.Action("BorrowBook", "Borrow", new { bookId }) });
+                return RedirectToAction("Login", "Accounts", new { returnUrl = Url.Action("BorrowBook", "Borrow", new { bookId }) });
             }
 
             try
@@ -43,7 +43,7 @@ namespace ELibraryManagement.Web.Controllers
                 var currentUser = await _authApiService.GetCurrentUserAsync();
                 if (currentUser == null)
                 {
-                    return RedirectToAction("Login", "Account");
+                    return RedirectToAction("Login", "Accounts");
                 }
 
                 // Tạo ViewModel
@@ -80,7 +80,7 @@ namespace ELibraryManagement.Web.Controllers
             if (!await _borrowApiService.IsAuthenticatedAsync())
             {
                 TempData["ErrorMessage"] = "Vui lòng đăng nhập để mượn sách.";
-                return RedirectToAction("Login", "Account");
+                return RedirectToAction("Login", "Accounts");
             }
 
             try
@@ -110,7 +110,7 @@ namespace ELibraryManagement.Web.Controllers
             if (!await _borrowApiService.IsAuthenticatedAsync())
             {
                 TempData["ErrorMessage"] = "Vui lòng đăng nhập để xem lịch sử mượn sách.";
-                return RedirectToAction("Login", "Account");
+                return RedirectToAction("Login", "Accounts");
             }
 
             // Placeholder - sẽ implement sau

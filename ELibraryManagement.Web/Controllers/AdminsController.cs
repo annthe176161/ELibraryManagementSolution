@@ -65,7 +65,7 @@ namespace ELibraryManagement.Web.Controllers
             if (!_authApiService.IsAuthenticated())
             {
                 TempData["ErrorMessage"] = "Bạn cần đăng nhập để truy cập trang này.";
-                return RedirectToAction("Login", "Account");
+                return RedirectToAction("Login", "Accounts");
             }
 
             if (!await IsAdminAsync())
@@ -1532,7 +1532,7 @@ namespace ELibraryManagement.Web.Controllers
         public async Task<IActionResult> CreateFine(CreateFineRequest model)
         {
             var accessCheck = await CheckAdminAccessAsync();
-            if (accessCheck != null) return RedirectToAction("Login", "Account");
+            if (accessCheck != null) return RedirectToAction("Login", "Accounts");
 
             if (!ModelState.IsValid)
             {

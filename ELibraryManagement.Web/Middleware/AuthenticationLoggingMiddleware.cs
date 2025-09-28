@@ -14,7 +14,7 @@ namespace ELibraryManagement.Web.Middleware
         public async Task InvokeAsync(HttpContext context, IAuthApiService authService)
         {
             // Log authentication state for debugging
-            if (context.Request.Path.StartsWithSegments("/Account") ||
+            if (context.Request.Path.StartsWithSegments("/Accounts") ||
                 context.Request.Path.StartsWithSegments("/Book"))
             {
                 var isAuth = authService.IsAuthenticated();

@@ -31,14 +31,14 @@ namespace ELibraryManagement.Web.Controllers
                 if (currentUser == null)
                 {
                     TempData["ErrorMessage"] = "Vui lòng đăng nhập để xem chi tiết.";
-                    return RedirectToAction("Login", "Account");
+                    return RedirectToAction("Login", "Accounts");
                 }
 
                 var token = _authApiService.GetCurrentToken();
                 if (string.IsNullOrEmpty(token))
                 {
                     TempData["ErrorMessage"] = "Phiên đăng nhập đã hết hạn.";
-                    return RedirectToAction("Login", "Account");
+                    return RedirectToAction("Login", "Accounts");
                 }
 
                 // Lấy danh sách lịch sử mượn sách (bao gồm cả sách đã trả)
@@ -101,7 +101,7 @@ namespace ELibraryManagement.Web.Controllers
             if (!isAuth)
             {
                 TempData["ErrorMessage"] = "Bạn cần đăng nhập để mượn sách.";
-                return RedirectToAction("Login", "Account");
+                return RedirectToAction("Login", "Accounts");
             }
 
             try
@@ -176,7 +176,7 @@ namespace ELibraryManagement.Web.Controllers
             {
                 System.Diagnostics.Debug.WriteLine("User not authenticated - redirecting to login");
                 TempData["ErrorMessage"] = "Bạn cần đăng nhập để mượn sách.";
-                return RedirectToAction("Login", "Account");
+                return RedirectToAction("Login", "Accounts");
             }
 
             if (!ModelState.IsValid)
@@ -197,7 +197,7 @@ namespace ELibraryManagement.Web.Controllers
                 {
                     System.Diagnostics.Debug.WriteLine("Current user is null");
                     TempData["ErrorMessage"] = "Không thể xác thực người dùng.";
-                    return RedirectToAction("Login", "Account");
+                    return RedirectToAction("Login", "Accounts");
                 }
 
                 System.Diagnostics.Debug.WriteLine($"Current user: {currentUser.Id} - {currentUser.UserName}");
@@ -207,7 +207,7 @@ namespace ELibraryManagement.Web.Controllers
                 {
                     System.Diagnostics.Debug.WriteLine("Token is null or empty");
                     TempData["ErrorMessage"] = "Phiên đăng nhập đã hết hạn.";
-                    return RedirectToAction("Login", "Account");
+                    return RedirectToAction("Login", "Accounts");
                 }
 
                 System.Diagnostics.Debug.WriteLine($"Token exists: {token.Substring(0, Math.Min(20, token.Length))}...");
@@ -319,7 +319,7 @@ namespace ELibraryManagement.Web.Controllers
                 if (!_authApiService.IsAuthenticated())
                 {
                     TempData["ErrorMessage"] = "Bạn cần đăng nhập để xem sách đã mượn.";
-                    return RedirectToAction("Login", "Account");
+                    return RedirectToAction("Login", "Accounts");
                 }
 
                 var currentUser = await _authApiService.GetCurrentUserAsync();
@@ -327,7 +327,7 @@ namespace ELibraryManagement.Web.Controllers
                 {
                     TempData["ErrorMessage"] = "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.";
                     _authApiService.Logout();
-                    return RedirectToAction("Login", "Account");
+                    return RedirectToAction("Login", "Accounts");
                 }
 
                 var token = _authApiService.GetCurrentToken();
@@ -335,7 +335,7 @@ namespace ELibraryManagement.Web.Controllers
                 {
                     TempData["ErrorMessage"] = "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.";
                     _authApiService.Logout();
-                    return RedirectToAction("Login", "Account");
+                    return RedirectToAction("Login", "Accounts");
                 }
 
                 // Clear irrelevant success messages (like Google login success) on this page
@@ -362,7 +362,7 @@ namespace ELibraryManagement.Web.Controllers
             if (!_authApiService.IsAuthenticated())
             {
                 TempData["ErrorMessage"] = "Bạn cần đăng nhập để hủy yêu cầu mượn sách.";
-                return RedirectToAction("Login", "Account");
+                return RedirectToAction("Login", "Accounts");
             }
 
             try
@@ -371,7 +371,7 @@ namespace ELibraryManagement.Web.Controllers
                 if (string.IsNullOrEmpty(token))
                 {
                     TempData["ErrorMessage"] = "Phiên đăng nhập đã hết hạn.";
-                    return RedirectToAction("Login", "Account");
+                    return RedirectToAction("Login", "Accounts");
                 }
 
                 var result = await _bookApiService.CancelBorrowRequestAsync(id, token);
