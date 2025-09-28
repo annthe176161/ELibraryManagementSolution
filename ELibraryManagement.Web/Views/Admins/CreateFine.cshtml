@@ -337,13 +337,13 @@
             const userEmail = selectedOption.data('email');
 
             $('#userInfoContent').html(`
-                                    <div class="row">
-                                        <div class="col-12">
-                                            <h6>${userName}</h6>
-                                            <p class="text-muted mb-2">${userEmail}</p>
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <h6>${userName}</h6>
+                                                <p class="text-muted mb-2">${userEmail}</p>
+                                            </div>
                                         </div>
-                                    </div>
-                                `);
+                                    `);
 
             // Load additional user info via AJAX (fines, etc.)
             $.get('@Url.Action("GetUserFines")', { userId: userId }, function (response) {
@@ -392,13 +392,13 @@
 
                     if (response.message === 'MissingAuthToken') {
                         $('#borrowRecordSelect').html('<option value="">-- Yêu cầu đăng nhập (token không có) --</option>').prop('disabled', false).trigger('change');
-                        $('#borrowRecordStatus').html('Token đăng nhập bị thiếu. <a href="@Url.Action("Login", "Account")">Đăng nhập lại</a>');
+                        $('#borrowRecordStatus').html('Token đăng nhập bị thiếu. <a href="@Url.Action("Login", "Accounts")">Đăng nhập lại</a>');
                         return;
                     }
 
                     if (response.message === 'TokenExpired') {
                         $('#borrowRecordSelect').html('<option value="">-- Token hết hạn --</option>').prop('disabled', false).trigger('change');
-                        $('#borrowRecordStatus').html('Token đăng nhập đã hết hạn. <a href="@Url.Action("Login", "Account")">Đăng nhập lại</a>');
+                        $('#borrowRecordStatus').html('Token đăng nhập đã hết hạn. <a href="@Url.Action("Login", "Accounts")">Đăng nhập lại</a>');
                         return;
                     }
 
@@ -409,7 +409,7 @@
 
                     // If status is 401, suggest re-login
                     if (response.status === 401) {
-                        $('#borrowRecordStatus').html('Lỗi xác thực (401). <a href="@Url.Action("Login", "Account")">Đăng nhập lại</a>');
+                        $('#borrowRecordStatus').html('Lỗi xác thực (401). <a href="@Url.Action("Login", "Accounts")">Đăng nhập lại</a>');
                     }
                     return;
                 }

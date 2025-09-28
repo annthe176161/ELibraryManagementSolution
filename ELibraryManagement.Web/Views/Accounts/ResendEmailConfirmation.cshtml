@@ -36,7 +36,7 @@
                             <button type="submit" class="btn btn-primary">
                                 <i class="fas fa-envelope"></i> Gửi lại Email
                             </button>
-                            <a href="@Url.Action("Login", "Account")" class="btn btn-secondary ml-2">
+                            <a href="@Url.Action("Login", "Accounts")" class="btn btn-secondary ml-2">
                                 Quay lại đăng nhập
                             </a>
                         </div>
@@ -48,5 +48,7 @@
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

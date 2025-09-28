@@ -13,7 +13,7 @@
                             <i class="fas fa-check-circle fa-3x mb-3"></i>
                             <h3>Xác nhận thành công!</h3>
                             <p>@ViewBag.Message</p>
-                            <a href="@Url.Action("Login", "Account")" class="btn btn-primary">Đăng nhập ngay</a>
+                            <a href="@Url.Action("Login", "Accounts")" class="btn btn-primary">Đăng nhập ngay</a>
                         </div>
                     }
                     else
@@ -22,8 +22,9 @@
                             <i class="fas fa-exclamation-circle fa-3x mb-3"></i>
                             <h3>Xác nhận thất bại!</h3>
                             <p>@ViewBag.Message</p>
-                            <a href="@Url.Action("ResendEmailConfirmation", "Account")" class="btn btn-warning">Gửi lại email xác nhận</a>
-                            <a href="@Url.Action("Register", "Account")" class="btn btn-secondary ml-2">Đăng ký lại</a>
+                            <a href="@Url.Action("ResendEmailConfirmation", "Accounts")" class="btn btn-warning">Gửi lại
+                                email xác nhận</a>
+                            <a href="@Url.Action("Register", "Accounts")" class="btn btn-secondary ml-2">Đăng ký lại</a>
                         </div>
                     }
                 </div>
