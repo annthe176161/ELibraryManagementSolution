@@ -1,0 +1,182 @@
+@model BorrowConfirmationViewModel
+@{
+    ViewData["Title"] = "Xác nhận mượn sách";
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-book-open me-2"></i>
+                        Xác nhận mượn sách
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <!-- Book Information -->
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            @if (!string.IsNullOrEmpty(Model.Book.ImageUrl))
+                            {
+                                <img src="@Model.Book.ImageUrl" alt="@Model.Book.Title" class="img-fluid rounded shadow-sm" style="max-height: 300px;">
+                            }
+                            else
+                            {
+                                <div class="bg-light d-flex align-items-center justify-content-center rounded" style="height: 300px;">
+                                    <i class="fas fa-book fa-3x text-muted"></i>
+                                </div>
+                            }
+                        </div>
+                        <div class="col-md-8">
+                            <h5 class="text-primary mb-3">Thông tin sách</h5>
+                            <table class="table table-borderless">
+                                <tr>
+                                    <td class="fw-bold" style="width: 30%;">Tên sách:</td>
+                                    <td>@Model.Book.Title</td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold">Tác giả:</td>
+                                    <td>@Model.Book.Author</td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold">ISBN:</td>
+                                    <td>@Model.Book.ISBN</td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold">Nhà xuất bản:</td>
+                                    <td>@Model.Book.Publisher</td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold">Năm xuất bản:</td>
+                                    <td>@Model.Book.PublicationYear</td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold">Số lượng có sẵn:</td>
+                                    <td>
+                                        <span class="badge bg-success">@Model.Book.AvailableCopies / @Model.Book.TotalCopies</span>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Student Information -->
+                    <div class="mb-4">
+                        <h5 class="text-primary mb-3">Thông tin sinh viên</h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <table class="table table-borderless">
+                                    <tr>
+                                        <td class="fw-bold" style="width: 40%;">Họ và tên:</td>
+                                        <td>@Model.Student.FullName</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-bold">Email:</td>
+                                        <td>@Model.Student.Email</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-bold">MSSV:</td>
+                                        <td>@Model.Student.StudentId</td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="col-md-6">
+                                <table class="table table-borderless">
+                                    <tr>
+                                        <td class="fw-bold" style="width: 40%;">Số điện thoại:</td>
+                                        <td>@Model.Student.PhoneNumber</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-bold">Khoa:</td>
+                                        <td>@Model.Student.Faculty</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-bold">Lớp:</td>
+                                        <td>@Model.Student.Class</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Borrow Information -->
+                    <div class="mb-4">
+                        <h5 class="text-primary mb-3">Thông tin mượn sách</h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <table class="table table-borderless">
+                                    <tr>
+                                        <td class="fw-bold" style="width: 40%;">Ngày mượn:</td>
+                                        <td>@Model.BorrowDate.ToString("dd/MM/yyyy")</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-bold">Ngày trả dự kiến:</td>
+                                        <td class="text-warning fw-bold">@Model.DueDate.ToString("dd/MM/yyyy")</td>
+                                    </tr>
+                                </table>
+                            </div>
+                            <div class="col-md-6">
+                                <table class="table table-borderless">
+                                    <tr>
+                                        <td class="fw-bold" style="width: 40%;">Thời gian mượn:</td>
+                                        <td>@Model.BorrowDurationDays ngày</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="fw-bold">Số lần gia hạn tối đa:</td>
+                                        <td>@Model.MaxExtensions lần</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Terms and Conditions -->
+                    <div class="alert alert-info mb-4">
+                        <h6 class="alert-heading">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Điều khoản và điều kiện
+                        </h6>
+                        <ul class="mb-0 small">
+                            <li>Bạn có trách nhiệm giữ gìn sách và trả đúng hạn.</li>
+                            <li>Nếu trả muộn, bạn sẽ bị phạt theo quy định của thư viện.</li>
+                            <li>Sách bị hỏng hoặc mất sẽ phải đền bù theo giá trị sách.</li>
+                            <li>Bạn có thể gia hạn tối đa @Model.MaxExtensions lần nếu không có người khác đặt trước.</li>
+                            <li>Vui lòng kiểm tra thông tin kỹ trước khi xác nhận.</li>
+                        </ul>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="d-flex justify-content-between">
+                        <a href="@Url.Action("BookDetail", "Home", new { id = Model.Book.Id })" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left me-2"></i>
+                            Quay lại
+                        </a>
+                        <div>
+                            <form asp-action="ConfirmBorrow" asp-controller="Borrows" method="post" style="display: inline;">
+                                <input type="hidden" name="bookId" value="@Model.Book.Id" />
+                                <button type="submit" class="btn btn-primary btn-lg" onclick="return confirm('Bạn có chắc chắn muốn mượn cuốn sách này?')">
+                                    <i class="fas fa-check me-2"></i>
+                                    Xác nhận mượn sách
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Add any necessary JavaScript here
+        document.addEventListener('DOMContentLoaded', function() {
+            // Auto focus on confirm button for better UX
+            const confirmBtn = document.querySelector('button[type="submit"]');
+            if (confirmBtn) {
+                confirmBtn.focus();
+            }
+        });
+    </script>
+}

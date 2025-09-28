@@ -26,7 +26,7 @@ namespace ELibraryManagement.Web.Controllers
             if (!isAuthenticated)
             {
                 TempData["ErrorMessage"] = "Vui lòng đăng nhập để mượn sách.";
-                return RedirectToAction("Login", "Accounts", new { returnUrl = Url.Action("BorrowBook", "Borrow", new { bookId }) });
+                return RedirectToAction("Login", "Accounts", new { returnUrl = Url.Action("BorrowBook", "Borrows", new { bookId }) });
             }
 
             try
@@ -89,7 +89,7 @@ namespace ELibraryManagement.Web.Controllers
                 if (result.Success)
                 {
                     TempData["SuccessMessage"] = "Mượn sách thành công! Bạn có thể xem chi tiết trong lịch sử mượn sách.";
-                    return RedirectToAction("MyBorrows", "Borrow");
+                    return RedirectToAction("MyBorrows", "Borrows");
                 }
                 else
                 {

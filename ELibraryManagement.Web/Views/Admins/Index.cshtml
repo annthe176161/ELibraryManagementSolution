@@ -696,21 +696,21 @@
         function addNewBook() {
             showNotification('Chuyển đến trang thêm sách...', 'info');
             setTimeout(() => {
-                window.location.href = '@Url.Action("Books", "Admin")';
+                window.location.href = '@Url.Action("Books", "Admins")';
             }, 1000);
         }
 
         function processReturns() {
             showNotification('Chuyển đến trang quản lý mượn trả...', 'info');
             setTimeout(() => {
-                window.location.href = '@Url.Action("Borrows", "Admin")';
+                window.location.href = '@Url.Action("Borrows", "Admins")';
             }, 1000);
         }
 
         function viewOverdueBooks() {
             showNotification('Đang tải danh sách sách quá hạn...', 'warning');
             setTimeout(() => {
-                window.location.href = '@Url.Action("Borrows", "Admin")?filter=overdue';
+                window.location.href = '@Url.Action("Borrows", "Admins")?filter=overdue';
             }, 1000);
         }
 

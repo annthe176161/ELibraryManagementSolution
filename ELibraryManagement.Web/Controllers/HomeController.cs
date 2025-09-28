@@ -226,7 +226,9 @@ namespace ELibraryManagement.Web.Controllers
                 }
                 ViewBag.HasBorrowedBook = hasBorrowedBook;
                 ViewBag.BorrowStatus = borrowStatus;
-                ViewBag.CanReview = canReview; return View(book);
+                ViewBag.CanReview = canReview;
+
+                return View(book);
             }
             catch (Exception ex)
             {

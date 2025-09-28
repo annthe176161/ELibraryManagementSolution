@@ -15,7 +15,7 @@ namespace ELibraryManagement.Web.Middleware
         {
             // Log authentication state for debugging
             if (context.Request.Path.StartsWithSegments("/Accounts") ||
-                context.Request.Path.StartsWithSegments("/Book"))
+                context.Request.Path.StartsWithSegments("/Books"))
             {
                 var isAuth = authService.IsAuthenticated();
                 var token = authService.GetCurrentUserToken();

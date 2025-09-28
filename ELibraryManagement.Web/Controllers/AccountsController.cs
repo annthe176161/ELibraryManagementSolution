@@ -202,7 +202,7 @@ namespace ELibraryManagement.Web.Controllers
         // Redirect action for backward compatibility
         public IActionResult MyBooks()
         {
-            return RedirectToAction("MyBooks", "Book");
+            return RedirectToAction("MyBooks", "Books");
         }
 
         [HttpGet]

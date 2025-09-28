@@ -552,7 +552,7 @@ namespace ELibraryManagement.Web.Controllers
         }
 
         // Borrow Management Actions
-        [HttpPost("Admin/ApproveBorrowRequest/{borrowId}")]
+        [HttpPost("Admins/ApproveBorrowRequest/{borrowId}")]
         public async Task<IActionResult> ApproveBorrowRequest(int borrowId)
         {
             var accessCheck = await CheckAdminAccessAsync();
@@ -894,48 +894,6 @@ namespace ELibraryManagement.Web.Controllers
                 return Json(new { success = false, message = $"Có lỗi xảy ra: {ex.Message}" });
             }
         }
-
-        // GET: Admin/UserBorrows/{id} - DEPRECATED: Functionality moved to inline user details modal
-        /*
-        public async Task<IActionResult> UserBorrows(string id)
-        {
-            var accessCheck = await CheckAdminAccessAsync();
-            if (accessCheck != null) return accessCheck;
-
-            try
-            {
-                var token = _authApiService.GetCurrentToken();
-                _httpClient.DefaultRequestHeaders.Authorization =
-                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-
-                // Get user info
-                var userResponse = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Users/admin/{id}");
-                AdminUserViewModel? user = null;
-                if (userResponse.IsSuccessStatusCode)
-                {
-                    var userContent = await userResponse.Content.ReadAsStringAsync();
-                    user = JsonSerializer.Deserialize<AdminUserViewModel>(userContent, _jsonOptions);
-                }
-
-                // Get user's borrow history
-                var borrowResponse = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Borrows/user/{id}");
-                List<UserBorrowedBookViewModel> borrows = new List<UserBorrowedBookViewModel>();
-                if (borrowResponse.IsSuccessStatusCode)
-                {
-                    var borrowContent = await borrowResponse.Content.ReadAsStringAsync();
-                    borrows = JsonSerializer.Deserialize<List<UserBorrowedBookViewModel>>(borrowContent, _jsonOptions) ?? new List<UserBorrowedBookViewModel>();
-                }
-
-                ViewBag.User = user;
-                return View(borrows);
-            }
-            catch (Exception)
-            {
-                ViewBag.User = null;
-                return View(new List<UserBorrowedBookViewModel>());
-            }
-        }
-        */
 
         // GET: Admin/EditUser/{id}
         public async Task<IActionResult> EditUser(string id)

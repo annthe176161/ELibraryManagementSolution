@@ -374,8 +374,8 @@
             $('#borrowRecordSelect').prop('disabled', true).html('<option value="">Đang tải...</option>');
             $('#borrowRecordStatus').text('Đang tải bản ghi mượn...');
 
-            // Call Admin controller action explicitly so the request goes via the web app (includes token)
-            const url = '@Url.Action("GetUserActiveBorrowRecords", "Admin")';
+            // Call Admins controller action explicitly so the request goes via the web app (includes token)
+            const url = '@Url.Action("GetUserActiveBorrowRecords", "Admins")';
 
             $.get(url, { userId: userId }, function (response) {
                 let options = '<option value="">-- Không liên quan đến mượn sách --</option>';

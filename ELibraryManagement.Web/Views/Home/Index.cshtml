@@ -510,7 +510,7 @@
             e.preventDefault();
             const searchTerm = document.querySelector('.search-container input').value;
             if (searchTerm.trim()) {
-                window.location.href = `/Book?search=${encodeURIComponent(searchTerm)}`;
+                window.location.href = `/Books?search=${encodeURIComponent(searchTerm)}`;
             }
         });
 
@@ -519,7 +519,7 @@
                 e.preventDefault();
                 const searchTerm = this.value;
                 if (searchTerm.trim()) {
-                    window.location.href = `/Book?search=${encodeURIComponent(searchTerm)}`;
+                    window.location.href = `/Books?search=${encodeURIComponent(searchTerm)}`;
                 }
             }
         });
