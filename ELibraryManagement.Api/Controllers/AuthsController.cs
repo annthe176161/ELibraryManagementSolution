@@ -236,7 +236,8 @@ namespace ELibraryManagement.Api.Controllers
         [AllowAnonymous]
         public IActionResult GoogleLogin()
         {
-            var redirectUrl = Url.Action("GoogleResponse", "Auth");
+            // Sử dụng absolute URL để đảm bảo Google redirect đúng
+            var redirectUrl = "https://localhost:7125/api/Auths/google-response";
             var properties = _signInManager.ConfigureExternalAuthenticationProperties("Google", redirectUrl);
             return Challenge(properties, "Google");
         }
@@ -248,23 +249,28 @@ namespace ELibraryManagement.Api.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> GoogleResponse()
         {
+            Console.WriteLine("GoogleResponse callback được gọi");
+
             var info = await _signInManager.GetExternalLoginInfoAsync();
             if (info == null)
             {
+                Console.WriteLine("ExternalLoginInfo null - Google callback failed");
                 // Redirect về login page với error message
-                return Redirect($"https://localhost:7208/Account/Login?error={Uri.EscapeDataString("Lỗi đăng nhập bên ngoài")}");
+                return Redirect($"https://localhost:7208/Accounts/Login?error={Uri.EscapeDataString("Lỗi đăng nhập bên ngoài")}");
             }
+
+            Console.WriteLine($"Google login info received: {info.Principal?.Identity?.Name}");
 
             var result = await _authService.HandleGoogleLoginAsync(info);
             if (!result.Success)
             {
                 // Redirect về login page với error message
-                return Redirect($"https://localhost:7208/Account/Login?error={Uri.EscapeDataString(result.Message)}");
+                return Redirect($"https://localhost:7208/Accounts/Login?error={Uri.EscapeDataString(result.Message)}");
             }
 
             // Redirect về frontend với token
             var userData = JsonSerializer.Serialize(result.User);
-            return Redirect($"https://localhost:7208/Account/Login?token={result.Token}&user={Uri.EscapeDataString(userData)}");
+            return Redirect($"https://localhost:7208/Accounts/Login?token={result.Token}&user={Uri.EscapeDataString(userData)}");
         }
 
         /// <summary>

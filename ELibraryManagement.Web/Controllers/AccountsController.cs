@@ -49,6 +49,9 @@ namespace ELibraryManagement.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> Login(string? token = null, string? user = null, string? error = null)
         {
+            // Debug logging
+            Console.WriteLine($"Login GET called with token: {!string.IsNullOrEmpty(token)}, user: {!string.IsNullOrEmpty(user)}, error: {error}");
+
             // Prevent browser caching to ensure fresh content
             Response.Headers["Cache-Control"] = "no-cache, no-store, must-revalidate";
             Response.Headers["Pragma"] = "no-cache";
