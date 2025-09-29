@@ -98,24 +98,24 @@ namespace ELibraryManagement.Api.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                return BadRequest(new { Success = false, Message = "Dữ liệu không hợp lệ." });
             }
 
             var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
 
             if (string.IsNullOrEmpty(userId))
             {
-                return Unauthorized();
+                return Unauthorized(new { Success = false, Message = "Không thể xác thực người dùng." });
             }
 
             var result = await _authService.ChangePasswordAsync(userId, request);
 
             if (!result)
             {
-                return BadRequest(new { Message = "Không thể đổi mật khẩu. Vui lòng kiểm tra mật khẩu hiện tại." });
+                return BadRequest(new { Success = false, Message = "Không thể đổi mật khẩu. Vui lòng kiểm tra mật khẩu hiện tại." });
             }
 
-            return Ok(new { Message = "Đổi mật khẩu thành công." });
+            return Ok(new { Success = true, Message = "Đổi mật khẩu thành công!" });
         }
 
         /// <summary>

@@ -184,11 +184,7 @@ namespace ELibraryManagement.Web.Controllers
                 // Pass cache-busting timestamp to view
                 ViewBag.CacheBuster = t ?? DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 
-                // Debug: Log avatar URL for troubleshooting
-                if (TempData["DebugMessage"] != null)
-                {
-                    TempData["DebugMessage"] += $" | Avatar URL: {user.AvatarUrl} | Cache-buster: {ViewBag.CacheBuster}";
-                }
+
 
                 return View(user);
             }
@@ -402,7 +398,6 @@ namespace ELibraryManagement.Web.Controllers
                     // Clear ModelState to ensure no validation messages are shown
                     ModelState.Clear();
                     TempData["SuccessMessage"] = "Đổi mật khẩu thành công!";
-                    TempData["DebugMessage"] = "Redirecting to Profile after successful password change";
                     return RedirectToAction("Profile");
                 }
 
