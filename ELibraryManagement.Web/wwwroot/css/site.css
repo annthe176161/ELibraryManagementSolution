@@ -333,3 +333,26 @@ footer .text-white-50 {
 footer {
     animation: fadeInUp 0.6s ease-out;
 }
+
+/* Remove footer effects */
+footer, .hover-effect, .hover-link, .social-links a {
+    box-shadow: none !important;
+    transform: none !important;
+    transition: none !important;
+    animation: none !important;
+}
+.hover-effect:hover, .hover-link:hover, .social-links a:hover {
+    background: none !important;
+    color: inherit !important;
+}
+
+/* Remove header effects */
+header.fixed-top, .navbar, .navbar-brand, .nav-link, .dropdown-item {
+    box-shadow: none !important;
+    transform: none !important;
+    transition: none !important;
+}
+.navbar-brand:hover, .nav-link:hover, .dropdown-item:hover {
+    background-color: transparent !important;
+    color: inherit !important;
+}
