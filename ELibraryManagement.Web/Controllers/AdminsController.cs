@@ -1450,117 +1450,117 @@ namespace ELibraryManagement.Web.Controllers
             }
         }
 
-        // GET: Admin/CreateFine - Tạo phạt mới
-        [HttpGet]
-        public async Task<IActionResult> CreateFine(string? userId = null)
-        {
-            var accessCheck = await CheckAdminAccessAsync();
-            if (accessCheck != null) return accessCheck;
+        // GET: Admin/CreateFine - Tạo phạt mới - DISABLED
+        // [HttpGet]
+        // public async Task<IActionResult> CreateFine(string? userId = null)
+        // {
+        //     var accessCheck = await CheckAdminAccessAsync();
+        //     if (accessCheck != null) return accessCheck;
 
-            try
-            {
-                // Get all users for dropdown
-                var token = _authApiService.GetCurrentToken();
-                _httpClient.DefaultRequestHeaders.Authorization =
-                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+        //     try
+        //     {
+        //         // Get all users for dropdown
+        //         var token = _authApiService.GetCurrentToken();
+        //         _httpClient.DefaultRequestHeaders.Authorization =
+        //             new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
-                var usersResponse = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Users");
-                List<AdminUserViewModel> users = new List<AdminUserViewModel>();
+        //         var usersResponse = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Users");
+        //         List<AdminUserViewModel> users = new List<AdminUserViewModel>();
 
-                if (usersResponse.IsSuccessStatusCode)
-                {
-                    var usersContent = await usersResponse.Content.ReadAsStringAsync();
-                    users = JsonSerializer.Deserialize<List<AdminUserViewModel>>(usersContent, _jsonOptions) ?? new List<AdminUserViewModel>();
-                }
+        //         if (usersResponse.IsSuccessStatusCode)
+        //         {
+        //             var usersContent = await usersResponse.Content.ReadAsStringAsync();
+        //             users = JsonSerializer.Deserialize<List<AdminUserViewModel>>(usersContent, _jsonOptions) ?? new List<AdminUserViewModel>();
+        //         }
 
-                ViewBag.Users = users.Where(u => u.Roles.Any(r => r.Equals("User", StringComparison.OrdinalIgnoreCase))).ToList();
-                ViewBag.SelectedUserId = userId;
+        //         ViewBag.Users = users.Where(u => u.Roles.Any(r => r.Equals("User", StringComparison.OrdinalIgnoreCase))).ToList();
+        //         ViewBag.SelectedUserId = userId;
 
-                return View(new CreateFineRequest());
-            }
-            catch (Exception ex)
-            {
-                TempData["ErrorMessage"] = $"Có lỗi xảy ra: {ex.Message}";
-                return RedirectToAction("Fines");
-            }
-        }
+        //         return View(new CreateFineRequest());
+        //     }
+        //     catch (Exception ex)
+        //     {
+        //         TempData["ErrorMessage"] = $"Có lỗi xảy ra: {ex.Message}";
+        //         return RedirectToAction("Fines");
+        //     }
+        // }
 
-        // POST: Admin/CreateFine - Tạo phạt mới
-        [HttpPost]
-        public async Task<IActionResult> CreateFine(CreateFineRequest model)
-        {
-            var accessCheck = await CheckAdminAccessAsync();
-            if (accessCheck != null) return RedirectToAction("Login", "Accounts");
+        // POST: Admin/CreateFine - Tạo phạt mới - DISABLED
+        // [HttpPost]
+        // public async Task<IActionResult> CreateFine(CreateFineRequest model)
+        // {
+        //     var accessCheck = await CheckAdminAccessAsync();
+        //     if (accessCheck != null) return RedirectToAction("Login", "Accounts");
 
-            if (!ModelState.IsValid)
-            {
-                // Reload users for dropdown
-                var token = _authApiService.GetCurrentToken();
-                _httpClient.DefaultRequestHeaders.Authorization =
-                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+        //     if (!ModelState.IsValid)
+        //     {
+        //         // Reload users for dropdown
+        //         var token = _authApiService.GetCurrentToken();
+        //         _httpClient.DefaultRequestHeaders.Authorization =
+        //             new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
-                var usersResponse = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Users");
-                List<AdminUserViewModel> users = new List<AdminUserViewModel>();
+        //         var usersResponse = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Users");
+        //         List<AdminUserViewModel> users = new List<AdminUserViewModel>();
 
-                if (usersResponse.IsSuccessStatusCode)
-                {
-                    var usersContent = await usersResponse.Content.ReadAsStringAsync();
-                    users = JsonSerializer.Deserialize<List<AdminUserViewModel>>(usersContent, _jsonOptions) ?? new List<AdminUserViewModel>();
-                }
+        //         if (usersResponse.IsSuccessStatusCode)
+        //         {
+        //             var usersContent = await usersResponse.Content.ReadAsStringAsync();
+        //             users = JsonSerializer.Deserialize<List<AdminUserViewModel>>(usersContent, _jsonOptions) ?? new List<AdminUserViewModel>();
+        //         }
 
-                ViewBag.Users = users.Where(u => u.Roles.Any(r => r.Equals("User", StringComparison.OrdinalIgnoreCase))).ToList();
-                return View(model);
-            }
+        //         ViewBag.Users = users.Where(u => u.Roles.Any(r => r.Equals("User", StringComparison.OrdinalIgnoreCase))).ToList();
+        //         return View(model);
+        //     }
 
-            try
-            {
-                var token = _authApiService.GetCurrentToken();
-                _httpClient.DefaultRequestHeaders.Authorization =
-                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+        //     try
+        //     {
+        //         var token = _authApiService.GetCurrentToken();
+        //         _httpClient.DefaultRequestHeaders.Authorization =
+        //             new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
-                // Set token for FineApiService
-                if (!string.IsNullOrEmpty(token))
-                {
-                    _fineApiService.SetAuthToken(token);
-                }
+        //         // Set token for FineApiService
+        //         if (!string.IsNullOrEmpty(token))
+        //         {
+        //             _fineApiService.SetAuthToken(token);
+        //         }
 
-                // Handle special fine types that require BorrowRecord status update
-                if (!string.IsNullOrEmpty(model.FineType) && model.BorrowRecordId.HasValue && !string.IsNullOrEmpty(token))
-                {
-                    await UpdateBorrowRecordStatusBasedOnFineType(model.FineType, model.BorrowRecordId.Value, token);
-                }
+        //         // Handle special fine types that require BorrowRecord status update
+        //         if (!string.IsNullOrEmpty(model.FineType) && model.BorrowRecordId.HasValue && !string.IsNullOrEmpty(token))
+        //         {
+        //             await UpdateBorrowRecordStatusBasedOnFineType(model.FineType, model.BorrowRecordId.Value, token);
+        //         }
 
-                var success = await _fineApiService.CreateFineAsync(model);
+        //         var success = await _fineApiService.CreateFineAsync(model);
 
-                if (success)
-                {
-                    TempData["SuccessMessage"] = "Tạo phạt thành công";
-                    return RedirectToAction("Fines");
-                }
-                else
-                {
-                    TempData["ErrorMessage"] = "Không thể tạo phạt. Vui lòng thử lại.";
+        //         if (success)
+        //         {
+        //             TempData["SuccessMessage"] = "Tạo phạt thành công";
+        //             return RedirectToAction("Fines");
+        //         }
+        //         else
+        //         {
+        //             TempData["ErrorMessage"] = "Không thể tạo phạt. Vui lòng thử lại.";
 
-                    // Reload users for dropdown
-                    var usersResponse = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Users");
-                    List<AdminUserViewModel> users = new List<AdminUserViewModel>();
+        //             // Reload users for dropdown
+        //             var usersResponse = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Users");
+        //             List<AdminUserViewModel> users = new List<AdminUserViewModel>();
 
-                    if (usersResponse.IsSuccessStatusCode)
-                    {
-                        var usersContent = await usersResponse.Content.ReadAsStringAsync();
-                        users = JsonSerializer.Deserialize<List<AdminUserViewModel>>(usersContent, _jsonOptions) ?? new List<AdminUserViewModel>();
-                    }
+        //             if (usersResponse.IsSuccessStatusCode)
+        //             {
+        //                 var usersContent = await usersResponse.Content.ReadAsStringAsync();
+        //                 users = JsonSerializer.Deserialize<List<AdminUserViewModel>>(usersContent, _jsonOptions) ?? new List<AdminUserViewModel>();
+        //             }
 
-                    ViewBag.Users = users.Where(u => u.Roles.Any(r => r.Equals("User", StringComparison.OrdinalIgnoreCase))).ToList();
-                    return View(model);
-                }
-            }
-            catch (Exception ex)
-            {
-                TempData["ErrorMessage"] = $"Có lỗi xảy ra: {ex.Message}";
-                return RedirectToAction("Fines");
-            }
-        }
+        //             ViewBag.Users = users.Where(u => u.Roles.Any(r => r.Equals("User", StringComparison.OrdinalIgnoreCase))).ToList();
+        //             return View(model);
+        //         }
+        //     }
+        //     catch (Exception ex)
+        //     {
+        //         TempData["ErrorMessage"] = $"Có lỗi xảy ra: {ex.Message}";
+        //         return RedirectToAction("Fines");
+        //     }
+        // }
 
         // POST: Admin/MarkFineAsPaid - Đánh dấu phạt đã thanh toán
         [HttpPost]

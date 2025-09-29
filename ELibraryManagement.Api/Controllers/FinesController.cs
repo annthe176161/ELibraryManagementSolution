@@ -170,75 +170,75 @@ namespace ELibraryManagement.Api.Controllers
         }
 
         /// <summary>
-        /// Tạo phạt mới - Chỉ dành cho Admin
+        /// Tạo phạt mới - Chỉ dành cho Admin - DISABLED
         /// </summary>
-        [HttpPost]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> CreateFine([FromBody] CreateFineRequest request)
-        {
-            try
-            {
-                // Validate user exists
-                var userExists = await _context.Users.AnyAsync(u => u.Id == request.UserId);
-                if (!userExists)
-                {
-                    return BadRequest(new { message = "Người dùng không tồn tại" });
-                }
+        // [HttpPost]
+        // [Authorize(Roles = "Admin")]
+        // public async Task<IActionResult> CreateFine([FromBody] CreateFineRequest request)
+        // {
+        //     try
+        //     {
+        //         // Validate user exists
+        //         var userExists = await _context.Users.AnyAsync(u => u.Id == request.UserId);
+        //         if (!userExists)
+        //         {
+        //             return BadRequest(new { message = "Người dùng không tồn tại" });
+        //         }
 
-                // Validate borrow record if provided
-                if (request.BorrowRecordId.HasValue)
-                {
-                    var borrowRecordExists = await _context.BorrowRecords.AnyAsync(br => br.Id == request.BorrowRecordId);
-                    if (!borrowRecordExists)
-                    {
-                        return BadRequest(new { message = "Bản ghi mượn sách không tồn tại" });
-                    }
-                }
+        //         // Validate borrow record if provided
+        //         if (request.BorrowRecordId.HasValue)
+        //         {
+        //             var borrowRecordExists = await _context.BorrowRecords.AnyAsync(br => br.Id == request.BorrowRecordId);
+        //             if (!borrowRecordExists)
+        //             {
+        //                 return BadRequest(new { message = "Bản ghi mượn sách không tồn tại" });
+        //             }
+        //         }
 
-                var fine = new Fine
-                {
-                    UserId = request.UserId,
-                    BorrowRecordId = request.BorrowRecordId,
-                    Amount = request.Amount,
-                    Reason = request.Reason,
-                    Description = request.Description,
-                    DueDate = request.DueDate ?? DateTime.UtcNow.AddDays(30), // Default 30 days
-                    Status = FineStatus.Pending,
-                    FineDate = DateTime.UtcNow,
-                    CreatedAt = DateTime.UtcNow
-                };
+        //         var fine = new Fine
+        //         {
+        //             UserId = request.UserId,
+        //             BorrowRecordId = request.BorrowRecordId,
+        //             Amount = request.Amount,
+        //             Reason = request.Reason,
+        //             Description = request.Description,
+        //             DueDate = request.DueDate ?? DateTime.UtcNow.AddDays(30), // Default 30 days
+        //             Status = FineStatus.Pending,
+        //             FineDate = DateTime.UtcNow,
+        //             CreatedAt = DateTime.UtcNow
+        //         };
 
-                _context.Fines.Add(fine);
-                await _context.SaveChangesAsync();
+        //         _context.Fines.Add(fine);
+        //         await _context.SaveChangesAsync();
 
-                // Create action history
-                var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                if (!string.IsNullOrEmpty(currentUserId))
-                {
-                    var actionHistory = new FineActionHistory
-                    {
-                        FineId = fine.Id,
-                        UserId = currentUserId,
-                        ActionType = FineActionType.ReminderSent,
-                        Description = $"Tạo phạt mới: {request.Reason}",
-                        Amount = request.Amount,
-                        Notes = request.Description,
-                        ActionDate = DateTime.UtcNow,
-                        CreatedAt = DateTime.UtcNow
-                    };
+        //         // Create action history
+        //         var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        //         if (!string.IsNullOrEmpty(currentUserId))
+        //         {
+        //             var actionHistory = new FineActionHistory
+        //             {
+        //                 FineId = fine.Id,
+        //                 UserId = currentUserId,
+        //                 ActionType = FineActionType.ReminderSent,
+        //                 Description = $"Tạo phạt mới: {request.Reason}",
+        //                 Amount = request.Amount,
+        //                 Notes = request.Description,
+        //                 ActionDate = DateTime.UtcNow,
+        //                 CreatedAt = DateTime.UtcNow
+        //             };
 
-                    _context.FineActionHistories.Add(actionHistory);
-                    await _context.SaveChangesAsync();
-                }
+        //             _context.FineActionHistories.Add(actionHistory);
+        //             await _context.SaveChangesAsync();
+        //         }
 
-                return CreatedAtAction(nameof(GetFineDetails), new { id = fine.Id }, new { id = fine.Id, message = "Tạo phạt thành công" });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error creating fine");
-                return BadRequest(new { message = ex.Message });
-            }
-        }
+        //         return CreatedAtAction(nameof(GetFineDetails), new { id = fine.Id }, new { id = fine.Id, message = "Tạo phạt thành công" });
+        //     }
+        //     catch (Exception ex)
+        //     {
+        //         _logger.LogError(ex, "Error creating fine");
+        //         return BadRequest(new { message = ex.Message });
+        //     }
+        // }
 
         /// <summary>
         /// Cập nhật phạt - Chỉ dành cho Admin

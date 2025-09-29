@@ -95,31 +95,39 @@ namespace ELibraryManagement.Web.Services.Implementations
             }
         }
 
-        public async Task<bool> CreateFineAsync(CreateFineRequest request)
+        public Task<bool> CreateFineAsync(CreateFineRequest request)
         {
-            try
-            {
-                var json = JsonSerializer.Serialize(request, _jsonOptions);
-                var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-                var response = await _httpClient.PostAsync($"{GetApiBaseUrl()}/api/Fines", content);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    _logger.LogInformation("Fine created successfully for user: {UserId}", request.UserId);
-                    return true;
-                }
-
-                var errorContent = await response.Content.ReadAsStringAsync();
-                _logger.LogWarning("Failed to create fine. Status: {StatusCode}, Error: {Error}", response.StatusCode, errorContent);
-                return false;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error creating fine");
-                return false;
-            }
+            // Method disabled - Fine creation feature has been deactivated
+            _logger.LogWarning("CreateFineAsync called but feature is disabled");
+            return Task.FromResult(false);
         }
+
+        // DISABLED: Original CreateFineAsync method
+        // public async Task<bool> CreateFineAsync(CreateFineRequest request)
+        // {
+        //     try
+        //     {
+        //         var json = JsonSerializer.Serialize(request, _jsonOptions);
+        //         var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+        //         var response = await _httpClient.PostAsync($"{GetApiBaseUrl()}/api/Fines", content);
+
+        //         if (response.IsSuccessStatusCode)
+        //         {
+        //             _logger.LogInformation("Fine created successfully for user: {UserId}", request.UserId);
+        //             return true;
+        //         }
+
+        //         var errorContent = await response.Content.ReadAsStringAsync();
+        //         _logger.LogWarning("Failed to create fine. Status: {StatusCode}, Error: {Error}", response.StatusCode, errorContent);
+        //         return false;
+        //     }
+        //     catch (Exception ex)
+        //     {
+        //         _logger.LogError(ex, "Error creating fine");
+        //         return false;
+        //     }
+        // }
 
         public async Task<bool> UpdateFineAsync(int id, UpdateFineRequest request)
         {

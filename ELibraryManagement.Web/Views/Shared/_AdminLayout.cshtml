@@ -143,7 +143,7 @@
 
                     <!-- Fine Management -->
                     <li class="nav-item">
-                        <a class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Fines" || ViewContext.RouteData.Values["action"]?.ToString() == "CreateFine" ? "active" : "")"
+                        <a class="nav-link @(ViewContext.RouteData.Values["action"]?.ToString() == "Fines" ? "active" : "")"
                             asp-controller="Admins" asp-action="Fines">
                             <i class="fas fa-money-bill-wave me-3"></i>
                             Quản lý phạt
