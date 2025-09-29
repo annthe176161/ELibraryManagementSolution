@@ -89,7 +89,7 @@ namespace ELibraryManagement.Api.Services.Implementations
 
             // Generate email confirmation token
             var emailToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-            var confirmationLink = $"{_configuration["AppSettings:BaseUrl"]}/api/auth/confirm-email?userId={user.Id}&token={Uri.EscapeDataString(emailToken)}";
+            var confirmationLink = $"{_configuration["AppSettings:BaseUrl"]}/api/auths/confirm-email?userId={user.Id}&token={Uri.EscapeDataString(emailToken)}";
 
             // Send confirmation email
             await _emailService.SendEmailConfirmationAsync(user.Email, confirmationLink);
@@ -572,7 +572,7 @@ namespace ELibraryManagement.Api.Services.Implementations
 
             // Generate new email confirmation token
             var emailToken = await _userManager.GenerateEmailConfirmationTokenAsync(user);
-            var confirmationLink = $"{_configuration["AppSettings:BaseUrl"]}/api/auth/confirm-email?userId={user.Id}&token={Uri.EscapeDataString(emailToken)}";
+            var confirmationLink = $"{_configuration["AppSettings:BaseUrl"]}/api/auths/confirm-email?userId={user.Id}&token={Uri.EscapeDataString(emailToken)}";
 
             // Send confirmation email
             var emailSent = await _emailService.SendEmailConfirmationAsync(user.Email, confirmationLink);

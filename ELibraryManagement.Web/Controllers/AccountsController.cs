@@ -399,7 +399,10 @@ namespace ELibraryManagement.Web.Controllers
 
                 if (result.Success)
                 {
-                    TempData["SuccessMessage"] = result.Message;
+                    // Clear ModelState to ensure no validation messages are shown
+                    ModelState.Clear();
+                    TempData["SuccessMessage"] = "Đổi mật khẩu thành công!";
+                    TempData["DebugMessage"] = "Redirecting to Profile after successful password change";
                     return RedirectToAction("Profile");
                 }
 

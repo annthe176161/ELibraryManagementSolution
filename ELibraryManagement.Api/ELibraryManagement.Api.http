@@ -9,7 +9,7 @@ Accept: application/json
 ###
 
 # Register a new user
-POST {{ELibraryManagement.Api_HostAddress}}/api/auth/register
+POST {{ELibraryManagement.Api_HostAddress}}/api/auths/register
 Content-Type: application/json
 
 {
@@ -33,7 +33,7 @@ Content-Type: application/json
 # 4. All subsequent requests will automatically use your token!
 
 # Login with Admin credentials
-POST {{ELibraryManagement.Api_HostAddress}}/api/auth/login
+POST {{ELibraryManagement.Api_HostAddress}}/api/auths/login
 Content-Type: application/json
 
 {
@@ -44,14 +44,14 @@ Content-Type: application/json
 ###
 
 # Get current user info (uses the token from @authToken variable)
-GET {{ELibraryManagement.Api_HostAddress}}/api/auth/me
+GET {{ELibraryManagement.Api_HostAddress}}/api/auths/me
 Authorization: Bearer {{authToken}}
 Accept: application/json
 
 ###
 
 # Change password (uses the token from @authToken variable)
-POST {{ELibraryManagement.Api_HostAddress}}/api/auth/change-password
+POST {{ELibraryManagement.Api_HostAddress}}/api/auths/change-password
 Authorization: Bearer {{authToken}}
 Content-Type: application/json
 
@@ -64,7 +64,7 @@ Content-Type: application/json
 ###
 
 # Get user roles (uses the token from @authToken variable)
-GET {{ELibraryManagement.Api_HostAddress}}/api/auth/roles
+GET {{ELibraryManagement.Api_HostAddress}}/api/auths/roles
 Authorization: Bearer {{authToken}}
 Accept: application/json
 

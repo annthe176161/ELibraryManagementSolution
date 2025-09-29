@@ -237,7 +237,7 @@ namespace ELibraryManagement.Api.Controllers
         public IActionResult GoogleLogin()
         {
             // Sử dụng absolute URL để đảm bảo Google redirect đúng
-            var redirectUrl = "https://localhost:7125/api/Auths/google-response";
+            var redirectUrl = "https://localhost:7125/api/auths/google-response";
             var properties = _signInManager.ConfigureExternalAuthenticationProperties("Google", redirectUrl);
             return Challenge(properties, "Google");
         }
