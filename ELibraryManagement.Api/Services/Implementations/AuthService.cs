@@ -349,7 +349,7 @@ namespace ELibraryManagement.Api.Services.Implementations
                     return new AuthResponseDto
                     {
                         Success = true,
-                        Message = "Nếu email tồn tại trong hệ thống, chúng tôi đã gửi link reset mật khẩu đến email của bạn."
+                        Message = "Chúng tôi đã gửi hướng dẫn đặt lại mật khẩu đến địa chỉ email của bạn. Vui lòng kiểm tra hộp thư (bao gồm cả thư mục spam)."
                     };
                 }
 
@@ -375,7 +375,7 @@ namespace ELibraryManagement.Api.Services.Implementations
                 return new AuthResponseDto
                 {
                     Success = true,
-                    Message = "Nếu email tồn tại trong hệ thống, chúng tôi đã gửi link reset mật khẩu đến email của bạn."
+                    Message = "Chúng tôi đã gửi hướng dẫn đặt lại mật khẩu đến địa chỉ email của bạn. Vui lòng kiểm tra hộp thư (bao gồm cả thư mục spam)."
                 };
             }
             catch (Exception ex)
