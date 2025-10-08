@@ -414,7 +414,7 @@
             }).fail(function(xhr, status, error) {
                 console.error('Failed to load fine details:', xhr.status, error);
                 console.error('Response:', xhr.responseText);
-                showAlert('danger', 'Không thể tải chi tiết phạt: ' + (xhr.responseText || error));
+                showNotification('Không thể tải chi tiết phạt: ' + (xhr.responseText || error), 'error');
             });
         }
 
@@ -441,14 +441,15 @@
                 notes: notes
             }, function(response) {
                 if (response.success) {
-                    showAlert('success', response.message);
+                    // use centralized notification (renders at top-right)
+                    showNotification(response.message, 'success');
                     $('#payFineModal').modal('hide');
                     setTimeout(() => location.reload(), 1500);
                 } else {
-                    showAlert('danger', response.message);
+                    showNotification(response.message, 'error');
                 }
-            }).fail(function() {
-                showAlert('danger', 'Có lỗi xảy ra khi cập nhật trạng thái phạt');
+                }).fail(function() {
+                showNotification('Có lỗi xảy ra khi cập nhật trạng thái phạt', 'error');
             });
         }
 
@@ -456,8 +457,8 @@
             const reason = $('#waiveReason').val().trim();
             const notes = $('#waiveNotes').val();
             
-            if (!reason) {
-                showAlert('warning', 'Vui lòng nhập lý do miễn phạt');
+                if (!reason) {
+                showNotification('Vui lòng nhập lý do miễn phạt', 'warning');
                 return;
             }
 
@@ -467,32 +468,19 @@
                 notes: notes
             }, function(response) {
                 if (response.success) {
-                    showAlert('success', response.message);
+                    showNotification(response.message, 'success');
                     $('#waiveFineModal').modal('hide');
                     setTimeout(() => location.reload(), 1500);
                 } else {
-                    showAlert('danger', response.message);
+                    showNotification(response.message, 'error');
                 }
             }).fail(function() {
                 showAlert('danger', 'Có lỗi xảy ra khi miễn phạt');
             });
         }
 
-        function showAlert(type, message) {
-            const alertHtml = `
-                <div class="alert alert-${type} alert-dismissible fade show" role="alert">
-                    ${message}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            `;
-            
-            $('.container-fluid').prepend(alertHtml);
-            
-            // Auto dismiss after 5 seconds
-            setTimeout(() => {
-                $('.alert').alert('close');
-            }, 5000);
-        }
+        // Use the centralized showNotification defined in /wwwroot/js/admin.js
+        // showNotification(message, type) -> positions to top-right
 
         // Initialize DataTable for better UX
         $(document).ready(function() {
