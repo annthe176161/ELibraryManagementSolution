@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using ELibraryManagement.Api.Data;
 using ELibraryManagement.Api.Models;
+using ELibraryManagement.Api.Services.Interfaces;
 using System.Security.Claims;
 
 namespace ELibraryManagement.Api.Controllers
@@ -14,11 +15,13 @@ namespace ELibraryManagement.Api.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly ILogger<FineController> _logger;
+        private readonly IUserStatusService _userStatusService;
 
-        public FineController(ApplicationDbContext context, ILogger<FineController> logger)
+        public FineController(ApplicationDbContext context, ILogger<FineController> logger, IUserStatusService userStatusService)
         {
             _context = context;
             _logger = logger;
+            _userStatusService = userStatusService;
         }
 
         /// <summary>
@@ -246,7 +249,11 @@ namespace ELibraryManagement.Api.Controllers
         {
             try
             {
-                var fine = await _context.Fines.FindAsync(id);
+                var fine = await _context.Fines
+                    .Include(f => f.BorrowRecord)
+                        .ThenInclude(br => br!.Book)
+                    .FirstOrDefaultAsync(f => f.Id == id);
+
                 if (fine == null)
                 {
                     return NotFound(new { message = "Không tìm thấy phạt" });
@@ -267,6 +274,36 @@ namespace ELibraryManagement.Api.Controllers
                     if (request.Status.Value == FineStatus.Paid && !fine.PaidDate.HasValue)
                     {
                         fine.PaidDate = DateTime.UtcNow;
+                    }
+
+                    // *** FIX: Handle BorrowRecord and CurrentBorrowCount when status changes to Paid ***
+                    if (request.Status.Value == FineStatus.Paid && oldStatus != FineStatus.Paid)
+                    {
+                        // Update borrow record status if exists (payment means book was returned)
+                        if (fine.BorrowRecord != null && fine.BorrowRecord.Status != BorrowStatus.Returned)
+                        {
+                            _logger.LogInformation("📚 Updating BorrowRecord via UpdateFine: ID={BorrowRecordId}, CurrentStatus={CurrentStatus}",
+                                fine.BorrowRecord.Id, fine.BorrowRecord.Status);
+
+                            fine.BorrowRecord.Status = BorrowStatus.Returned;
+                            fine.BorrowRecord.ReturnDate = DateTime.UtcNow;
+                            fine.BorrowRecord.UpdatedAt = DateTime.UtcNow;
+
+                            // Update book available quantity
+                            if (fine.BorrowRecord.Book != null)
+                            {
+                                fine.BorrowRecord.Book.AvailableQuantity++;
+                                fine.BorrowRecord.Book.UpdatedAt = DateTime.UtcNow;
+
+                                _logger.LogInformation("✅ Increased book {BookId} available quantity when fine {FineId} status updated to Paid",
+                                    fine.BorrowRecord.Book.Id, fine.Id);
+                            }
+
+                            // Decrement user's CurrentBorrowCount when book is returned
+                            _logger.LogInformation("👤 Decrementing CurrentBorrowCount for user: {UserId} (UpdateFine to Paid)", fine.UserId);
+                            await _userStatusService.DecrementBorrowCountAsync(fine.UserId);
+                            _logger.LogInformation("✅ Decremented CurrentBorrowCount for user {UserId} when fine {FineId} status updated to Paid", fine.UserId, fine.Id);
+                        }
                     }
                 }
 
@@ -372,6 +409,11 @@ namespace ELibraryManagement.Api.Controllers
                             fine.BorrowRecord.Book.Id, fine.BorrowRecord.Book.AvailableQuantity, fine.Id);
                     }
 
+                    // *** FIX: Decrement user's CurrentBorrowCount when book is returned ***
+                    _logger.LogInformation("👤 Decrementing CurrentBorrowCount for user: {UserId}", fine.UserId);
+                    await _userStatusService.DecrementBorrowCountAsync(fine.UserId);
+                    _logger.LogInformation("✅ Decremented CurrentBorrowCount for user {UserId} when fine {FineId} was paid", fine.UserId, fine.Id);
+
                     _logger.LogInformation("✅ Updated BorrowRecord {BorrowRecordId} status to Returned when fine {FineId} was paid",
                         fine.BorrowRecord.Id, fine.Id);
                 }
@@ -424,7 +466,11 @@ namespace ELibraryManagement.Api.Controllers
         {
             try
             {
-                var fine = await _context.Fines.FindAsync(id);
+                var fine = await _context.Fines
+                    .Include(f => f.BorrowRecord)
+                        .ThenInclude(br => br!.Book)
+                    .FirstOrDefaultAsync(f => f.Id == id);
+
                 if (fine == null)
                 {
                     return NotFound(new { message = "Không tìm thấy phạt" });
@@ -437,6 +483,32 @@ namespace ELibraryManagement.Api.Controllers
 
                 fine.Status = FineStatus.Waived;
                 fine.UpdatedAt = DateTime.UtcNow;
+
+                // Update borrow record status if exists (waiving fine means book was returned)
+                if (fine.BorrowRecord != null && fine.BorrowRecord.Status != BorrowStatus.Returned)
+                {
+                    _logger.LogInformation("📚 Updating BorrowRecord for waived fine: ID={BorrowRecordId}, CurrentStatus={CurrentStatus}",
+                        fine.BorrowRecord.Id, fine.BorrowRecord.Status);
+
+                    fine.BorrowRecord.Status = BorrowStatus.Returned;
+                    fine.BorrowRecord.ReturnDate = DateTime.UtcNow;
+                    fine.BorrowRecord.UpdatedAt = DateTime.UtcNow;
+
+                    // Update book available quantity
+                    if (fine.BorrowRecord.Book != null)
+                    {
+                        fine.BorrowRecord.Book.AvailableQuantity++;
+                        fine.BorrowRecord.Book.UpdatedAt = DateTime.UtcNow;
+
+                        _logger.LogInformation("✅ Increased book {BookId} available quantity when fine {FineId} was waived",
+                            fine.BorrowRecord.Book.Id, fine.Id);
+                    }
+
+                    // *** FIX: Decrement user's CurrentBorrowCount when book is returned via waiving fine ***
+                    _logger.LogInformation("👤 Decrementing CurrentBorrowCount for user: {UserId} (waived fine)", fine.UserId);
+                    await _userStatusService.DecrementBorrowCountAsync(fine.UserId);
+                    _logger.LogInformation("✅ Decremented CurrentBorrowCount for user {UserId} when fine {FineId} was waived", fine.UserId, fine.Id);
+                }
 
                 await _context.SaveChangesAsync();
 
