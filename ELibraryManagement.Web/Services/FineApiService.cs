@@ -6,6 +6,7 @@ namespace ELibraryManagement.Web.Services
 {
     public interface IFineApiService
     {
+        void SetAuthToken(string token);
         Task<(List<FineViewModel> fines, int totalCount, int totalPages)> GetAllFinesAsync(int page = 1, int pageSize = 20, string? status = null, string? search = null);
         Task<FineDetailViewModel?> GetFineDetailsAsync(int id);
         Task<bool> CreateFineAsync(CreateFineRequest request);
@@ -35,6 +36,11 @@ namespace ELibraryManagement.Web.Services
         }
 
         private string GetApiBaseUrl() => _configuration["ApiSettings:BaseUrl"] ?? "http://localhost:5000";
+
+        public void SetAuthToken(string token)
+        {
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+        }
 
         private void SetAuthorizationHeader(string token)
         {
@@ -156,15 +162,27 @@ namespace ELibraryManagement.Web.Services
         {
             try
             {
+                _logger.LogInformation("Starting MarkFineAsPaidAsync for Fine ID: {FineId} with notes: {Notes}", id, notes ?? "none");
+
                 var request = new { notes };
                 var json = JsonSerializer.Serialize(request, _jsonOptions);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                var response = await _httpClient.PostAsync($"{GetApiBaseUrl()}/api/Fine/{id}/pay", content);
+                var url = $"{GetApiBaseUrl()}/api/Fine/{id}/pay";
+                _logger.LogInformation("Calling API endpoint: {Url}", url);
+
+                // Log authorization header
+                var authHeader = _httpClient.DefaultRequestHeaders.Authorization;
+                _logger.LogInformation("Authorization header: {AuthHeader}", authHeader != null ? $"{authHeader.Scheme} {authHeader.Parameter?[..10]}..." : "None");
+
+                var response = await _httpClient.PostAsync(url, content);
+
+                _logger.LogInformation("API response status: {StatusCode}", response.StatusCode);
 
                 if (response.IsSuccessStatusCode)
                 {
-                    _logger.LogInformation("Fine marked as paid successfully for ID: {FineId}", id);
+                    var responseContent = await response.Content.ReadAsStringAsync();
+                    _logger.LogInformation("Fine marked as paid successfully for ID: {FineId}. Response: {Response}", id, responseContent);
                     return true;
                 }
 

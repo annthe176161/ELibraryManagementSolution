@@ -359,9 +359,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Xác nhận thanh toán phạt</h5>
-                <button type="button" class="close" data-dismiss="modal">
-                    <span>&times;</span>
-                </button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <p>Bạn có chắc chắn muốn đánh dấu phạt này là đã thanh toán?</p>
@@ -371,7 +369,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
                 <button type="button" class="btn btn-success" onclick="confirmPayment()">Xác nhận thanh toán</button>
             </div>
         </div>
@@ -384,9 +382,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Miễn phạt</h5>
-                <button type="button" class="close" data-dismiss="modal">
-                    <span>&times;</span>
-                </button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <p>Bạn có chắc chắn muốn miễn phạt này?</p>
@@ -400,7 +396,7 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
                 <button type="button" class="btn btn-warning" onclick="confirmWaive()">Xác nhận miễn phạt</button>
             </div>
         </div>
@@ -412,11 +408,16 @@
         let currentFineId = 0;
 
         function viewFineDetails(fineId) {
+            console.log('Trying to view fine details for ID:', fineId);
+            
             $.get('@Url.Action("FineDetails")/' + fineId, function(data) {
+                console.log('Fine details loaded successfully');
                 $('#fineDetailModal .modal-content').html(data);
                 $('#fineDetailModal').modal('show');
-            }).fail(function() {
-                showAlert('danger', 'Không thể tải chi tiết phạt');
+            }).fail(function(xhr, status, error) {
+                console.error('Failed to load fine details:', xhr.status, error);
+                console.error('Response:', xhr.responseText);
+                showAlert('danger', 'Không thể tải chi tiết phạt: ' + (xhr.responseText || error));
             });
         }
 
@@ -484,9 +485,7 @@
             const alertHtml = `
                 <div class="alert alert-${type} alert-dismissible fade show" role="alert">
                     ${message}
-                    <button type="button" class="close" data-dismiss="alert">
-                        <span>&times;</span>
-                    </button>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             `;
             

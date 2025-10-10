@@ -509,5 +509,24 @@ namespace ELibraryManagement.Api.Controllers
                 return BadRequest(new { message = ex.Message });
             }
         }
+
+        [HttpPost("admin/process-overdue")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> ProcessOverdueBooks([FromServices] IOverdueProcessingService overdueService)
+        {
+            try
+            {
+                var processedCount = await overdueService.ProcessOverdueBooksAsync();
+                return Ok(new
+                {
+                    message = $"Đã xử lý {processedCount} borrow records quá hạn",
+                    processedCount = processedCount
+                });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
     }
 }

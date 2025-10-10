@@ -320,22 +320,65 @@ namespace ELibraryManagement.Api.Controllers
         {
             try
             {
-                var fine = await _context.Fines.FindAsync(id);
+                _logger.LogInformation("🎯 Starting MarkFineAsPaid for Fine ID: {FineId}", id);
+
+                var fine = await _context.Fines
+                    .Include(f => f.BorrowRecord)
+                        .ThenInclude(br => br!.Book)
+                    .FirstOrDefaultAsync(f => f.Id == id);
+
                 if (fine == null)
                 {
+                    _logger.LogWarning("❌ Fine not found with ID: {FineId}", id);
                     return NotFound(new { message = "Không tìm thấy phạt" });
                 }
 
+                _logger.LogInformation("✅ Found fine: ID={FineId}, Status={Status}, BorrowRecordId={BorrowRecordId}",
+                    fine.Id, fine.Status, fine.BorrowRecordId);
+
                 if (fine.Status == FineStatus.Paid)
                 {
+                    _logger.LogWarning("⚠️ Fine already paid: {FineId}", id);
                     return BadRequest(new { message = "Phạt đã được thanh toán" });
                 }
 
+                // Update fine status
                 fine.Status = FineStatus.Paid;
                 fine.PaidDate = DateTime.UtcNow;
                 fine.UpdatedAt = DateTime.UtcNow;
 
+                _logger.LogInformation("📝 Updated fine status to Paid for ID: {FineId}", id);
+
+                // Update borrow record status if exists (payment means book was returned)
+                if (fine.BorrowRecord != null && fine.BorrowRecord.Status != BorrowStatus.Returned)
+                {
+                    _logger.LogInformation("📚 Updating BorrowRecord: ID={BorrowRecordId}, CurrentStatus={CurrentStatus}",
+                        fine.BorrowRecord.Id, fine.BorrowRecord.Status);
+
+                    fine.BorrowRecord.Status = BorrowStatus.Returned;
+                    fine.BorrowRecord.ReturnDate = DateTime.UtcNow;
+                    fine.BorrowRecord.UpdatedAt = DateTime.UtcNow;
+
+                    // Update book available quantity
+                    if (fine.BorrowRecord.Book != null)
+                    {
+                        _logger.LogInformation("📖 Updating Book: ID={BookId}, CurrentAvailable={CurrentAvailable}",
+                            fine.BorrowRecord.Book.Id, fine.BorrowRecord.Book.AvailableQuantity);
+
+                        fine.BorrowRecord.Book.AvailableQuantity++;
+                        fine.BorrowRecord.Book.UpdatedAt = DateTime.UtcNow;
+
+                        _logger.LogInformation("✅ Increased book {BookId} available quantity to {AvailableQuantity} when fine {FineId} was paid",
+                            fine.BorrowRecord.Book.Id, fine.BorrowRecord.Book.AvailableQuantity, fine.Id);
+                    }
+
+                    _logger.LogInformation("✅ Updated BorrowRecord {BorrowRecordId} status to Returned when fine {FineId} was paid",
+                        fine.BorrowRecord.Id, fine.Id);
+                }
+
+                _logger.LogInformation("💾 Saving changes to database...");
                 await _context.SaveChangesAsync();
+                _logger.LogInformation("✅ Database changes saved successfully");
 
                 // Create action history
                 var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -357,7 +400,13 @@ namespace ELibraryManagement.Api.Controllers
                     await _context.SaveChangesAsync();
                 }
 
-                return Ok(new { message = "Đã đánh dấu phạt là đã thanh toán" });
+                var returnMessage = "Đã đánh dấu phạt là đã thanh toán";
+                if (fine.BorrowRecord != null)
+                {
+                    returnMessage += " và cập nhật trạng thái sách đã trả";
+                }
+
+                return Ok(new { message = returnMessage });
             }
             catch (Exception ex)
             {

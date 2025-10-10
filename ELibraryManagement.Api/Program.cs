@@ -72,9 +72,15 @@ namespace ELibraryManagement.Api
             builder.Services.AddScoped<ICloudinaryService, CloudinaryService>();
             builder.Services.AddScoped<IUserStatusService, UserStatusService>();
             builder.Services.AddScoped<IEmailService, EmailService>();
+            builder.Services.AddScoped<IOverdueProcessingService, OverdueProcessingService>();
+
+            // Configure OverdueSettings
+            builder.Services.Configure<OverdueSettings>(
+                builder.Configuration.GetSection("OverdueSettings"));
 
             // Add Background Services
             builder.Services.AddHostedService<ELibraryManagement.Api.BackgroundServices.BookDueReminderService>();
+            builder.Services.AddHostedService<ELibraryManagement.Api.BackgroundServices.OverdueBooksProcessingService>();
 
             // Configure Cloudinary
             builder.Services.AddSingleton(provider =>

@@ -1405,6 +1405,9 @@ namespace ELibraryManagement.Web.Controllers
                 _httpClient.DefaultRequestHeaders.Authorization =
                     new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
+                // Set token cho FineApiService
+                _fineApiService.SetAuthToken(token);
+
                 var (fines, totalCount, totalPages) = await _fineApiService.GetAllFinesAsync(page, 20, status, search);
                 var statistics = await _fineApiService.GetFineStatisticsAsync();
 
@@ -1436,6 +1439,9 @@ namespace ELibraryManagement.Web.Controllers
                 var token = _authApiService.GetCurrentToken();
                 _httpClient.DefaultRequestHeaders.Authorization =
                     new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+                // Set token cho FineApiService
+                _fineApiService.SetAuthToken(token);
 
                 var fineDetail = await _fineApiService.GetFineDetailsAsync(id);
                 if (fineDetail != null)
@@ -1561,14 +1567,19 @@ namespace ELibraryManagement.Web.Controllers
             try
             {
                 var token = _authApiService.GetCurrentToken();
-                _httpClient.DefaultRequestHeaders.Authorization =
-                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                if (string.IsNullOrEmpty(token))
+                {
+                    return Json(new { success = false, message = "Không có token xác thực" });
+                }
+
+                // Set token cho FineApiService
+                _fineApiService.SetAuthToken(token);
 
                 var success = await _fineApiService.MarkFineAsPaidAsync(id, notes);
 
                 if (success)
                 {
-                    return Json(new { success = true, message = "Đã đánh dấu phạt là đã thanh toán" });
+                    return Json(new { success = true, message = "Đã đánh dấu phạt là đã thanh toán và cập nhật trạng thái sách đã trả" });
                 }
                 else
                 {
@@ -1591,8 +1602,13 @@ namespace ELibraryManagement.Web.Controllers
             try
             {
                 var token = _authApiService.GetCurrentToken();
-                _httpClient.DefaultRequestHeaders.Authorization =
-                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+                if (string.IsNullOrEmpty(token))
+                {
+                    return Json(new { success = false, message = "Không có token xác thực" });
+                }
+
+                // Set token cho FineApiService
+                _fineApiService.SetAuthToken(token);
 
                 var success = await _fineApiService.WaiveFineAsync(id, reason, notes);
 

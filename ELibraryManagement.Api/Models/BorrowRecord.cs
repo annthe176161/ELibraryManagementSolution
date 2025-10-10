@@ -29,7 +29,7 @@ namespace ELibraryManagement.Api.Models
 
         public DateTime? ConfirmedDate { get; set; } // Ngày admin xác nhận mượn
 
-        public bool IsOverdue => Status == BorrowStatus.Borrowed && ReturnDate == null && DateTime.UtcNow > DueDate;
+        public bool IsOverdue => (Status == BorrowStatus.Borrowed || Status == BorrowStatus.Overdue) && ReturnDate == null && DateTime.UtcNow > DueDate;
 
         public int OverdueDays => IsOverdue ? (DateTime.UtcNow - DueDate).Days : 0;
 
@@ -49,6 +49,7 @@ namespace ELibraryManagement.Api.Models
     {
         Requested,  // Sinh viên yêu cầu mượn (chờ xác nhận)
         Borrowed,   // Đang mượn (đã xác nhận)
+        Overdue,    // Quá hạn (tự động chuyển khi quá hạn)
         Returned,   // Đã trả
         Lost,       // Mất sách
         Damaged,    // Hư hỏng
