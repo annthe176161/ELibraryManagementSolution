@@ -58,6 +58,21 @@ namespace ELibraryManagement.Api.Services.Implementations
                 };
             }
 
+            // Check PhoneNumber uniqueness if provided
+            if (!string.IsNullOrWhiteSpace(request.PhoneNumber))
+            {
+                var normalizedPhone = request.PhoneNumber.Replace(" ", "").Trim();
+                var existingPhone = _userManager.Users.FirstOrDefault(u => (u.PhoneNumber ?? "") == normalizedPhone);
+                if (existingPhone != null)
+                {
+                    return new AuthResponseDto
+                    {
+                        Success = false,
+                        Message = "Số điện thoại đã được sử dụng bởi người khác."
+                    };
+                }
+            }
+
             // Check StudentId uniqueness if provided
             if (!string.IsNullOrWhiteSpace(request.StudentId))
             {
