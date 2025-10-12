@@ -22,7 +22,7 @@ namespace ELibraryManagement.Web.Models
         public string ConfirmPassword { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Tên đăng nhập là bắt buộc")]
-        [MaxLength(10, ErrorMessage = "Tên đăng nhập không được quá 10 ký tự")]
+        [MaxLength(20, ErrorMessage = "Tên đăng nhập không được quá 20 ký tự")]
         [RegularExpression("^[a-zA-Z0-9]+$", ErrorMessage = "Tên đăng nhập chỉ được chứa chữ cái và số, không được có khoảng trắng hoặc ký tự đặc biệt.")]
         [Display(Name = "Tên đăng nhập")]
         public string UserName { get; set; } = string.Empty;

@@ -128,7 +128,8 @@ namespace ELibraryManagement.Api.Controllers
                     .SelectMany(v => v.Errors)
                     .Select(e => e.ErrorMessage)
                     .ToList();
-                return BadRequest(new {
+                return BadRequest(new
+                {
                     Success = false,
                     Message = "Dữ liệu không hợp lệ: " + string.Join(", ", errors)
                 });
