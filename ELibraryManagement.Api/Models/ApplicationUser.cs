@@ -11,7 +11,7 @@ namespace ELibraryManagement.Api.Models
         [MaxLength(100)]
         public string LastName { get; set; } = string.Empty;
 
-        [MaxLength(20)]
+        [MaxLength(10)]
         public string StudentId { get; set; } = string.Empty;
 
         [MaxLength(255)]

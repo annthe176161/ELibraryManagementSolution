@@ -10,7 +10,7 @@ namespace ELibraryManagement.Web.Models
         public string Email { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Mật khẩu là bắt buộc")]
-        [MinLength(6, ErrorMessage = "Mật khẩu phải có ít nhất 6 ký tự")]
+        [MinLength(8, ErrorMessage = "Mật khẩu phải có ít nhất 8 ký tự")]
         [Display(Name = "Mật khẩu")]
         [DataType(DataType.Password)]
         public string Password { get; set; } = string.Empty;
@@ -22,7 +22,8 @@ namespace ELibraryManagement.Web.Models
         public string ConfirmPassword { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Tên đăng nhập là bắt buộc")]
-        [MaxLength(50, ErrorMessage = "Tên đăng nhập không được quá 50 ký tự")]
+        [MaxLength(10, ErrorMessage = "Tên đăng nhập không được quá 10 ký tự")]
+        [RegularExpression("^[a-zA-Z0-9]+$", ErrorMessage = "Tên đăng nhập chỉ được chứa chữ cái và số, không được có khoảng trắng hoặc ký tự đặc biệt.")]
         [Display(Name = "Tên đăng nhập")]
         public string UserName { get; set; } = string.Empty;
 
@@ -34,7 +35,8 @@ namespace ELibraryManagement.Web.Models
         [Display(Name = "Tên")]
         public string? LastName { get; set; }
 
-        [MaxLength(20, ErrorMessage = "Mã sinh viên không được quá 20 ký tự")]
+        [MaxLength(10, ErrorMessage = "Mã sinh viên không được quá 10 ký tự")]
+        [RegularExpression("^[a-zA-Z0-9]+$", ErrorMessage = "Mã sinh viên chỉ được chứa chữ cái và số, không được có khoảng trắng hoặc ký tự đặc biệt.")]
         [Display(Name = "Mã sinh viên")]
         public string? StudentId { get; set; }
 
@@ -100,7 +102,8 @@ namespace ELibraryManagement.Web.Models
         public string? LastName { get; set; }
 
         [Display(Name = "Mã sinh viên")]
-        [MaxLength(20, ErrorMessage = "Mã sinh viên không được quá 20 ký tự")]
+        [MaxLength(10, ErrorMessage = "Mã sinh viên không được quá 10 ký tự")]
+        [RegularExpression("^[a-zA-Z0-9]+$", ErrorMessage = "Mã sinh viên chỉ được chứa chữ cái và số, không được có khoảng trắng hoặc ký tự đặc biệt.")]
         public string? StudentId { get; set; }
 
         [Display(Name = "Số điện thoại")]
@@ -132,7 +135,7 @@ namespace ELibraryManagement.Web.Models
         public string CurrentPassword { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Vui lòng nhập mật khẩu mới")]
-        [StringLength(100, ErrorMessage = "Mật khẩu phải có ít nhất {2} ký tự", MinimumLength = 6)]
+        [StringLength(100, ErrorMessage = "Mật khẩu phải có ít nhất {2} ký tự", MinimumLength = 8)]
         [DataType(DataType.Password)]
         [Display(Name = "Mật khẩu mới")]
         public string NewPassword { get; set; } = string.Empty;
@@ -163,7 +166,7 @@ namespace ELibraryManagement.Web.Models
         public string Token { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Vui lòng nhập mật khẩu mới")]
-        [StringLength(100, ErrorMessage = "Mật khẩu phải có ít nhất {2} ký tự", MinimumLength = 6)]
+        [StringLength(100, ErrorMessage = "Mật khẩu phải có ít nhất {2} ký tự", MinimumLength = 8)]
         [DataType(DataType.Password)]
         [Display(Name = "Mật khẩu mới")]
         public string NewPassword { get; set; } = string.Empty;

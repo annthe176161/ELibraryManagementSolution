@@ -58,6 +58,20 @@ namespace ELibraryManagement.Api.Services.Implementations
                 };
             }
 
+            // Check StudentId uniqueness if provided
+            if (!string.IsNullOrWhiteSpace(request.StudentId))
+            {
+                var existingStudent = _userManager.Users.FirstOrDefault(u => u.StudentId == request.StudentId);
+                if (existingStudent != null)
+                {
+                    return new AuthResponseDto
+                    {
+                        Success = false,
+                        Message = "Mã sinh viên (StudentId) đã tồn tại."
+                    };
+                }
+            }
+
             // Create new user
             var user = new ApplicationUser
             {

@@ -4,20 +4,22 @@ namespace ELibraryManagement.Api.DTOs
 {
     public class RegisterRequestDto
     {
-        [Required]
-        [EmailAddress]
+        [Required(ErrorMessage = "Email là bắt buộc.")]
+        [ELibraryManagement.Api.Validators.StrictEmail(ErrorMessage = "Địa chỉ email không hợp lệ.")]
+        [ELibraryManagement.Api.Validators.DisposableEmail(ErrorMessage = "Không được sử dụng email tạm thời. Vui lòng sử dụng email thật.")]
         public string Email { get; set; } = string.Empty;
 
-        [Required]
-        [MinLength(6)]
+        [Required(ErrorMessage = "Mật khẩu là bắt buộc.")]
+        [MinLength(8, ErrorMessage = "Mật khẩu phải có ít nhất 8 ký tự.")]
         public string Password { get; set; } = string.Empty;
 
-        [Required]
-        [Compare("Password")]
+        [Required(ErrorMessage = "Vui lòng xác nhận mật khẩu.")]
+        [Compare("Password", ErrorMessage = "Mật khẩu xác nhận không khớp.")]
         public string ConfirmPassword { get; set; } = string.Empty;
 
-        [Required]
-        [MaxLength(50)]
+        [Required(ErrorMessage = "Tên đăng nhập là bắt buộc.")]
+        [MaxLength(10, ErrorMessage = "Tên đăng nhập không được quá 10 ký tự.")]
+        [RegularExpression("^[a-zA-Z0-9]+$", ErrorMessage = "Tên đăng nhập chỉ được chứa chữ cái và số, không được có khoảng trắng hoặc ký tự đặc biệt.")]
         public string UserName { get; set; } = string.Empty;
 
         [MaxLength(50)]
@@ -26,15 +28,17 @@ namespace ELibraryManagement.Api.DTOs
         [MaxLength(50)]
         public string? LastName { get; set; }
 
-        [MaxLength(20)]
+        [MaxLength(10, ErrorMessage = "Mã sinh viên không được quá 10 ký tự.")]
+        [RegularExpression("^[a-zA-Z0-9]+$", ErrorMessage = "Mã sinh viên chỉ được chứa chữ cái và số, không được có khoảng trắng hoặc ký tự đặc biệt.")]
         public string? StudentId { get; set; }
 
         [MaxLength(255)]
         public string? Address { get; set; }
 
-        [Phone]
+        [RegularExpression(@"^0[0-9]{9}$", ErrorMessage = "Số điện thoại phải bắt đầu bằng 0 và có đúng 10 chữ số.")]
         public string? PhoneNumber { get; set; }
 
+        [ELibraryManagement.Api.Validators.MinAge(18, ErrorMessage = "Người dùng phải lớn hơn hoặc bằng 18 tuổi.")]
         public DateTime? DateOfBirth { get; set; }
     }
 
@@ -68,6 +72,7 @@ namespace ELibraryManagement.Api.DTOs
         public string? PhoneNumber { get; set; }
         public string? Address { get; set; }
         public string? AvatarUrl { get; set; }
+        [ELibraryManagement.Api.Validators.MinAge(18, ErrorMessage = "Người dùng phải lớn hơn hoặc bằng 18 tuổi.")]
         public DateTime? DateOfBirth { get; set; }
         public DateTime CreatedAt { get; set; }
         public List<string> Roles { get; set; } = new List<string>();
@@ -85,10 +90,11 @@ namespace ELibraryManagement.Api.DTOs
         [MaxLength(100)]
         public string? LastName { get; set; }
 
-        [MaxLength(20)]
+        [MaxLength(10, ErrorMessage = "Mã sinh viên không được quá 10 ký tự.")]
+        [RegularExpression("^[a-zA-Z0-9]+$", ErrorMessage = "Mã sinh viên chỉ được chứa chữ cái và số, không được có khoảng trắng hoặc ký tự đặc biệt.")]
         public string? StudentId { get; set; }
 
-        [Phone]
+        [RegularExpression(@"^0[0-9]{9}$", ErrorMessage = "Số điện thoại phải bắt đầu bằng 0 và có đúng 10 chữ số.")]
         public string? PhoneNumber { get; set; }
 
         public DateTime? DateOfBirth { get; set; }
@@ -106,26 +112,28 @@ namespace ELibraryManagement.Api.DTOs
         [Required]
         public string CurrentPassword { get; set; } = string.Empty;
 
-        [Required]
-        [MinLength(6)]
+        [Required(ErrorMessage = "Mật khẩu mới là bắt buộc.")]
+        [MinLength(8, ErrorMessage = "Mật khẩu mới phải có ít nhất 8 ký tự.")]
         public string NewPassword { get; set; } = string.Empty;
 
-        [Required]
-        [Compare("NewPassword")]
+        [Required(ErrorMessage = "Vui lòng xác nhận mật khẩu mới.")]
+        [Compare("NewPassword", ErrorMessage = "Mật khẩu xác nhận không khớp.")]
         public string ConfirmNewPassword { get; set; } = string.Empty;
     }
 
     public class ForgotPasswordRequestDto
     {
-        [Required]
-        [EmailAddress]
+        [Required(ErrorMessage = "Email là bắt buộc.")]
+        [ELibraryManagement.Api.Validators.StrictEmail(ErrorMessage = "Địa chỉ email không hợp lệ.")]
+        [ELibraryManagement.Api.Validators.DisposableEmail(ErrorMessage = "Không được sử dụng email tạm thời. Vui lòng sử dụng email thật.")]
         public string Email { get; set; } = string.Empty;
     }
 
     public class ResetPasswordRequestDto
     {
-        [Required]
-        [EmailAddress]
+        [Required(ErrorMessage = "Email là bắt buộc.")]
+        [ELibraryManagement.Api.Validators.StrictEmail(ErrorMessage = "Địa chỉ email không hợp lệ.")]
+        [ELibraryManagement.Api.Validators.DisposableEmail(ErrorMessage = "Không được sử dụng email tạm thời. Vui lòng sử dụng email thật.")]
         public string Email { get; set; } = string.Empty;
 
         [Required]

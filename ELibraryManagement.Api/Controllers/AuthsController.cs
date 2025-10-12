@@ -30,7 +30,16 @@ namespace ELibraryManagement.Api.Controllers
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                var errors = ModelState.Values
+                    .SelectMany(v => v.Errors)
+                    .Select(e => e.ErrorMessage)
+                    .ToList();
+                var errorResponse = new AuthResponseDto
+                {
+                    Success = false,
+                    Message = "Dữ liệu không hợp lệ: " + string.Join(", ", errors)
+                };
+                return BadRequest(errorResponse);
             }
 
             var result = await _authService.RegisterAsync(request);

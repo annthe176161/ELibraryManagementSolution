@@ -119,6 +119,12 @@ namespace ELibraryManagement.Api
             books.EntityType.HasMany(b => b.Categories);
 
             // Configure MVC with formatters
+            // Disable automatic 400 on model validation so controllers can return custom Vietnamese messages
+            builder.Services.Configure<ApiBehaviorOptions>(options =>
+            {
+                options.SuppressModelStateInvalidFilter = true;
+            });
+
             builder.Services.AddControllers(options =>
             {
                 // Add XML formatter with custom settings
