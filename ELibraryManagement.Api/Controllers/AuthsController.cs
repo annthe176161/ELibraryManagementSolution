@@ -28,7 +28,17 @@ namespace ELibraryManagement.Api.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Register([FromBody] RegisterRequestDto request)
         {
-            if (!ModelState.IsValid)
+            // Trim common input fields to avoid accidental leading/trailing spaces
+            request.Email = request.Email?.Trim();
+            request.UserName = request.UserName?.Trim();
+            request.Password = request.Password?.Trim();
+            request.ConfirmPassword = request.ConfirmPassword?.Trim();
+            request.StudentId = request.StudentId?.Trim();
+            request.PhoneNumber = request.PhoneNumber?.Trim();
+
+            // Re-validate model after normalization
+            ModelState.Clear();
+            if (!TryValidateModel(request))
             {
                 var errors = ModelState.Values
                     .SelectMany(v => v.Errors)
@@ -105,9 +115,23 @@ namespace ELibraryManagement.Api.Controllers
         [Authorize]
         public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordRequestDto request)
         {
-            if (!ModelState.IsValid)
+            // Trim password inputs to avoid accidental leading/trailing spaces causing mismatch
+            request.CurrentPassword = request.CurrentPassword?.Trim();
+            request.NewPassword = request.NewPassword?.Trim();
+            request.ConfirmNewPassword = request.ConfirmNewPassword?.Trim();
+
+            // Re-validate model after normalization
+            ModelState.Clear();
+            if (!TryValidateModel(request))
             {
-                return BadRequest(new { Success = false, Message = "Dữ liệu không hợp lệ." });
+                var errors = ModelState.Values
+                    .SelectMany(v => v.Errors)
+                    .Select(e => e.ErrorMessage)
+                    .ToList();
+                return BadRequest(new {
+                    Success = false,
+                    Message = "Dữ liệu không hợp lệ: " + string.Join(", ", errors)
+                });
             }
 
             var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
@@ -121,7 +145,8 @@ namespace ELibraryManagement.Api.Controllers
 
             if (!result)
             {
-                return BadRequest(new { Success = false, Message = "Không thể đổi mật khẩu. Vui lòng kiểm tra mật khẩu hiện tại." });
+                // Return a clear Vietnamese message when current password is incorrect
+                return BadRequest(new { Success = false, Message = "Mật khẩu hiện tại không đúng." });
             }
 
             return Ok(new { Success = true, Message = "Đổi mật khẩu thành công!" });
