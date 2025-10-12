@@ -320,11 +320,55 @@ namespace ELibraryManagement.Api.Services.Implementations
                     };
                 }
 
+                // Validate DateOfBirth (MinAge) server-side to be safe
+                if (request.DateOfBirth.HasValue)
+                {
+                    var today = DateTime.UtcNow.Date;
+                    var age = today.Year - request.DateOfBirth.Value.Year;
+                    if (request.DateOfBirth.Value.Date > today.AddYears(-age)) age--;
+                    if (age < 18)
+                    {
+                        return new AuthResponseDto
+                        {
+                            Success = false,
+                            Message = "Người dùng phải lớn hơn hoặc bằng 18 tuổi."
+                        };
+                    }
+                }
+
                 // Cập nhật thông tin
+                // Nếu phone được cung cấp và khác với phone hiện tại, kiểm tra tính duy nhất
+                if (!string.IsNullOrWhiteSpace(request.PhoneNumber) && request.PhoneNumber != user.PhoneNumber)
+                {
+                    var normalizedPhone = request.PhoneNumber.Replace(" ", "").Trim();
+                    var existingPhoneUser = _userManager.Users.FirstOrDefault(u => (u.PhoneNumber ?? "") == normalizedPhone && u.Id != user.Id);
+                    if (existingPhoneUser != null)
+                    {
+                        return new AuthResponseDto
+                        {
+                            Success = false,
+                            Message = "Số điện thoại đã được sử dụng bởi người khác."
+                        };
+                    }
+                    user.PhoneNumber = normalizedPhone;
+                }
+
                 user.FirstName = request.FirstName;
                 user.LastName = request.LastName;
-                user.StudentId = request.StudentId;
-                user.PhoneNumber = request.PhoneNumber;
+                // Nếu StudentId được cung cấp và khác với hiện tại, kiểm tra tính duy nhất
+                if (!string.IsNullOrWhiteSpace(request.StudentId) && request.StudentId != user.StudentId)
+                {
+                    var existingStudent = _userManager.Users.FirstOrDefault(u => (u.StudentId ?? "") == request.StudentId && u.Id != user.Id);
+                    if (existingStudent != null)
+                    {
+                        return new AuthResponseDto
+                        {
+                            Success = false,
+                            Message = "Mã sinh viên (StudentId) đã được sử dụng bởi người khác."
+                        };
+                    }
+                    user.StudentId = request.StudentId;
+                }
                 user.DateOfBirth = request.DateOfBirth;
                 user.Address = request.Address;
 
