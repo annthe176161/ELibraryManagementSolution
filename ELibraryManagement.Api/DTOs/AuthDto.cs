@@ -139,12 +139,12 @@ namespace ELibraryManagement.Api.DTOs
         [Required]
         public string Token { get; set; } = string.Empty;
 
-        [Required]
-        [MinLength(6)]
+        [Required(ErrorMessage = "Mật khẩu mới là bắt buộc.")]
+        [MinLength(8, ErrorMessage = "Mật khẩu mới phải có ít nhất 8 ký tự.")]
         public string NewPassword { get; set; } = string.Empty;
 
-        [Required]
-        [Compare("NewPassword")]
+        [Required(ErrorMessage = "Vui lòng xác nhận mật khẩu mới.")]
+        [Compare("NewPassword", ErrorMessage = "Mật khẩu xác nhận không khớp.")]
         public string ConfirmNewPassword { get; set; } = string.Empty;
     }
 }

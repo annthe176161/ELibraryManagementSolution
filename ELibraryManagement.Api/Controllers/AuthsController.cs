@@ -353,6 +353,30 @@ namespace ELibraryManagement.Api.Controllers
 
             return Ok(result);
         }
+
+        /// <summary>
+        /// [DEV ONLY] Get password reset token for testing - REMOVE IN PRODUCTION!
+        /// </summary>
+        [HttpPost("dev/get-reset-token")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetResetTokenForDev([FromBody] ResendEmailConfirmationDto request)
+        {
+            var user = await _signInManager.UserManager.FindByEmailAsync(request.Email);
+            if (user == null)
+            {
+                return BadRequest(new { success = false, message = "User not found" });
+            }
+
+            var resetToken = await _signInManager.UserManager.GeneratePasswordResetTokenAsync(user);
+
+            return Ok(new
+            {
+                success = true,
+                email = request.Email,
+                resetToken = resetToken,
+                message = "Use this token in the 'token' field of reset-password endpoint (NOT in Authorization header!)"
+            });
+        }
     }
 
     public class AssignRoleRequestDto
