@@ -248,13 +248,14 @@
                                         @{
                                             var statusClass = fine.Status switch
                                             {
-                                                "Pending" => fine.IsOverdue ? "badge-danger" : "badge-warning",
-                                                "Paid" => "badge-success",
-                                                "Waived" => "badge-info",
-                                                _ => "badge-secondary"
+                                                // Use Bootstrap 5 background and text classes for good contrast
+                                                "Pending" => fine.IsOverdue ? "bg-danger text-white" : "bg-warning text-dark",
+                                                "Paid" => "bg-success text-white",
+                                                "Waived" => "bg-info text-dark",
+                                                _ => "bg-secondary text-white"
                                             };
                                         }
-                                        <span class="badge @statusClass">
+                                        <span class="badge @statusClass" style="font-size:0.9rem;">
                                             @FineStatuses.GetDisplayName(fine.Status)
                                         </span>
                                         @if (fine.IsOverdue)
@@ -289,10 +290,6 @@
                                                 <button type="button" class="btn btn-sm btn-success mb-1" 
                                                         onclick="markAsPaid(@fine.Id, '@fine.UserFullName')" title="Đánh dấu đã thanh toán">
                                                     <i class="fas fa-money-bill"></i>
-                                                </button>
-                                                <button type="button" class="btn btn-sm btn-warning mb-1" 
-                                                        onclick="waiveFine(@fine.Id, '@fine.UserFullName', @fine.Amount)" title="Miễn phạt">
-                                                    <i class="fas fa-hand-holding"></i>
                                                 </button>
                                             }
                                         </div>

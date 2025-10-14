@@ -53,16 +53,17 @@
                         
                         <dt class="col-sm-4">Trạng thái:</dt>
                         <dd class="col-sm-8">
-                            @{
+                            @{ 
+                                // Use high-contrast bg/text classes so badge is readable on white background
                                 var statusClass = Model.Status switch
                                 {
-                                    "Pending" => Model.IsOverdue ? "badge-danger" : "badge-warning",
-                                    "Paid" => "badge-success",
-                                    "Waived" => "badge-info",
-                                    _ => "badge-secondary"
+                                    "Pending" => Model.IsOverdue ? "bg-danger text-white" : "bg-warning text-dark",
+                                    "Paid" => "bg-success text-white",
+                                    "Waived" => "bg-info text-dark",
+                                    _ => "bg-secondary text-white"
                                 };
                             }
-                            <span class="badge @statusClass">
+                            <span class="badge @statusClass" style="font-size:0.95rem;">
                                 @FineStatuses.GetDisplayName(Model.Status)
                             </span>
                             @if (Model.IsOverdue)
@@ -118,7 +119,8 @@
                         
                         <dt class="col-sm-5">Số lần nhắc:</dt>
                         <dd class="col-sm-7">
-                            <span class="badge badge-secondary">@Model.ReminderCount lần</span>
+                            @{ var reminderClass = Model.ReminderCount > 0 ? "bg-danger text-white" : "bg-secondary text-white"; }
+                            <span class="badge @reminderClass">@Model.ReminderCount lần</span>
                         </dd>
                     </dl>
                 </div>
@@ -247,10 +249,6 @@
             <i class="fas fa-money-bill"></i>
             Đánh dấu đã thanh toán
         </button>
-        <button type="button" class="btn btn-warning" onclick="waiveFineFromModal(@Model.Id, '@Model.UserFullName', @Model.Amount)">
-            <i class="fas fa-hand-holding"></i>
-            Miễn phạt
-        </button>
     }
     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
         <i class="fas fa-times"></i>
@@ -311,8 +309,5 @@
         markAsPaid(fineId, userName);
     }
 
-    function waiveFineFromModal(fineId, userName, amount) {
-        $('#fineDetailModal').modal('hide');
-        waiveFine(fineId, userName, amount);
-    }
+    // waiveFineFromModal removed - waive functionality intentionally disabled in UI
 </script>
