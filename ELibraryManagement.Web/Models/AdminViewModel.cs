@@ -42,8 +42,8 @@ namespace ELibraryManagement.Web.Models
         public string Status { get; set; } = "";
         public string? Notes { get; set; }
         public decimal? FineAmount { get; set; }
-        public bool IsOverdue => ReturnDate == null && DateTimeHelper.VietnamNow() > DueDate;
-        public int OverdueDays => IsOverdue ? (DateTimeHelper.VietnamNow() - DueDate).Days : 0;
+        public bool IsOverdue => ReturnDate == null && DateTimeHelper.VietnamNow() > DueDate.ToVietnamTime();
+        public int OverdueDays => IsOverdue ? (DateTimeHelper.VietnamNow().Date - DueDate.ToVietnamTime().Date).Days : 0;
         public string StatusDisplay => Status switch
         {
             "Requested" => "Đã đăng ký",
@@ -88,8 +88,8 @@ namespace ELibraryManagement.Web.Models
         public string Status { get; set; } = "";
         public string? Notes { get; set; }
         public decimal? FineAmount { get; set; }
-        public bool IsOverdue => ReturnDate == null && DateTimeHelper.VietnamNow() > DueDate;
-        public int OverdueDays => IsOverdue ? (DateTimeHelper.VietnamNow() - DueDate).Days : 0;
+        public bool IsOverdue => ReturnDate == null && DateTimeHelper.VietnamNow() > DueDate.ToVietnamTime();
+        public int OverdueDays => IsOverdue ? (DateTimeHelper.VietnamNow().Date - DueDate.ToVietnamTime().Date).Days : 0;
         public string StatusDisplay => Status switch
         {
             "Requested" => "Đã đăng ký",

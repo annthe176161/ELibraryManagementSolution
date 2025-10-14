@@ -1,4 +1,5 @@
 using ELibraryManagement.Web.Models;
+using ELibraryManagement.Web.Helpers;
 using System.Text.Json;
 using System.Text;
 
@@ -24,8 +25,8 @@ namespace ELibraryManagement.Web.Services
         public DateTime? ReturnDate { get; set; }
         public string Status { get; set; } = string.Empty;
         public string? Notes { get; set; }
-        public bool IsOverdue => ReturnDate == null && DateTime.UtcNow > DueDate;
-        public int OverdueDays => IsOverdue ? (DateTime.UtcNow - DueDate).Days : 0;
+        public bool IsOverdue => ReturnDate == null && DateTimeHelper.VietnamNow() > DueDate.ToVietnamTime();
+        public int OverdueDays => IsOverdue ? (DateTimeHelper.VietnamNow().Date - DueDate.ToVietnamTime().Date).Days : 0;
         public decimal? FineAmount { get; set; }
         public string? FineStatus { get; set; }
         public string? FineReason { get; set; }

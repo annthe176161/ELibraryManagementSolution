@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using ELibraryManagement.Api.Helpers;
 
 namespace ELibraryManagement.Api.Models
 {
@@ -29,9 +30,10 @@ namespace ELibraryManagement.Api.Models
 
         public DateTime? ConfirmedDate { get; set; } // Ngày admin xác nhận mượn
 
-        public bool IsOverdue => (Status == BorrowStatus.Borrowed || Status == BorrowStatus.Overdue) && ReturnDate == null && DateTime.UtcNow > DueDate;
+        // Use Vietnam local date for overdue calculations to keep consistent with UI
+        public bool IsOverdue => (Status == BorrowStatus.Borrowed || Status == BorrowStatus.Overdue) && ReturnDate == null && DateTimeHelper.VietnamNow() > DueDate.ToVietnamTime();
 
-        public int OverdueDays => IsOverdue ? (DateTime.UtcNow - DueDate).Days : 0;
+        public int OverdueDays => IsOverdue ? (DateTimeHelper.VietnamNow().Date - DueDate.ToVietnamTime().Date).Days : 0;
 
         public bool CanExtend => false; // Chức năng gia hạn đã bị vô hiệu hóa
 

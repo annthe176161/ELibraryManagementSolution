@@ -46,7 +46,8 @@ namespace ELibraryManagement.Api.Services.Implementations
 
                 foreach (var borrowRecord in overdueBorrowRecords)
                 {
-                    var overdueDays = (DateTime.UtcNow - borrowRecord.DueDate).Days;
+                    // Use Vietnam local date to calculate days-overdue (date-only) to avoid off-by-one due to timezones
+                    var overdueDays = (DateTimeHelper.VietnamNow().Date - borrowRecord.DueDate.ToVietnamTime().Date).Days;
                     _logger.LogInformation($"📖 Xử lý borrow record ID {borrowRecord.Id}: {borrowRecord.Book.Title} - quá hạn {overdueDays} ngày");
 
                     var success = await ProcessSingleBorrowRecordAsync(borrowRecord.Id);
@@ -90,7 +91,7 @@ namespace ELibraryManagement.Api.Services.Implementations
                     return false; // Không cần xử lý
                 }
 
-                var overdueDays = (DateTime.UtcNow - borrowRecord.DueDate).Days;
+                var overdueDays = (DateTimeHelper.VietnamNow().Date - borrowRecord.DueDate.ToVietnamTime().Date).Days;
 
                 // Cập nhật trạng thái thành Overdue (nếu chưa phải)
                 if (borrowRecord.Status != BorrowStatus.Overdue)

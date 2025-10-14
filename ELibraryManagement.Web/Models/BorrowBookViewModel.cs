@@ -71,8 +71,8 @@ namespace ELibraryManagement.Web.Models
         public string? FineReason { get; set; }
         // Helper that returns the UTC DateTime to use as borrow start: prefer ConfirmedDate when present
         public DateTime DisplayBorrowDateUtc => ConfirmedDate ?? BorrowDate;
-        public bool IsOverdue => DueDate < DateTimeHelper.VietnamNow() && ReturnDate == null;
-        public int DaysOverdue => IsOverdue ? (DateTimeHelper.VietnamNow() - DueDate).Days : 0;
+        public bool IsOverdue => DueDate.ToVietnamTime() < DateTimeHelper.VietnamNow() && ReturnDate == null;
+        public int DaysOverdue => IsOverdue ? (DateTimeHelper.VietnamNow().Date - DueDate.ToVietnamTime().Date).Days : 0;
         public bool HasFine => FineAmount.HasValue && FineAmount.Value > 0;
         public string FineAmountFormatted => FineAmount.HasValue ? FineAmount.Value.ToString("N0") + " VND" : "Không có phạt";
     }
