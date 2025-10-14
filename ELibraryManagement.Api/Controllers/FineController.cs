@@ -522,7 +522,15 @@ namespace ELibraryManagement.Api.Controllers
                 var pendingFines = await _context.Fines.CountAsync(f => f.Status == FineStatus.Pending);
                 var paidFines = await _context.Fines.CountAsync(f => f.Status == FineStatus.Paid);
                 var waivedFines = await _context.Fines.CountAsync(f => f.Status == FineStatus.Waived);
-                var overdueFines = await _context.Fines.CountAsync(f => f.DueDate.HasValue && f.DueDate < DateTime.UtcNow && f.Status == FineStatus.Pending);
+                // Consider fines that were created because a borrow is overdue (Reason contains "Quá hạn"
+                // or the related BorrowRecord has status Overdue) as "Overdue" for administrative statistics.
+                var overdueFines = await _context.Fines
+                    .Include(f => f.BorrowRecord)
+                    .Where(f => f.Status == FineStatus.Pending && (
+                        (f.Reason != null && f.Reason.Contains("Quá hạn")) ||
+                        (f.BorrowRecord != null && f.BorrowRecord.Status == BorrowStatus.Overdue)
+                    ))
+                    .CountAsync();
 
                 var totalAmount = await _context.Fines.SumAsync(f => f.Amount);
                 var paidAmount = await _context.Fines.Where(f => f.Status == FineStatus.Paid).SumAsync(f => f.Amount);
