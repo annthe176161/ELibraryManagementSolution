@@ -29,15 +29,15 @@ namespace ELibraryManagement.Api.Services.Implementations
             {
                 _logger.LogInformation("🔍 Bắt đầu tìm kiếm sách quá hạn...");
 
-                // Tìm tất cả borrow records đang mượn hoặc đã quá hạn nhưng chưa trả và chưa có phạt
+                // Tìm tất cả borrow records đang mượn hoặc đã quá hạn nhưng chưa trả
+                // QUAN TRỌNG: Không bỏ qua những records đã có phạt để có thể cập nhật phạt theo số ngày quá hạn thực tế
                 var overdueBorrowRecords = await _context.BorrowRecords
                     .Include(br => br.User)
                     .Include(br => br.Book)
                     .Include(br => br.Fines)
                     .Where(br => (br.Status == BorrowStatus.Borrowed || br.Status == BorrowStatus.Overdue)
                               && br.ReturnDate == null
-                              && br.DueDate < DateTime.UtcNow
-                              && !br.Fines.Any()) // Chỉ xử lý records chưa có phạt
+                              && br.DueDate < DateTime.UtcNow)
                     .ToListAsync();
 
                 _logger.LogInformation($"📋 Tìm thấy {overdueBorrowRecords.Count} borrow records quá hạn");
@@ -99,14 +99,17 @@ namespace ELibraryManagement.Api.Services.Implementations
                     borrowRecord.UpdatedAt = DateTime.UtcNow;
                 }
 
-                // Kiểm tra xem đã có fine cho borrow record này chưa
+                // Kiểm tra xem đã có fine chưa thanh toán cho borrow record này chưa
                 var existingFine = borrowRecord.Fines
                     .FirstOrDefault(f => f.Reason.Contains("Quá hạn") && f.Status == FineStatus.Pending);
+
+                var fineAmount = CalculateFineAmount(overdueDays);
+                var isNewFine = false;
+                var oldAmount = 0m;
 
                 if (existingFine == null)
                 {
                     // Tạo fine mới
-                    var fineAmount = CalculateFineAmount(overdueDays);
                     var fine = new Fine
                     {
                         UserId = borrowRecord.UserId, // Thêm UserId từ BorrowRecord
@@ -119,24 +122,67 @@ namespace ELibraryManagement.Api.Services.Implementations
                     };
 
                     _context.Fines.Add(fine);
+                    isNewFine = true;
+                    existingFine = fine; // Để sử dụng cho việc ghi lịch sử sau
 
-                    _logger.LogInformation($"Tạo phạt mới cho borrow record {borrowRecordId}: {fineAmount:C}");
+                    _logger.LogInformation($"✨ Tạo phạt mới cho borrow record {borrowRecordId}: {fineAmount:C} ({overdueDays} ngày)");
                 }
                 else
                 {
-                    // Cập nhật fine hiện tại nếu số tiền thay đổi
-                    var newFineAmount = CalculateFineAmount(overdueDays);
-                    if (existingFine.Amount != newFineAmount)
+                    // Cập nhật fine hiện tại theo số ngày quá hạn thực tế
+                    oldAmount = existingFine.Amount;
+                    if (existingFine.Amount != fineAmount)
                     {
-                        existingFine.Amount = newFineAmount;
+                        existingFine.Amount = fineAmount;
                         existingFine.Reason = $"Quá hạn {overdueDays} ngày - Sách: {borrowRecord.Book.Title}";
                         existingFine.UpdatedAt = DateTime.UtcNow;
 
-                        _logger.LogInformation($"Cập nhật phạt cho borrow record {borrowRecordId}: {newFineAmount:C}");
+                        _logger.LogInformation($"🔄 Cập nhật phạt cho borrow record {borrowRecordId}: {oldAmount:C} → {fineAmount:C} ({overdueDays} ngày)");
+                    }
+                    else
+                    {
+                        _logger.LogInformation($"✅ Phạt cho borrow record {borrowRecordId} đã đúng: {fineAmount:C} ({overdueDays} ngày) - không cần cập nhật");
+                        return true; // Không cần lưu thay đổi
                     }
                 }
 
                 await _context.SaveChangesAsync();
+
+                // Ghi log lịch sử sau khi đã có FineId
+                if (isNewFine)
+                {
+                    var fineHistory = new FineActionHistory
+                    {
+                        FineId = existingFine.Id,
+                        UserId = borrowRecord.UserId,
+                        ActionType = FineActionType.ReminderSent,
+                        Description = $"Tạo phạt quá hạn {overdueDays} ngày",
+                        Amount = fineAmount,
+                        Notes = $"Phạt được tạo tự động do sách quá hạn",
+                        ActionDate = DateTime.UtcNow
+                    };
+                    _context.FineActionHistories.Add(fineHistory);
+                }
+                else if (oldAmount != fineAmount)
+                {
+                    var fineHistory = new FineActionHistory
+                    {
+                        FineId = existingFine.Id,
+                        UserId = borrowRecord.UserId,
+                        ActionType = FineActionType.ReminderSent,
+                        Description = $"Cập nhật phạt từ {oldAmount:C} lên {fineAmount:C} do tăng thêm ngày quá hạn",
+                        Amount = fineAmount,
+                        Notes = $"Cập nhật tự động - hiện tại quá hạn {overdueDays} ngày",
+                        ActionDate = DateTime.UtcNow
+                    };
+                    _context.FineActionHistories.Add(fineHistory);
+                }
+
+                // Lưu lịch sử nếu có
+                if (_context.ChangeTracker.HasChanges())
+                {
+                    await _context.SaveChangesAsync();
+                }
 
                 _logger.LogInformation($"Đã xử lý borrow record {borrowRecordId} quá hạn {overdueDays} ngày");
                 return true;
