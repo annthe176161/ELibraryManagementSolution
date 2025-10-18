@@ -41,8 +41,8 @@ namespace ELibraryManagement.Web.Controllers
                     return RedirectToAction("Login", "Account");
                 }
 
-                // Lấy danh sách sách đã mượn
-                var borrowedBooks = await _bookApiService.GetBorrowedBooksAsync(currentUser.Id, token);
+                // Lấy danh sách lịch sử mượn sách (bao gồm cả sách đã trả)
+                var borrowedBooks = await _bookApiService.GetBorrowHistoryAsync(currentUser.Id, token);
                 var borrowedBook = borrowedBooks.FirstOrDefault(b => b.BorrowRecordId == borrowRecordId);
 
                 if (borrowedBook == null)
@@ -59,13 +59,10 @@ namespace ELibraryManagement.Web.Controllers
                     return RedirectToAction("MyBooks");
                 }
 
-                // Lấy lịch sử mượn trả đầy đủ để tính thống kê
-                var borrowHistory = await _bookApiService.GetBorrowHistoryAsync(currentUser.Id, token);
-
-                // Tính toán thống kê cá nhân
+                // Tính toán thống kê cá nhân từ borrowedBooks (đã là lịch sử đầy đủ)
                 var currentlyActiveBorrows = borrowedBooks?.Where(b =>
                     b.Status == "Borrowed").Count() ?? 0; // Chỉ đếm sách đang mượn thực sự
-                var totalBorrowed = borrowHistory?.Where(b =>
+                var totalBorrowed = borrowedBooks?.Where(b =>
                     b.Status == "Borrowed" || b.Status == "Returned").Count() ?? 0; // Chỉ đếm sách đã mượn và đã trả (loại bỏ Requested, Cancelled)
 
                 // Tạo ViewModel cho borrowed book details
@@ -340,7 +337,8 @@ namespace ELibraryManagement.Web.Controllers
                 // Clear irrelevant success messages (like Google login success) on this page
                 TempData.Remove("SuccessMessage");
 
-                var borrowedBooks = await _bookApiService.GetBorrowedBooksAsync(currentUser.Id, token);
+                // Use GetBorrowHistoryAsync to get all borrow history including returned books
+                var borrowedBooks = await _bookApiService.GetBorrowHistoryAsync(currentUser.Id, token);
 
                 return View(borrowedBooks);
             }

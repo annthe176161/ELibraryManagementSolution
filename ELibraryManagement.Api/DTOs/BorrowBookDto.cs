@@ -49,6 +49,8 @@ namespace ELibraryManagement.Api.DTOs
         public bool IsOverdue => ReturnDate == null && DateTime.UtcNow > DueDate;
         public int OverdueDays => IsOverdue ? (DateTime.UtcNow - DueDate).Days : 0;
         public decimal? FineAmount { get; set; }
+        public string? FineStatus { get; set; }
+        public string? FineReason { get; set; }
     }
 
     public class UpdateBorrowStatusDto

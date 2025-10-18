@@ -8,6 +8,7 @@ namespace ELibraryManagement.Api.Services.Interfaces
         Task<BookDto?> GetBookByIdAsync(int id);
         Task<BorrowBookResponseDto> BorrowBookAsync(BorrowBookRequestDto request);
         Task<IEnumerable<BorrowRecordDto>> GetBorrowedBooksByUserAsync(string userId);
+        Task<IEnumerable<BorrowRecordDto>> GetBorrowHistoryByUserAsync(string userId);
         Task<ReturnBookResponseDto> ReturnBookAsync(int borrowRecordId);
         Task<CancelBorrowRequestResponseDto> CancelBorrowRequestAsync(int borrowRecordId);
 

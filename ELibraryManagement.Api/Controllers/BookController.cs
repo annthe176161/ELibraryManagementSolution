@@ -93,6 +93,17 @@ namespace ELibraryManagement.Api.Controllers
         }
 
         /// <summary>
+        /// Lấy toàn bộ lịch sử mượn sách của user - Yêu cầu đăng nhập
+        /// </summary>
+        [HttpGet("history/{userId}")]
+        [Authorize]
+        public async Task<IActionResult> GetBorrowHistory(string userId)
+        {
+            var borrowHistory = await _bookService.GetBorrowHistoryByUserAsync(userId);
+            return Ok(borrowHistory);
+        }
+
+        /// <summary>
         /// Trả sách - Yêu cầu đăng nhập
         /// </summary>
         [HttpPost("return/{borrowRecordId}")]

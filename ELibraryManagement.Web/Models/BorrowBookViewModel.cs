@@ -63,7 +63,12 @@ namespace ELibraryManagement.Web.Models
         public DateTime? ReturnDate { get; set; }
         public string Status { get; set; } = string.Empty;
         public string? Notes { get; set; }
+        public decimal? FineAmount { get; set; }
+        public string? FineStatus { get; set; }
+        public string? FineReason { get; set; }
         public bool IsOverdue => DueDate < DateTimeHelper.VietnamNow() && ReturnDate == null;
         public int DaysOverdue => IsOverdue ? (DateTimeHelper.VietnamNow() - DueDate).Days : 0;
+        public bool HasFine => FineAmount.HasValue && FineAmount.Value > 0;
+        public string FineAmountFormatted => FineAmount.HasValue ? FineAmount.Value.ToString("N0") + " VND" : "Không có phạt";
     }
 }

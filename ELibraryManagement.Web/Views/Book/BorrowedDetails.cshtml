@@ -414,6 +414,74 @@
                             <div class="detail-value">@Model.BorrowRecord.Notes</div>
                         </div>
                     }
+
+                    <!-- Fine Information -->
+                    @if (Model.BorrowRecord.HasFine)
+                    {
+                        <div class="detail-item">
+                            <div class="detail-label">
+                                <i class="fas fa-money-bill-wave text-danger"></i>
+                                Phí phạt
+                            </div>
+                            <div class="detail-value">
+                                <span class="text-danger fw-bold">@Model.BorrowRecord.FineAmountFormatted</span>
+                            </div>
+                        </div>
+
+                        @if (!string.IsNullOrEmpty(Model.BorrowRecord.FineReason))
+                        {
+                            <div class="detail-item">
+                                <div class="detail-label">
+                                    <i class="fas fa-exclamation-triangle text-warning"></i>
+                                    Lý do phạt
+                                </div>
+                                <div class="detail-value">@Model.BorrowRecord.FineReason</div>
+                            </div>
+                        }
+
+                        @if (!string.IsNullOrEmpty(Model.BorrowRecord.FineStatus))
+                        {
+                            <div class="detail-item">
+                                <div class="detail-label">
+                                    <i class="fas fa-info-circle text-info"></i>
+                                    Trạng thái phạt
+                                </div>
+                                <div class="detail-value">
+                                    @{
+                                        var fineStatusClass = Model.BorrowRecord.FineStatus.ToLower() switch
+                                        {
+                                            "pending" => "badge bg-warning",
+                                            "paid" => "badge bg-success",
+                                            "waived" => "badge bg-info",
+                                            "overdue" => "badge bg-danger",
+                                            _ => "badge bg-secondary"
+                                        };
+                                        var fineStatusText = Model.BorrowRecord.FineStatus.ToLower() switch
+                                        {
+                                            "pending" => "Chưa thanh toán",
+                                            "paid" => "Đã thanh toán",
+                                            "waived" => "Đã miễn",
+                                            "overdue" => "Quá hạn thanh toán",
+                                            _ => Model.BorrowRecord.FineStatus
+                                        };
+                                    }
+                                    <span class="@fineStatusClass">@fineStatusText</span>
+                                </div>
+                            </div>
+                        }
+                    }
+                    else
+                    {
+                        <div class="detail-item">
+                            <div class="detail-label">
+                                <i class="fas fa-check-circle text-success"></i>
+                                Phí phạt
+                            </div>
+                            <div class="detail-value">
+                                <span class="text-success">Không có phạt</span>
+                            </div>
+                        </div>
+                    }
                 </div>
             </div>
 

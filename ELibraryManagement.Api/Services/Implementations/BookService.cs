@@ -214,6 +214,45 @@ namespace ELibraryManagement.Api.Services.Implementations
             return borrowedRecords;
         }
 
+        public async Task<IEnumerable<BorrowRecordDto>> GetBorrowHistoryByUserAsync(string userId)
+        {
+            var borrowHistory = await _context.BorrowRecords
+                .Where(br => br.UserId == userId)
+                .Include(br => br.Book)
+                .Include(br => br.Fines) // Include Fine information
+                .OrderByDescending(br => br.BorrowDate)
+                .Select(br => new BorrowRecordDto
+                {
+                    Id = br.Id,
+                    BookId = br.BookId,
+                    BookTitle = br.Book.Title,
+                    BookAuthor = br.Book.Author,
+                    BookCoverUrl = br.Book.CoverImageUrl ?? "",
+                    UserId = br.UserId,
+                    BorrowDate = br.BorrowDate,
+                    DueDate = br.DueDate,
+                    ReturnDate = br.ReturnDate,
+                    Status = br.Status.ToString(),
+                    Notes = br.Notes,
+                    // Add fine information
+                    FineAmount = br.Fines.Where(f => f.BorrowRecordId == br.Id).Sum(f => f.Amount),
+                    FineStatus = br.Fines.Any(f => f.BorrowRecordId == br.Id) ?
+                                br.Fines.Where(f => f.BorrowRecordId == br.Id).OrderByDescending(f => f.CreatedAt).First().Status.ToString() : null,
+                    FineReason = br.Fines.Any(f => f.BorrowRecordId == br.Id) ?
+                                br.Fines.Where(f => f.BorrowRecordId == br.Id).OrderByDescending(f => f.CreatedAt).First().Reason : null
+                })
+                .ToListAsync();
+
+            // Debug logging
+            Console.WriteLine($"Found {borrowHistory.Count} history records for user {userId}");
+            foreach (var record in borrowHistory)
+            {
+                Console.WriteLine($"Book: {record.BookTitle}, Status: {record.Status}, Fine: {record.FineAmount}");
+            }
+
+            return borrowHistory;
+        }
+
         public async Task<ReturnBookResponseDto> ReturnBookAsync(int borrowRecordId)
         {
             var borrowRecord = await _context.BorrowRecords

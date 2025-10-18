@@ -1147,7 +1147,7 @@ namespace ELibraryManagement.Web.Services
                 _httpClient.DefaultRequestHeaders.Authorization =
                     new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
-                var response = await _httpClient.GetAsync($"{apiBaseUrl}/api/Borrow/user/{userId}");
+                var response = await _httpClient.GetAsync($"{apiBaseUrl}/api/Book/history/{userId}");
                 var responseContent = await response.Content.ReadAsStringAsync();
 
                 if (response.IsSuccessStatusCode)
@@ -1165,7 +1165,10 @@ namespace ELibraryManagement.Web.Services
                         DueDate = GetPropertyValue<DateTime>(borrow, "dueDate"),
                         ReturnDate = GetPropertyValue<DateTime?>(borrow, "returnDate"),
                         Status = GetPropertyValue<string>(borrow, "status") ?? "",
-                        Notes = GetPropertyValue<string>(borrow, "notes")
+                        Notes = GetPropertyValue<string>(borrow, "notes"),
+                        FineAmount = GetPropertyValue<decimal?>(borrow, "fineAmount"),
+                        FineStatus = GetPropertyValue<string>(borrow, "fineStatus"),
+                        FineReason = GetPropertyValue<string>(borrow, "fineReason")
                     }).ToList() ?? new List<UserBorrowedBookViewModel>();
                 }
 
