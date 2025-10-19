@@ -42,12 +42,13 @@ namespace ELibraryManagement.Api.Controllers
                 var roles = await _userManager.GetRolesAsync(user);
 
                 // Calculate ActiveBorrows and TotalBorrows for each user
+                // Treat Overdue as active so admin shows overdue items under "Đang mượn"
                 var activeBorrowsCount = await _context.BorrowRecords
-                    .Where(br => br.UserId == user.Id && br.Status == BorrowStatus.Borrowed)
+                    .Where(br => br.UserId == user.Id && (br.Status == BorrowStatus.Borrowed || br.Status == BorrowStatus.Overdue))
                     .CountAsync();
 
                 var totalBorrowsCount = await _context.BorrowRecords
-                    .Where(br => br.UserId == user.Id && (br.Status == BorrowStatus.Borrowed || br.Status == BorrowStatus.Returned))
+                    .Where(br => br.UserId == user.Id && (br.Status == BorrowStatus.Borrowed || br.Status == BorrowStatus.Returned || br.Status == BorrowStatus.Overdue))
                     .CountAsync();
 
                 userDtos.Add(new UserDto
@@ -299,14 +300,14 @@ namespace ELibraryManagement.Api.Controllers
 
                 var roles = await _userManager.GetRolesAsync(user);
 
-                // Calculate ActiveBorrows - count borrow records with status "Borrowed"
+                // Calculate ActiveBorrows - count borrow records with status Borrowed or Overdue
                 var activeBorrowsCount = await _context.BorrowRecords
-                    .Where(br => br.UserId == user.Id && br.Status == BorrowStatus.Borrowed)
+                    .Where(br => br.UserId == user.Id && (br.Status == BorrowStatus.Borrowed || br.Status == BorrowStatus.Overdue))
                     .CountAsync();
 
-                // Calculate TotalBorrows - count borrow records that have been actually borrowed (Borrowed or Returned)
+                // Calculate TotalBorrows - count borrow records that were borrowed (Borrowed, Returned, or Overdue)
                 var totalBorrowsCount = await _context.BorrowRecords
-                    .Where(br => br.UserId == user.Id && (br.Status == BorrowStatus.Borrowed || br.Status == BorrowStatus.Returned))
+                    .Where(br => br.UserId == user.Id && (br.Status == BorrowStatus.Borrowed || br.Status == BorrowStatus.Returned || br.Status == BorrowStatus.Overdue))
                     .CountAsync();
 
                 var result = new
