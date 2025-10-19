@@ -269,6 +269,28 @@ namespace ELibraryManagement.Api.Controllers
                     var reminderNote = $"MANUAL_REMINDER_{DateTime.UtcNow:yyyy-MM-dd_HH:mm} - Email nhắc nhở gửi thủ công bởi admin";
                     borrowRecord.Notes = $"{borrowRecord.Notes}\n{reminderNote}";
                     borrowRecord.UpdatedAt = DateTime.UtcNow;
+                    // If there's a pending fine related to this borrow, increment reminder count and add history
+                    var fine = await _context.Fines.FirstOrDefaultAsync(f => f.BorrowRecordId == borrowRecord.Id && f.Status == FineStatus.Pending);
+                    if (fine != null)
+                    {
+                        fine.ReminderCount += 1;
+                        fine.LastReminderDate = DateTime.UtcNow;
+
+                        var history = new FineActionHistory
+                        {
+                            FineId = fine.Id,
+                            UserId = borrowRecord.UserId ?? string.Empty,
+                            ActionType = FineActionType.ReminderSent,
+                            Description = $"Gửi nhắc nhở thủ công - Borrow ID {borrowRecord.Id}",
+                            Amount = fine.Amount,
+                            Notes = "Gửi nhắc nhở thủ công bởi admin",
+                            ActionDate = DateTime.UtcNow,
+                            CreatedAt = DateTime.UtcNow
+                        };
+
+                        _context.FineActionHistories.Add(history);
+                    }
+
                     await _context.SaveChangesAsync();
 
                     return Ok(new

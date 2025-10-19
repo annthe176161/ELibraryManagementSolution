@@ -126,7 +126,7 @@ namespace ELibraryManagement.Api.Services.Implementations
                     isNewFine = true;
                     existingFine = fine; // Để sử dụng cho việc ghi lịch sử sau
 
-                    _logger.LogInformation($"✨ Tạo phạt mới cho borrow record {borrowRecordId}: {fineAmount:C} ({overdueDays} ngày)");
+                    _logger.LogInformation($"✨ Tạo phạt mới cho borrow record {borrowRecordId}: {fineAmount:N0} VND ({overdueDays} ngày)");
                 }
                 else
                 {
@@ -138,11 +138,11 @@ namespace ELibraryManagement.Api.Services.Implementations
                         existingFine.Reason = $"Quá hạn {overdueDays} ngày - Sách: {borrowRecord.Book.Title}";
                         existingFine.UpdatedAt = DateTime.UtcNow;
 
-                        _logger.LogInformation($"🔄 Cập nhật phạt cho borrow record {borrowRecordId}: {oldAmount:C} → {fineAmount:C} ({overdueDays} ngày)");
+                        _logger.LogInformation($"🔄 Cập nhật phạt cho borrow record {borrowRecordId}: {oldAmount:N0} VND → {fineAmount:N0} VND ({overdueDays} ngày)");
                     }
                     else
                     {
-                        _logger.LogInformation($"✅ Phạt cho borrow record {borrowRecordId} đã đúng: {fineAmount:C} ({overdueDays} ngày) - không cần cập nhật");
+                        _logger.LogInformation($"✅ Phạt cho borrow record {borrowRecordId} đã đúng: {fineAmount:N0} VND ({overdueDays} ngày) - không cần cập nhật");
                         return true; // Không cần lưu thay đổi
                     }
                 }
@@ -171,7 +171,7 @@ namespace ELibraryManagement.Api.Services.Implementations
                         FineId = existingFine.Id,
                         UserId = borrowRecord.UserId,
                         ActionType = FineActionType.ReminderSent,
-                        Description = $"Cập nhật phạt từ {oldAmount:C} lên {fineAmount:C} do tăng thêm ngày quá hạn",
+                        Description = $"Cập nhật phạt từ {oldAmount:N0} VND lên {fineAmount:N0} VND do tăng thêm ngày quá hạn",
                         Amount = fineAmount,
                         Notes = $"Cập nhật tự động - hiện tại quá hạn {overdueDays} ngày",
                         ActionDate = DateTime.UtcNow
