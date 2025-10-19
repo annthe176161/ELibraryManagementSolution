@@ -550,10 +550,7 @@
 
                     <div class="stat-card">
                         <div class="stat-value">
-                            @{
-                                var overdueCount = 0; // Placeholder - cần API để lấy số liệu thực
-                            }
-                            @overdueCount
+                            @((int?)ViewBag.OverdueCount ?? 0)
                         </div>
                         <div class="stat-label">Lần quá hạn</div>
                     </div>

@@ -222,9 +222,10 @@ namespace ELibraryManagement.Api.Services.Implementations
             // Use int values for enum comparison to ensure proper SQL translation
             var requestedStatus = (int)BorrowStatus.Requested;
             var borrowedStatus = (int)BorrowStatus.Borrowed;
+            var overdueStatus = (int)BorrowStatus.Overdue;
 
             var borrowedRecords = await _context.BorrowRecords
-                .Where(br => br.UserId == userId && ((int)br.Status == requestedStatus || (int)br.Status == borrowedStatus))
+                .Where(br => br.UserId == userId && ((int)br.Status == requestedStatus || (int)br.Status == borrowedStatus || (int)br.Status == overdueStatus))
                 .Include(br => br.Book)
                 .OrderByDescending(br => br.BorrowDate)
                 .Select(br => new BorrowRecordDto

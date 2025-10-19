@@ -60,10 +60,9 @@ namespace ELibraryManagement.Web.Controllers
                 }
 
                 // Tính toán thống kê cá nhân từ borrowedBooks (đã là lịch sử đầy đủ)
-                var currentlyActiveBorrows = borrowedBooks?.Where(b =>
-                    b.Status == "Borrowed").Count() ?? 0; // Chỉ đếm sách đang mượn thực sự
-                var totalBorrowed = borrowedBooks?.Where(b =>
-                    b.Status == "Borrowed" || b.Status == "Returned").Count() ?? 0; // Chỉ đếm sách đã mượn và đã trả (loại bỏ Requested, Cancelled)
+                // Treat Overdue as active so overdue items appear in "Sách đang mượn"
+                var currentlyActiveBorrows = borrowedBooks?.Where(b => b.Status == "Borrowed" || b.Status == "Overdue").Count() ?? 0;
+                var totalBorrowed = borrowedBooks?.Where(b => b.Status == "Borrowed" || b.Status == "Returned" || b.Status == "Overdue").Count() ?? 0; // Count Borrowed, Returned and Overdue
 
                 // Tạo ViewModel cho borrowed book details
                 var viewModel = new BorrowedBookDetailViewModel
@@ -75,6 +74,8 @@ namespace ELibraryManagement.Web.Controllers
                 // Truyền thông tin thống kê qua ViewBag
                 ViewBag.CurrentActiveBorrows = currentlyActiveBorrows;
                 ViewBag.TotalBorrowed = totalBorrowed;
+                // Number of times the user had overdue borrows
+                ViewBag.OverdueCount = borrowedBooks?.Count(b => b.IsOverdue) ?? 0;
 
                 return View(viewModel);
             }
