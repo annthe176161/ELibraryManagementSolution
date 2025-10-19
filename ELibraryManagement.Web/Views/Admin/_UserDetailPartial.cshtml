@@ -258,6 +258,10 @@
                                                 {
                                                     <span class="badge bg-secondary">Đã hủy</span>
                                                 }
+                                                else if (borrow.Status == "Overdue")
+                                                {
+                                                    <span class="badge bg-danger">Quá hạn</span>
+                                                }
                                                 else
                                                 {
                                                     <span class="badge bg-light text-dark">@borrow.Status</span>
