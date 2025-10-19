@@ -120,8 +120,9 @@ namespace ELibraryManagement.Web.Controllers
                 var allBorrowedBooks = await _bookApiService.GetBorrowedBooksAsync(currentUser?.Id ?? "", token ?? "");
 
                 // Filter only currently borrowed books (exclude requested, cancelled and returned)
+                // Treat Overdue as active so overdue items still count toward the user's limit
                 var currentlyBorrowedBooks = allBorrowedBooks?.Where(b =>
-                    b.Status == "Borrowed").ToList() ?? new List<UserBorrowedBookViewModel>();
+                    b.Status == "Borrowed" || b.Status == "Overdue").ToList() ?? new List<UserBorrowedBookViewModel>();
                 var currentBorrowedCount = currentlyBorrowedBooks.Count;
                 var maxBooksAllowed = 5;
                 var canBorrow = currentBorrowedCount < maxBooksAllowed;
