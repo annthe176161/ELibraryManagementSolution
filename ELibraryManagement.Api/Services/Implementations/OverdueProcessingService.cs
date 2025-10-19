@@ -163,6 +163,9 @@ namespace ELibraryManagement.Api.Services.Implementations
                         ActionDate = DateTime.UtcNow
                     };
                     _context.FineActionHistories.Add(fineHistory);
+                    // Update reminder counters on the fine so UI/statistics reflect reminder actions
+                    existingFine.ReminderCount += 1;
+                    existingFine.LastReminderDate = DateTime.UtcNow;
                 }
                 else if (oldAmount != fineAmount)
                 {
@@ -177,6 +180,9 @@ namespace ELibraryManagement.Api.Services.Implementations
                         ActionDate = DateTime.UtcNow
                     };
                     _context.FineActionHistories.Add(fineHistory);
+                    // Update reminder metadata so reminder count and date are accurate
+                    existingFine.ReminderCount += 1;
+                    existingFine.LastReminderDate = DateTime.UtcNow;
                 }
 
                 // Lưu lịch sử nếu có

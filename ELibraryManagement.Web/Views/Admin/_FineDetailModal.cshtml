@@ -117,11 +117,7 @@
                             <dd class="col-sm-7">@Model.UpdatedAt.Value.ToString("dd/MM/yyyy HH:mm")</dd>
                         }
                         
-                        <dt class="col-sm-5">Số lần nhắc:</dt>
-                        <dd class="col-sm-7">
-                            @{ var reminderClass = Model.ReminderCount > 0 ? "bg-danger text-white" : "bg-secondary text-white"; }
-                            <span class="badge @reminderClass">@Model.ReminderCount lần</span>
-                        </dd>
+                        <!-- Reminder count removed per UX request -->
                     </dl>
                 </div>
             </div>

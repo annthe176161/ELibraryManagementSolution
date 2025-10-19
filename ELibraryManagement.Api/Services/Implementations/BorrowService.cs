@@ -43,8 +43,9 @@ namespace ELibraryManagement.Api.Services.Implementations
                     ReturnDate = br.ReturnDate,
                     Status = br.Status.ToString(),
                     Notes = br.Notes,
+                    // Include all fines (pending or paid) so the admin list can display amounts even after payment
                     FineAmount = _context.Fines
-                        .Where(f => f.BorrowRecordId == br.Id && f.Status == FineStatus.Pending)
+                        .Where(f => f.BorrowRecordId == br.Id)
                         .Sum(f => (decimal?)f.Amount)
                 })
                 .ToListAsync();
@@ -75,8 +76,9 @@ namespace ELibraryManagement.Api.Services.Implementations
                     ReturnDate = br.ReturnDate,
                     Status = br.Status.ToString(),
                     Notes = br.Notes,
+                    // Include all fines (pending or paid)
                     FineAmount = _context.Fines
-                        .Where(f => f.BorrowRecordId == br.Id && f.Status == FineStatus.Pending)
+                        .Where(f => f.BorrowRecordId == br.Id)
                         .Sum(f => (decimal?)f.Amount)
                 })
                 .FirstOrDefaultAsync();
