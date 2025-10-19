@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ELibraryManagement.Api.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20251012172641_InitialCreate")]
+    [Migration("20251019083152_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -103,8 +103,8 @@ namespace ELibraryManagement.Api.Migrations
 
                     b.Property<string>("StudentId")
                         .IsRequired()
-                        .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
 
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
