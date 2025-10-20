@@ -233,18 +233,37 @@
         position: relative;
     }
 
+    .password-group .modern-input {
+        padding-right: 2.75rem;
+    }
+
+    /* Hide native browser password reveal buttons (Chrome/Edge/IE) to avoid duplicate icons */
+    input[type="password"]::-ms-reveal,
+    input[type="password"]::-ms-clear,
+    input[type="password"]::-webkit-textfield-decoration-container,
+    input[type="password"]::-webkit-credentials-auto-fill-button,
+    input[type="password"]::-webkit-inner-spin-button,
+    input[type="password"]::-webkit-search-decoration {
+        display: none !important;
+        width: 0 !important;
+        height: 0 !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+    }
+
     .password-toggle-btn {
         position: absolute;
-        right: 0.75rem;
+        right: 0.5rem;
         top: 50%;
         transform: translateY(-50%);
         background: none;
         border: none;
         color: var(--gray-400);
         cursor: pointer;
-        padding: 0.5rem;
+        padding: 0.5rem 0.75rem;
         border-radius: 6px;
         transition: all 0.3s ease;
+        font-size: 1rem;
     }
 
     .password-toggle-btn:hover {
@@ -581,7 +600,7 @@
                         <input asp-for="Password" id="Password" class="modern-input" type="password"
                             placeholder="Nhập mật khẩu của bạn..." />
                         <button type="button" class="password-toggle-btn" onclick="togglePassword()">
-                            <i class="fas fa-eye" id="toggleIcon"></i>
+                            <span id="toggleText">Hiện</span>
                         </button>
                     </div>
                     <span asp-validation-for="Password" class="validation-error"></span>
@@ -631,16 +650,14 @@
     <script>
         function togglePassword() {
             const field = document.getElementById('Password');
-            const icon = document.getElementById('toggleIcon');
+            const toggleText = document.getElementById('toggleText');
 
             if (field.type === 'password') {
                 field.type = 'text';
-                icon.classList.remove('fa-eye');
-                icon.classList.add('fa-eye-slash');
+                toggleText.textContent = 'Ẩn';
             } else {
                 field.type = 'password';
-                icon.classList.remove('fa-eye-slash');
-                icon.classList.add('fa-eye');
+                toggleText.textContent = 'Hiện';
             }
         }
 
