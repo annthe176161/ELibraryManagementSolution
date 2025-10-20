@@ -212,10 +212,36 @@
 
     .input-group {
         position: relative;
+        overflow: visible;
+        /* ensure toggle button isn't clipped */
     }
 
     .input-group .form-control {
-        padding-right: 3rem;
+        padding-right: 4.5rem;
+        /* leave more space for toggle button */
+    }
+
+    /* Hide native browser password reveal buttons on inputs inside register page */
+    input[type="password"]::-ms-reveal,
+    input[type="password"]::-ms-clear,
+    input[type="password"]::-webkit-textfield-decoration-container,
+    input[type="password"]::-webkit-credentials-auto-fill-button,
+    input[type="password"]::-webkit-inner-spin-button,
+    input[type="password"]::-webkit-search-decoration,
+    input[type="password"]::-webkit-clear-button,
+    input[type="password"]::-webkit-password-reveal-button,
+    input[type="password"]::-webkit-password-reveal {
+        display: none !important;
+        width: 0 !important;
+        height: 0 !important;
+        opacity: 0 !important;
+        pointer-events: none !important;
+    }
+
+    /* Ensure the input itself doesn't add browser-specific appearance that may overlap */
+    input[type="password"] {
+        -webkit-appearance: none !important;
+        appearance: none !important;
     }
 
     .toggle-password-btn {
@@ -230,6 +256,9 @@
         background: white;
         color: #6b7280;
         transition: all 0.3s ease;
+        z-index: 9999;
+        /* ensure it's on top of input and any browser UI */
+        pointer-events: auto;
     }
 
     .toggle-password-btn:hover {
@@ -484,6 +513,7 @@
                     <div class="input-group">
                         <input asp-for="Password" type="password" id="Password" class="form-control"
                             placeholder="Nhập mật khẩu" />
+                        <button type="button" class="toggle-password-btn" id="togglePasswordBtn">Hiện</button>
                     </div>
                     <span asp-validation-for="Password" class="text-danger"></span>
                 </div>
@@ -495,6 +525,7 @@
                     <div class="input-group">
                         <input asp-for="ConfirmPassword" type="password" id="ConfirmPassword" class="form-control"
                             placeholder="Nhập lại mật khẩu" />
+                        <button type="button" class="toggle-password-btn" id="toggleConfirmPasswordBtn">Hiện</button>
                     </div>
                     <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
                 </div>
@@ -550,6 +581,8 @@
     document.addEventListener('DOMContentLoaded', function () {
         const passwordInput = document.getElementById('Password');
         const confirmPasswordInput = document.getElementById('ConfirmPassword');
+        const togglePasswordBtn = document.getElementById('togglePasswordBtn');
+        const toggleConfirmPasswordBtn = document.getElementById('toggleConfirmPasswordBtn');
 
         function validatePasswords() {
             const password = passwordInput.value;
@@ -565,6 +598,30 @@
         if (passwordInput && confirmPasswordInput) {
             passwordInput.addEventListener('input', validatePasswords);
             confirmPasswordInput.addEventListener('input', validatePasswords);
+        }
+
+        // Toggle password visibility handlers
+        function toggleFieldVisibility(inputEl, buttonEl) {
+            if (!inputEl || !buttonEl) return;
+            if (inputEl.type === 'password') {
+                inputEl.type = 'text';
+                buttonEl.textContent = 'Ẩn';
+            } else {
+                inputEl.type = 'password';
+                buttonEl.textContent = 'Hiện';
+            }
+        }
+
+        if (togglePasswordBtn) {
+            togglePasswordBtn.addEventListener('click', function () {
+                toggleFieldVisibility(passwordInput, togglePasswordBtn);
+            });
+        }
+
+        if (toggleConfirmPasswordBtn) {
+            toggleConfirmPasswordBtn.addEventListener('click', function () {
+                toggleFieldVisibility(confirmPasswordInput, toggleConfirmPasswordBtn);
+            });
         }
 
         // Form validation feedback
