@@ -446,14 +446,6 @@
             <!-- Basic Information -->
             <div class="form-row">
                 <div class="form-group">
-                    <label asp-for="UserName" class="form-label">
-                        <i class="fas fa-user"></i>
-                        Tên đăng nhập
-                    </label>
-                    <input asp-for="UserName" class="form-control" placeholder="Nhập tên đăng nhập" />
-                    <span asp-validation-for="UserName" class="text-danger"></span>
-                </div>
-                <div class="form-group">
                     <label asp-for="Email" class="form-label">
                         <i class="fas fa-envelope"></i>
                         Email
@@ -461,10 +453,6 @@
                     <input asp-for="Email" class="form-control" placeholder="Nhập địa chỉ email" />
                     <span asp-validation-for="Email" class="text-danger"></span>
                 </div>
-            </div>
-
-            <!-- Personal Information -->
-            <div class="form-row">
                 <div class="form-group">
                     <label asp-for="FirstName" class="form-label">
                         <i class="fas fa-id-card"></i>
@@ -473,6 +461,10 @@
                     <input asp-for="FirstName" class="form-control" placeholder="Nhập họ" />
                     <span asp-validation-for="FirstName" class="text-danger"></span>
                 </div>
+            </div>
+
+            <!-- Name Information -->
+            <div class="form-row">
                 <div class="form-group">
                     <label asp-for="LastName" class="form-label">
                         <i class="fas fa-id-card"></i>
@@ -480,6 +472,14 @@
                     </label>
                     <input asp-for="LastName" class="form-control" placeholder="Nhập tên" />
                     <span asp-validation-for="LastName" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="PhoneNumber" class="form-label">
+                        <i class="fas fa-phone"></i>
+                        Số điện thoại
+                    </label>
+                    <input asp-for="PhoneNumber" class="form-control" placeholder="Nhập số điện thoại" />
+                    <span asp-validation-for="PhoneNumber" class="text-danger"></span>
                 </div>
             </div>
 
@@ -494,12 +494,12 @@
                     <span asp-validation-for="StudentId" class="text-danger"></span>
                 </div>
                 <div class="form-group">
-                    <label asp-for="PhoneNumber" class="form-label">
-                        <i class="fas fa-phone"></i>
-                        Số điện thoại
+                    <label asp-for="DateOfBirth" class="form-label">
+                        <i class="fas fa-calendar"></i>
+                        Ngày sinh
                     </label>
-                    <input asp-for="PhoneNumber" class="form-control" placeholder="Nhập số điện thoại" />
-                    <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                    <input asp-for="DateOfBirth" type="date" class="form-control" />
+                    <span asp-validation-for="DateOfBirth" class="text-danger"></span>
                 </div>
             </div>
 
@@ -531,16 +531,7 @@
                 </div>
             </div>
 
-            <!-- Additional Information -->
-            <div class="form-group">
-                <label asp-for="DateOfBirth" class="form-label">
-                    <i class="fas fa-calendar"></i>
-                    Ngày sinh
-                </label>
-                <input asp-for="DateOfBirth" type="date" class="form-control" />
-                <span asp-validation-for="DateOfBirth" class="text-danger"></span>
-            </div>
-
+            <!-- Address Section -->
             <div class="form-group full-width">
                 <label asp-for="Address" class="form-label">
                     <i class="fas fa-map-marker-alt"></i>

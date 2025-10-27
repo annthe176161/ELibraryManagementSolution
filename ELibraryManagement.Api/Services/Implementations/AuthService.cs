@@ -94,8 +94,8 @@ namespace ELibraryManagement.Api.Services.Implementations
                 Email = request.Email,
                 FirstName = request.FirstName,
                 LastName = request.LastName,
-                StudentId = request.StudentId,
-                Address = request.Address,
+                StudentId = request.StudentId ?? "", // Set empty string if null
+                Address = request.Address ?? "", // Set empty string if null
                 PhoneNumber = request.PhoneNumber,
                 DateOfBirth = request.DateOfBirth,
                 CreatedAt = DateTime.UtcNow,
@@ -147,6 +147,26 @@ namespace ELibraryManagement.Api.Services.Implementations
                 };
             }
 
+            // Check if user is locked/disabled before password check
+            if (!user.IsActive)
+            {
+                return new AuthResponseDto
+                {
+                    Success = false,
+                    Message = "Tài khoản của bạn đã bị khóa. Vui lòng liên hệ quản trị viên để được hỗ trợ."
+                };
+            }
+
+            // Check if account is locked out
+            if (await _userManager.IsLockedOutAsync(user))
+            {
+                return new AuthResponseDto
+                {
+                    Success = false,
+                    Message = "Tài khoản của bạn đã bị khóa. Vui lòng liên hệ quản trị viên để được hỗ trợ."
+                };
+            }
+
             var result = await _signInManager.CheckPasswordSignInAsync(user, request.Password, false);
 
             if (!result.Succeeded)
@@ -165,16 +185,6 @@ namespace ELibraryManagement.Api.Services.Implementations
                 {
                     Success = false,
                     Message = "Vui lòng xác nhận địa chỉ email của bạn trước khi đăng nhập. Kiểm tra email để nhận liên kết xác nhận."
-                };
-            }
-
-            // Check if user is active
-            if (!user.IsActive)
-            {
-                return new AuthResponseDto
-                {
-                    Success = false,
-                    Message = "Tài khoản của bạn đã bị vô hiệu hóa. Vui lòng liên hệ quản trị viên để được hỗ trợ."
                 };
             }
 
@@ -369,8 +379,14 @@ namespace ELibraryManagement.Api.Services.Implementations
                     }
                     user.StudentId = request.StudentId;
                 }
+                else if (string.IsNullOrWhiteSpace(request.StudentId))
+                {
+                    // Nếu StudentId trống, set empty string thay vì null
+                    user.StudentId = "";
+                }
+
                 user.DateOfBirth = request.DateOfBirth;
-                user.Address = request.Address;
+                user.Address = request.Address ?? ""; // Set empty string if null
 
                 // Only update AvatarUrl if it's explicitly provided (not null or empty)
                 if (!string.IsNullOrEmpty(request.AvatarUrl))

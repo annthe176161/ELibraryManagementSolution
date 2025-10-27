@@ -30,11 +30,13 @@ namespace ELibraryManagement.Api.Controllers
         {
             // Trim common input fields to avoid accidental leading/trailing spaces
             request.Email = request.Email?.Trim();
-            request.UserName = request.UserName?.Trim();
             request.Password = request.Password?.Trim();
             request.ConfirmPassword = request.ConfirmPassword?.Trim();
             request.StudentId = request.StudentId?.Trim();
             request.PhoneNumber = request.PhoneNumber?.Trim();
+
+            // Generate UserName from Email
+            request.UserName = request.Email;
 
             // Re-validate model after normalization
             ModelState.Clear();
@@ -375,6 +377,30 @@ namespace ELibraryManagement.Api.Controllers
                 email = request.Email,
                 resetToken = resetToken,
                 message = "Use this token in the 'token' field of reset-password endpoint (NOT in Authorization header!)"
+            });
+        }
+
+        /// <summary>
+        /// [DEV ONLY] Get email confirmation token for testing - REMOVE IN PRODUCTION!
+        /// </summary>
+        [HttpPost("dev/get-confirm-token")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetConfirmTokenForDev([FromBody] ResendEmailConfirmationDto request)
+        {
+            var user = await _signInManager.UserManager.FindByEmailAsync(request.Email);
+            if (user == null)
+            {
+                return BadRequest(new { success = false, message = "User not found" });
+            }
+
+            var confirmToken = await _signInManager.UserManager.GenerateEmailConfirmationTokenAsync(user);
+
+            return Ok(new
+            {
+                success = true,
+                email = request.Email,
+                confirmToken = confirmToken,
+                message = "Use this token in the confirm-email endpoint URL"
             });
         }
     }

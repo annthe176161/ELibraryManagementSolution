@@ -16,7 +16,6 @@ Content-Type: application/json
   "email": "user@example.com",
   "password": "Password123!",
   "confirmPassword": "Password123!",
-  "userName": "testuser",
   "firstName": "Test",
   "lastName": "User",
   "phoneNumber": "0123456789",

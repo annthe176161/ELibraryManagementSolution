@@ -43,7 +43,6 @@ namespace ELibraryManagement.Web.Services.Implementations
                     email = model.Email,
                     password = model.Password,
                     confirmPassword = model.ConfirmPassword,
-                    userName = model.UserName,
                     firstName = model.FirstName,
                     lastName = model.LastName,
                     studentId = model.StudentId,
@@ -58,29 +57,45 @@ namespace ELibraryManagement.Web.Services.Implementations
                 var response = await _httpClient.PostAsync($"{apiBaseUrl}/api/auths/register", content);
                 var responseContent = await response.Content.ReadAsStringAsync();
 
-                if (response.IsSuccessStatusCode)
+                try
                 {
-                    var apiResponse = JsonSerializer.Deserialize<JsonElement>(responseContent, _jsonOptions);
-                    return new AuthResponseViewModel
+                    if (response.IsSuccessStatusCode)
                     {
-                        Success = true,
-                        Message = "Đăng ký thành công! Bạn có thể đăng nhập ngay bây giờ.",
-                        Token = GetJsonProperty<string>(apiResponse, "token"),
-                        User = ParseUser(apiResponse)
-                    };
+                        var apiResponse = JsonSerializer.Deserialize<JsonElement>(responseContent, _jsonOptions);
+                        return new AuthResponseViewModel
+                        {
+                            Success = true,
+                            Message = "Đăng ký thành công! Bạn có thể đăng nhập ngay bây giờ.",
+                            Token = GetJsonProperty<string>(apiResponse, "token"),
+                            User = ParseUser(apiResponse)
+                        };
+                    }
+                    else
+                    {
+                        var errorResponse = JsonSerializer.Deserialize<JsonElement>(responseContent, _jsonOptions);
+                        return new AuthResponseViewModel
+                        {
+                            Success = false,
+                            Message = GetJsonProperty<string>(errorResponse, "message") ?? "Đăng ký thất bại"
+                        };
+                    }
                 }
-                else
+                catch (JsonException jsonEx)
                 {
-                    var errorResponse = JsonSerializer.Deserialize<JsonElement>(responseContent, _jsonOptions);
+                    // Response không phải JSON, có thể là HTML error page
+                    System.Diagnostics.Debug.WriteLine($"JSON Parse Error: {jsonEx.Message}");
+                    System.Diagnostics.Debug.WriteLine($"Response Content: {responseContent.Substring(0, Math.Min(200, responseContent.Length))}");
+
                     return new AuthResponseViewModel
                     {
                         Success = false,
-                        Message = GetJsonProperty<string>(errorResponse, "message") ?? "Đăng ký thất bại"
+                        Message = $"Lỗi server: Không thể parse response. Status Code: {response.StatusCode}"
                     };
                 }
             }
             catch (Exception ex)
             {
+                System.Diagnostics.Debug.WriteLine($"Exception in RegisterAsync: {ex.Message}");
                 return new AuthResponseViewModel
                 {
                     Success = false,
@@ -406,11 +421,24 @@ namespace ELibraryManagement.Web.Services.Implementations
                     return result ?? new AuthResponseViewModel { Success = true, Message = "Cập nhật thông tin thành công!" };
                 }
 
-                return new AuthResponseViewModel
+                try
                 {
-                    Success = false,
-                    Message = $"Cập nhật thông tin thất bại: {responseContent}"
-                };
+                    var errorResponse = JsonSerializer.Deserialize<JsonElement>(responseContent, _jsonOptions);
+                    var message = GetJsonProperty<string>(errorResponse, "message") ?? "Cập nhật thông tin thất bại";
+                    return new AuthResponseViewModel
+                    {
+                        Success = false,
+                        Message = message
+                    };
+                }
+                catch
+                {
+                    return new AuthResponseViewModel
+                    {
+                        Success = false,
+                        Message = "Cập nhật thông tin thất bại"
+                    };
+                }
             }
             catch (Exception ex)
             {
@@ -459,11 +487,24 @@ namespace ELibraryManagement.Web.Services.Implementations
                     return result ?? new AuthResponseViewModel { Success = true, Message = "Đổi mật khẩu thành công!" };
                 }
 
-                return new AuthResponseViewModel
+                try
                 {
-                    Success = false,
-                    Message = $"Đổi mật khẩu thất bại: {responseContent}"
-                };
+                    var errorResponse = JsonSerializer.Deserialize<JsonElement>(responseContent, _jsonOptions);
+                    var message = GetJsonProperty<string>(errorResponse, "message") ?? "Đổi mật khẩu thất bại";
+                    return new AuthResponseViewModel
+                    {
+                        Success = false,
+                        Message = message
+                    };
+                }
+                catch
+                {
+                    return new AuthResponseViewModel
+                    {
+                        Success = false,
+                        Message = "Đổi mật khẩu thất bại"
+                    };
+                }
             }
             catch (Exception ex)
             {
@@ -496,11 +537,24 @@ namespace ELibraryManagement.Web.Services.Implementations
                     return result ?? new AuthResponseViewModel { Success = true, Message = "Đã gửi link reset mật khẩu!" };
                 }
 
-                return new AuthResponseViewModel
+                try
                 {
-                    Success = false,
-                    Message = $"Gửi link reset mật khẩu thất bại: {responseContent}"
-                };
+                    var errorResponse = JsonSerializer.Deserialize<JsonElement>(responseContent, _jsonOptions);
+                    var message = GetJsonProperty<string>(errorResponse, "message") ?? "Gửi link reset mật khẩu thất bại";
+                    return new AuthResponseViewModel
+                    {
+                        Success = false,
+                        Message = message
+                    };
+                }
+                catch
+                {
+                    return new AuthResponseViewModel
+                    {
+                        Success = false,
+                        Message = "Gửi link reset mật khẩu thất bại"
+                    };
+                }
             }
             catch (Exception ex)
             {
@@ -536,11 +590,24 @@ namespace ELibraryManagement.Web.Services.Implementations
                     return result ?? new AuthResponseViewModel { Success = true, Message = "Reset mật khẩu thành công!" };
                 }
 
-                return new AuthResponseViewModel
+                try
                 {
-                    Success = false,
-                    Message = $"Reset mật khẩu thất bại: {responseContent}"
-                };
+                    var errorResponse = JsonSerializer.Deserialize<JsonElement>(responseContent, _jsonOptions);
+                    var message = GetJsonProperty<string>(errorResponse, "message") ?? "Reset mật khẩu thất bại";
+                    return new AuthResponseViewModel
+                    {
+                        Success = false,
+                        Message = message
+                    };
+                }
+                catch
+                {
+                    return new AuthResponseViewModel
+                    {
+                        Success = false,
+                        Message = "Reset mật khẩu thất bại"
+                    };
+                }
             }
             catch (Exception ex)
             {
@@ -603,11 +670,24 @@ namespace ELibraryManagement.Web.Services.Implementations
                     };
                 }
 
-                return new AuthResponseViewModel
+                try
                 {
-                    Success = false,
-                    Message = $"Upload avatar thất bại: {responseContent}"
-                };
+                    var errorResponse = JsonSerializer.Deserialize<JsonElement>(responseContent, _jsonOptions);
+                    var message = GetJsonProperty<string>(errorResponse, "message") ?? "Upload avatar thất bại";
+                    return new AuthResponseViewModel
+                    {
+                        Success = false,
+                        Message = message
+                    };
+                }
+                catch
+                {
+                    return new AuthResponseViewModel
+                    {
+                        Success = false,
+                        Message = "Upload avatar thất bại"
+                    };
+                }
             }
             catch (Exception ex)
             {
