@@ -136,6 +136,15 @@ namespace ELibraryManagement.Api.Services.Implementations
                 return false;
             }
 
+            // Check if user has overdue books that haven't been returned
+            var hasOverdueBooks = await _context.BorrowRecords
+                .AnyAsync(br => br.UserId == userId && br.Status == BorrowStatus.Overdue);
+
+            if (hasOverdueBooks)
+            {
+                return false;
+            }
+
             // Compute live count of currently borrowed books (do not count requested-only records)
             var liveBorrowedCount = await _context.BorrowRecords
                 .CountAsync(br => br.UserId == userId && br.Status == BorrowStatus.Borrowed);

@@ -107,6 +107,19 @@ namespace ELibraryManagement.Api.Services.Implementations
             if (!canBorrow)
             {
                 var userStatus = await _userStatusService.GetUserStatusAsync(request.UserId);
+
+                // Check for overdue books first
+                var overdueBooks = await _context.BorrowRecords
+                    .Where(br => br.UserId == request.UserId && br.Status == BorrowStatus.Overdue)
+                    .Include(br => br.Book)
+                    .ToListAsync();
+
+                if (overdueBooks.Any())
+                {
+                    var overdueBookTitles = string.Join(", ", overdueBooks.Select(br => $"'{br.Book.Title}' (hạn trả: {br.DueDate:dd/MM/yyyy})"));
+                    throw new InvalidOperationException($"Bạn có {overdueBooks.Count} sách quá hạn chưa trả: {overdueBookTitles}. Vui lòng trả sách quá hạn trước khi mượn sách mới.");
+                }
+
                 if (userStatus.AccountStatus == UserAccountStatus.Blocked)
                 {
                     throw new InvalidOperationException($"Tài khoản của bạn đã bị khóa. Lý do: {userStatus.BlockReason}");
