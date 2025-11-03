@@ -8,7 +8,6 @@ namespace ELibraryManagement.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    [Route("odata/[controller]")]
     [Produces("application/json", "application/xml", "text/csv")]
     public class BooksController : ControllerBase
     {
@@ -36,7 +35,6 @@ namespace ELibraryManagement.Api.Controllers
         /// Lấy thông tin sách theo ID
         /// </summary>
         [HttpGet("{id}")]
-        [EnableQuery]
         public async Task<IActionResult> GetBookById(int id)
         {
             var book = await _bookService.GetBookByIdAsync(id);
