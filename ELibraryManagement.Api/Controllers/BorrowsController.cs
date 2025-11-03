@@ -76,16 +76,6 @@ namespace ELibraryManagement.Api.Controllers
         }
 
         /// <summary>
-        /// Gia hạn sách (Đã vô hiệu hóa)
-        /// </summary>
-        [HttpPost("{id}/extend")]
-        [Authorize]
-        public IActionResult ExtendBorrow(int id, [FromBody] ExtendBorrowRequestDto? request = null)
-        {
-            return BadRequest(new { message = "Chức năng gia hạn sách đã bị vô hiệu hóa." });
-        }
-
-        /// <summary>
         /// Cập nhật trạng thái borrow record - Chỉ dành cho Admin
         /// </summary>
         [HttpPut("admin/{id}/status")]
@@ -110,16 +100,6 @@ namespace ELibraryManagement.Api.Controllers
             {
                 return BadRequest(new { message = ex.Message });
             }
-        }
-
-        /// <summary>
-        /// Gia hạn ngày trả sách - Đã vô hiệu hóa
-        /// </summary>
-        [HttpPut("admin/{id}/extend")]
-        [Authorize(Roles = "Admin")]
-        public IActionResult ExtendDueDate(int id, [FromBody] ExtendDueDateDto extendDto)
-        {
-            return BadRequest(new { message = "Chức năng gia hạn sách đã bị vô hiệu hóa." });
         }
 
         /// <summary>

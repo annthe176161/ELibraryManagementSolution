@@ -153,12 +153,6 @@ namespace ELibraryManagement.Api.Services.Implementations
             return true;
         }
 
-        public Task<bool> ExtendDueDateAsync(int id, DateTime newDueDate)
-        {
-            // Chức năng gia hạn đã bị vô hiệu hóa
-            return Task.FromResult(false);
-        }
-
         public async Task<bool> SendReminderAsync(int id)
         {
             var borrowRecord = await _context.BorrowRecords
@@ -338,17 +332,6 @@ namespace ELibraryManagement.Api.Services.Implementations
                     Notes = br.Notes
                 })
                 .ToListAsync();
-        }
-
-        public Task<ExtendBorrowResponseDto> ExtendBorrowAsync(int id, string? reason = null)
-        {
-            return Task.FromResult(new ExtendBorrowResponseDto
-            {
-                Success = false,
-                BorrowRecordId = id,
-                BookTitle = "",
-                Message = "Chức năng gia hạn sách đã bị vô hiệu hóa."
-            });
         }
     }
 }

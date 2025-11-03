@@ -680,44 +680,6 @@ namespace ELibraryManagement.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> ExtendDueDate(int id, DateTime newDueDate, string? reason)
-        {
-            var accessCheck = await CheckAdminAccessAsync();
-            if (accessCheck != null) return Json(new { success = false, message = "Unauthorized" });
-
-            try
-            {
-                var token = _authApiService.GetCurrentToken();
-                if (string.IsNullOrEmpty(token))
-                {
-                    return Json(new { success = false, message = "Không có token xác thực" });
-                }
-
-                _httpClient.DefaultRequestHeaders.Clear();
-                _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
-
-                var extendDto = new { NewDueDate = newDueDate, Reason = reason };
-                var json = JsonSerializer.Serialize(extendDto, _jsonOptions);
-                var content = new StringContent(json, System.Text.Encoding.UTF8, "application/json");
-
-                var response = await _httpClient.PutAsync($"{GetApiBaseUrl()}/api/Borrows/admin/{id}/extend", content);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    return Json(new { success = true, message = "Gia hạn thành công" });
-                }
-                else
-                {
-                    return Json(new { success = false, message = "Không thể gia hạn" });
-                }
-            }
-            catch (Exception ex)
-            {
-                return Json(new { success = false, message = $"Có lỗi xảy ra: {ex.Message}" });
-            }
-        }
-
-        [HttpPost]
         public async Task<IActionResult> SendReminder(int id)
         {
             var accessCheck = await CheckAdminAccessAsync();
