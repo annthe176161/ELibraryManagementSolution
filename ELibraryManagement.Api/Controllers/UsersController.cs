@@ -185,55 +185,6 @@ namespace ELibraryManagement.Api.Controllers
         }
 
         /// <summary>
-        /// Upload avatar cho user theo ID (Admin only)
-        /// </summary>
-        [HttpPost("upload-avatar/{userId}")]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> UploadAvatarForUser(string userId, IFormFile file)
-        {
-            try
-            {
-                if (file == null || file.Length == 0)
-                {
-                    return BadRequest("No file provided");
-                }
-
-                var user = await _userManager.FindByIdAsync(userId);
-                if (user == null)
-                {
-                    return NotFound("Không tìm thấy người dùng");
-                }
-
-                // Upload ảnh lên Cloudinary
-                var imageUrl = await _cloudinaryService.UploadImageAsync(file, "avatars");
-                if (imageUrl == null)
-                {
-                    return BadRequest("Không thể tải lên hình ảnh");
-                }
-
-                // Cập nhật AvatarUrl trong database
-                user.AvatarUrl = imageUrl;
-                var result = await _userManager.UpdateAsync(user);
-
-                if (result.Succeeded)
-                {
-                    return Ok(new
-                    {
-                        Message = "Tải lên avatar thành công",
-                        AvatarUrl = imageUrl,
-                        UserId = userId
-                    });
-                }
-
-                return BadRequest("Không thể cập nhật avatar người dùng");
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
-        }
-
-        /// <summary>
         /// Lấy thông tin chi tiết user theo ID cho admin
         /// </summary>
         [HttpGet("admin/{id}")]
