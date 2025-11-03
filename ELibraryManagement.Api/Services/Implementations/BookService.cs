@@ -567,35 +567,6 @@ namespace ELibraryManagement.Api.Services.Implementations
             return bookDtos;
         }
 
-        public async Task<int> SyncAvailableQuantitiesAsync()
-        {
-            var books = await _context.Books.Where(b => !b.IsDeleted).ToListAsync();
-            int updatedCount = 0;
-
-            foreach (var book in books)
-            {
-                // Calculate actual borrowed count
-                // Treat Overdue and Lost as borrowed so sync keeps AvailableQuantity accurate
-                var borrowedCount = await _context.BorrowRecords
-                    .CountAsync(br => br.BookId == book.Id && (br.Status == BorrowStatus.Borrowed || br.Status == BorrowStatus.Overdue || br.Status == BorrowStatus.Lost));
-
-                var correctAvailableQuantity = Math.Max(0, book.Quantity - borrowedCount);
-
-                if (book.AvailableQuantity != correctAvailableQuantity)
-                {
-                    book.AvailableQuantity = correctAvailableQuantity;
-                    updatedCount++;
-                }
-            }
-
-            if (updatedCount > 0)
-            {
-                await _context.SaveChangesAsync();
-            }
-
-            return updatedCount;
-        }
-
         public async Task<bool> DecrementAvailableQuantityAsync(int bookId)
         {
             try
