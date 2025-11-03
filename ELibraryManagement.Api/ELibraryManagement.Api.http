@@ -69,13 +69,6 @@ Accept: application/json
 
 ###
 
-# Create test user for testing borrow functionality (uses the token from @authToken variable)
-POST {{ELibraryManagement.Api_HostAddress}}/api/user/create-test-user
-Authorization: Bearer {{authToken}}
-Content-Type: application/json
-
-###
-
 # Get all users
 GET {{ELibraryManagement.Api_HostAddress}}/api/user
 Accept: application/json
