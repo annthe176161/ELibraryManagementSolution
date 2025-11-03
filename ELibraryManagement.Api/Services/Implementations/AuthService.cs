@@ -234,24 +234,6 @@ namespace ELibraryManagement.Api.Services.Implementations
             return result.Succeeded;
         }
 
-        public async Task<bool> AssignRoleAsync(string userId, string roleName)
-        {
-            var user = await _userManager.FindByIdAsync(userId);
-            if (user == null)
-            {
-                return false;
-            }
-
-            // Ensure role exists
-            if (!await _roleManager.RoleExistsAsync(roleName))
-            {
-                await _roleManager.CreateAsync(new IdentityRole(roleName));
-            }
-
-            var result = await _userManager.AddToRoleAsync(user, roleName);
-            return result.Succeeded;
-        }
-
         public async Task<IList<string>> GetUserRolesAsync(string userId)
         {
             var user = await _userManager.FindByIdAsync(userId);

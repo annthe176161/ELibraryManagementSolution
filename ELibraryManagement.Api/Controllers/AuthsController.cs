@@ -174,28 +174,6 @@ namespace ELibraryManagement.Api.Controllers
         }
 
         /// <summary>
-        /// Gán role cho user (chỉ dành cho Admin)
-        /// </summary>
-        [HttpPost("assign-role")]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> AssignRole([FromBody] AssignRoleRequestDto request)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            var result = await _authService.AssignRoleAsync(request.UserId, request.RoleName);
-
-            if (!result)
-            {
-                return BadRequest(new { Message = "Không thể gán vai trò." });
-            }
-
-            return Ok(new { Message = $"Đã gán vai trò '{request.RoleName}' thành công cho người dùng." });
-        }
-
-        /// <summary>
         /// Cập nhật thông tin cá nhân
         /// </summary>
         [HttpPut("update-profile")]
@@ -403,12 +381,6 @@ namespace ELibraryManagement.Api.Controllers
                 message = "Use this token in the confirm-email endpoint URL"
             });
         }
-    }
-
-    public class AssignRoleRequestDto
-    {
-        public string UserId { get; set; } = string.Empty;
-        public string RoleName { get; set; } = string.Empty;
     }
 
     public class ResendEmailConfirmationDto
