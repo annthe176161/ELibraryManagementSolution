@@ -1196,45 +1196,6 @@ namespace ELibraryManagement.Web.Services.Implementations
             }
         }
 
-        public async Task<BorrowBookResponseViewModel> ReturnBookAsync(int borrowRecordId, string token)
-        {
-            try
-            {
-                var apiBaseUrl = GetApiBaseUrl();
-
-                _httpClient.DefaultRequestHeaders.Authorization =
-                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-
-                var response = await _httpClient.PostAsync($"{apiBaseUrl}/api/Books/return/{borrowRecordId}", null);
-                var responseContent = await response.Content.ReadAsStringAsync();
-
-                if (response.IsSuccessStatusCode)
-                {
-                    return new BorrowBookResponseViewModel
-                    {
-                        Success = true,
-                        Message = "Trả sách thành công!"
-                    };
-                }
-                else
-                {
-                    return new BorrowBookResponseViewModel
-                    {
-                        Success = false,
-                        Message = "Không thể trả sách. Vui lòng thử lại sau."
-                    };
-                }
-            }
-            catch (Exception ex)
-            {
-                return new BorrowBookResponseViewModel
-                {
-                    Success = false,
-                    Message = $"Có lỗi xảy ra: {ex.Message}"
-                };
-            }
-        }
-
         public async Task<BorrowBookResponseViewModel> CancelBorrowRequestAsync(int borrowRecordId, string token)
         {
             try

@@ -16,7 +16,6 @@ namespace ELibraryManagement.Web.Services.Interfaces
         Task<List<UserBorrowedBookViewModel>> GetBorrowedBooksAsync(string userId, string token);
         Task<List<UserBorrowedBookViewModel>> GetBorrowHistoryAsync(string userId, string token);
         Task<bool> HasUserBorrowedBookAsync(string userId, int bookId, string token);
-        Task<BorrowBookResponseViewModel> ReturnBookAsync(int borrowRecordId, string token);
         Task<BorrowBookResponseViewModel> CancelBorrowRequestAsync(int borrowRecordId, string token);
     }
 }

@@ -102,23 +102,6 @@ namespace ELibraryManagement.Api.Controllers
         }
 
         /// <summary>
-        /// Trả sách - Yêu cầu đăng nhập
-        /// </summary>
-        [HttpPost("return/{borrowRecordId}")]
-        [Authorize]
-        public async Task<IActionResult> ReturnBook(int borrowRecordId)
-        {
-            var result = await _bookService.ReturnBookAsync(borrowRecordId);
-
-            if (!result.Success)
-            {
-                return BadRequest(result);
-            }
-
-            return Ok(result);
-        }
-
-        /// <summary>
         /// Hủy yêu cầu mượn sách - Yêu cầu đăng nhập
         /// </summary>
         [HttpPost("cancel/{borrowRecordId}")]
