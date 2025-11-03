@@ -1728,12 +1728,6 @@ namespace ELibraryManagement.Web.Controllers
                 if (response.IsSuccessStatusCode)
                 {
                     _logger.LogInformation("Successfully updated BorrowRecord {BorrowRecordId} status to {Status}", borrowRecordId, newStatus);
-
-                    // For lost books, also decrease available quantity
-                    if (fineType == "lost")
-                    {
-                        await DecrementBookAvailableQuantity(borrowRecordId, token);
-                    }
                 }
                 else
                 {
@@ -1744,50 +1738,6 @@ namespace ELibraryManagement.Web.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error updating BorrowRecord {BorrowRecordId} status for fine type {FineType}", borrowRecordId, fineType);
-            }
-        }
-
-        /// <summary>
-        /// Decrease book's available quantity when marking as lost
-        /// </summary>
-        private async Task DecrementBookAvailableQuantity(int borrowRecordId, string token)
-        {
-            try
-            {
-                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-
-                // Get borrow record to find the book ID
-                var borrowResponse = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Borrows/{borrowRecordId}");
-                if (!borrowResponse.IsSuccessStatusCode)
-                {
-                    _logger.LogWarning("Could not fetch BorrowRecord {BorrowRecordId} to decrement book quantity", borrowRecordId);
-                    return;
-                }
-
-                var borrowContent = await borrowResponse.Content.ReadAsStringAsync();
-                var borrowRecord = JsonSerializer.Deserialize<JsonElement>(borrowContent, _jsonOptions);
-
-                if (borrowRecord.TryGetProperty("bookId", out var bookIdElement))
-                {
-                    var bookId = bookIdElement.GetInt32();
-
-                    // Call API to decrement available quantity
-                    var response = await _httpClient.PostAsync($"{GetApiBaseUrl()}/api/Books/admin/{bookId}/decrement-quantity", null);
-
-                    if (response.IsSuccessStatusCode)
-                    {
-                        _logger.LogInformation("Successfully decremented available quantity for Book {BookId}", bookId);
-                    }
-                    else
-                    {
-                        var errorContent = await response.Content.ReadAsStringAsync();
-                        _logger.LogWarning("Failed to decrement available quantity for Book {BookId}. Response: {Response}", bookId, errorContent);
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error decrementing book quantity for BorrowRecord {BorrowRecordId}", borrowRecordId);
             }
         }
     }

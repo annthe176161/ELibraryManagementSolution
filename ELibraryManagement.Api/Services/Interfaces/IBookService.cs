@@ -16,6 +16,5 @@ namespace ELibraryManagement.Api.Services.Interfaces
         Task<BookDto> UpdateBookAsync(UpdateBookDto updateBookDto);
         Task<bool> DeleteBookAsync(int id);
         Task<IEnumerable<BookDto>> GetAllBooksAsync();
-        Task<bool> DecrementAvailableQuantityAsync(int bookId);
     }
 }
