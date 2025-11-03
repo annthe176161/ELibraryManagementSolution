@@ -102,6 +102,13 @@ namespace ELibraryManagement.Api.Services.Implementations
 
         public async Task<BorrowBookResponseDto> BorrowBookAsync(BorrowBookRequestDto request)
         {
+            // Check if user exists
+            var user = await _context.Users.FindAsync(request.UserId);
+            if (user == null)
+            {
+                throw new ArgumentException("Không tìm thấy người dùng với ID đã cung cấp.");
+            }
+
             // Check if user can borrow
             var canBorrow = await _userStatusService.CanUserBorrowAsync(request.UserId);
             if (!canBorrow)
@@ -138,7 +145,7 @@ namespace ELibraryManagement.Api.Services.Implementations
             var book = await _context.Books.FindAsync(request.BookId);
             if (book == null)
             {
-                throw new ArgumentException("Không tìm thấy sách.");
+                throw new ArgumentException("Không tìm thấy sách với ID đã cung cấp.");
             }
 
             if (book.AvailableQuantity <= 0)
@@ -192,6 +199,13 @@ namespace ELibraryManagement.Api.Services.Implementations
 
             // Calculate due date (default 14 days if not provided)
             var dueDate = request.DueDate ?? DateTime.UtcNow.AddDays(14);
+
+            // Validate due date does not exceed 30 days
+            var maxDueDate = DateTime.UtcNow.AddDays(30);
+            if (dueDate > maxDueDate)
+            {
+                throw new InvalidOperationException("Thời gian mượn sách không được vượt quá 30 ngày từ ngày hiện tại.");
+            }
 
             // Create borrow record with Requested status (pending admin approval)
             var newBorrowRecord = new BorrowRecord
