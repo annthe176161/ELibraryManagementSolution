@@ -680,40 +680,6 @@ namespace ELibraryManagement.Web.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> SendReminder(int id)
-        {
-            var accessCheck = await CheckAdminAccessAsync();
-            if (accessCheck != null) return Json(new { success = false, message = "Unauthorized" });
-
-            try
-            {
-                var token = _authApiService.GetCurrentToken();
-                if (string.IsNullOrEmpty(token))
-                {
-                    return Json(new { success = false, message = "Không có token xác thực" });
-                }
-
-                _httpClient.DefaultRequestHeaders.Clear();
-                _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
-
-                var response = await _httpClient.PostAsync($"{GetApiBaseUrl()}/api/Borrows/admin/{id}/remind", null);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    return Json(new { success = true, message = "Đã gửi thông báo nhắc nhở" });
-                }
-                else
-                {
-                    return Json(new { success = false, message = "Không thể gửi thông báo" });
-                }
-            }
-            catch (Exception ex)
-            {
-                return Json(new { success = false, message = $"Có lỗi xảy ra: {ex.Message}" });
-            }
-        }
-
-        [HttpPost]
         public async Task<IActionResult> ConfirmReturn(int id)
         {
             var accessCheck = await CheckAdminAccessAsync();

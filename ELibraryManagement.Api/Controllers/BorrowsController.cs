@@ -103,28 +103,6 @@ namespace ELibraryManagement.Api.Controllers
         }
 
         /// <summary>
-        /// Gửi thông báo nhắc nhở - Chỉ dành cho Admin
-        /// </summary>
-        [HttpPost("admin/{id}/remind")]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> SendReminder(int id)
-        {
-            try
-            {
-                var result = await _borrowService.SendReminderAsync(id);
-                if (result)
-                {
-                    return Ok(new { message = "Đã gửi thông báo nhắc nhở" });
-                }
-                return NotFound(new { message = "Không tìm thấy borrow record" });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-        }
-
-        /// <summary>
         /// Xác nhận trả sách - Chỉ dành cho Admin
         /// </summary>
         [HttpPost("admin/{id}/return")]
@@ -190,104 +168,6 @@ namespace ELibraryManagement.Api.Controllers
                     isFinalStatus = _validationService.IsFinalStatus(borrowRecord.Status),
                     allowedTransitions = statusList
                 });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-        }
-
-        /// <summary>
-        /// Gửi email nhắc nhở trả sách thủ công - Chỉ dành cho Admin
-        /// </summary>
-        [HttpPost("admin/{id}/send-reminder")]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> SendDueReminder(int id)
-        {
-            try
-            {
-                var borrowRecord = await _context.BorrowRecords
-                    .Include(br => br.User)
-                    .Include(br => br.Book)
-                    .FirstOrDefaultAsync(br => br.Id == id);
-
-                if (borrowRecord == null)
-                {
-                    return NotFound(new { message = "Không tìm thấy bản ghi mượn sách" });
-                }
-
-                if (borrowRecord.Status != BorrowStatus.Borrowed || borrowRecord.ReturnDate != null)
-                {
-                    return BadRequest(new { message = "Sách này không đang trong trạng thái mượn" });
-                }
-
-                var daysLeft = (borrowRecord.DueDate.ToVietnamTime().Date - DateTime.UtcNow.ToVietnamTime().Date).Days;
-                var userName = $"{borrowRecord.User.FirstName} {borrowRecord.User.LastName}".Trim();
-
-                if (string.IsNullOrEmpty(userName))
-                {
-                    userName = borrowRecord.User.Email?.Split('@')[0] ?? "Unknown User";
-                }
-
-                if (string.IsNullOrEmpty(borrowRecord.User.Email))
-                {
-                    return BadRequest(new { message = "Email người dùng không hợp lệ" });
-                }
-
-                var emailSent = await _emailService.SendBookDueReminderAsync(
-                    borrowRecord.User.Email,
-                    userName,
-                    borrowRecord.Book.Title,
-                    borrowRecord.DueDate,
-                    daysLeft,
-                    borrowRecord.CanExtend
-                );
-
-                if (emailSent)
-                {
-                    // Cập nhật notes để ghi lại việc gửi email thủ công
-                    var reminderNote = $"MANUAL_REMINDER_{DateTime.UtcNow:yyyy-MM-dd_HH:mm} - Email nhắc nhở gửi thủ công bởi admin";
-                    borrowRecord.Notes = $"{borrowRecord.Notes}\n{reminderNote}";
-                    borrowRecord.UpdatedAt = DateTime.UtcNow;
-                    // If there's a pending fine related to this borrow, increment reminder count and add history
-                    var fine = await _context.Fines.FirstOrDefaultAsync(f => f.BorrowRecordId == borrowRecord.Id && f.Status == FineStatus.Pending);
-                    if (fine != null)
-                    {
-                        fine.ReminderCount += 1;
-                        fine.LastReminderDate = DateTime.UtcNow;
-
-                        var history = new FineActionHistory
-                        {
-                            FineId = fine.Id,
-                            UserId = borrowRecord.UserId ?? string.Empty,
-                            ActionType = FineActionType.ReminderSent,
-                            Description = $"Gửi nhắc nhở thủ công - Borrow ID {borrowRecord.Id}",
-                            Amount = fine.Amount,
-                            Notes = "Gửi nhắc nhở thủ công bởi admin",
-                            ActionDate = DateTime.UtcNow,
-                            CreatedAt = DateTime.UtcNow
-                        };
-
-                        _context.FineActionHistories.Add(history);
-                    }
-
-                    await _context.SaveChangesAsync();
-
-                    return Ok(new
-                    {
-                        message = "Đã gửi email nhắc nhở thành công",
-                        emailSent = true,
-                        recipient = borrowRecord.User.Email
-                    });
-                }
-                else
-                {
-                    return BadRequest(new
-                    {
-                        message = "Không thể gửi email nhắc nhở",
-                        emailSent = false
-                    });
-                }
             }
             catch (Exception ex)
             {

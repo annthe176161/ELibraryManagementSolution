@@ -153,54 +153,6 @@ namespace ELibraryManagement.Api.Services.Implementations
             return true;
         }
 
-        public async Task<bool> SendReminderAsync(int id)
-        {
-            var borrowRecord = await _context.BorrowRecords
-                .Include(br => br.User)
-                .Include(br => br.Book)
-                .FirstOrDefaultAsync(br => br.Id == id);
-
-            if (borrowRecord == null)
-                return false;
-
-            // Here you would implement email sending logic
-            // For now, we'll just log it or add a note
-            borrowRecord.Notes = $"{borrowRecord.Notes}\nReminder sent on {DateTime.UtcNow:yyyy-MM-dd HH:mm}";
-            borrowRecord.UpdatedAt = DateTime.UtcNow;
-
-            // If there's an associated pending fine, increment reminder count and add an action history entry
-            var fine = await _context.Fines.FirstOrDefaultAsync(f => f.BorrowRecordId == borrowRecord.Id && f.Status == FineStatus.Pending);
-            if (fine != null)
-            {
-                try
-                {
-                    fine.ReminderCount += 1;
-                    fine.LastReminderDate = DateTime.UtcNow;
-
-                    var history = new FineActionHistory
-                    {
-                        FineId = fine.Id,
-                        UserId = borrowRecord.UserId ?? string.Empty,
-                        ActionType = FineActionType.ReminderSent,
-                        Description = $"Gửi nhắc nhở - Borrow ID {borrowRecord.Id}",
-                        Amount = fine.Amount,
-                        Notes = "Gửi nhắc nhở thủ công (service)",
-                        ActionDate = DateTime.UtcNow,
-                        CreatedAt = DateTime.UtcNow
-                    };
-
-                    _context.FineActionHistories.Add(history);
-                }
-                catch
-                {
-                    // Do not fail the entire operation if history update fails; proceed to save what we can
-                }
-            }
-
-            await _context.SaveChangesAsync();
-            return true;
-        }
-
         public async Task<ReturnBookResponseDto> ConfirmReturnAsync(int id)
         {
             var borrowRecord = await _context.BorrowRecords
