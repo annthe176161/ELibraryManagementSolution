@@ -715,12 +715,6 @@ namespace ELibraryManagement.Web.Controllers
             }
         }
 
-        [HttpPost]
-        public IActionResult ExtendBorrow(int id, string? reason = null)
-        {
-            return Json(new { success = false, message = "Chức năng gia hạn sách đã bị vô hiệu hóa." });
-        }
-
         // GET: Admin/GetUserDetail/{id}
         [HttpGet]
         public async Task<IActionResult> GetUserDetail(string id)

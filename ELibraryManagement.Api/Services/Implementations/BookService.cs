@@ -567,19 +567,6 @@ namespace ELibraryManagement.Api.Services.Implementations
             return bookDtos;
         }
 
-        public async Task<IEnumerable<CategoryDto>> GetAllCategoriesAsync()
-        {
-            return await _context.Categories
-                .Where(c => !c.IsDeleted)
-                .Select(c => new CategoryDto
-                {
-                    Id = c.Id,
-                    Name = c.Name,
-                    Description = c.Description,
-                    Color = c.Color
-                }).ToListAsync();
-        }
-
         public async Task<int> SyncAvailableQuantitiesAsync()
         {
             var books = await _context.Books.Where(b => !b.IsDeleted).ToListAsync();

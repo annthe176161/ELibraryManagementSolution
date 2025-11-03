@@ -12,7 +12,6 @@ namespace ELibraryManagement.Web.Services.Interfaces
         Task<bool> ApproveBorrowRequestAsync(int borrowId);
         Task<ReturnBookResponseViewModel?> ConfirmReturnAsync(int borrowId);
         Task<List<BorrowRecordViewModel>?> GetOverdueBorrowsAsync();
-        Task<bool> SendReminderAsync(int borrowId);
         Task<BorrowResult> BorrowBookAsync(int bookId);
         Task<bool> CancelBorrowRequestAsync(int borrowId);
         Task<List<BorrowRecordViewModel>?> GetMyBorrowsAsync();

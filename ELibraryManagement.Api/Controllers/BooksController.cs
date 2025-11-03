@@ -235,24 +235,6 @@ namespace ELibraryManagement.Api.Controllers
         }
 
         /// <summary>
-        /// Lấy tất cả danh mục - Chỉ dành cho Admin
-        /// </summary>
-        [HttpGet("admin/categories")]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> GetAllCategories()
-        {
-            try
-            {
-                var categories = await _bookService.GetAllCategoriesAsync();
-                return Ok(new { success = true, data = categories });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { success = false, message = ex.Message });
-            }
-        }
-
-        /// <summary>
         /// Upload hình ảnh sách - Chỉ dành cho Admin
         /// </summary>
         [HttpPost("admin/upload-image")]

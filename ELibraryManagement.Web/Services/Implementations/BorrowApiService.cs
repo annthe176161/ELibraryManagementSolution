@@ -390,27 +390,6 @@ namespace ELibraryManagement.Web.Services.Implementations
             }
         }
 
-        public async Task<bool> SendReminderAsync(int borrowId)
-        {
-            try
-            {
-                var token = GetCurrentToken();
-                if (string.IsNullOrEmpty(token))
-                {
-                    return false;
-                }
-
-                SetAuthorizationHeader();
-
-                var response = await _httpClient.PostAsync($"{GetApiBaseUrl()}/api/Borrows/{borrowId}/reminder", null);
-                return response.IsSuccessStatusCode;
-            }
-            catch (Exception)
-            {
-                return false;
-            }
-        }
-
         public async Task<bool> CancelBorrowRequestAsync(int borrowId)
         {
             try
