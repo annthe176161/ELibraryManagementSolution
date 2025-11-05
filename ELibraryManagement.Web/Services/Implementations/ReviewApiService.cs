@@ -311,63 +311,6 @@ namespace ELibraryManagement.Web.Services.Implementations
             }
         }
 
-        public async Task<CanReviewViewModel> CanReviewBookAsync(int bookId, string token)
-        {
-            try
-            {
-                var apiBaseUrl = GetApiBaseUrl();
-                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-
-                var response = await _httpClient.GetAsync($"{apiBaseUrl}/api/Reviews/can-review/{bookId}");
-
-                if (response.IsSuccessStatusCode)
-                {
-                    var responseContent = await response.Content.ReadAsStringAsync();
-                    var data = JsonSerializer.Deserialize<dynamic>(responseContent, _jsonOptions);
-
-                    var canReview = GetPropertyValue<bool>(data, "canReview");
-                    var hasExistingReview = GetPropertyValue<bool>(data, "hasExistingReview");
-                    var existingReviewData = GetPropertyValue<dynamic>(data, "existingReview");
-
-                    var result = new CanReviewViewModel
-                    {
-                        CanReview = canReview,
-                        HasExistingReview = hasExistingReview
-                    };
-
-                    if (existingReviewData != null)
-                    {
-                        result.ExistingReview = MapToReviewViewModel(existingReviewData);
-                    }
-
-                    if (!canReview)
-                    {
-                        result.Message = "Bạn cần mượn sách này trước khi có thể viết đánh giá.";
-                    }
-                    else if (hasExistingReview)
-                    {
-                        result.Message = "Bạn đã đánh giá sách này rồi. Bạn có thể chỉnh sửa đánh giá hiện tại.";
-                    }
-
-                    return result;
-                }
-
-                return new CanReviewViewModel
-                {
-                    CanReview = false,
-                    Message = "Không thể kiểm tra điều kiện đánh giá."
-                };
-            }
-            catch
-            {
-                return new CanReviewViewModel
-                {
-                    CanReview = false,
-                    Message = "Có lỗi xảy ra khi kiểm tra điều kiện đánh giá."
-                };
-            }
-        }
-
         public async Task<ReviewViewModel?> GetMyReviewForBookAsync(int bookId, string token)
         {
             try

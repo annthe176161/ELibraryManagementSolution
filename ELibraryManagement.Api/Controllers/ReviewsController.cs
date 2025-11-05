@@ -208,31 +208,6 @@ namespace ELibraryManagement.Api.Controllers
         }
 
         /// <summary>
-        /// Kiểm tra user có thể review sách này không
-        /// </summary>
-        [HttpGet("can-review/{bookId}")]
-        public async Task<IActionResult> CanReviewBook(int bookId)
-        {
-            var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (string.IsNullOrEmpty(userId))
-            {
-                return Unauthorized("Không thể xác định user.");
-            }
-
-            var canReview = await _reviewService.CanUserReviewBookAsync(userId, bookId);
-            var existingReview = await _reviewService.GetUserReviewForBookAsync(userId, bookId);
-
-            var response = new
-            {
-                CanReview = canReview,
-                HasExistingReview = existingReview != null,
-                ExistingReview = existingReview
-            };
-
-            return Ok(response);
-        }
-
-        /// <summary>
         /// Lấy review của user cho một sách cụ thể
         /// </summary>
         [HttpGet("my-review/{bookId}")]

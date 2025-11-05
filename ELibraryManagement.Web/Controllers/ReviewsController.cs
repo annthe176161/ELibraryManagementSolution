@@ -51,20 +51,6 @@ namespace ELibraryManagement.Web.Controllers
                     return RedirectToAction("Login", "Accounts");
                 }
 
-                // Kiểm tra điều kiện có thể review
-                var canReview = await _reviewApiService.CanReviewBookAsync(bookId, token);
-                if (!canReview.CanReview)
-                {
-                    TempData["ErrorMessage"] = canReview.Message;
-                    return RedirectToAction("BookDetail", "Home", new { id = bookId });
-                }
-
-                if (canReview.HasExistingReview)
-                {
-                    TempData["InfoMessage"] = "Bạn đã đánh giá sách này rồi. Bạn có thể chỉnh sửa đánh giá hiện tại.";
-                    return RedirectToAction("Edit", new { id = canReview.ExistingReview?.Id });
-                }
-
                 // Lấy thông tin sách
                 var book = await _bookApiService.GetBookByIdAsync(bookId);
                 if (book == null)

@@ -26,9 +26,6 @@ namespace ELibraryManagement.Web.Services.Interfaces
         // Lấy reviews của user hiện tại
         Task<List<ReviewViewModel>> GetMyReviewsAsync(string token);
 
-        // Kiểm tra có thể review sách không
-        Task<CanReviewViewModel> CanReviewBookAsync(int bookId, string token);
-
         // Lấy review của user cho một sách
         Task<ReviewViewModel?> GetMyReviewForBookAsync(int bookId, string token);
     }
