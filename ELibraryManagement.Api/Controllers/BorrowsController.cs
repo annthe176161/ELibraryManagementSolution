@@ -122,59 +122,6 @@ namespace ELibraryManagement.Api.Controllers
 
         /// <summary>
         /// Lấy danh sách trạng thái có thể chuyển từ trạng thái hiện tại - Chỉ dành cho Admin
-        /// </summary>
-        [HttpGet("admin/{id}/allowed-transitions")]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> GetAllowedTransitions(int id)
-        {
-            try
-            {
-                var borrowRecord = await _context.BorrowRecords.FindAsync(id);
-                if (borrowRecord == null)
-                {
-                    return NotFound(new { message = "Borrow record not found" });
-                }
-
-                var allowedStatuses = _validationService.GetAllowedTransitions(borrowRecord.Status);
-                var statusList = allowedStatuses.Select(status => new
-                {
-                    Value = status.ToString(),
-                    DisplayName = status switch
-                    {
-                        BorrowStatus.Requested => "Đã đăng ký",
-                        BorrowStatus.Borrowed => "Đang mượn",
-                        BorrowStatus.Returned => "Đã trả",
-                        BorrowStatus.Lost => "Mất sách",
-                        BorrowStatus.Damaged => "Hư hỏng",
-                        BorrowStatus.Cancelled => "Đã hủy",
-                        _ => status.ToString()
-                    },
-                    IsFinal = _validationService.IsFinalStatus(status)
-                });
-
-                return Ok(new
-                {
-                    currentStatus = borrowRecord.Status.ToString(),
-                    currentStatusDisplay = borrowRecord.Status switch
-                    {
-                        BorrowStatus.Requested => "Đã đăng ký",
-                        BorrowStatus.Borrowed => "Đang mượn",
-                        BorrowStatus.Returned => "Đã trả",
-                        BorrowStatus.Lost => "Mất sách",
-                        BorrowStatus.Damaged => "Hư hỏng",
-                        BorrowStatus.Cancelled => "Đã hủy",
-                        _ => borrowRecord.Status.ToString()
-                    },
-                    isFinalStatus = _validationService.IsFinalStatus(borrowRecord.Status),
-                    allowedTransitions = statusList
-                });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-        }
-
         /// <summary>
         /// Lấy danh sách sách sắp hết hạn - Chỉ dành cho Admin
         /// </summary>

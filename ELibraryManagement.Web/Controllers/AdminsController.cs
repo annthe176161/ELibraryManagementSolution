@@ -621,41 +621,6 @@ namespace ELibraryManagement.Web.Controllers
             }
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetAllowedTransitions(int id)
-        {
-            var accessCheck = await CheckAdminAccessAsync();
-            if (accessCheck != null) return Json(new { success = false, message = "Unauthorized" });
-
-            try
-            {
-                var token = _authApiService.GetCurrentToken();
-                if (string.IsNullOrEmpty(token))
-                {
-                    return Json(new { success = false, message = "Không có token xác thực" });
-                }
-
-                _httpClient.DefaultRequestHeaders.Clear();
-                _httpClient.DefaultRequestHeaders.Add("Authorization", $"Bearer {token}");
-
-                var response = await _httpClient.GetAsync($"{GetApiBaseUrl()}/api/Borrows/admin/{id}/allowed-transitions");
-
-                if (response.IsSuccessStatusCode)
-                {
-                    var content = await response.Content.ReadAsStringAsync();
-                    return Json(new { success = true, data = JsonSerializer.Deserialize<object>(content, _jsonOptions) });
-                }
-                else
-                {
-                    return Json(new { success = false, message = "Không thể lấy danh sách trạng thái hợp lệ" });
-                }
-            }
-            catch (Exception ex)
-            {
-                return Json(new { success = false, message = $"Có lỗi xảy ra: {ex.Message}" });
-            }
-        }
-
         private async Task UpdateBorrowNotesInternal(int id, string? notes)
         {
             var token = _authApiService.GetCurrentToken();
