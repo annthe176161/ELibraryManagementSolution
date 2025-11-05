@@ -366,33 +366,6 @@
     </div>
 </div>
 
-<!-- Waive Fine Modal -->
-<div class="modal fade" id="waiveFineModal" tabindex="-1" role="dialog">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Miễn phạt</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <p>Bạn có chắc chắn muốn miễn phạt này?</p>
-                <div class="form-group">
-                    <label for="waiveReason">Lý do miễn phạt <span class="text-danger">*</span></label>
-                    <input type="text" id="waiveReason" class="form-control" placeholder="Nhập lý do miễn phạt..." required>
-                </div>
-                <div class="form-group">
-                    <label for="waiveNotes">Ghi chú</label>
-                    <textarea id="waiveNotes" class="form-control" rows="3" placeholder="Nhập ghi chú thêm..."></textarea>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                <button type="button" class="btn btn-warning" onclick="confirmWaive()">Xác nhận miễn phạt</button>
-            </div>
-        </div>
-    </div>
-</div>
-
 @section Scripts {
     <script>
         let currentFineId = 0;
@@ -418,14 +391,6 @@
             $('#payFineModal').modal('show');
         }
 
-        function waiveFine(fineId, userName, amount) {
-            currentFineId = fineId;
-            $('#waiveFineModal .modal-body p').html(`Bạn có chắc chắn muốn miễn phạt <strong>${amount.toLocaleString()} VND</strong> của sinh viên <strong>${userName}</strong>?`);
-            $('#waiveReason').val('');
-            $('#waiveNotes').val('');
-            $('#waiveFineModal').modal('show');
-        }
-
         function confirmPayment() {
             const notes = $('#paymentNotes').val();
             
@@ -443,32 +408,6 @@
                 }
                 }).fail(function() {
                 showNotification('Có lỗi xảy ra khi cập nhật trạng thái phạt', 'error');
-            });
-        }
-
-        function confirmWaive() {
-            const reason = $('#waiveReason').val().trim();
-            const notes = $('#waiveNotes').val();
-            
-                if (!reason) {
-                showNotification('Vui lòng nhập lý do miễn phạt', 'warning');
-                return;
-            }
-
-            $.post('@Url.Action("WaiveFine")', {
-                id: currentFineId,
-                reason: reason,
-                notes: notes
-            }, function(response) {
-                if (response.success) {
-                    showNotification(response.message, 'success');
-                    $('#waiveFineModal').modal('hide');
-                    setTimeout(() => location.reload(), 1500);
-                } else {
-                    showNotification(response.message, 'error');
-                }
-            }).fail(function() {
-                showAlert('danger', 'Có lỗi xảy ra khi miễn phạt');
             });
         }
 

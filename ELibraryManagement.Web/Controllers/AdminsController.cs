@@ -1372,41 +1372,6 @@ namespace ELibraryManagement.Web.Controllers
             }
         }
 
-        // POST: Admin/WaiveFine - Miễn phạt
-        [HttpPost]
-        public async Task<IActionResult> WaiveFine(int id, string reason, string? notes = null)
-        {
-            var accessCheck = await CheckAdminAccessAsync();
-            if (accessCheck != null) return Json(new { success = false, message = "Unauthorized" });
-
-            try
-            {
-                var token = _authApiService.GetCurrentToken();
-                if (string.IsNullOrEmpty(token))
-                {
-                    return Json(new { success = false, message = "Không có token xác thực" });
-                }
-
-                // Set token cho FineApiService
-                _fineApiService.SetAuthToken(token);
-
-                var success = await _fineApiService.WaiveFineAsync(id, reason, notes);
-
-                if (success)
-                {
-                    return Json(new { success = true, message = "Đã miễn phạt thành công" });
-                }
-                else
-                {
-                    return Json(new { success = false, message = "Không thể miễn phạt" });
-                }
-            }
-            catch (Exception ex)
-            {
-                return Json(new { success = false, message = $"Có lỗi xảy ra: {ex.Message}" });
-            }
-        }
-
         // POST: Admin/UpdateFine - Cập nhật phạt
         [HttpPost]
         public async Task<IActionResult> UpdateFine(int id, [FromBody] UpdateFineRequest model)

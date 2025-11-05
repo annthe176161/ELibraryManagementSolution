@@ -387,90 +387,6 @@ namespace ELibraryManagement.Api.Controllers
         }
 
         /// <summary>
-        /// Miễn phạt - Chỉ dành cho Admin
-        /// </summary>
-        [HttpPost("{id}/waive")]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> WaiveFine(int id, [FromBody] WaiveFineRequest request)
-        {
-            try
-            {
-                var fine = await _context.Fines
-                    .Include(f => f.BorrowRecord)
-                        .ThenInclude(br => br!.Book)
-                    .FirstOrDefaultAsync(f => f.Id == id);
-
-                if (fine == null)
-                {
-                    return NotFound(new { message = "Không tìm thấy phạt" });
-                }
-
-                if (fine.Status == FineStatus.Paid || fine.Status == FineStatus.Waived)
-                {
-                    return BadRequest(new { message = "Phạt đã được xử lý" });
-                }
-
-                fine.Status = FineStatus.Waived;
-                fine.UpdatedAt = DateTime.UtcNow;
-
-                // Update borrow record status if exists (waiving fine means book was returned)
-                if (fine.BorrowRecord != null && fine.BorrowRecord.Status != BorrowStatus.Returned)
-                {
-                    _logger.LogInformation("📚 Updating BorrowRecord for waived fine: ID={BorrowRecordId}, CurrentStatus={CurrentStatus}",
-                        fine.BorrowRecord.Id, fine.BorrowRecord.Status);
-
-                    fine.BorrowRecord.Status = BorrowStatus.Returned;
-                    fine.BorrowRecord.ReturnDate = DateTime.UtcNow;
-                    fine.BorrowRecord.UpdatedAt = DateTime.UtcNow;
-
-                    // Update book available quantity
-                    if (fine.BorrowRecord.Book != null)
-                    {
-                        fine.BorrowRecord.Book.AvailableQuantity++;
-                        fine.BorrowRecord.Book.UpdatedAt = DateTime.UtcNow;
-
-                        _logger.LogInformation("✅ Increased book {BookId} available quantity when fine {FineId} was waived",
-                            fine.BorrowRecord.Book.Id, fine.Id);
-                    }
-
-                    // *** FIX: Decrement user's CurrentBorrowCount when book is returned via waiving fine ***
-                    _logger.LogInformation("👤 Decrementing CurrentBorrowCount for user: {UserId} (waived fine)", fine.UserId);
-                    await _userStatusService.DecrementBorrowCountAsync(fine.UserId);
-                    _logger.LogInformation("✅ Decremented CurrentBorrowCount for user {UserId} when fine {FineId} was waived", fine.UserId, fine.Id);
-                }
-
-                await _context.SaveChangesAsync();
-
-                // Create action history
-                var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                if (!string.IsNullOrEmpty(currentUserId))
-                {
-                    var actionHistory = new FineActionHistory
-                    {
-                        FineId = fine.Id,
-                        UserId = currentUserId,
-                        ActionType = FineActionType.FineWaived,
-                        Description = $"Miễn phạt - Lý do: {request.Reason}",
-                        Amount = fine.Amount,
-                        Notes = request.Notes,
-                        ActionDate = DateTime.UtcNow,
-                        CreatedAt = DateTime.UtcNow
-                    };
-
-                    _context.FineActionHistories.Add(actionHistory);
-                    await _context.SaveChangesAsync();
-                }
-
-                return Ok(new { message = "Đã miễn phạt thành công" });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error waiving fine for ID: {FineId}", id);
-                return BadRequest(new { message = ex.Message });
-            }
-        }
-
-        /// <summary>
         /// Lấy phạt của một user cụ thể - Chỉ dành cho Admin
         /// </summary>
         [HttpGet("user/{userId}")]
@@ -580,12 +496,6 @@ namespace ELibraryManagement.Api.Controllers
 
     public class PayFineRequest
     {
-        public string? Notes { get; set; }
-    }
-
-    public class WaiveFineRequest
-    {
-        public string Reason { get; set; } = string.Empty;
         public string? Notes { get; set; }
     }
 }

@@ -194,33 +194,6 @@ namespace ELibraryManagement.Web.Services.Implementations
             }
         }
 
-        public async Task<bool> WaiveFineAsync(int id, string reason, string? notes = null)
-        {
-            try
-            {
-                var request = new { reason, notes };
-                var json = JsonSerializer.Serialize(request, _jsonOptions);
-                var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-                var response = await _httpClient.PostAsync($"{GetApiBaseUrl()}/api/Fines/{id}/waive", content);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    _logger.LogInformation("Fine waived successfully for ID: {FineId}", id);
-                    return true;
-                }
-
-                var errorContent = await response.Content.ReadAsStringAsync();
-                _logger.LogWarning("Failed to waive fine. Status: {StatusCode}, Error: {Error}", response.StatusCode, errorContent);
-                return false;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error waiving fine for ID: {FineId}", id);
-                return false;
-            }
-        }
-
         public async Task<List<FineViewModel>> GetUserFinesAsync(string userId)
         {
             try

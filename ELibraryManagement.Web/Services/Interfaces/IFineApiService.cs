@@ -11,7 +11,6 @@ namespace ELibraryManagement.Web.Services.Interfaces
         Task<bool> CreateFineAsync(CreateFineRequest request);
         Task<bool> UpdateFineAsync(int id, UpdateFineRequest request);
         Task<bool> MarkFineAsPaidAsync(int id, string? notes = null);
-        Task<bool> WaiveFineAsync(int id, string reason, string? notes = null);
         Task<List<FineViewModel>> GetUserFinesAsync(string userId);
         Task<FineStatisticsViewModel> GetFineStatisticsAsync();
     }
