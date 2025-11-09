@@ -238,14 +238,4 @@ namespace ELibraryManagement.Web.Models
         public DateTime? DueDate { get; set; }
         public string? FineType { get; set; } // overdue, lost, damaged, other
     }
-
-    public class UpdateFineRequest
-    {
-        public decimal Amount { get; set; }
-        public string Reason { get; set; } = string.Empty;
-        public string? Description { get; set; }
-        public DateTime? DueDate { get; set; }
-        public string? Status { get; set; }
-        public string? Notes { get; set; }
-    }
 }

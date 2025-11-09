@@ -1372,36 +1372,6 @@ namespace ELibraryManagement.Web.Controllers
             }
         }
 
-        // POST: Admin/UpdateFine - Cập nhật phạt
-        [HttpPost]
-        public async Task<IActionResult> UpdateFine(int id, [FromBody] UpdateFineRequest model)
-        {
-            var accessCheck = await CheckAdminAccessAsync();
-            if (accessCheck != null) return Json(new { success = false, message = "Unauthorized" });
-
-            try
-            {
-                var token = _authApiService.GetCurrentToken();
-                _httpClient.DefaultRequestHeaders.Authorization =
-                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
-
-                var success = await _fineApiService.UpdateFineAsync(id, model);
-
-                if (success)
-                {
-                    return Json(new { success = true, message = "Cập nhật phạt thành công" });
-                }
-                else
-                {
-                    return Json(new { success = false, message = "Không thể cập nhật phạt" });
-                }
-            }
-            catch (Exception ex)
-            {
-                return Json(new { success = false, message = $"Có lỗi xảy ra: {ex.Message}" });
-            }
-        }
-
         // GET: Admin/GetUserFines/{userId} - Lấy danh sách phạt của user
         [HttpGet]
         public async Task<IActionResult> GetUserFines(string userId)

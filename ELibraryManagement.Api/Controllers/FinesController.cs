@@ -170,114 +170,6 @@ namespace ELibraryManagement.Api.Controllers
         }
 
         /// <summary>
-        /// Cập nhật phạt - Chỉ dành cho Admin
-        /// </summary>
-        [HttpPut("{id}")]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> UpdateFine(int id, [FromBody] UpdateFineRequest request)
-        {
-            try
-            {
-                var fine = await _context.Fines
-                    .Include(f => f.BorrowRecord)
-                        .ThenInclude(br => br!.Book)
-                    .FirstOrDefaultAsync(f => f.Id == id);
-
-                if (fine == null)
-                {
-                    return NotFound(new { message = "Không tìm thấy phạt" });
-                }
-
-                var oldStatus = fine.Status;
-                var oldAmount = fine.Amount;
-
-                fine.Amount = request.Amount;
-                fine.Reason = request.Reason;
-                fine.Description = request.Description;
-                fine.DueDate = request.DueDate;
-                fine.UpdatedAt = DateTime.UtcNow;
-
-                if (request.Status.HasValue)
-                {
-                    fine.Status = request.Status.Value;
-                    if (request.Status.Value == FineStatus.Paid && !fine.PaidDate.HasValue)
-                    {
-                        fine.PaidDate = DateTime.UtcNow;
-                    }
-
-                    // *** FIX: Handle BorrowRecord and CurrentBorrowCount when status changes to Paid ***
-                    if (request.Status.Value == FineStatus.Paid && oldStatus != FineStatus.Paid)
-                    {
-                        // Update borrow record status if exists (payment means book was returned)
-                        if (fine.BorrowRecord != null && fine.BorrowRecord.Status != BorrowStatus.Returned)
-                        {
-                            _logger.LogInformation("📚 Updating BorrowRecord via UpdateFine: ID={BorrowRecordId}, CurrentStatus={CurrentStatus}",
-                                fine.BorrowRecord.Id, fine.BorrowRecord.Status);
-
-                            fine.BorrowRecord.Status = BorrowStatus.Returned;
-                            fine.BorrowRecord.ReturnDate = DateTime.UtcNow;
-                            fine.BorrowRecord.UpdatedAt = DateTime.UtcNow;
-
-                            // Update book available quantity
-                            if (fine.BorrowRecord.Book != null)
-                            {
-                                fine.BorrowRecord.Book.AvailableQuantity++;
-                                fine.BorrowRecord.Book.UpdatedAt = DateTime.UtcNow;
-
-                                _logger.LogInformation("✅ Increased book {BookId} available quantity when fine {FineId} status updated to Paid",
-                                    fine.BorrowRecord.Book.Id, fine.Id);
-                            }
-
-                            // Decrement user's CurrentBorrowCount when book is returned
-                            _logger.LogInformation("👤 Decrementing CurrentBorrowCount for user: {UserId} (UpdateFine to Paid)", fine.UserId);
-                            await _userStatusService.DecrementBorrowCountAsync(fine.UserId);
-                            _logger.LogInformation("✅ Decremented CurrentBorrowCount for user {UserId} when fine {FineId} status updated to Paid", fine.UserId, fine.Id);
-                        }
-                    }
-                }
-
-                await _context.SaveChangesAsync();
-
-                // Create action history
-                var currentUserId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                if (!string.IsNullOrEmpty(currentUserId))
-                {
-                    var description = "Cập nhật phạt";
-                    if (oldStatus != fine.Status)
-                    {
-                        description += $" - Thay đổi trạng thái từ {oldStatus} thành {fine.Status}";
-                    }
-                    if (oldAmount != fine.Amount)
-                    {
-                        description += $" - Thay đổi số tiền từ {oldAmount:N0} VND thành {fine.Amount:N0} VND";
-                    }
-
-                    var actionHistory = new FineActionHistory
-                    {
-                        FineId = fine.Id,
-                        UserId = currentUserId,
-                        ActionType = fine.Status == FineStatus.Paid ? FineActionType.PaymentReceived : FineActionType.ReminderSent,
-                        Description = description,
-                        Amount = fine.Amount,
-                        Notes = request.Notes,
-                        ActionDate = DateTime.UtcNow,
-                        CreatedAt = DateTime.UtcNow
-                    };
-
-                    _context.FineActionHistories.Add(actionHistory);
-                    await _context.SaveChangesAsync();
-                }
-
-                return Ok(new { message = "Cập nhật phạt thành công" });
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error updating fine with ID: {FineId}", id);
-                return BadRequest(new { message = ex.Message });
-            }
-        }
-
-        /// <summary>
         /// Đánh dấu phạt đã thanh toán - Chỉ dành cho Admin
         /// </summary>
         [HttpPost("{id}/pay")]
@@ -482,16 +374,6 @@ namespace ELibraryManagement.Api.Controllers
         public string Reason { get; set; } = string.Empty;
         public string? Description { get; set; }
         public DateTime? DueDate { get; set; }
-    }
-
-    public class UpdateFineRequest
-    {
-        public decimal Amount { get; set; }
-        public string Reason { get; set; } = string.Empty;
-        public string? Description { get; set; }
-        public DateTime? DueDate { get; set; }
-        public FineStatus? Status { get; set; }
-        public string? Notes { get; set; }
     }
 
     public class PayFineRequest

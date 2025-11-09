@@ -129,32 +129,6 @@ namespace ELibraryManagement.Web.Services.Implementations
         //     }
         // }
 
-        public async Task<bool> UpdateFineAsync(int id, UpdateFineRequest request)
-        {
-            try
-            {
-                var json = JsonSerializer.Serialize(request, _jsonOptions);
-                var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-                var response = await _httpClient.PutAsync($"{GetApiBaseUrl()}/api/Fines/{id}", content);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    _logger.LogInformation("Fine updated successfully for ID: {FineId}", id);
-                    return true;
-                }
-
-                var errorContent = await response.Content.ReadAsStringAsync();
-                _logger.LogWarning("Failed to update fine. Status: {StatusCode}, Error: {Error}", response.StatusCode, errorContent);
-                return false;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error updating fine with ID: {FineId}", id);
-                return false;
-            }
-        }
-
         public async Task<bool> MarkFineAsPaidAsync(int id, string? notes = null)
         {
             try
