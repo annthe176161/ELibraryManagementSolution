@@ -1194,7 +1194,33 @@ namespace ELibraryManagement.Web.Controllers
                 else
                 {
                     var errorContent = await response.Content.ReadAsStringAsync();
-                    return Json(new { success = false, message = $"Lỗi từ API: {response.StatusCode} - {errorContent}" });
+
+                    // Try to extract meaningful error message from API response
+                    string errorMessage = "Có lỗi xảy ra khi lưu sách";
+                    try
+                    {
+                        var errorJson = JsonSerializer.Deserialize<JsonElement>(errorContent, _jsonOptions);
+                        if (errorJson.TryGetProperty("message", out var messageProp))
+                        {
+                            var rawMessage = messageProp.GetString() ?? "";
+                            // Clean up the message - remove "Details: " prefix if present
+                            if (rawMessage.Contains("Details:"))
+                            {
+                                errorMessage = rawMessage.Split("Details:")[1].Trim();
+                            }
+                            else
+                            {
+                                errorMessage = rawMessage;
+                            }
+                        }
+                    }
+                    catch
+                    {
+                        // If parsing fails, use the raw error content
+                        errorMessage = errorContent.Length > 100 ? errorContent.Substring(0, 100) + "..." : errorContent;
+                    }
+
+                    return Json(new { success = false, message = errorMessage });
                 }
             }
             catch (Exception ex)
@@ -1261,7 +1287,22 @@ namespace ELibraryManagement.Web.Controllers
                 else
                 {
                     var errorContent = await response.Content.ReadAsStringAsync();
-                    return Json(new { success = false, message = $"Lỗi từ API: {response.StatusCode} - {errorContent}" });
+                    string errorMessage = "Có lỗi xảy ra";
+
+                    try
+                    {
+                        var errorJson = System.Text.Json.JsonDocument.Parse(errorContent);
+                        if (errorJson.RootElement.TryGetProperty("message", out var messageElement))
+                        {
+                            errorMessage = messageElement.GetString() ?? errorMessage;
+                        }
+                    }
+                    catch
+                    {
+                        errorMessage = errorContent;
+                    }
+
+                    return Json(new { success = false, message = errorMessage });
                 }
             }
             catch (Exception ex)

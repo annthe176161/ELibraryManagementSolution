@@ -379,6 +379,18 @@ namespace ELibraryManagement.Api.Services.Implementations
                 throw new ArgumentException("ISBN không được vượt quá 13 ký tự");
             }
 
+            // Check if ISBN already exists (for non-deleted books)
+            if (!string.IsNullOrEmpty(createBookDto.ISBN))
+            {
+                var existingBook = await _context.Books
+                    .FirstOrDefaultAsync(b => b.ISBN == createBookDto.ISBN && !b.IsDeleted);
+
+                if (existingBook != null)
+                {
+                    throw new ArgumentException($"ISBN '{createBookDto.ISBN}' đã tồn tại trong hệ thống");
+                }
+            }
+
             var book = new Book
             {
                 Title = createBookDto.Title,
@@ -444,6 +456,18 @@ namespace ELibraryManagement.Api.Services.Implementations
                 throw new ArgumentException($"Không tìm thấy sách với ID {updateBookDto.Id}");
             }
 
+            // Check if ISBN already exists (for other non-deleted books)
+            if (!string.IsNullOrEmpty(updateBookDto.ISBN) && book.ISBN != updateBookDto.ISBN)
+            {
+                var existingBook = await _context.Books
+                    .FirstOrDefaultAsync(b => b.ISBN == updateBookDto.ISBN && !b.IsDeleted && b.Id != updateBookDto.Id);
+
+                if (existingBook != null)
+                {
+                    throw new ArgumentException($"ISBN '{updateBookDto.ISBN}' đã tồn tại trong hệ thống");
+                }
+            }
+
             // Update book properties
             book.Title = updateBookDto.Title;
             book.Author = updateBookDto.Author;
@@ -495,11 +519,18 @@ namespace ELibraryManagement.Api.Services.Implementations
                 return false;
             }
 
-            // Check if book has active borrows
-            var hasActiveBorrows = book.BorrowRecords.Any(br => br.Status == BorrowStatus.Borrowed);
+            // Check if book has pending borrow requests (Requested status)
+            var hasPendingRequests = book.BorrowRecords.Any(br => br.Status == BorrowStatus.Requested);
+            if (hasPendingRequests)
+            {
+                throw new InvalidOperationException("Không thể xóa sách có yêu cầu mượn đang chờ xác nhận");
+            }
+
+            // Check if book has active borrows (Borrowed or Overdue status)
+            var hasActiveBorrows = book.BorrowRecords.Any(br => br.Status == BorrowStatus.Borrowed || br.Status == BorrowStatus.Overdue);
             if (hasActiveBorrows)
             {
-                throw new InvalidOperationException("Không thể xóa sách đang được mượn");
+                throw new InvalidOperationException("Không thể xóa sách đang được mượn hoặc quá hạn");
             }
 
             // Soft delete
