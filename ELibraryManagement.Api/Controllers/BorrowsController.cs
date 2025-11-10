@@ -121,53 +121,6 @@ namespace ELibraryManagement.Api.Controllers
         }
 
         /// <summary>
-        /// Lấy danh sách trạng thái có thể chuyển từ trạng thái hiện tại - Chỉ dành cho Admin
-        /// <summary>
-        /// Lấy danh sách sách sắp hết hạn - Chỉ dành cho Admin
-        /// </summary>
-        [HttpGet("admin/due-soon")]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> GetBooksDueSoon([FromQuery] int days = 7)
-        {
-            try
-            {
-                var today = DateTime.UtcNow.ToVietnamTime().Date;
-                var targetDate = today.AddDays(days);
-
-                var dueSoonBooks = await _context.BorrowRecords
-                    .Include(br => br.User)
-                    .Include(br => br.Book)
-                    .Where(br => br.Status == BorrowStatus.Borrowed &&
-                               br.ReturnDate == null &&
-                               br.DueDate.Date >= today &&
-                               br.DueDate.Date <= targetDate)
-                    .OrderBy(br => br.DueDate)
-                    .Select(br => new
-                    {
-                        id = br.Id,
-                        bookTitle = br.Book.Title,
-                        userName = $"{br.User.FirstName} {br.User.LastName}".Trim(),
-                        userEmail = br.User.Email,
-                        borrowDate = br.BorrowDate,
-                        dueDate = br.DueDate,
-                        daysLeft = (br.DueDate.ToVietnamTime().Date - today).Days,
-                        canExtend = br.CanExtend,
-                        extensionCount = br.ExtensionCount,
-                        isOverdue = br.IsOverdue,
-                        lastReminderSent = br.Notes != null && br.Notes.Contains("REMINDER_")
-                            ? "Đã gửi" : "Chưa gửi"
-                    })
-                    .ToListAsync();
-
-                return Ok(dueSoonBooks);
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-        }
-
-        /// <summary>
         /// Lấy lịch sử mượn sách của một user - Chỉ dành cho Admin
         /// </summary>
         [HttpGet("user/{userId}")]
@@ -283,25 +236,6 @@ namespace ELibraryManagement.Api.Controllers
                 }
 
                 return Ok(new { message = "Đã phê duyệt yêu cầu mượn sách thành công." });
-            }
-            catch (Exception ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-        }
-
-        [HttpPost("admin/process-overdue")]
-        [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> ProcessOverdueBooks([FromServices] IOverdueProcessingService overdueService)
-        {
-            try
-            {
-                var processedCount = await overdueService.ProcessOverdueBooksAsync();
-                return Ok(new
-                {
-                    message = $"Đã xử lý {processedCount} borrow records quá hạn",
-                    processedCount = processedCount
-                });
             }
             catch (Exception ex)
             {
