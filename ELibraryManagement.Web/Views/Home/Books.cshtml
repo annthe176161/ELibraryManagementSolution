@@ -688,17 +688,17 @@
         <form method="get" action="@Url.Action("Books", "Home")" class="filter-form">
             <div class="row">
                 <!-- Search -->
-                <div class="col-md-6 mb-3">
+                <div class="col-md-4 mb-3">
                     <label class="form-label">
                         <i class="fas fa-search"></i>
                         Tìm kiếm sách
                     </label>
                     <input type="text" name="search" class="form-control"
-                        placeholder="Nhập tên sách, tác giả hoặc từ khóa..." value="@ViewBag.Search">
+                        placeholder="Nhập tên sách hoặc từ khóa..." value="@ViewBag.Search">
                 </div>
 
                 <!-- Category Filter -->
-                <div class="col-md-6 mb-3">
+                <div class="col-md-4 mb-3">
                     <label class="form-label">
                         <i class="fas fa-tags"></i>
                         Thể loại
@@ -718,29 +718,8 @@
                     </select>
                 </div>
 
-                <!-- Author Filter -->
-                <div class="col-md-6 mb-3">
-                    <label class="form-label">
-                        <i class="fas fa-user-edit"></i>
-                        Tác giả
-                    </label>
-                    <select name="author" class="form-select">
-                        <option value="">-- Tất cả tác giả --</option>
-                        @if (ViewBag.Authors != null)
-                        {
-                            foreach (string author in ViewBag.Authors)
-                            {
-                                var isSelected = ViewBag.Author == author;
-                                <option value="@author" selected="@isSelected">
-                                    @author
-                                </option>
-                            }
-                        }
-                    </select>
-                </div>
-
                 <!-- Sort By -->
-                <div class="col-md-6 mb-3">
+                <div class="col-md-4 mb-3">
                     <label class="form-label">
                         <i class="fas fa-sort"></i>
                         Sắp xếp theo
@@ -748,8 +727,6 @@
                     <select name="sortBy" class="form-select">
                         <option value="title" selected="@(ViewBag.SortBy == "title")">Tên sách (A-Z)</option>
                         <option value="title_desc" selected="@(ViewBag.SortBy == "title_desc")">Tên sách (Z-A)</option>
-                        <option value="author" selected="@(ViewBag.SortBy == "author")">Tác giả (A-Z)</option>
-                        <option value="author_desc" selected="@(ViewBag.SortBy == "author_desc")">Tác giả (Z-A)</option>
                         <option value="year" selected="@(ViewBag.SortBy == "year")">Năm xuất bản (Mới nhất)</option>
                         <option value="year_asc" selected="@(ViewBag.SortBy == "year_asc")">Năm xuất bản (Cũ nhất)</option>
                     </select>
@@ -1084,26 +1061,6 @@
             categorySelect.addEventListener('change', function () {
                 console.log('Category changed:', this.value);
                 // Reset to page 1 when changing category
-                const form = this.form;
-                const pageInput = form.querySelector('input[name="page"]');
-                if (pageInput) pageInput.value = '1';
-                else {
-                    const hiddenPageInput = document.createElement('input');
-                    hiddenPageInput.type = 'hidden';
-                    hiddenPageInput.name = 'page';
-                    hiddenPageInput.value = '1';
-                    form.appendChild(hiddenPageInput);
-                }
-                form.submit();
-            });
-        }
-
-        // Auto-submit form when author changes
-        const authorSelect = document.querySelector('select[name="author"]');
-        if (authorSelect) {
-            authorSelect.addEventListener('change', function () {
-                console.log('Author changed:', this.value);
-                // Reset to page 1 when changing author
                 const form = this.form;
                 const pageInput = form.querySelector('input[name="page"]');
                 if (pageInput) pageInput.value = '1';

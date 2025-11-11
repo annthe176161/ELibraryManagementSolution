@@ -140,8 +140,6 @@ namespace ELibraryManagement.Web.Controllers
                         FullName = $"{currentUser?.FirstName} {currentUser?.LastName}".Trim() ?? userName ?? "Nguyễn Văn An",
                         Email = currentUser?.Email ?? "anNV@fpt.edu.vn",
                         PhoneNumber = currentUser?.PhoneNumber ?? "0123 456 789",
-                        Major = "Công nghệ thông tin", // This might come from a different field or table
-                        AcademicYear = "2021 - 2025", // This might be calculated from registration date
                         StudentStatus = "Đang học" // This might come from user status
                     }
                 };
@@ -248,8 +246,6 @@ namespace ELibraryManagement.Web.Controllers
                         FullName = $"{currentUser?.FirstName} {currentUser?.LastName}".Trim() ?? _authApiService.GetCurrentUserName() ?? "Nguyễn Văn An",
                         Email = currentUser?.Email ?? "anNV@fpt.edu.vn",
                         PhoneNumber = currentUser?.PhoneNumber ?? "0123 456 789",
-                        Major = "Công nghệ thông tin",
-                        AcademicYear = "2021 - 2025",
                         StudentStatus = "Đang học"
                     };
 
@@ -288,8 +284,6 @@ namespace ELibraryManagement.Web.Controllers
                             FullName = $"{currentUser?.FirstName} {currentUser?.LastName}".Trim() ?? _authApiService.GetCurrentUserName() ?? "Nguyễn Văn An",
                             Email = currentUser?.Email ?? "anNV@fpt.edu.vn",
                             PhoneNumber = currentUser?.PhoneNumber ?? "0123 456 789",
-                            Major = "Công nghệ thông tin",
-                            AcademicYear = "2021 - 2025",
                             StudentStatus = "Đang học"
                         };
 

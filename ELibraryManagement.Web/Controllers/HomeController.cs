@@ -38,15 +38,12 @@ namespace ELibraryManagement.Web.Controllers
                 {
                     var pagedBooks = await _bookApiService.GetAvailableBooksPagedAsync(search, category, author, sortBy, page, pageSize);
 
-                    // Lấy danh sách categories và authors để hiển thị trong filter
+                    // Lấy danh sách categories để hiển thị trong filter
                     var categories = await _bookApiService.GetCategoriesAsync();
-                    var authors = await _bookApiService.GetAuthorsAsync();
 
                     ViewBag.Categories = categories;
-                    ViewBag.Authors = authors;
                     ViewBag.Search = search;
                     ViewBag.Category = category;
-                    ViewBag.Author = author;
                     ViewBag.SortBy = sortBy;
                     ViewBag.Page = page;
                     ViewBag.PageSize = pageSize;
@@ -66,15 +63,12 @@ namespace ELibraryManagement.Web.Controllers
                     // Fallback to old method
                     var books = await _bookApiService.GetAvailableBooksAsync(search, category, author, sortBy, page, pageSize);
 
-                    // Lấy danh sách categories và authors để hiển thị trong filter
+                    // Lấy danh sách categories để hiển thị trong filter
                     var categories = await _bookApiService.GetCategoriesAsync();
-                    var authors = await _bookApiService.GetAuthorsAsync();
 
                     ViewBag.Categories = categories;
-                    ViewBag.Authors = authors;
                     ViewBag.Search = search;
                     ViewBag.Category = category;
-                    ViewBag.Author = author;
                     ViewBag.SortBy = sortBy;
                     ViewBag.Page = page;
                     ViewBag.PageSize = pageSize;
@@ -96,10 +90,8 @@ namespace ELibraryManagement.Web.Controllers
 
                 // Set empty pagination values for error case
                 ViewBag.Categories = new List<string>();
-                ViewBag.Authors = new List<string>();
                 ViewBag.Search = search;
                 ViewBag.Category = category;
-                ViewBag.Author = author;
                 ViewBag.SortBy = sortBy;
                 ViewBag.Page = page;
                 ViewBag.PageSize = pageSize;

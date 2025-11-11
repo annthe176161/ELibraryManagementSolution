@@ -99,7 +99,7 @@ namespace ELibraryManagement.Web.Services.Implementations
                 _httpClient.DefaultRequestHeaders.Authorization =
                     new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
 
-                var apiUrl = $"{_configuration["ApiSettings:BaseUrl"]}/api/Borrows/borrow";
+                var apiUrl = $"{_configuration["ApiSettings:BaseUrl"]}/api/Books/borrow";
                 var requestContent = new StringContent(
                     JsonSerializer.Serialize(new { BookId = bookId }),
                     Encoding.UTF8,
