@@ -118,8 +118,8 @@ namespace ELibraryManagement.Api.Services.Implementations
                         Amount = fineAmount,
                         Reason = $"Quá hạn {overdueDays} ngày - Sách: {borrowRecord.Book.Title}",
                         Status = FineStatus.Pending,
-                        CreatedAt = DateTime.UtcNow,
-                        DueDate = DateTime.UtcNow.AddDays(_overdueSettings.FinePaymentDueDays)
+                        CreatedAt = DateTime.UtcNow
+                        // Không cần DueDate - phạt tính liên tục theo số ngày quá hạn
                     };
 
                     _context.Fines.Add(fine);
@@ -207,19 +207,15 @@ namespace ELibraryManagement.Api.Services.Implementations
                 return 0;
 
             // Tính phạt cố định: 5,000 VNĐ/ngày
+            // Phạt tiếp tục tính theo số ngày quá hạn thực tế, không bị giới hạn tối đa
             decimal totalFine = overdueDays * _overdueSettings.DailyFine;
 
-            // Giới hạn phạt tối đa
-            return Math.Min(totalFine, _overdueSettings.MaxFineAmount);
+            return totalFine;
         }
     }
 
     public class OverdueSettings
     {
-        public decimal DailyFine { get; set; } = 5000; // 5,000 VNĐ/ngày
-
-        public decimal MaxFineAmount { get; set; } = 500000; // Phạt tối đa 500,000 VNĐ
-
-        public int FinePaymentDueDays { get; set; } = 30; // Hạn thanh toán phạt: 30 ngày
+        public decimal DailyFine { get; set; } = 5000; // 5,000 VNĐ/ngày - phạt tính liên tục theo số ngày quá hạn thực tế
     }
 }
