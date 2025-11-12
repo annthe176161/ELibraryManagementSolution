@@ -48,7 +48,7 @@ namespace ELibraryManagement.Api
             builder.Services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                // options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             })
             .AddJwtBearer(options =>
             {
@@ -63,22 +63,22 @@ namespace ELibraryManagement.Api
                     IssuerSigningKey = new SymmetricSecurityKey(
                         Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"] ?? "default-secret-key-for-development-only"))
                 };
-            })
-            .AddGoogle(options =>
-            {
-                options.ClientId = builder.Configuration["Authentication:Google:ClientId"] ?? "";
-                options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"] ?? "";
-                options.CallbackPath = "/signin-google";
-
-                // Thêm các options để tương thích với chính sách mới của Google
-                options.Scope.Add("openid");
-                options.Scope.Add("profile");
-                options.Scope.Add("email");
-
-                // Đảm bảo sử dụng HTTPS và user agent tương thích
-                options.SaveTokens = true;
-                options.AccessType = "offline";
             });
+            //.AddGoogle(options =>
+            //{
+            //    options.ClientId = builder.Configuration["Authentication:Google:ClientId"] ?? "";
+            //    options.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"] ?? "";
+            //    options.CallbackPath = "/signin-google";
+
+            //    // Thêm các options để tương thích với chính sách mới của Google
+            //    options.Scope.Add("openid");
+            //    options.Scope.Add("profile");
+            //    options.Scope.Add("email");
+
+            //    // Đảm bảo sử dụng HTTPS và user agent tương thích
+            //    options.SaveTokens = true;
+            //    options.AccessType = "offline";
+            //});
 
             // Register services
             builder.Services.AddScoped<IBookService, BookService>();

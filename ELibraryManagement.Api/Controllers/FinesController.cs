@@ -48,7 +48,15 @@ namespace ELibraryManagement.Api.Controllers
                 // Search by user name or email
                 if (!string.IsNullOrEmpty(search))
                 {
-                    query = query.Where(f => f.User.FullName.Contains(search) || f.User.Email!.Contains(search));
+                    if (!string.IsNullOrEmpty(search))
+                    {
+                        query = query.Where(f =>
+                            f.User.FirstName.Contains(search) ||
+                            f.User.LastName.Contains(search) ||
+                            f.User.Email.Contains(search)
+                        );
+                    }
+
                 }
 
                 var totalCount = await query.CountAsync();
